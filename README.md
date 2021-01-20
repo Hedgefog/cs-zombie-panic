@@ -4,6 +4,10 @@ __Version:__ 0.9.5
 ### Download latest:
 - [Releases](./releases)
 
+### Requirements
+- Amx Mod X 1.9.0+
+- ReAPI
+
 ### Deployment
 - Clone repository.
 - Extract compiler executable and includes to _"compiler"_ folder of project.
