@@ -1,0 +1,4 @@
+3
+weapon			640 640hud2	0	90	170	45
+weapon_s		640 640hud5	0	90	170	45
+ammo				640	zombiepanic/b1/640zombiehead	0	0	56 300

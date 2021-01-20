@@ -1,0 +1,15 @@
+gfx/env/duskbk.tga
+gfx/env/duskdn.tga
+gfx/env/duskft.tga
+gfx/env/dusklf.tga
+gfx/env/duskrt.tga
+gfx/env/duskup.tga
+halflife.wad
+sound/ambience/computalk1.wav
+sound/ambience/industrial1.wav
+sound/ambience/techamb2.wav
+sprites/glow01.spr
+zp_contingency.wad
+maps/zpo_contingency.txt
+maps/zpo_contingency.res
+zpo_contingency_final_layout.jpg

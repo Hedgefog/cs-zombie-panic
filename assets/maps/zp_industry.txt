@@ -1,0 +1,39 @@
+-------======= Readme.txt for ZP_INDUSTRY =======-------
+--------------------------------------------------------
+
+------General Information--------------------------------------------
+
+Title		: Industry
+Author		: Philip "Paladin" Johannes
+Author Email	: leveldesigner@arcor.de	
+Home page	: www.leveldesigner.tk
+
+------Credits and Thanks---------------------------------------------
+
+Thanks to :
+MikeZilla - For his textures
+Poke646 Team - For their textures
+Wadfather - For another bunch of great textures
+Relic25 - For his textures
+Spooger - For his textures
+Cstrike Team - For some textures and the skymap
+Valve - For simply making Half-Life the game we all love
+
+------Additional Info, Tips, and Notes-------------------------------
+
+ZP_INDUSTRY is set in an industrial part of a larger city and focuses on
+a dark and moody atmosphere.
+
+------Play Information-----------------------------------------------
+
+Single Player   : No
+Deathmatch	: Yes
+Teamplay        : No
+Modification    : Zombie Panic!
+How Many Players: 6-16
+
+------Construction---------------------------------------------------
+
+Editor(s) used	: Worldcraft 3.5
+Compile Machine	: Athlon 2400xp with 512MB DDR SDRAM
+Compile time	: about 2 and a half hours

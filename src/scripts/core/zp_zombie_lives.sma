@@ -1,0 +1,104 @@
+#pragma semicolon 1
+
+#include <amxmodx>
+#include <hamsandwich>
+#include <reapi>
+
+#include <api_rounds>
+
+#include <zombiepanic>
+
+#define PLUGIN "[Zombie Panic] Zombie Lives"
+#define AUTHOR "Hedgehog Fog"
+
+#define TASKID_PLAYER_RESPAWN 100
+
+#define SPAWN_DELAY 5.0
+
+new g_iLives = 0;
+
+new g_pCvarLives;
+
+public plugin_init() {
+    register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+
+    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
+
+    g_pCvarLives = register_cvar("zp_zombie_lives", "20");
+}
+
+public plugin_natives() {
+  register_native("ZP_GameRules_GetZombieLives", "Native_GetZombieLives");
+  register_native("ZP_GameRules_SetZombieLives", "Native_SetZombieLives");
+}
+
+public Native_GetZombieLives(iPluginId, iArgc) {
+  return g_iLives;
+}
+
+public Native_SetZombieLives(iPluginId, iArgc) {
+  g_iLives = get_param(1);
+}
+
+public Zp_Fw_PlayerJoined(pPlayer) {
+    ExecuteHam(Ham_Player_PreThink, pPlayer);
+
+    if (!is_user_alive(pPlayer)) {
+      set_task(SPAWN_DELAY, "TaskRespawnPlayer", TASKID_PLAYER_RESPAWN + pPlayer);
+    }
+
+    return PLUGIN_HANDLED;
+}
+
+public Round_Fw_RoundStart() {
+  g_iLives = ZP_GameRules_GetObjectiveMode() ? 255 : get_pcvar_num(g_pCvarLives);
+}
+
+public OnPlayerSpawn_Post(pPlayer) {
+  remove_task(pPlayer);
+}
+
+public OnPlayerKilled_Post(pPlayer) {
+  if (!ZP_Player_IsZombie(pPlayer) && !ZP_GameRules_GetObjectiveMode()) {
+    g_iLives++;
+  }
+
+  remove_task(pPlayer);
+  set_task(SPAWN_DELAY, "TaskRespawnPlayer", TASKID_PLAYER_RESPAWN + pPlayer);
+}
+
+public TaskRespawnPlayer(iTaskId) {
+  new pPlayer = iTaskId - TASKID_PLAYER_RESPAWN;
+  RespawnPlayer(pPlayer);
+}
+
+RespawnPlayer(pPlayer) {
+  if (!g_iLives) {
+    set_task(SPAWN_DELAY, "TaskRespawnPlayer", TASKID_PLAYER_RESPAWN + pPlayer);
+    return;
+  }
+
+  if (!is_user_connected(pPlayer)) {
+      return;
+  }
+
+  if (is_user_alive(pPlayer)) {
+      return;
+  }
+
+  new iTeam = get_member(pPlayer, m_iTeam);
+  if (iTeam != ZP_ZOMBIE_TEAM && iTeam != ZP_HUMAN_TEAM) {
+      return;
+  }
+
+  if (ZP_Player_IsZombie(pPlayer)) {
+    if (!ZP_GameRules_GetObjectiveMode()) {
+      g_iLives--;
+    }
+  } else {
+    set_member(pPlayer, m_iTeam, ZP_ZOMBIE_TEAM);
+  }
+
+  ExecuteHamB(Ham_CS_RoundRespawn, pPlayer);
+}
