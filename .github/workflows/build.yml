@@ -92,7 +92,7 @@
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
             upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: ./dist/bundles/full/zombiepanic-${{ steps.buildvars.outputs.tagversion }}-addons-build.zip
+            asset_path: ./dist/bundles/full/zombiepanic-${{ steps.buildvars.outputs.tagversion }}-addons.zip
             asset_name: zombiepanic-${{ steps.buildvars.outputs.tagversion }}-addons-build.zip
             asset_content_type: application/zip
         - name: Upload Release Resources
