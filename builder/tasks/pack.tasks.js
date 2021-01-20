@@ -100,15 +100,15 @@ gulp.task('pack:full', () => {
         .pipe(gulp.dest(buildDir));
 });
 
-gulp.task('pack:sdk', () => {
-    const buildDir = resolveBundledDir('sdk');
-    const sdkArchiveName = resolveArchiveName('sdk');
+// gulp.task('pack:sdk', () => {
+//     const buildDir = resolveBundledDir('sdk');
+//     const sdkArchiveName = resolveArchiveName('sdk');
 
-    return gulp.src([
-        config.sdk.dir + '/**'
-    ])
-        .pipe(zip(sdkArchiveName))
-        .pipe(gulp.dest(buildDir));
-});
+//     return gulp.src([
+//         config.sdk.dir + '/**'
+//     ])
+//         .pipe(zip(sdkArchiveName))
+//         .pipe(gulp.dest(buildDir));
+// });
 
-gulp.task('pack', gulp.series('pack:full', 'pack:src', 'pack:sdk'));
+gulp.task('pack', gulp.series('pack:full', 'pack:src'));
