@@ -69,17 +69,17 @@ public @Weapon_PrimaryAttack(this) {
 
   if (pHit < 0) {
     switch (random(3)) {
-      case 0: CW_PlayAnimation(this, 4, 0.25);
-      case 1: CW_PlayAnimation(this, 5, 0.25);
-      case 2: CW_PlayAnimation(this, 7, 0.25);
+      case 0: CW_PlayAnimation(this, 4, 11.0 / 22.0);
+      case 1: CW_PlayAnimation(this, 5, 14.0 / 22.0);
+      case 2: CW_PlayAnimation(this, 7, 19.0 / 24.0);
     }
 
     emit_sound(pPlayer, CHAN_ITEM, ZP_WEAPON_CROWBAR_MISS_SOUND, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
   } else {
     switch (random(3)) {
-      case 0: CW_PlayAnimation(this, 3, 0.25);
-      case 1: CW_PlayAnimation(this, 6, 0.25);
-      case 2: CW_PlayAnimation(this, 8, 0.25);
+      case 0: CW_PlayAnimation(this, 3, 11.0 / 22.0);
+      case 1: CW_PlayAnimation(this, 6, 14.0 / 22.0);
+      case 2: CW_PlayAnimation(this, 8, 19.0 / 24.0);
     }
 
     if (UTIL_IsPlayer(pHit)) {
