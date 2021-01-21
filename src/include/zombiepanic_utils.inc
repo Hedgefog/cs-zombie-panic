@@ -91,3 +91,13 @@ stock UTIL_BeamPoints(const Float:vecStart[3], const Float:vecEnd[3], const colo
     write_byte(10);	// scroll speed in 0.1's
     message_end();
 }
+
+stock bool:UTIL_IsMasterTriggered(const szMaster[], pActivator) {
+    new pMaster = engfunc(EngFunc_FindEntityByString, 0, "targetname", szMaster);
+
+    if (pMaster && (ExecuteHam(Ham_ObjectCaps, pMaster) & FCAP_MASTER)) {
+        return !!ExecuteHamB(Ham_IsTriggered, pMaster, pActivator);
+    }
+
+    return true;
+}

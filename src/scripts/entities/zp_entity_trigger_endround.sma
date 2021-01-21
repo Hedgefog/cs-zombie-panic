@@ -34,6 +34,7 @@ public plugin_precache() {
     );
 
     CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME, "OnSpawn");
+    CE_RegisterHook(CEFunction_KVD, ENTITY_NAME, "OnKvd");
 }
 
 public Round_Fw_RoundStart() {
@@ -45,6 +46,12 @@ public OnSpawn(pEntity) {
     set_pev(pEntity, pev_movetype, MOVETYPE_NONE);
     set_pev(pEntity, pev_effects, EF_NODRAW);
     ZP_GameRules_SetObjectiveMode(true);
+}
+
+public OnKvd(pEntity, const szKey[], const szValue[]) {
+    if (equal(szKey, "master")) {
+        set_pev(pEntity, pev_message, szValue);
+    }
 }
 
 public OnTouch_Post(pEntity, pToucher) {
@@ -61,6 +68,13 @@ public OnTouch_Post(pEntity, pToucher) {
     }
 
     if (g_bDispatched) {
+        return HAM_IGNORED;
+    }
+
+    static szMaster[32];
+    pev(pEntity, pev_message, szMaster, charsmax(szMaster));
+
+    if (!UTIL_IsMasterTriggered(szMaster, pToucher)) {
         return HAM_IGNORED;
     }
 
