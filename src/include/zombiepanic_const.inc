@@ -78,6 +78,18 @@ stock const ZP_CHARACTER_FOLDER[] = "models/zombiepanic/b1/characters";
 
 stock const ZP_STARTUP_SOUND[] = "sound/zombiepanic/b1/music/gamestartup.mp3";
 
+stock const ZP_MUSIC_LIST[][ZP_Music] = {
+  { "sound/zombiepanic/b1/music/KM_CityOfSouls.mp3", 3.32},
+  { "sound/zombiepanic/b1/music/KM_CloudOfSorrow.mp3", 4.07},
+  { "sound/zombiepanic/b1/music/KM_Descent.mp3", 4.18},
+  { "sound/zombiepanic/b1/music/KM_ForgottenKingdom.mp3", 2.56},
+  { "sound/zombiepanic/b1/music/KM_FrozenWasteland.mp3", 4.54},
+  { "sound/zombiepanic/b1/music/KM_Horde.mp3", 4.56},
+  { "sound/zombiepanic/b1/music/KM_Nightmare.mp3", 4.53},
+  { "sound/zombiepanic/b1/music/KM_Orphanage.mp3", 3.27},
+  { "sound/zombiepanic/b1/music/KM_Plague.mp3", 3.10},
+};
+
 stock const ZP_WEAPON_PISTOL_HUD_TXT[] = "sprites/zombiepanic/b1/weapon_9mmhandgun.txt";
 stock const ZP_WEAPON_MAGNUM_HUD_TXT[] = "sprites/zombiepanic/b1/weapon_357.txt";
 stock const ZP_WEAPON_RIFLE_HUD_TXT[] = "sprites/zombiepanic/b1/weapon_556ar.txt";
