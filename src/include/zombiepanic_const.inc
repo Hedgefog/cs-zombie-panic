@@ -14,6 +14,11 @@
 #define ZP_NEW_ROUND_DELAY 5.0
 #define ZP_AMMO_RESPAWN_TIME 150.0
 
+enum ZP_Music {
+  ZP_Music_Path[64],
+  Float:ZP_Music_Duration
+}
+
 stock const ZP_WEAPON_PISTOL[] = "zombiepanic/b1/weapon_9mmhandgun";
 stock const ZP_WEAPON_RIFLE[] = "zombiepanic/b1/weapon_556AR";
 stock const ZP_WEAPON_SHOTGUN[] = "zombiepanic/b1/weapon_shotgun";

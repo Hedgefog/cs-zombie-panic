@@ -13,11 +13,6 @@ enum ZP_CharacterModels {
   CharacterModel_Swipe
 }
 
-enum ZP_Music {
-  ZP_Music_Path[64],
-  Float:ZP_Music_Duration
-}
-
 // Player
 
 native bool:ZP_Player_IsZombie(pPlayer);

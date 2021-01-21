@@ -13,6 +13,7 @@
 #define MUSIC_DELAY 3.0
 
 new bool:g_bPlayerMusic[MAX_PLAYERS + 1];
+new g_pCvarMusic;
 
 public plugin_precache() {
   precache_generic(ZP_STARTUP_SOUND);
@@ -26,6 +27,8 @@ public plugin_init() {
   register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
   RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
+
+  g_pCvarMusic = register_cvar("zp_music", "1");
 }
 
 public client_connect(pPlayer) {
@@ -33,9 +36,14 @@ public client_connect(pPlayer) {
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
-  if (!g_bPlayerMusic[pPlayer]) {
-    set_task(MUSIC_DELAY, "TaskPlay", TASKID_PLAY_NEXT_TRACK + pPlayer);
-    g_bPlayerMusic[pPlayer] = true;
+  if (get_pcvar_num(g_pCvarMusic)) {
+    if (!g_bPlayerMusic[pPlayer]) {
+      set_task(MUSIC_DELAY, "TaskPlay", TASKID_PLAY_NEXT_TRACK + pPlayer);
+      g_bPlayerMusic[pPlayer] = true;
+    }
+  } else {
+    remove_task(TASKID_PLAY_NEXT_TRACK + pPlayer);
+    g_bPlayerMusic[pPlayer] = false;
   }
 }
 
