@@ -43,7 +43,7 @@ public plugin_init() {
 }
 
 public @Weapon_PrimaryAttack(this) {
-  if (CW_DefaultShotgunShot(this, 6.0, 1.0, 0.5, Float:VECTOR_CONE_15DEGREES, 16)) {
+  if (CW_DefaultShotgunShot(this, 6.0, 1.0, 0.5, Float:{0.0975, 0.0975, 0.0975}, 16)) {
     CW_PlayAnimation(this, 1, 1.5);
     new pPlayer = CW_GetPlayer(this);
     emit_sound(pPlayer, CHAN_WEAPON, ZP_WEAPON_SHOTGUN_SHOT_SOUND, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
