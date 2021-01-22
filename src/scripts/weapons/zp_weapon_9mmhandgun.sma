@@ -3,10 +3,11 @@
 #include <amxmodx>
 #include <fakemeta>
 #include <reapi>
-
-#include <api_custom_weapons>
+#include <xs>
 
 #include <zombiepanic>
+#include <zombiepanic_utils>
+#include <api_custom_weapons>
 
 #define PLUGIN "[Zombie Panic] Weapon 9mm Handgun"
 #define AUTHOR "Hedgehog Fog"
@@ -57,9 +58,12 @@ public @Weapon_Idle(this) {
 public @Weapon_PrimaryAttack(this) {
   if (get_member(this, m_Weapon_iShotsFired) > 0) {
     return;
-  } 
+  }
 
-  if (CW_DefaultShot(this, 15.0, 0.2, Float:VECTOR_CONE_2DEGREES)) {
+  static Float:vecSpread[3];
+  UTIL_CalculateWeaponSpread(this, Float:VECTOR_CONE_2DEGREES, 3.0, 0.95, 3.5, vecSpread);
+
+  if (CW_DefaultShot(this, 15.0, 0.2, vecSpread)) {
     CW_PlayAnimation(this, 3, 0.71);
     new pPlayer = CW_GetPlayer(this);
     emit_sound(pPlayer, CHAN_WEAPON, ZP_WEAPON_PISTOL_SHOT_SOUND, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);

@@ -101,3 +101,24 @@ stock bool:UTIL_IsMasterTriggered(const szMaster[], pActivator) {
 
     return true;
 }
+
+stock UTIL_CalculateWeaponSpread(pWeapon, const Float:vecSpread[3], Float:flMovementFactor, Float:flDuckFactor, Float:flAirFactor, Float:vecOut[3]) {
+  new pPlayer = get_member(pWeapon, m_pPlayer);
+  new iShotsFired = get_member(pWeapon, m_Weapon_iShotsFired);
+
+  xs_vec_copy(vecSpread, vecOut);
+  
+  static Float:vecVelocity[3];
+  pev(pPlayer, pev_velocity, vecVelocity);
+  if (iShotsFired > 0 && xs_vec_len(vecVelocity) > 0) {
+    xs_vec_mul_scalar(vecOut, flMovementFactor, vecOut);
+  }
+
+  if (pev(pPlayer, pev_flags) & FL_DUCKING) {
+    xs_vec_mul_scalar(vecOut, flDuckFactor, vecOut);
+  }
+
+  if (~pev(pPlayer, pev_flags) & FL_ONGROUND) {
+    xs_vec_mul_scalar(vecOut, flAirFactor, vecOut);
+  }
+}
