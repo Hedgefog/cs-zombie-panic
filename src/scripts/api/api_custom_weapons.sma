@@ -758,6 +758,7 @@ WeaponHolster(this) {
   new pPlayer = GetPlayer(this);
   SetWeaponPrediction(pPlayer, true);
   set_member(this, m_Weapon_fInReload, 0);
+  set_member(this, m_Weapon_fInSpecialReload, 0);
 
   if (ExecuteBindedFunction(CWB_Holster, this) > PLUGIN_CONTINUE) {
     return;
