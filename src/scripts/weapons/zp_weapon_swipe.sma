@@ -58,7 +58,7 @@ public @Weapon_PrimaryAttack(this) {
 
   if (pHit < 0) {
     switch (random(3)) {
-      case 0: CW_PlayAnimation(this, 1, 11.0 / 22.0);
+      case 0: CW_PlayAnimation(this, 4, 11.0 / 22.0);
       case 1: CW_PlayAnimation(this, 5, 14.0 / 22.0);
       case 2: CW_PlayAnimation(this, 7, 19.0 / 24.0);
     }
