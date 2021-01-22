@@ -62,6 +62,10 @@ public OnPlayerSpawn_Post(pPlayer) {
 }
 
 bool:Panic(pPlayer) {
+  if (g_bPlayerPanic[pPlayer]) {
+    return false;
+  }
+  
   if (get_gametime() - g_flPlayerLastPanic[pPlayer] < PANIC_DELAY) {
     return false;
   }
