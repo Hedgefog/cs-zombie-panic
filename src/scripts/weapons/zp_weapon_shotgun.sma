@@ -46,7 +46,7 @@ public plugin_init() {
 
 public @Weapon_PrimaryAttack(this) {
   static Float:vecSpread[3];
-  UTIL_CalculateWeaponSpread(this, Float:{0.0975, 0.0975, 0.0975}, 1.5, 0.95, 2.0, vecSpread);
+  UTIL_CalculateWeaponSpread(this, Float:{0.0975, 0.0975, 0.0975}, 1.5, 1.0, 0.95, 2.0, vecSpread);
 
   if (CW_DefaultShotgunShot(this, 6.0, 1.0, 0.5, vecSpread, 16)) {
     CW_PlayAnimation(this, 1, 1.5);

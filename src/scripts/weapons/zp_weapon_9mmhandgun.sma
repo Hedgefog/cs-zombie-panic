@@ -61,7 +61,7 @@ public @Weapon_PrimaryAttack(this) {
   }
 
   static Float:vecSpread[3];
-  UTIL_CalculateWeaponSpread(this, Float:VECTOR_CONE_2DEGREES, 3.0, 0.95, 3.5, vecSpread);
+  UTIL_CalculateWeaponSpread(this, Float:VECTOR_CONE_2DEGREES, 3.0, 0.5, 0.95, 3.5, vecSpread);
 
   if (CW_DefaultShot(this, 15.0, 0.2, vecSpread)) {
     CW_PlayAnimation(this, 3, 0.71);
