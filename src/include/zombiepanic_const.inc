@@ -19,10 +19,10 @@ enum ZP_Music {
   Float:ZP_Music_Duration
 }
 
-stock const ZP_WEAPON_PISTOL[] = "zombiepanic/b1/weapon_9mmhandgun";
-stock const ZP_WEAPON_RIFLE[] = "zombiepanic/b1/weapon_556AR";
-stock const ZP_WEAPON_SHOTGUN[] = "zombiepanic/b1/weapon_shotgun";
-stock const ZP_WEAPON_MAGNUM[] = "zombiepanic/b1/weapon_357";
+stock const ZP_WEAPON_PISTOL[] = "zombiepanic/b2/weapon_9mmhandgun";
+stock const ZP_WEAPON_RIFLE[] = "zombiepanic/b2/weapon_556AR";
+stock const ZP_WEAPON_SHOTGUN[] = "zombiepanic/b2/weapon_shotgun";
+stock const ZP_WEAPON_MAGNUM[] = "zombiepanic/b2/weapon_357";
 stock const ZP_WEAPON_SATCHEL[] = "zombiepanic/b1/weapon_satchel";
 stock const ZP_WEAPON_GRENADE[] = "zombiepanic/b1/weapon_handgrenade";
 stock const ZP_WEAPON_SWIPE[] = "zombiepanic/b1/weapon_swipe";
@@ -95,10 +95,10 @@ stock const ZP_MUSIC_LIST[][ZP_Music] = {
   { "sound/zombiepanic/b1/music/KM_Plague.mp3", 3.10},
 };
 
-stock const ZP_WEAPON_PISTOL_HUD_TXT[] = "sprites/zombiepanic/b1/weapon_9mmhandgun.txt";
-stock const ZP_WEAPON_MAGNUM_HUD_TXT[] = "sprites/zombiepanic/b1/weapon_357.txt";
-stock const ZP_WEAPON_RIFLE_HUD_TXT[] = "sprites/zombiepanic/b1/weapon_556ar.txt";
-stock const ZP_WEAPON_SHOTGUN_HUD_TXT[] = "sprites/zombiepanic/b1/weapon_shotgun.txt";
+stock const ZP_WEAPON_PISTOL_HUD_TXT[] = "sprites/zombiepanic/b2/weapon_9mmhandgun.txt";
+stock const ZP_WEAPON_MAGNUM_HUD_TXT[] = "sprites/zombiepanic/b2/weapon_357.txt";
+stock const ZP_WEAPON_RIFLE_HUD_TXT[] = "sprites/zombiepanic/b2/weapon_556ar.txt";
+stock const ZP_WEAPON_SHOTGUN_HUD_TXT[] = "sprites/zombiepanic/b2/weapon_shotgun.txt";
 stock const ZP_WEAPON_CROWBAR_HUD_TXT[] = "sprites/zombiepanic/b1/weapon_crowbar.txt";
 stock const ZP_WEAPON_SWIPE_HUD_TXT[] = "sprites/zombiepanic/b1/weapon_swipe.txt";
 stock const ZP_WEAPON_GRENADE_HUD_TXT[] = "sprites/zombiepanic/b1/weapon_handgrenade.txt";
@@ -111,7 +111,11 @@ stock const ZP_HUD_SPRITES[][] = {
   "sprites/zombiepanic/b1/640hud6.spr",
   "sprites/zombiepanic/b1/640hud7.spr",
   "sprites/zombiepanic/b1/640hudz.spr",
-  "sprites/zombiepanic/b1/640zombiehead.spr"
+  "sprites/zombiepanic/b1/640zombiehead.spr",
+  "sprites/zombiepanic/b1/pistol_xhair.spr",
+  "sprites/zombiepanic/b1/magnum_xhair.spr",
+  "sprites/zombiepanic/b1/colt_xhair.spr",
+  "sprites/zombiepanic/b1/shotgun_xhair.spr"
 };
 
 stock const ZP_ZOMBIE_AMBIENT_SOUNDS[][] = {
