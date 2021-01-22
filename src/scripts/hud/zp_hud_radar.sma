@@ -32,7 +32,7 @@ public plugin_init() {
   register_message(gmsgHideWeapon, "OnMessage_HideWeapon");
   register_message(gmsgRadar, "OnMessage_Radar");
 
-  register_forward(FM_CmdStart, "OnCmdStart");
+  // register_forward(FM_CmdStart, "OnCmdStart");
 }
 
 public OnMessage_Radar(iMsgId, iMsgDest, pPlayer) {
