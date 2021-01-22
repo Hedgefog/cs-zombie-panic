@@ -101,6 +101,8 @@ public @Weapon_Deploy(this) {
   } else {
     CW_DefaultDeploy(this, ZP_WEAPON_SATCHEL_V_MODEL, ZP_WEAPON_SATCHEL_P_MODEL, 1, "grenade");
   }
+
+  CW_PlayAnimation(this, 2, 61.0 / 30.0);
 }
 
 public @Weapon_Holster(this) {
