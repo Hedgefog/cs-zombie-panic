@@ -62,11 +62,7 @@ public @Weapon_PrimaryAttack(this) {
     CW_PlayAnimation(this, 2, 1.03);
     new pPlayer = CW_GetPlayer(this);
     emit_sound(pPlayer, CHAN_WEAPON, ZP_WEAPON_MAGNUM_SHOT_SOUNDS[random(sizeof(ZP_WEAPON_MAGNUM_SHOT_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-    static Float:vecPunchAngle[3];
-    vecPunchAngle[0] = -10.0;
-    vecPunchAngle[1] = random_float(-0.5, 0.5);
-    vecPunchAngle[2] = 0.0;
-    set_pev(pPlayer, pev_punchangle, vecPunchAngle);
+    set_pev(pPlayer, pev_punchangle, Float:{-10.0, 0.0, 0.0});
 
     CW_EjectWeaponBrass(this, engfunc(EngFunc_ModelIndex, "models/shell.mdl"), 1);
   }
