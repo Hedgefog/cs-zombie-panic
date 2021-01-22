@@ -97,12 +97,10 @@ public @Weapon_Deploy(this) {
   new pPlayer = CW_GetPlayer(this);
 
   if (g_bPlayerChargeReady[pPlayer] || get_member(pPlayer, m_rgAmmo, g_iAmmoId) <= 0) {
-    CW_DefaultDeploy(this, ZP_WEAPON_SATCHELRADIO_V_MODEL, ZP_WEAPON_SATCHELRADIO_P_MODEL, 1, "grenade");
+    CW_DefaultDeploy(this, ZP_WEAPON_SATCHELRADIO_V_MODEL, ZP_WEAPON_SATCHELRADIO_P_MODEL, 2, "grenade");
   } else {
-    CW_DefaultDeploy(this, ZP_WEAPON_SATCHEL_V_MODEL, ZP_WEAPON_SATCHEL_P_MODEL, 1, "grenade");
+    CW_DefaultDeploy(this, ZP_WEAPON_SATCHEL_V_MODEL, ZP_WEAPON_SATCHEL_P_MODEL, 2, "grenade");
   }
-
-  CW_PlayAnimation(this, 2, 61.0 / 30.0);
 }
 
 public @Weapon_Holster(this) {
