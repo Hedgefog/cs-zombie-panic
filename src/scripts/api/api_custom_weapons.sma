@@ -167,7 +167,6 @@ public plugin_natives() {
   register_native("CW_RemovePlayerItem", "Native_RemovePlayerItem");
 
   register_native("CW_Bind", "Native_Bind");
-
 }
 
 public plugin_end() {

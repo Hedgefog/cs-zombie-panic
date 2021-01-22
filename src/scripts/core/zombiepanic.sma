@@ -24,6 +24,7 @@ public plugin_init() {
     register_cvar("mp_scoreboard_showmoney", "0");
     register_cvar("mp_scoreboard_showhealth", "0");
     register_cvar("mp_scoreboard_showdefkit", "0");
+    register_cvar("mp_autoteambalance", "0");
 
     g_fwConfigLoaded = CreateMultiForward("Zp_Fw_ConfigLoaded", ET_IGNORE);
 }
