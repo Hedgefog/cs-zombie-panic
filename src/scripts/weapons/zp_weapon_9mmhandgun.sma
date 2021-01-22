@@ -59,7 +59,7 @@ public @Weapon_PrimaryAttack(this) {
     return;
   } 
 
-  if (CW_DefaultShot(this, 15.0, 0.2, Float:VECTOR_CONE_5DEGREES)) {
+  if (CW_DefaultShot(this, 15.0, 0.2, Float:VECTOR_CONE_2DEGREES)) {
     CW_PlayAnimation(this, 3, 0.71);
     new pPlayer = CW_GetPlayer(this);
     emit_sound(pPlayer, CHAN_WEAPON, ZP_WEAPON_PISTOL_SHOT_SOUND, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
