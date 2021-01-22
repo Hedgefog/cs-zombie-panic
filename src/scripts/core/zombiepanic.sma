@@ -11,6 +11,8 @@
 new g_fwConfigLoaded;
 new g_fwResult;
 
+new g_pCvarVersion;
+
 public plugin_precache() {
     for (new i = 0; i < sizeof(ZP_HUD_SPRITES); ++i) {
         precache_generic(ZP_HUD_SPRITES[i]);
@@ -19,6 +21,11 @@ public plugin_precache() {
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+
+    g_pCvarVersion = register_cvar("zombiepanic_version", ZP_VERSION);
+
+    hook_cvar_change(g_pCvarVersion, "OnVersionCvarChange");
+
     register_cvar("mp_flashlight", "1");
     register_cvar("mp_freezetime", "10");
     register_cvar("mp_scoreboard_showmoney", "0");
@@ -35,6 +42,10 @@ public plugin_natives() {
 
 public plugin_cfg() {
     LoadConfig();
+}
+
+public OnVersionCvarChange() {
+    set_pcvar_string(g_pCvarVersion, ZP_VERSION);
 }
 
 LoadConfig() {
