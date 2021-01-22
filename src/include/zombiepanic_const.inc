@@ -112,10 +112,10 @@ stock const ZP_HUD_SPRITES[][] = {
   "sprites/zombiepanic/b1/640hud7.spr",
   "sprites/zombiepanic/b1/640hudz.spr",
   "sprites/zombiepanic/b1/640zombiehead.spr",
-  "sprites/zombiepanic/b1/pistol_xhair.spr",
-  "sprites/zombiepanic/b1/magnum_xhair.spr",
-  "sprites/zombiepanic/b1/colt_xhair.spr",
-  "sprites/zombiepanic/b1/shotgun_xhair.spr"
+  "sprites/zombiepanic/b2/pistol_xhair.spr",
+  "sprites/zombiepanic/b2/magnum_xhair.spr",
+  "sprites/zombiepanic/b2/colt_xhair.spr",
+  "sprites/zombiepanic/b2/shotgun_xhair.spr"
 };
 
 stock const ZP_ZOMBIE_AMBIENT_SOUNDS[][] = {
