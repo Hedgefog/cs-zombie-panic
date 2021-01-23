@@ -69,7 +69,7 @@ stock UTIL_CreateAmmoBox(iAmmoId, iAmount) {
     return iWeaponBox;
 }
 
-stock UTIL_BeamPoints(const Float:vecStart[3], const Float:vecEnd[3], const color[3]) {
+stock UTIL_BeamPoints(const Float:vecStart[3], const Float:vecEnd[3], const color[3], iLifetime = 30) {
     message_begin(MSG_BROADCAST ,SVC_TEMPENTITY);
     write_byte(TE_BEAMPOINTS);
     write_coord(floatround(vecStart[0]));	// start position
@@ -81,7 +81,7 @@ stock UTIL_BeamPoints(const Float:vecStart[3], const Float:vecEnd[3], const colo
     write_short(engfunc(EngFunc_ModelIndex, "sprites/laserbeam.spr"));	// sprite index
     write_byte(0);	// starting frame
     write_byte(10);	// frame rate in 0.1's
-    write_byte(30);	// life in 0.1's
+    write_byte(iLifetime);	// life in 0.1's
     write_byte(2);	// line width in 0.1's
     write_byte(1);	// noise amplitude in 0.01's
     write_byte(color[0]);	// Red
