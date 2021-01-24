@@ -16,37 +16,66 @@
 #define SPRITE_NAME "sprites/zombiepanic/b2/objective_mark.spr"
 #define SPRITE_WIDTH 128.0
 #define SPRITE_HEIGHT 128.0
-#define SPRITE_SCALE 0.125
+#define SPRITE_SCALE 0.03125
+#define SPRITE_AMT 25.0
+#define MARK_UPDATE_DELAY 0.1
+#define MARK_MAX_VELOCITY 200.0
+#define MARK_MAX_MOVE_STEP_LENGTH 1000.0
+#define MARK_MAX_SCALE_STEP 0.0625
+#define MARK_MAX_SCALE_STEP_LENGTH 50.0
 
-new Array:g_iszButtons;
+enum _:Frame { TopLeft, TopRight, BottomLeft, BottomRight };
+
+enum PlayerData {
+  Float:Player_Origin[3],
+  Float:Player_MarkOrigin[3],
+  Float:Player_MarkAngles[3],
+  Float:Player_MarkUpdateTime,
+  Float:Player_MarkScale
+}
+
+new Array:g_irgMarks;
 new g_iMarkModelIndex;
 
+new g_rgPlayerData[MAX_PLAYERS][12][PlayerData];
+
 public plugin_precache() {
-  g_iszButtons = ArrayCreate();
+  g_irgMarks = ArrayCreate();
   g_iMarkModelIndex = precache_model(SPRITE_NAME);
 
   RegisterHam(Ham_Spawn, "func_button", "OnButtonSpawn_Post", .Post = 1);
+  RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
+
+  register_cvar("objectivemark_ratio", "0.025");
 }
 
 public plugin_init() {
   register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
+  register_forward(FM_AddToFullPack, "OnAddToFullPack", 0);
   register_forward(FM_AddToFullPack, "OnAddToFullPack_Post", 1);
   register_forward(FM_CheckVisibility, "OnCheckVisibility");
 }
 
 public plugin_end() {
-  ArrayDestroy(g_iszButtons);
+  ArrayDestroy(g_irgMarks);
 }
 
 public OnButtonSpawn_Post(pButton) {
-  ArrayPushCell(g_iszButtons, pButton);
-
   new pMark = CreateMark(pButton);
+  set_pev(pMark, pev_iuser1, ArraySize(g_irgMarks));
+  ArrayPushCell(g_irgMarks, pButton);
+
   set_pev(pButton, pev_iuser1, pMark);
 }
 
-public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
+public OnPlayerSpawn_Post(pPlayer) {
+  for (new iMarkIndex = 0; iMarkIndex < ArraySize(g_irgMarks); ++iMarkIndex) {
+    g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkUpdateTime] = 0.0;
+  }
+}
+
+public OnAddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
   if (!UTIL_IsPlayer(pHost)) {
     return FMRES_IGNORED;
   }
@@ -66,8 +95,44 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
   if (!IsUsableObjective(pHost, pButton)) {
     return FMRES_SUPERCEDE;
   }
+  
+  new iMarkIndex = pev(pEntity, pev_iuser1);
 
-  DrawMark(pEntity, pHost, es);
+  new Float:flDelta = get_gametime() - g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkUpdateTime];
+  if (!g_rgPlayerData[pHost][iMarkIndex][Player_MarkUpdateTime] || flDelta >= MARK_UPDATE_DELAY) {
+    CalculateMark(pEntity, pHost);
+  }
+
+  return FMRES_HANDLED;
+}
+
+public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
+  if (!UTIL_IsPlayer(pHost)) {
+    return FMRES_IGNORED;
+  }
+
+  if (!pev_valid(pEntity)) {
+    return FMRES_IGNORED;
+  }
+
+  static szClassname[32];
+  pev(pEntity, pev_classname, szClassname, charsmax(szClassname));
+
+  if (!equal(szClassname, MARK_CLASSNAME)) {
+    return FMRES_IGNORED;
+  }
+
+  new iMarkIndex = pev(pEntity, pev_iuser1);
+
+  static Float:vecSrc[3];
+  xs_vec_copy(g_rgPlayerData[pHost][iMarkIndex][Player_Origin], vecSrc);
+
+  static Float:vecEnd[3];
+  xs_vec_copy(g_rgPlayerData[pHost][iMarkIndex][Player_MarkOrigin], vecEnd);
+
+  set_es(es, ES_Angles, g_rgPlayerData[pHost][iMarkIndex][Player_MarkAngles]);
+  set_es(es, ES_Origin, g_rgPlayerData[pHost][iMarkIndex][Player_MarkOrigin]);
+  set_es(es, ES_Scale, g_rgPlayerData[pHost][iMarkIndex][Player_MarkScale]);
 
   return FMRES_HANDLED;
 }
@@ -95,7 +160,7 @@ CreateMark(pButton) {
   set_pev(pMark, pev_scale, SPRITE_SCALE);
   set_pev(pMark, pev_modelindex, g_iMarkModelIndex);
   set_pev(pMark, pev_rendermode, kRenderTransAdd);
-  set_pev(pMark, pev_renderamt, 120.0);
+  set_pev(pMark, pev_renderamt, SPRITE_AMT);
   set_pev(pMark, pev_movetype, MOVETYPE_FLYMISSILE);
   set_pev(pMark, pev_solid, SOLID_NOT);
   set_pev(pMark, pev_spawnflags, SF_SPRITE_STARTON);
@@ -110,28 +175,40 @@ CreateMark(pButton) {
   return pMark;
 }
 
-DrawMark(pMark, pPlayer, es) {
-  enum _:Frame { TopLeft, TopRight, BottomLeft, BottomRight };
+CalculateMark(pMark, pPlayer) {
+  new iMarkIndex = pev(pMark, pev_iuser1);
+  new Float:flDelta = get_gametime() - g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkUpdateTime];
+
+  static Float:vecOrigin[3];
+  ExecuteHam(Ham_Player_GetGunPosition, pPlayer, vecOrigin);
 
   static Float:vecTarget[3];
   pev(pMark, pev_origin, vecTarget);
 
-  static Float:vecEyes[3];
-  ExecuteHam(Ham_Player_GetGunPosition, pPlayer, vecEyes);
+  // ANCHOR: Smooth movement
+  if (g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkUpdateTime] > 0.0) {
+    new Float:flMaxStep = MARK_MAX_VELOCITY * flDelta;
+    new Float:flDirLen = xs_vec_distance(vecOrigin, g_rgPlayerData[pPlayer][iMarkIndex][Player_Origin]);
 
-  static Float:vecDir[3];
-  xs_vec_sub(vecTarget, vecEyes, vecDir);
-
-  new Float:flDistance = xs_vec_len(vecDir);
-
-  for (new i = 0; i < 3; ++i) {
-    vecTarget[i] = vecEyes[i] + ((vecDir[i] / flDistance) * 250.0);
+    if (flDirLen > flMaxStep && flDirLen < MARK_MAX_MOVE_STEP_LENGTH) {
+      for (new i = 0; i < 3; ++i) {
+        vecOrigin[i] = g_rgPlayerData[pPlayer][iMarkIndex][Player_Origin][i] + (((vecOrigin[i] - g_rgPlayerData[pPlayer][iMarkIndex][Player_Origin][i]) / flDirLen) * flMaxStep);
+      }
+    }
   }
+
+  // ANCHOR: Caclulate angles
+  static Float:vecDir[3];
+  xs_vec_sub(vecTarget, vecOrigin, vecDir);
 
   static Float:vecAngles[3];
   xs_vec_normalize(vecDir, vecAngles);
   vector_to_angle(vecAngles, vecAngles);
   vecAngles[0] = -vecAngles[0];
+
+  // ANCHOR: Calculate origin
+  static Float:vecForward[3];
+  angle_vector(vecAngles, ANGLEVECTOR_FORWARD, vecForward);
 
   static Float:vecUp[3];
   angle_vector(vecAngles, ANGLEVECTOR_UP, vecUp);
@@ -139,73 +216,53 @@ DrawMark(pMark, pPlayer, es) {
   static Float:vecRight[3];
   angle_vector(vecAngles, ANGLEVECTOR_RIGHT, vecRight);
 
-  static Float:vecForward[3];
-  angle_vector(vecAngles, ANGLEVECTOR_FORWARD, vecForward);
-
-  new Float:flHalfWidth = (SPRITE_WIDTH * SPRITE_SCALE) / 2.0;
-  new Float:flHalfHeight = (SPRITE_HEIGHT * SPRITE_SCALE) / 2.0;
-
-  static Float:rgvecFrameSrc[Frame][3];
-  for (new i = 0; i < 3; ++i) {
-    rgvecFrameSrc[TopLeft][i] = vecEyes[i] + (vecRight[i] * -flHalfWidth) +  (vecUp[i] * flHalfHeight);
-    rgvecFrameSrc[TopRight][i] = vecEyes[i] + (vecRight[i] * flHalfWidth) + (vecUp[i] * flHalfHeight);
-    rgvecFrameSrc[BottomLeft][i] = vecEyes[i] + (vecRight[i] * -flHalfWidth) + (vecUp[i] * -flHalfHeight);
-    rgvecFrameSrc[BottomRight][i] = vecEyes[i] + (vecRight[i] * flHalfWidth) + (vecUp[i] * -flHalfHeight);
-  }
-
   static Float:rgvecFrameEnd[Frame][3];
-  for (new i = 0; i < 3; ++i) {
-    rgvecFrameEnd[TopLeft][i] = vecTarget[i] + (vecRight[i] * -flHalfWidth) +  (vecUp[i] * flHalfHeight);
-    rgvecFrameEnd[TopRight][i] = vecTarget[i] + (vecRight[i] * flHalfWidth) + (vecUp[i] * flHalfHeight);
-    rgvecFrameEnd[BottomLeft][i] = vecTarget[i] + (vecRight[i] * -flHalfWidth) + (vecUp[i] * -flHalfHeight);
-    rgvecFrameEnd[BottomRight][i] = vecTarget[i] + (vecRight[i] * flHalfWidth) + (vecUp[i] * -flHalfHeight);
-  }
-
-  new Float:flSmallestFraction = 1.0;
-
-  new pTr = create_tr2();
-
-  for (new i = 0; i < Frame; ++i) {
-    // engfunc(EngFunc_TraceLine, rgvecFrameSrc[i], rgvecFrameEnd[i], IGNORE_GLASS, pPlayer, pTr);
-    engfunc(EngFunc_TraceLine, vecEyes, rgvecFrameEnd[i], IGNORE_GLASS, pPlayer, pTr);
-    // UTIL_BeamPoints(rgvecFrameSrc[i], rgvecFrameEnd[i], {0, 255, 0}, 1);
-
-    static Float:flFraction;
-    get_tr2(pTr, TR_flFraction, flFraction);
-
-    if (flFraction < flSmallestFraction) {
-      flSmallestFraction = flFraction;
-    }
-  }
-
-  free_tr2(pTr);
-
-  if (flSmallestFraction < 1.0) {
-    for (new i = 0; i < Frame; ++i) {
-      for (new j = 0; j < 3; ++j) {
-        rgvecFrameEnd[i][j] = rgvecFrameSrc[i][j] + ((rgvecFrameEnd[i][j] - rgvecFrameSrc[i][j]) * flSmallestFraction) - (vecForward[j] * flHalfWidth);
-      }
-    }
-  }
-
-  for (new i = 0; i < Frame; ++i) {
-    UTIL_BeamPoints(rgvecFrameSrc[i], rgvecFrameEnd[i], {0, 0, 255}, 1);
-    UTIL_BeamPoints(vecEyes, rgvecFrameEnd[i], {255, 0, 0}, 1);
-  }
+  CreateFrame(vecTarget, SPRITE_WIDTH * SPRITE_SCALE, SPRITE_HEIGHT * SPRITE_SCALE, vecUp, vecRight, rgvecFrameEnd);
+  TraceFrame(vecOrigin, rgvecFrameEnd, pPlayer, rgvecFrameEnd);
 
   for (new i = 0; i < 3; ++i) {
     vecTarget[i] = (rgvecFrameEnd[TopLeft][i] + rgvecFrameEnd[BottomRight][i]) * 0.5;
   }
 
-  // UTIL_BeamPoints(vecEyes, vecTarget, {255, 0, 0}, 1);
+  // ANCHOR: Calculate scale
+  new Float:flScale = SPRITE_SCALE * (xs_vec_distance(vecOrigin, vecTarget) / 100);
+  
+  // ANCHOR: Smooth scale
+  if (g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkUpdateTime] > 0.0) {
+    new Float:flMaxStep = 1 + ((MARK_MAX_SCALE_STEP / g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkScale]) * flDelta);
+    new Float:flScaleRatio = flScale / g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkScale];
+    new Float:flLastDistance = xs_vec_distance(g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkOrigin], g_rgPlayerData[pPlayer][iMarkIndex][Player_Origin]);
+    new Float:flDistance = xs_vec_distance(vecTarget, vecOrigin);
 
-  new Float:flScale = floatmax(SPRITE_SCALE / xs_vec_distance(vecEyes, vecTarget), 0.005);
+    if (floatabs(flLastDistance - flDistance) < MARK_MAX_SCALE_STEP_LENGTH) {
+      if (flScaleRatio > flMaxStep) {
+            flScale = g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkScale] * flMaxStep;
+        } else if (flScaleRatio < (1.0 / flMaxStep)) {
+          flScale = g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkScale] * (1.0 / flMaxStep);
+        }
+    } else {
+      flScale = 0.005;
+    }
+  }
 
-  log_amx("flScale %f", flScale);
+  // ANCHOR: Fix frame position accounting to scale
+  CreateFrame(vecTarget, SPRITE_WIDTH * flScale, SPRITE_HEIGHT * flScale, vecUp, vecRight, rgvecFrameEnd);
+  for (new i = 0; i < Frame; ++i) {
+    for (new j = 0; j < 3; ++j) {
+      rgvecFrameEnd[i][j] -= (vecForward[j] * ((SPRITE_WIDTH * flScale) / 2.0));
+    }
+  }
 
-  set_es(es, ES_Scale, flScale);
-  set_es(es, ES_Angles, vecAngles);
-  set_es(es, ES_Origin, vecTarget);
+  // ANCHOR: Get target point
+  for (new i = 0; i < 3; ++i) {
+    vecTarget[i] = (rgvecFrameEnd[TopLeft][i] + rgvecFrameEnd[BottomRight][i]) * 0.5;
+  }
+
+  xs_vec_copy(vecOrigin, g_rgPlayerData[pPlayer][iMarkIndex][Player_Origin]);
+  xs_vec_copy(vecTarget, g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkOrigin]);
+  xs_vec_copy(vecAngles, g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkAngles]);
+  g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkScale] = flScale;
+  g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkUpdateTime] = get_gametime();
 }
 
 bool:IsUsableObjective(pPlayer, pButton) {
@@ -224,9 +281,51 @@ bool:IsUsableObjective(pPlayer, pButton) {
     return false;
   }
 
-  if (~pev(pButton, pev_spawnflags) & BIT(9)) {
+  if (~pev(pButton, pev_spawnflags) & ZP_BUTTON_FLAG_HUMAN_ONLY) {
     return false;
   }
 
   return true;
+}
+
+
+CreateFrame(const Float:vecOrigin[3], Float:flWidth, Float:flHeight, const Float:vecUp[3], const Float:vecRight[3], Float:rgvecFrameOut[Frame][3]) {
+  new Float:flHalfWidth = flWidth / 2.0;
+  new Float:flHalfHeight = flHeight / 2.0;
+
+  for (new i = 0; i < 3; ++i) {
+    rgvecFrameOut[TopLeft][i] = vecOrigin[i] + (vecRight[i] * -flHalfWidth) +  (vecUp[i] * flHalfHeight);
+    rgvecFrameOut[TopRight][i] = vecOrigin[i] + (vecRight[i] * flHalfWidth) + (vecUp[i] * flHalfHeight);
+    rgvecFrameOut[BottomLeft][i] = vecOrigin[i] + (vecRight[i] * -flHalfWidth) + (vecUp[i] * -flHalfHeight);
+    rgvecFrameOut[BottomRight][i] = vecOrigin[i] + (vecRight[i] * flHalfWidth) + (vecUp[i] * -flHalfHeight);
+  }
+}
+
+Float:TraceFrame(const Float:vecSrc[3], const Float:rgvecFrame[Frame][3], pIgnore, Float:rgvecFrameOut[Frame][3]) {
+  new pTr = create_tr2();
+
+  new Float:flMinFraction = 1.0;
+
+  for (new i = 0; i < Frame; ++i) {
+    engfunc(EngFunc_TraceLine, vecSrc, rgvecFrame[i], IGNORE_GLASS, pIgnore, pTr);
+
+    static Float:flFraction;
+    get_tr2(pTr, TR_flFraction, flFraction);
+
+    if (flFraction < flMinFraction) {
+      flMinFraction = flFraction;
+    }
+  }
+
+  free_tr2(pTr);
+
+  if (flMinFraction < 1.0) {
+    for (new i = 0; i < Frame; ++i) {
+      for (new j = 0; j < 3; ++j) {
+        rgvecFrameOut[i][j] = vecSrc[j] + ((rgvecFrame[i][j] - vecSrc[j]) * flMinFraction);
+      }
+    }
+  }
+
+  return flMinFraction;
 }
