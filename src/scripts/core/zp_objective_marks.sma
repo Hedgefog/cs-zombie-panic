@@ -44,13 +44,12 @@ public plugin_precache() {
   g_iMarkModelIndex = precache_model(SPRITE_NAME);
 
   RegisterHam(Ham_Spawn, "func_button", "OnButtonSpawn_Post", .Post = 1);
-  RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
-
-  register_cvar("objectivemark_ratio", "0.025");
 }
 
 public plugin_init() {
   register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+
+  RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
 
   register_forward(FM_AddToFullPack, "OnAddToFullPack", 0);
   register_forward(FM_AddToFullPack, "OnAddToFullPack_Post", 1);
