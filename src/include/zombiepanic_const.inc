@@ -13,6 +13,7 @@
 #define ZP_ZOMBIE_HEALTH 200.0
 #define ZP_NEW_ROUND_DELAY 5.0
 #define ZP_AMMO_RESPAWN_TIME 150.0
+#define ZP_BUTTON_FLAG_HUMAN_ONLY BIT(9)
 
 enum ZP_Music {
   ZP_Music_Path[64],
