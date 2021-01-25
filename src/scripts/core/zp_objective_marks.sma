@@ -13,7 +13,6 @@
 #define AUTHOR "Hedgehog Fog"
 
 #define MARK_CLASSNAME "_mark"
-#define SPRITE_NAME "sprites/zombiepanic/b2/objective_mark.spr"
 #define SPRITE_WIDTH 128.0
 #define SPRITE_HEIGHT 128.0
 #define SPRITE_SCALE 0.03125
@@ -41,7 +40,7 @@ new g_rgPlayerData[MAX_PLAYERS][12][PlayerData];
 
 public plugin_precache() {
   g_irgMarks = ArrayCreate();
-  g_iMarkModelIndex = precache_model(SPRITE_NAME);
+  g_iMarkModelIndex = precache_model(ZP_OBJECTIVE_MARK_SPRITE);
 
   RegisterHam(Ham_Spawn, "func_button", "OnButtonSpawn_Post", .Post = 1);
 }

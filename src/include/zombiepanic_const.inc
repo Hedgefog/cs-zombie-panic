@@ -207,3 +207,5 @@ stock const ZP_WEAPON_PISTOL_RELOAD_END_SOUND[] = "items/9mmclip2.wav";
 stock const ZP_CHARACTERS[][] = {
   "male"
 };
+
+stock const ZP_OBJECTIVE_MARK_SPRITE[] = "sprites/zombiepanic/b2/objective_mark.spr";
