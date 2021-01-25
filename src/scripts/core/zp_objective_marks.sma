@@ -49,6 +49,16 @@ public plugin_precache() {
 public plugin_init() {
   register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
+  if (!ZP_GameRules_GetObjectiveMode()) {
+    for (new i = ArraySize(g_irgMarks) - 1; i >= 0; --i) {
+      new pMark = ArrayGetCell(g_irgMarks, i);
+      engfunc(EngFunc_RemoveEntity, pMark);
+      ArrayDeleteItem(g_irgMarks, i);
+    }
+
+    return;
+  }
+
   RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
 
   register_forward(FM_AddToFullPack, "OnAddToFullPack", 0);
@@ -63,7 +73,7 @@ public plugin_end() {
 public OnButtonSpawn_Post(pButton) {
   new pMark = CreateMark(pButton);
   set_pev(pMark, pev_iuser1, ArraySize(g_irgMarks));
-  ArrayPushCell(g_irgMarks, pButton);
+  ArrayPushCell(g_irgMarks, pMark);
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
