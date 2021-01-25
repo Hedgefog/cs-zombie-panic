@@ -91,11 +91,11 @@ public OnAddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     }
 
     if (!is_user_alive(pHost)) {
-        return FMRES_IGNORED;
+        return FMRES_SUPERCEDE;
     }
 
     if (ZP_Player_IsZombie(pHost)) {
-        return FMRES_IGNORED;
+        return FMRES_SUPERCEDE;
     }
 
     if (!pev_valid(pEntity)) {
@@ -130,11 +130,11 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     }
 
     if (!is_user_alive(pHost)) {
-        return FMRES_IGNORED;
+        return FMRES_SUPERCEDE;
     }
 
     if (ZP_Player_IsZombie(pHost)) {
-        return FMRES_IGNORED;
+        return FMRES_SUPERCEDE;
     }
 
     if (!pev_valid(pEntity)) {
@@ -329,7 +329,7 @@ Float:TraceFrame(const Float:vecSrc[3], const Float:rgvecFrame[Frame][3], pIgnor
     new Float:flMinFraction = 1.0;
 
     for (new i = 0; i < Frame; ++i) {
-        engfunc(EngFunc_TraceLine, vecSrc, rgvecFrame[i], IGNORE_GLASS, pIgnore, pTr);
+        engfunc(EngFunc_TraceLine, vecSrc, rgvecFrame[i], IGNORE_GLASS | IGNORE_MONSTERS, pIgnore, pTr);
 
         static Float:flFraction;
         get_tr2(pTr, TR_flFraction, flFraction);
