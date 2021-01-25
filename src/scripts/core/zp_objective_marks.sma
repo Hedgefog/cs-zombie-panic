@@ -87,6 +87,10 @@ public OnAddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     return FMRES_IGNORED;
   }
 
+  if (is_user_bot(pHost)) {
+    return FMRES_IGNORED;
+  }
+
   if (!pev_valid(pEntity)) {
     return FMRES_IGNORED;
   }
@@ -99,11 +103,12 @@ public OnAddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
   }
 
   new pButton = pev(pEntity, pev_owner);
+  new iMarkIndex = pev(pEntity, pev_iuser1);
   if (!IsUsableObjective(pHost, pButton)) {
+    g_rgPlayerData[pHost][iMarkIndex][Player_MarkUpdateTime] = 0.0;
     return FMRES_SUPERCEDE;
   }
   
-  new iMarkIndex = pev(pEntity, pev_iuser1);
   new Float:flDelta = get_gametime() - g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkUpdateTime];
   if (!g_rgPlayerData[pHost][iMarkIndex][Player_MarkUpdateTime] || flDelta >= MARK_UPDATE_DELAY) {
     CalculateMark(pEntity, pHost);
@@ -129,9 +134,11 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
   }
 
   new iMarkIndex = pev(pEntity, pev_iuser1);
-  set_es(es, ES_Angles, g_rgPlayerData[pHost][iMarkIndex][Player_MarkAngles]);
-  set_es(es, ES_Origin, g_rgPlayerData[pHost][iMarkIndex][Player_MarkOrigin]);
-  set_es(es, ES_Scale, g_rgPlayerData[pHost][iMarkIndex][Player_MarkScale]);
+  if (g_rgPlayerData[pHost][iMarkIndex][Player_MarkUpdateTime] > 0.0) {
+    set_es(es, ES_Angles, g_rgPlayerData[pHost][iMarkIndex][Player_MarkAngles]);
+    set_es(es, ES_Origin, g_rgPlayerData[pHost][iMarkIndex][Player_MarkOrigin]);
+    set_es(es, ES_Scale, g_rgPlayerData[pHost][iMarkIndex][Player_MarkScale]);
+  }
 
   return FMRES_HANDLED;
 }
@@ -267,7 +274,7 @@ CalculateMark(pMark, pPlayer) {
 bool:IsUsableObjective(pPlayer, pButton) {
   new iszMaster = get_ent_data(pButton, "CBaseToggle", "m_sMaster");
 
-  if (iszMaster > 0) {
+  if (iszMaster) {
     static szMaster[32];
     engfunc(EngFunc_SzFromIndex, iszMaster, szMaster, charsmax(szMaster));
 
