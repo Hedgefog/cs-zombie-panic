@@ -21,7 +21,7 @@
 #define MARK_MAX_VELOCITY 200.0
 #define MARK_MAX_MOVE_STEP_LENGTH 1000.0
 #define MARK_MAX_SCALE_STEP 0.0625
-#define MARK_MAX_SCALE_STEP_LENGTH 50.0
+#define MARK_MAX_SCALE_STEP_LENGTH 100.0
 
 enum _:Frame { TopLeft, TopRight, BottomLeft, BottomRight };
 
@@ -258,10 +258,10 @@ CalculateMark(pMark, pPlayer) {
             new Float:flMaxStep = 1 + ((MARK_MAX_SCALE_STEP / g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkScale]) * flDelta);
 
             if (flScaleRatio > flMaxStep) {
-                    flScale = g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkScale] * flMaxStep;
-                } else if (flScaleRatio < (1.0 / flMaxStep)) {
-                    flScale = g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkScale] * (1.0 / flMaxStep);
-                }
+                flScale = g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkScale] * flMaxStep;
+            } else if (flScaleRatio < (1.0 / flMaxStep)) {
+                flScale = g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkScale] * (1.0 / flMaxStep);
+            }
         } else {
             flScale = 0.005;
         }
