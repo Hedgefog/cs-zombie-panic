@@ -78,9 +78,12 @@ public OnButtonUse(pEntity, pToucher) {
     return HAM_IGNORED;
   }
 
-  PlayAmbient(pToucher);
+  if (pev(pEntity, pev_spawnflags) & ZP_BUTTON_FLAG_HUMAN_ONLY) {
+    PlayAmbient(pToucher);
+    return HAM_SUPERCEDE;
+  }
 
-  return HAM_SUPERCEDE;
+  return HAM_HANDLED;
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
