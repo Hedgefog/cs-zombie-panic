@@ -58,7 +58,9 @@ public OnWeaponBoxTouch(iWeaponBox, pToucher) {
   }
 
   if (GetHamReturnStatus() < HAM_SUPERCEDE) {
-    PickupWeaponBox(pToucher, iWeaponBox);
+    if (!get_member_game(m_bFreezePeriod)) {
+      PickupWeaponBox(pToucher, iWeaponBox);
+    }
   }
 
   return HAM_SUPERCEDE;

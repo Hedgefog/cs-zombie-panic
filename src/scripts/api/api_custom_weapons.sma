@@ -733,6 +733,10 @@ SecondaryAttack(this) {
 }
 
 PrimaryAttack(this) {
+  if (get_member_game(m_bFreezePeriod)) {
+    return;
+  }
+
   if (ExecuteBindedFunction(CWB_PrimaryAttack, this) > PLUGIN_CONTINUE) {
     return;
   }
