@@ -90,6 +90,14 @@ public OnAddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
         return FMRES_IGNORED;
     }
 
+    if (!is_user_alive(pHost)) {
+        return FMRES_IGNORED;
+    }
+
+    if (ZP_Player_IsZombie(pHost)) {
+        return FMRES_IGNORED;
+    }
+
     if (!pev_valid(pEntity)) {
         return FMRES_IGNORED;
     }
@@ -103,7 +111,7 @@ public OnAddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
 
     new pButton = pev(pEntity, pev_owner);
     new iMarkIndex = pev(pEntity, pev_iuser1);
-    if (ZP_Player_IsZombie(pHost) || !IsUsableObjective(pHost, pButton)) {
+    if (!IsUsableObjective(pHost, pButton)) {
         g_rgPlayerData[pHost][iMarkIndex][Player_MarkUpdateTime] = 0.0;
         return FMRES_SUPERCEDE;
     }
@@ -118,6 +126,14 @@ public OnAddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
 
 public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     if (!UTIL_IsPlayer(pHost)) {
+        return FMRES_IGNORED;
+    }
+
+    if (!is_user_alive(pHost)) {
+        return FMRES_IGNORED;
+    }
+
+    if (ZP_Player_IsZombie(pHost)) {
         return FMRES_IGNORED;
     }
 
