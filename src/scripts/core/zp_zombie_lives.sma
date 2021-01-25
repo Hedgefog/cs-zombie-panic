@@ -64,8 +64,10 @@ public OnPlayerKilled_Post(pPlayer) {
     g_iLives++;
   }
 
-  remove_task(pPlayer);
-  set_task(SPAWN_DELAY, "TaskRespawnPlayer", TASKID_PLAYER_RESPAWN + pPlayer);
+  if (!get_member_game(m_bFreezePeriod)) {
+    remove_task(pPlayer);
+    set_task(SPAWN_DELAY, "TaskRespawnPlayer", TASKID_PLAYER_RESPAWN + pPlayer);
+  }
 }
 
 public TaskRespawnPlayer(iTaskId) {

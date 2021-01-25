@@ -131,7 +131,7 @@ bool:UpdatePlayerSpeed(pPlayer) {
     return false;
   }
 
-  if (!Round_IsRoundStarted()) {
+  if (get_member_game(m_bFreezePeriod)) {
     return false;
   }
 

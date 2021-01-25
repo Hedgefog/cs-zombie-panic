@@ -34,6 +34,7 @@ public plugin_init() {
     register_clcmd("chooseteam", "OnPlayerChangeTeam");
     register_clcmd("jointeam", "OnPlayerChangeTeam");
     register_clcmd("joinclass", "OnPlayerChangeTeam");
+    register_clcmd("drop", "OnClCmd_Drop");
 
     register_message(get_user_msgid("ShowMenu"), "OnMessage_ShowMenu");
     register_message(get_user_msgid("VGUIMenu"), "OnMessage_VGUIMenu");
@@ -76,7 +77,7 @@ public Round_Fw_NewRound() {
         }
 
         new iTeam = get_member(pPlayer, m_iTeam);
-        if (iTeam != ZP_HUMAN_TEAM && iTeam != ZP_ZOMBIE_TEAM) {
+        if (iTeam != ZP_ZOMBIE_TEAM) {
             continue;
         }
 
@@ -85,6 +86,20 @@ public Round_Fw_NewRound() {
     }
 
     return PLUGIN_CONTINUE;
+}
+
+public Round_Fw_RoundStart() {
+    DistributeTeams();
+
+    log_amx("New round started");
+}
+
+public Round_Fw_RoundExpired() {
+    if (!g_bObjectiveMode) {
+        DispatchWin(ZP_HUMAN_TEAM);
+
+        log_amx("Round expired, survivors win!");
+    }
 }
 
 /*--------------------------------[ Hooks ]--------------------------------*/
@@ -130,8 +145,8 @@ public OnPlayerChangeTeam(pPlayer, iKey) {
     return PLUGIN_HANDLED;
 }
 
-public OnClCmd_ChooseTeam(pPlayer) {
-    return PLUGIN_HANDLED;
+public OnClCmd_Drop(pPlayer) {
+    return get_member_game(m_bFreezePeriod) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
 }
 
 public OnPlayerSpawn(pPlayer) {
@@ -140,7 +155,9 @@ public OnPlayerSpawn(pPlayer) {
     }
 
     if (!Round_IsRoundStarted()) {
-        OpenTeamMenu(pPlayer);
+        if (!ZP_Player_IsZombie(pPlayer)) {
+            OpenTeamMenu(pPlayer);
+        }
     } else {
         CheckWinConditions();
     }
@@ -155,30 +172,18 @@ public OnPlayerKilled_Post(pPlayer) {
 }
 
 public OpenTeamMenu(pPlayer) {
-    new iMenu = menu_create("What's your plan?", "TeamMenuHandler");
-    menu_additem(iMenu, "I wanna shit my pants");
-    menu_additem(iMenu, "Join Zombies");
-    menu_setprop(iMenu, MPROP_EXIT, MEXIT_NEVER);
-    menu_display(pPlayer, iMenu, 0);
+    new pMenu = menu_create("What's your plan?", "TeamMenuHandler");
+    menu_additem(pMenu, "I wanna shit my pants");
+    menu_additem(pMenu, "Join Zombies");
+    menu_setprop(pMenu, MPROP_EXIT, MEXIT_NEVER);
+    menu_display(pPlayer, pMenu, 0);
 }
 
 public OnCheckWinConditions() {
     return PLUGIN_HANDLED;
 }
 
-public Round_Fw_RoundStart() {
-    DistributeTeams();
-
-    log_amx("New round started");
-}
-
-public Round_Fw_RoundExpired() {
-    if (!g_bObjectiveMode) {
-        DispatchWin(ZP_HUMAN_TEAM);
-
-        log_amx("Round expired, survivors win!");
-    }
-}
+/*--------------------------------[ Methods ]--------------------------------*/
 
 DistributeTeams() {
     new pPlayerCount = CalculatePlayerCount();
@@ -320,6 +325,8 @@ CheckWinConditions(pIgnorePlayer = 0) {
 DispatchWin(iTeam) {
     Round_DispatchWin(iTeam, ZP_NEW_ROUND_DELAY);
 }
+
+/*--------------------------------[ Tasks ]--------------------------------*/
 
 public TaskJoin(pPlayer) {
     set_member(pPlayer, m_bTeamChanged, get_member(pPlayer, m_bTeamChanged) & ~BIT(8));
