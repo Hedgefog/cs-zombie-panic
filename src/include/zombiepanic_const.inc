@@ -41,35 +41,35 @@ stock const ZP_FLASHLIGHT_SOUND[] = "items/flashlight1.wav";
 
 stock const ZP_WEAPONBOX_MODEL[] = "models/zombiepanic/b1/items/w_weaponbox.mdl";
 
-stock const ZP_WEAPON_PISTOL_V_MODEL[] = "models/zombiepanic/b1/items/v_9mmhandgun.mdl";
+stock const ZP_WEAPON_PISTOL_V_MODEL[] = "models/zombiepanic/b2/items/v_9mmhandgun.mdl";
 stock const ZP_WEAPON_PISTOL_P_MODEL[] = "models/zombiepanic/b1/items/p_9mmhandgun.mdl";
 stock const ZP_WEAPON_PISTOL_W_MODEL[] = "models/zombiepanic/b1/items/w_9mmhandgun.mdl";
 
-stock const ZP_WEAPON_MAGNUM_V_MODEL[] = "models/zombiepanic/b1/items/v_357.mdl";
+stock const ZP_WEAPON_MAGNUM_V_MODEL[] = "models/zombiepanic/b2/items/v_357.mdl";
 stock const ZP_WEAPON_MAGNUM_P_MODEL[] = "models/zombiepanic/b1/items/p_357.mdl";
 stock const ZP_WEAPON_MAGNUM_W_MODEL[] = "models/zombiepanic/b1/items/w_357.mdl";
 
-stock const ZP_WEAPON_RIFLE_V_MODEL[] = "models/zombiepanic/b1/items/v_556ar.mdl";
+stock const ZP_WEAPON_RIFLE_V_MODEL[] = "models/zombiepanic/b2/items/v_556ar.mdl";
 stock const ZP_WEAPON_RIFLE_P_MODEL[] = "models/zombiepanic/b1/items/p_556ar.mdl";
 stock const ZP_WEAPON_RIFLE_W_MODEL[] = "models/zombiepanic/b1/items/w_556ar.mdl";
 
-stock const ZP_WEAPON_SHOTGUN_V_MODEL[] = "models/zombiepanic/b1/items/v_shotgun.mdl";
+stock const ZP_WEAPON_SHOTGUN_V_MODEL[] = "models/zombiepanic/b2/items/v_shotgun.mdl";
 stock const ZP_WEAPON_SHOTGUN_P_MODEL[] = "models/zombiepanic/b1/items/p_shotgun.mdl";
 stock const ZP_WEAPON_SHOTGUN_W_MODEL[] = "models/zombiepanic/b1/items/w_shotgun.mdl";
 
-stock const ZP_WEAPON_CROWBAR_V_MODEL[] = "models/zombiepanic/b1/items/v_crowbar.mdl";
+stock const ZP_WEAPON_CROWBAR_V_MODEL[] = "models/zombiepanic/b2/items/v_crowbar.mdl";
 stock const ZP_WEAPON_CROWBAR_P_MODEL[] = "models/zombiepanic/b1/items/p_crowbar.mdl";
 stock const ZP_WEAPON_CROWBAR_W_MODEL[] = "models/w_crowbar.mdl";
 
-stock const ZP_WEAPON_GRENADE_V_MODEL[] = "models/zombiepanic/b1/items/v_grenade.mdl";
+stock const ZP_WEAPON_GRENADE_V_MODEL[] = "models/zombiepanic/b2/items/v_grenade.mdl";
 stock const ZP_WEAPON_GRENADE_P_MODEL[] = "models/zombiepanic/b1/items/p_grenade.mdl";
 stock const ZP_WEAPON_GRENADE_W_MODEL[] = "models/zombiepanic/b1/items/w_grenade.mdl";
 
-stock const ZP_WEAPON_SATCHEL_V_MODEL[] = "models/zombiepanic/b1/items/v_satchel.mdl";
+stock const ZP_WEAPON_SATCHEL_V_MODEL[] = "models/zombiepanic/b2/items/v_satchel.mdl";
 stock const ZP_WEAPON_SATCHEL_P_MODEL[] = "models/zombiepanic/b1/items/p_satchel.mdl";
 stock const ZP_WEAPON_SATCHEL_W_MODEL[] = "models/zombiepanic/b1/items/w_satchel.mdl";
 
-stock const ZP_WEAPON_SATCHELRADIO_V_MODEL[] = "models/zombiepanic/b1/items/v_satchel_radio.mdl";
+stock const ZP_WEAPON_SATCHELRADIO_V_MODEL[] = "models/zombiepanic/b2/items/v_satchel_radio.mdl";
 stock const ZP_WEAPON_SATCHELRADIO_P_MODEL[] = "models/zombiepanic/b1/items/p_satchel_radio.mdl";
 
 stock const ZP_ITEM_MEDKIT_MODEL[] = "models/zombiepanic/b1/items/w_medkit.mdl";

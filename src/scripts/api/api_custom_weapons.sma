@@ -766,14 +766,12 @@ WeaponHolster(this) {
 }
 
 WeaponDeploy(this) {
-  set_member(this, m_Weapon_iShotsFired, 0);
-
-  new pPlayer = GetPlayer(this);
-  SetWeaponPrediction(pPlayer, false);
-
   if (ExecuteBindedFunction(CWB_Deploy, this) > PLUGIN_CONTINUE) {
     return;
   }
+
+  new pPlayer = GetPlayer(this);
+  SetWeaponPrediction(pPlayer, false);
 }
 
 bool:ShouldWeaponIdle(this) {
@@ -972,6 +970,22 @@ GrenadeExplode(this, pTr, iDamageBits, Float:flRadius, Float:flMagnitude) {
     }
 }
 
+// ANCHOR: Weapon Callbacks
+
+public Smack(this) {
+  new tr = pev(this, pev_iuser1);
+  new pHit = get_tr2(tr, TR_pHit);
+  if (pHit < 0) {
+    pHit = 0;
+  }
+
+  new iDecalIndex = random_num(get_decal_index("{shot1"), get_decal_index("{shot5") + 1);
+  MakeDecal(tr, pHit, iDecalIndex, false);
+  free_tr2(tr);
+
+  SetThink(this, "");
+}
+
 // ANCHOR: Weapon Entity Default Methods
 
 bool:DefaultReload(this, iAnim, Float:flDelay) {
@@ -1106,8 +1120,16 @@ bool:DefaultDeploy(this, const szViewModel[], const szWeaponModel[], iAnim, cons
     set_member(pPlayer, m_szAnimExtention, szAnimExt);
   }
 
-  set_member(pPlayer, m_flNextAttack, 0.5);
+  set_member(this, m_Weapon_iShotsFired, 0);
   set_member(this, m_Weapon_flTimeWeaponIdle, 1.0);
+  set_member(this, m_Weapon_flLastFireTime, 0.0);
+  set_member(this, m_Weapon_flDecreaseShotsFired, get_gametime());
+
+  set_member(pPlayer, m_flNextAttack, 0.5);
+  set_member(pPlayer, m_iFOV, DEFAULT_FOV);
+  set_member(pPlayer, m_iLastZoom, DEFAULT_FOV);
+  set_member(pPlayer, m_bResumeZoom, 0);
+  set_pev(pPlayer, pev_fov, float(DEFAULT_FOV));
 
   return true;
 }
@@ -1245,18 +1267,6 @@ DefaultSwing(this, Float:flDamage, Float:flRate, Float:flDistance) {
   set_pev(this, pev_nextthink, get_gametime() + (flRate * 0.5));
 
   return pHit;
-}
-
-public Smack(this) {
-  new tr = pev(this, pev_iuser1);
-  new pHit = get_tr2(tr, TR_pHit);
-  if (pHit < 0) {
-    pHit = 0;
-  }
-
-  new iDecalIndex = random_num(get_decal_index("{shot1"), get_decal_index("{shot5") + 1);
-  MakeDecal(tr, pHit, iDecalIndex, false);
-  free_tr2(tr);
 }
 
 // ANCHOR: Weapon Methods
