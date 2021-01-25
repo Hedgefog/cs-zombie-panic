@@ -17,7 +17,7 @@
 #define SPRITE_WIDTH 128.0
 #define SPRITE_HEIGHT 128.0
 #define SPRITE_SCALE 0.03125
-#define SPRITE_AMT 25.0
+#define SPRITE_AMT 50.0
 #define MARK_UPDATE_DELAY 0.1
 #define MARK_MAX_VELOCITY 200.0
 #define MARK_MAX_MOVE_STEP_LENGTH 1000.0
@@ -64,8 +64,6 @@ public OnButtonSpawn_Post(pButton) {
   new pMark = CreateMark(pButton);
   set_pev(pMark, pev_iuser1, ArraySize(g_irgMarks));
   ArrayPushCell(g_irgMarks, pButton);
-
-  set_pev(pButton, pev_iuser1, pMark);
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
@@ -96,7 +94,6 @@ public OnAddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
   }
   
   new iMarkIndex = pev(pEntity, pev_iuser1);
-
   new Float:flDelta = get_gametime() - g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkUpdateTime];
   if (!g_rgPlayerData[pHost][iMarkIndex][Player_MarkUpdateTime] || flDelta >= MARK_UPDATE_DELAY) {
     CalculateMark(pEntity, pHost);
@@ -122,13 +119,6 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
   }
 
   new iMarkIndex = pev(pEntity, pev_iuser1);
-
-  static Float:vecSrc[3];
-  xs_vec_copy(g_rgPlayerData[pHost][iMarkIndex][Player_Origin], vecSrc);
-
-  static Float:vecEnd[3];
-  xs_vec_copy(g_rgPlayerData[pHost][iMarkIndex][Player_MarkOrigin], vecEnd);
-
   set_es(es, ES_Angles, g_rgPlayerData[pHost][iMarkIndex][Player_MarkAngles]);
   set_es(es, ES_Origin, g_rgPlayerData[pHost][iMarkIndex][Player_MarkOrigin]);
   set_es(es, ES_Scale, g_rgPlayerData[pHost][iMarkIndex][Player_MarkScale]);
