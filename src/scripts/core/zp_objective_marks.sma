@@ -103,7 +103,7 @@ public OnAddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
 
     new pButton = pev(pEntity, pev_owner);
     new iMarkIndex = pev(pEntity, pev_iuser1);
-    if (!IsUsableObjective(pHost, pButton)) {
+    if (ZP_Player_IsZombie(pHost) || !IsUsableObjective(pHost, pButton)) {
         g_rgPlayerData[pHost][iMarkIndex][Player_MarkUpdateTime] = 0.0;
         return FMRES_SUPERCEDE;
     }
