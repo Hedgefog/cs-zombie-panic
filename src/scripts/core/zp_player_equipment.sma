@@ -2,6 +2,7 @@
 
 #include <amxmodx>
 #include <fakemeta>
+#include <fun>
 #include <reapi>
 
 #include <zombiepanic>
@@ -50,6 +51,8 @@ public Round_Fw_RoundStart() {
 }
 
 EquipPlayer(pPlayer) {
+  strip_user_weapons(pPlayer);
+
   if (ZP_Player_IsZombie(pPlayer)) {
     CW_GiveWeapon(pPlayer, ZP_WEAPON_SWIPE);
   } else {
