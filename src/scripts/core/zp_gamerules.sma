@@ -17,15 +17,20 @@
 #define CHOOSE_TEAM1_CLASS_VGUI_MENU_ID 26
 #define CHOOSE_TEAM2_CLASS_VGUI_MENU_ID 27
 
-new g_iMaxPlayers;
-new bool:g_bObjectiveMode = false;
-
-new g_bPlayerPreferZombies[MAX_PLAYERS + 1];
+enum TeamPreference {
+    TeamPreference_Human,
+    TeamPreference_Zombie,
+    TeamPreference_Spectator
+}
 
 new g_pCvarLives;
 
 new g_fwPlayerJoined;
 new g_fwResult;
+
+new g_iTeamMenu;
+new bool:g_bObjectiveMode = false;
+new TeamPreference:g_iPlayerTeamPreference[MAX_PLAYERS + 1];
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
@@ -39,14 +44,15 @@ public plugin_init() {
     register_clcmd("jointeam", "OnPlayerChangeTeam");
     register_clcmd("joinclass", "OnPlayerChangeTeam");
     register_clcmd("drop", "OnClCmd_Drop");
+    register_forward(FM_ClientKill, "OnClientKill");
 
     register_message(get_user_msgid("ShowMenu"), "OnMessage_ShowMenu");
     register_message(get_user_msgid("VGUIMenu"), "OnMessage_VGUIMenu");
 
-    g_iMaxPlayers = get_maxplayers();
     g_fwPlayerJoined = CreateMultiForward("Zp_Fw_PlayerJoined", ET_IGNORE, FP_CELL);
 
     g_pCvarLives = register_cvar("zp_zombie_lives", "20");
+    g_iTeamMenu = CreateTeamMenu();
 }
 
 public plugin_natives() {
@@ -82,12 +88,8 @@ public Round_Fw_NewRound() {
             continue;
         }
 
-        new iTeam = get_member(pPlayer, m_iTeam);
-        if (iTeam != ZP_ZOMBIE_TEAM) {
-            continue;
-        }
-
-        g_bPlayerPreferZombies[pPlayer] = false;
+        g_iPlayerTeamPreference[pPlayer] = get_member(pPlayer, m_iTeam) == 3 ? TeamPreference_Spectator : TeamPreference_Human;
+        OpenTeamMenu(pPlayer);
     }
 
     ShuffleTeams();
@@ -157,13 +159,13 @@ public OnClCmd_Drop(pPlayer) {
     return get_member_game(m_bFreezePeriod) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
 }
 
+public OnClientKill(pPlayer) {
+    return get_member_game(m_bFreezePeriod) ? FMRES_SUPERCEDE : FMRES_IGNORED;
+}
+
 public OnPlayerSpawn(pPlayer) {
     if (!is_user_alive(pPlayer)) {
         return HAM_IGNORED;
-    }
-
-    if (!Round_IsRoundStarted()) {
-        OpenTeamMenu(pPlayer);
     }
 
     return HAM_HANDLED;
@@ -173,6 +175,7 @@ public OnPlayerSpawn_Post(pPlayer) {
     if (!Round_IsRoundStarted()) {
         set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
         set_pev(pPlayer, pev_takedamage, DAMAGE_NO);
+        ZP_ShowMapInfo(pPlayer);
         // ZP_Player_UpdateSpeed(pPlayer);
     } else {
         CheckWinConditions();
@@ -187,14 +190,6 @@ public OnPlayerKilled_Post(pPlayer) {
     return HAM_HANDLED;
 }
 
-public OpenTeamMenu(pPlayer) {
-    new pMenu = menu_create("What's your plan?", "TeamMenuHandler");
-    menu_additem(pMenu, "I wanna shit my pants");
-    menu_additem(pMenu, "Join Zombies");
-    menu_setprop(pMenu, MPROP_EXIT, MEXIT_NEVER);
-    menu_display(pPlayer, pMenu, 0);
-}
-
 public OnCheckWinConditions() {
     return PLUGIN_HANDLED;
 }
@@ -207,8 +202,7 @@ DistributeTeams() {
             continue;
         }
 
-        new iTeam = get_member(pPlayer, m_iTeam);
-        if (iTeam == ZP_ZOMBIE_TEAM) {
+        if (g_iPlayerTeamPreference[pPlayer] != TeamPreference_Spectator) {
             set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
         }
     }
@@ -246,7 +240,7 @@ DistributeTeams() {
 ProcessZombiePlayers(iMaxZombies) {
     new iZombieCount = 0;
 
-    for (new pPlayer = 1; pPlayer <= g_iMaxPlayers; ++pPlayer) {
+    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
         if (!is_user_connected(pPlayer)) {
             continue;
         }
@@ -256,18 +250,17 @@ ProcessZombiePlayers(iMaxZombies) {
             continue;
         }
 
-        if (is_user_alive(pPlayer) && !g_bPlayerPreferZombies[pPlayer]) {
+        if (g_iPlayerTeamPreference[pPlayer] != TeamPreference_Zombie) {
             continue;
         }
 
-        if (iZombieCount < iMaxZombies || !is_user_alive(pPlayer)) {
-            if (g_bPlayerPreferZombies[pPlayer]) {
-                log_amx("Player ^"%n^" has chosen a zombie team", pPlayer);
-            }
-
-            MovePlayerToZombieTeam(pPlayer);
-            iZombieCount++;
+        if (iZombieCount >= iMaxZombies) {
+            break;
         }
+
+        log_amx("Player ^"%n^" has chosen a zombie team", pPlayer);
+        set_member(pPlayer, m_iTeam, ZP_ZOMBIE_TEAM);
+        iZombieCount++;
     }
 
     return iZombieCount;
@@ -277,7 +270,7 @@ ChooseRandomZombie() {
     static rgpPlayers[MAX_PLAYERS + 1];
     new pPlayerCount = 0;
 
-    for (new pPlayer = 1; pPlayer <= g_iMaxPlayers; ++pPlayer) {
+    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
         if (!is_user_connected(pPlayer)) {
             continue;
         }
@@ -296,18 +289,14 @@ ChooseRandomZombie() {
     }
 
     new pPlayer = rgpPlayers[random(pPlayerCount)];
-    MovePlayerToZombieTeam(pPlayer);
-}
-
-MovePlayerToZombieTeam(pPlayer) {
     set_member(pPlayer, m_iTeam, ZP_ZOMBIE_TEAM);
-    log_amx("Player ^"%n^" was moved to the zombie team", pPlayer);
+    log_amx("Player ^"%n^" was randomly moved to the zombie team", pPlayer);
 }
 
 CalculatePlayerCount() {
     new pPlayerCount = 0;
 
-    for (new pPlayer = 1; pPlayer <= g_iMaxPlayers; ++pPlayer) {
+    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
         if (!is_user_connected(pPlayer)) {
             continue;
         }
@@ -328,7 +317,7 @@ CheckWinConditions(pIgnorePlayer = 0) {
     new iAliveZombieCount = 0;
     new iZombieCount = 0;
 
-    for (new pPlayer = 1; pPlayer <= g_iMaxPlayers; ++pPlayer) {
+    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
         if (pPlayer == pIgnorePlayer) {
             continue;
         }
@@ -362,7 +351,7 @@ CheckWinConditions(pIgnorePlayer = 0) {
 ShuffleTeams() {
     new Array:irgPlayers = ArrayCreate();
 
-    for (new pPlayer = 1; pPlayer <= g_iMaxPlayers; ++pPlayer) {
+    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
         if (!is_user_connected(pPlayer)) {
             continue;
         }
@@ -403,18 +392,63 @@ public TaskJoin(pPlayer) {
     ExecuteForward(g_fwPlayerJoined, g_fwResult, pPlayer);
 }
 
+/*--------------------------------[ Team Menu ]--------------------------------*/
+
+CreateTeamMenu() {
+    new iMenu = menu_create("What's your plan?", "TeamMenuHandler");
+    menu_additem(iMenu, "I wanna shit my pants");
+    menu_additem(iMenu, "Join Zombies");
+    menu_addblank2(iMenu);
+    menu_addblank2(iMenu);
+    menu_additem(iMenu, "Spectate");
+    menu_setprop(iMenu, MPROP_EXIT, MEXIT_NEVER);
+
+    return iMenu;
+}
+
+OpenTeamMenu(pPlayer) {
+    menu_display(pPlayer, g_iTeamMenu, 0);
+}
+
 public TeamMenuHandler(pPlayer, iMenu, iItem) {
-    if (iItem == 1) {
-        if (Round_IsRoundStarted()) {
-            if (!ZP_Player_IsZombie(pPlayer)) {
-                ExecuteHamB(Ham_Killed, pPlayer, pPlayer, 0);
+    switch (iItem) {
+        case 0: {
+            g_iPlayerTeamPreference[pPlayer] = TeamPreference_Human;
+        }
+        case 1: {
+            g_iPlayerTeamPreference[pPlayer] = TeamPreference_Zombie;
+        }
+        case 4: {
+            g_iPlayerTeamPreference[pPlayer] = TeamPreference_Spectator;
+            set_member(pPlayer, m_iTeam, 3);
+
+            if (is_user_alive(pPlayer)) {
+                ExecuteHam(Ham_Killed, pPlayer, pPlayer, 0);
             }
-        } else {
-            g_bPlayerPreferZombies[pPlayer] = true;
         }
     }
 
-    menu_destroy(iMenu);
+    if (Round_IsRoundStarted()) {
+        switch (iItem) {
+            case 0: {
+                if (get_member(pPlayer, m_iTeam) == 3) {
+                    ZP_GameRules_RespawnAsZombie(pPlayer);
+                }
+            }
+            case 1: {
+                if (!ZP_Player_IsZombie(pPlayer)) {
+                    if (get_member(pPlayer, m_iTeam) == 3) {
+                        ZP_GameRules_RespawnAsZombie(pPlayer);
+                    } else {
+                        ExecuteHamB(Ham_Killed, pPlayer, pPlayer, 0);
+                    }
+                }
+            }
+            case 4: {
+                CheckWinConditions();
+            }
+        }
+    }
 
     return PLUGIN_HANDLED;
 }

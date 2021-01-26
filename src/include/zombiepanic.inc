@@ -58,4 +58,9 @@ native bool:ZP_GameRules_GetObjectiveMode();
 native ZP_GameRules_SetObjectiveMode(bool:bValue);
 native ZP_GameRules_GetZombieLives();
 native ZP_GameRules_SetZombieLives(iLives);
+native ZP_GameRules_RespawnAsZombie(pPlayer);
 native ZP_GameRules_DispatchWin(iTeam);
+
+// Map Info
+
+native ZP_ShowMapInfo(pPlayer);

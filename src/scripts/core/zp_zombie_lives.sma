@@ -27,6 +27,7 @@ public plugin_init() {
 public plugin_natives() {
   register_native("ZP_GameRules_GetZombieLives", "Native_GetZombieLives");
   register_native("ZP_GameRules_SetZombieLives", "Native_SetZombieLives");
+  register_native("ZP_GameRules_RespawnAsZombie", "Native_RespawnAsZombie");
 }
 
 public Native_GetZombieLives(iPluginId, iArgc) {
@@ -37,11 +38,17 @@ public Native_SetZombieLives(iPluginId, iArgc) {
   g_iLives = get_param(1);
 }
 
+public Native_RespawnAsZombie(iPluginId, iArgc) {
+  new pPlayer = get_param(1);
+  set_member(pPlayer, m_iTeam, ZP_ZOMBIE_TEAM);
+  SetupRespawnTask(pPlayer);
+}
+
 public Zp_Fw_PlayerJoined(pPlayer) {
     ExecuteHam(Ham_Player_PreThink, pPlayer);
 
     if (!is_user_alive(pPlayer)) {
-      set_task(SPAWN_DELAY, "TaskRespawnPlayer", TASKID_PLAYER_RESPAWN + pPlayer);
+      SetupRespawnTask(pPlayer);
     }
 
     return PLUGIN_HANDLED;
@@ -56,20 +63,19 @@ public OnPlayerKilled_Post(pPlayer) {
     g_iLives++;
   }
 
-  if (!get_member_game(m_bFreezePeriod)) {
-    remove_task(pPlayer);
-    set_task(SPAWN_DELAY, "TaskRespawnPlayer", TASKID_PLAYER_RESPAWN + pPlayer);
+  if (!get_member_game(m_bFreezePeriod) && get_member(pPlayer, m_iTeam) != 3) {
+    SetupRespawnTask(pPlayer);
   }
 }
 
-public TaskRespawnPlayer(iTaskId) {
-  new pPlayer = iTaskId - TASKID_PLAYER_RESPAWN;
-  RespawnPlayer(pPlayer);
+SetupRespawnTask(pPlayer) {
+    remove_task(pPlayer);
+    set_task(SPAWN_DELAY, "Task_RespawnPlayer", TASKID_PLAYER_RESPAWN + pPlayer);
 }
 
 RespawnPlayer(pPlayer) {
   if (!g_iLives) {
-    set_task(SPAWN_DELAY, "TaskRespawnPlayer", TASKID_PLAYER_RESPAWN + pPlayer);
+    SetupRespawnTask(pPlayer);
     return;
   }
 
@@ -78,11 +84,6 @@ RespawnPlayer(pPlayer) {
   }
 
   if (is_user_alive(pPlayer)) {
-      return;
-  }
-
-  new iTeam = get_member(pPlayer, m_iTeam);
-  if (iTeam != ZP_ZOMBIE_TEAM && iTeam != ZP_HUMAN_TEAM) {
       return;
   }
 
@@ -95,4 +96,9 @@ RespawnPlayer(pPlayer) {
   }
 
   ExecuteHamB(Ham_CS_RoundRespawn, pPlayer);
+}
+
+public Task_RespawnPlayer(iTaskId) {
+  new pPlayer = iTaskId - TASKID_PLAYER_RESPAWN;
+  RespawnPlayer(pPlayer);
 }
