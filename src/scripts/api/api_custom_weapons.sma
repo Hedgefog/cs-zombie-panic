@@ -774,8 +774,8 @@ WeaponDeploy(this) {
     return;
   }
 
-  new pPlayer = GetPlayer(this);
-  SetWeaponPrediction(pPlayer, false);
+  SetThink(this, "DisablePrediction");
+  set_pev(this, pev_nextthink, get_gametime() + 0.1);
 }
 
 bool:ShouldWeaponIdle(this) {
@@ -987,6 +987,12 @@ public Smack(this) {
   MakeDecal(tr, pHit, iDecalIndex, false);
   free_tr2(tr);
 
+  SetThink(this, "");
+}
+
+public DisablePrediction(this) {
+  new pPlayer = GetPlayer(this);
+  SetWeaponPrediction(pPlayer, false);
   SetThink(this, "");
 }
 
