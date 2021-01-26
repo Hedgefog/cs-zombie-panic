@@ -90,14 +90,6 @@ public OnAddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
         return FMRES_IGNORED;
     }
 
-    if (!is_user_alive(pHost)) {
-        return FMRES_SUPERCEDE;
-    }
-
-    if (ZP_Player_IsZombie(pHost)) {
-        return FMRES_SUPERCEDE;
-    }
-
     if (!pev_valid(pEntity)) {
         return FMRES_IGNORED;
     }
@@ -107,6 +99,14 @@ public OnAddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
 
     if (!equal(szClassname, MARK_CLASSNAME)) {
         return FMRES_IGNORED;
+    }
+
+    if (!is_user_alive(pHost)) {
+        return FMRES_SUPERCEDE;
+    }
+
+    if (ZP_Player_IsZombie(pHost)) {
+        return FMRES_SUPERCEDE;
     }
 
     new pButton = pev(pEntity, pev_owner);
@@ -130,11 +130,11 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     }
 
     if (!is_user_alive(pHost)) {
-        return FMRES_SUPERCEDE;
+        return FMRES_IGNORED;
     }
 
     if (ZP_Player_IsZombie(pHost)) {
-        return FMRES_SUPERCEDE;
+        return FMRES_IGNORED;
     }
 
     if (!pev_valid(pEntity)) {
