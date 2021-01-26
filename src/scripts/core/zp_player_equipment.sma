@@ -22,14 +22,13 @@ public OnPlayerSpawnEquip(pPlayer) {
 
   set_member(pPlayer, m_szAnimExtention, "c4");
 
-  new Float:flMaxHealth;
-  pev(pPlayer, pev_max_health, flMaxHealth);
-
+  new Float:flMaxHealth = ZP_Player_IsZombie(pPlayer) ? ZP_ZOMBIE_HEALTH : 100.0;
+  set_pev(pPlayer, pev_max_health, flMaxHealth);
   set_pev(pPlayer, pev_health, flMaxHealth);
   set_pev(pPlayer, pev_armorvalue, 0.0);
   set_member(pPlayer, m_iKevlar, 0);
 
-  if (!get_member_game(m_bFreezePeriod)) {
+  if (Round_IsRoundStarted()) {
     EquipPlayer(pPlayer);
   }
 
@@ -52,10 +51,8 @@ public Round_Fw_RoundStart() {
 
 EquipPlayer(pPlayer) {
   if (ZP_Player_IsZombie(pPlayer)) {
-    set_pev(pPlayer, pev_max_health, ZP_ZOMBIE_HEALTH);
     CW_GiveWeapon(pPlayer, ZP_WEAPON_SWIPE);
   } else {
-    set_pev(pPlayer, pev_max_health, 100.0);
     CW_GiveWeapon(pPlayer, ZP_WEAPON_CROWBAR);
     CW_GiveWeapon(pPlayer, ZP_WEAPON_PISTOL);
   }
