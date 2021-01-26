@@ -17,15 +17,11 @@
 
 new g_iLives = 0;
 
-new g_pCvarLives;
-
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
     RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
-
-    g_pCvarLives = register_cvar("zp_zombie_lives", "20");
 }
 
 public plugin_natives() {
@@ -49,10 +45,6 @@ public Zp_Fw_PlayerJoined(pPlayer) {
     }
 
     return PLUGIN_HANDLED;
-}
-
-public Round_Fw_RoundStart() {
-  g_iLives = ZP_GameRules_GetObjectiveMode() ? 255 : get_pcvar_num(g_pCvarLives);
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
