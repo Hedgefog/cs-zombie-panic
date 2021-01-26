@@ -5,6 +5,7 @@
 #include <fakemeta>
 #include <hamsandwich>
 #include <xs>
+#include <reapi>
 
 #include <zombiepanic>
 #include <zombiepanic_utils>
@@ -86,6 +87,10 @@ public OnPlayerPreThink_Post(pPlayer) {
 bool:SetPlayerFlashlight(pPlayer, bool:bValue) {
   if (bValue == g_playerFlashlight[pPlayer][PlayerFlashlight_On]) {
     return true;
+  }
+
+  if (bValue && get_member_game(m_bFreezePeriod)) {
+    return false;
   }
 
   if (bValue && (ZP_Player_IsZombie(pPlayer) || !is_user_alive(pPlayer))) {
