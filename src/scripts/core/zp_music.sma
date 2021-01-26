@@ -32,6 +32,7 @@ public plugin_init() {
 }
 
 public client_connect(pPlayer) {
+  g_bPlayerMusic[pPlayer] = false;
   PlayMusic(pPlayer, ZP_STARTUP_SOUND, true);
 }
 
