@@ -202,6 +202,17 @@ public OnCheckWinConditions() {
 /*--------------------------------[ Methods ]--------------------------------*/
 
 DistributeTeams() {
+    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
+        if (!is_user_connected(pPlayer)) {
+            continue;
+        }
+
+        new iTeam = get_member(pPlayer, m_iTeam);
+        if (iTeam == ZP_ZOMBIE_TEAM) {
+            set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
+        }
+    }
+
     new pPlayerCount = CalculatePlayerCount();
     new iZombieCount = ProcessZombiePlayers(pPlayerCount / 2);
 
