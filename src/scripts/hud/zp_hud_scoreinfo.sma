@@ -52,7 +52,7 @@ public OnEvent(pPlayer) {
 
 Update(pPlayer, pTargetPlayer) {
     new iScore = get_user_frags(pTargetPlayer);
-    new iDeaths = ZP_Player_IsZombie(pPlayer) || pTargetPlayer == pPlayer ? get_user_deaths(pTargetPlayer) : 0;
+    new iDeaths = ZP_Player_IsZombie(pPlayer) || pTargetPlayer == pPlayer ? get_member(pTargetPlayer, m_iDeaths) : 0;
     new iClassId = 0;
     new iTeam = ZP_Player_IsZombie(pPlayer) || is_user_bot(pPlayer) ? get_member(pTargetPlayer, m_iTeam) : get_member(pPlayer, m_iTeam);
 
