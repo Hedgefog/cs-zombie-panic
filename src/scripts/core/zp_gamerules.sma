@@ -1,6 +1,7 @@
 #pragma semicolon 1
 
 #include <amxmodx>
+#include <fakemeta>
 #include <hamsandwich>
 #include <fun>
 #include <reapi>
@@ -21,6 +22,8 @@ new bool:g_bObjectiveMode = false;
 
 new g_bPlayerPreferZombies[MAX_PLAYERS + 1];
 
+new g_pCvarLives;
+
 new g_fwPlayerJoined;
 new g_fwResult;
 
@@ -29,6 +32,7 @@ public plugin_init() {
 
     Round_HookCheckWinConditions("OnCheckWinConditions");
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn", .Post = 0);
+    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
     RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
 
     register_clcmd("chooseteam", "OnPlayerChangeTeam");
@@ -41,6 +45,8 @@ public plugin_init() {
 
     g_iMaxPlayers = get_maxplayers();
     g_fwPlayerJoined = CreateMultiForward("Zp_Fw_PlayerJoined", ET_IGNORE, FP_CELL);
+
+    g_pCvarLives = register_cvar("zp_zombie_lives", "20");
 }
 
 public plugin_natives() {
@@ -82,15 +88,17 @@ public Round_Fw_NewRound() {
         }
 
         g_bPlayerPreferZombies[pPlayer] = false;
-        set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
     }
+
+    ShuffleTeams();
 
     return PLUGIN_CONTINUE;
 }
 
 public Round_Fw_RoundStart() {
+    ZP_GameRules_SetZombieLives(ZP_GameRules_GetObjectiveMode() ? 255 : get_pcvar_num(g_pCvarLives));
     DistributeTeams();
-
+    CheckWinConditions();
     log_amx("New round started");
 }
 
@@ -155,9 +163,17 @@ public OnPlayerSpawn(pPlayer) {
     }
 
     if (!Round_IsRoundStarted()) {
-        if (!ZP_Player_IsZombie(pPlayer)) {
-            OpenTeamMenu(pPlayer);
-        }
+        OpenTeamMenu(pPlayer);
+    }
+
+    return HAM_HANDLED;
+}
+
+public OnPlayerSpawn_Post(pPlayer) {
+    if (!Round_IsRoundStarted()) {
+        set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
+        set_pev(pPlayer, pev_takedamage, DAMAGE_NO);
+        // ZP_Player_UpdateSpeed(pPlayer);
     } else {
         CheckWinConditions();
     }
@@ -201,6 +217,19 @@ DistributeTeams() {
             log_amx("Not enough players to start");
         }
     }
+    
+    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
+        if (!is_user_connected(pPlayer)) {
+            continue;
+        }
+
+        new iTeam = get_member(pPlayer, m_iTeam);
+        if (iTeam != ZP_ZOMBIE_TEAM && iTeam != ZP_HUMAN_TEAM) {
+            continue;
+        }
+
+        ExecuteHamB(Ham_CS_RoundRespawn, pPlayer);
+    }
 }
 
 ProcessZombiePlayers(iMaxZombies) {
@@ -225,7 +254,7 @@ ProcessZombiePlayers(iMaxZombies) {
                 log_amx("Player ^"%n^" has chosen a zombie team", pPlayer);
             }
 
-            RespawnPlayerAsZombie(pPlayer);
+            MovePlayerToZombieTeam(pPlayer);
             iZombieCount++;
         }
     }
@@ -256,14 +285,11 @@ ChooseRandomZombie() {
     }
 
     new pPlayer = rgpPlayers[random(pPlayerCount)];
-    RespawnPlayerAsZombie(pPlayer);
+    MovePlayerToZombieTeam(pPlayer);
 }
 
-RespawnPlayerAsZombie(pPlayer) {
-    strip_user_weapons(pPlayer);
+MovePlayerToZombieTeam(pPlayer) {
     set_member(pPlayer, m_iTeam, ZP_ZOMBIE_TEAM);
-    ExecuteHamB(Ham_CS_RoundRespawn, pPlayer);
-
     log_amx("Player ^"%n^" was moved to the zombie team", pPlayer);
 }
 
@@ -320,6 +346,36 @@ CheckWinConditions(pIgnorePlayer = 0) {
             DispatchWin(ZP_HUMAN_TEAM);
         }
     }
+}
+
+ShuffleTeams() {
+    new Array:irgPlayers = ArrayCreate();
+
+    for (new pPlayer = 1; pPlayer <= g_iMaxPlayers; ++pPlayer) {
+        if (!is_user_connected(pPlayer)) {
+            continue;
+        }
+
+        new iTeam = get_member(pPlayer, m_iTeam);
+        if (iTeam != ZP_ZOMBIE_TEAM && iTeam != ZP_HUMAN_TEAM) {
+            continue;
+        }
+
+        ArrayPushCell(irgPlayers, pPlayer);
+    }
+
+    new iPlayerCount = ArraySize(irgPlayers);
+    for (new i = 0; i < iPlayerCount; ++i) {
+        ArraySwap(irgPlayers, i, random(iPlayerCount));
+    }
+
+    for (new i = 0; i < iPlayerCount; ++i) {
+        new pPlayer = ArrayGetCell(irgPlayers, i);
+        new iTeam = i % 2 ? ZP_HUMAN_TEAM : ZP_ZOMBIE_TEAM;
+        set_member(pPlayer, m_iTeam, iTeam);
+    }
+
+    ArrayDestroy(irgPlayers);
 }
 
 DispatchWin(iTeam) {
