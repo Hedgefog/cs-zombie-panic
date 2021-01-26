@@ -316,6 +316,7 @@ CheckWinConditions(pIgnorePlayer = 0) {
     new iAliveHumanCount = 0;
     new iAliveZombieCount = 0;
     new iZombieCount = 0;
+    new iPlayerCount = 0;
 
     for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
         if (pPlayer == pIgnorePlayer) {
@@ -337,6 +338,12 @@ CheckWinConditions(pIgnorePlayer = 0) {
                 iAliveHumanCount++;
             }
         }
+
+        iPlayerCount++;
+    }
+
+    if (iPlayerCount <= 1) {
+        return;
     }
 
     if (Round_IsRoundStarted()) {
