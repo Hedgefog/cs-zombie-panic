@@ -12,10 +12,10 @@
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    register_forward(FM_AddToFullPack, "OnAddToFullPack_Post", 1);
+    register_forward(FM_AddToFullPack, "OnAddToFullPack");
 }
 
-public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
+public OnAddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
   if (pEntity == pHost) {
     return FMRES_IGNORED;
   }
