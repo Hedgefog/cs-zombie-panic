@@ -24,6 +24,10 @@ public OnAddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     return FMRES_IGNORED;
   }
 
+  if (!pev_valid(pEntity)) {
+    return FMRES_IGNORED;
+  }
+
   if (!is_user_bot(pHost)) {
     return FMRES_IGNORED;
   }
