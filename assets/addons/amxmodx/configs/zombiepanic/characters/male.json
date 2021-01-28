@@ -1,5 +1,4 @@
 {
-  "name": "male",
   "models": {
     "zombie": "models/zombiepanic/b1/characters/male/zombie.mdl",
     "human": "models/zombiepanic/b1/characters/male/human.mdl",
