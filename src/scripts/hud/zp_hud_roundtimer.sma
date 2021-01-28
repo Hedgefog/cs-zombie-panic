@@ -2,11 +2,11 @@
 
 #include <amxmodx>
 #include <engine>
+#include <reapi>
 
 #include <zombiepanic>
-#include <zombiepanic_utils>
 
-#define PLUGIN "[Zombie Panic] Money HUD"
+#define PLUGIN "[Zombie Panic] RoundTimer HUD"
 #define AUTHOR "Hedgehog Fog"
 
 new gmsgHideWeapon;
@@ -23,15 +23,31 @@ public plugin_init() {
 }
 
 public OnResetHUD(pPlayer) {
+    if (!ZP_GameRules_GetObjectiveMode()) {
+      return PLUGIN_CONTINUE;
+    }
+
+    if (get_member_game(m_bFreezePeriod)) {
+       return PLUGIN_CONTINUE;
+    }
+
     emessage_begin(MSG_ONE, gmsgHideWeapon, _, pPlayer);
-    ewrite_byte(HIDEHUD_MONEY);
+    ewrite_byte(HIDEHUD_TIMER);
     emessage_end();
     
     return PLUGIN_CONTINUE;
 }
 
 public OnMessage_HideWeapon(iMsgId, iMsgDest, pPlayer) {
-    set_msg_arg_int(1, ARG_BYTE, get_msg_arg_int(1) | HIDEHUD_MONEY);
+    if (!ZP_GameRules_GetObjectiveMode()) {
+      return PLUGIN_CONTINUE;
+    }
+
+    if (get_member_game(m_bFreezePeriod)) {
+       return PLUGIN_CONTINUE;
+    }
+  
+    set_msg_arg_int(1, ARG_BYTE, get_msg_arg_int(1) | HIDEHUD_TIMER);
     g_iPlayerHideWeapon[pPlayer] = get_msg_arg_int(1);
 
     return PLUGIN_CONTINUE;
