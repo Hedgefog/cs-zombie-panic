@@ -15,17 +15,16 @@
 new bool:g_bPlayerPanic[MAX_PLAYERS + 1];
 new Float:g_flPlayerLastPanic[MAX_PLAYERS + 1];
 
-public plugin_precache() {
-  for (new i = 0; i < sizeof(ZP_PANIC_SOUNDS); ++i) {
-    precache_sound(ZP_PANIC_SOUNDS[i]);
-  }
-}
+new g_iFwPanic;
+new g_iFwResult;
 
 public plugin_init() {
   register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
   RegisterHam(Ham_Touch, "weaponbox", "OnItemTouch", .Post = 0);
   RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
+
+  g_iFwPanic = CreateMultiForward("ZP_Fw_PlayerPanic", ET_IGNORE, FP_CELL);
 }
 
 public plugin_natives() {
@@ -71,11 +70,11 @@ bool:Panic(pPlayer) {
   }
 
   ZP_Player_DropBackpack(pPlayer);
-  emit_sound(pPlayer, CHAN_VOICE, ZP_PANIC_SOUNDS[random(sizeof(ZP_PANIC_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
   g_bPlayerPanic[pPlayer] = true;
 
   set_task(PANIC_DURATION, "TaskEndPanic", pPlayer);
-  ZP_Player_UpdateSpeed(pPlayer);
+
+  ExecuteForward(g_iFwPanic, g_iFwResult, pPlayer);
 
   return true;
 }

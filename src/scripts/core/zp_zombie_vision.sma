@@ -13,6 +13,9 @@
 
 new bool:g_bPlayerVision[MAX_PLAYERS + 1];
 
+new g_iFwZombieVision;
+new g_iFwResult;
+
 public plugin_init() {
   register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
@@ -20,6 +23,8 @@ public plugin_init() {
   RegisterHam(Ham_Killed, "player", "OnPlayerKilled", .Post = 1);
 
   register_forward(FM_AddToFullPack, "OnAddToFullPack_Post", 1);
+
+  g_iFwZombieVision = CreateMultiForward("ZP_Fw_PlayerZombieVision", ET_IGNORE, FP_CELL, FP_CELL);
 }
 
 public plugin_natives() {
@@ -122,8 +127,9 @@ SetZombieVision(pPlayer, bool:bValue) {
 
   if (bValue) {
     set_task(0.1, "TaskLight", pPlayer, _, _, "b");
-    ZP_Player_PlayZombieAmbient(pPlayer);
   }
+
+  ExecuteForward(g_iFwZombieVision, g_iFwResult, pPlayer, bValue);
 }
 
 public TaskLight(iTaskId) {

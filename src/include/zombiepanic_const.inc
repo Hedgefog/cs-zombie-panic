@@ -80,8 +80,6 @@ stock const ZP_AMMO_RIFLE_MODEL[] = "models/zombiepanic/b1/items/w_556ARclip.mdl
 stock const ZP_AMMO_SHOTGUN_MODEL[] = "models/zombiepanic/b1/items/w_shotbox.mdl";
 stock const ZP_AMMO_MAGNUM_MODEL[] = "models/zombiepanic/b1/items/w_357ammobox.mdl";
 
-stock const ZP_CHARACTER_FOLDER[] = "models/zombiepanic/b1/characters";
-
 stock const ZP_STARTUP_SOUND[] = "sound/zombiepanic/b1/music/gamestartup.mp3";
 
 stock const ZP_MUSIC_LIST[][ZP_Music] = {
@@ -117,41 +115,6 @@ stock const ZP_HUD_SPRITES[][] = {
   "sprites/zombiepanic/b2/magnum_xhair.spr",
   "sprites/zombiepanic/b2/colt_xhair.spr",
   "sprites/zombiepanic/b2/shotgun_xhair.spr"
-};
-
-stock const ZP_ZOMBIE_AMBIENT_SOUNDS[][] = {
-  "zombiepanic/b1/player/zomambient1.wav",
-  "zombiepanic/b1/player/zomambient2.wav",
-  "zombiepanic/b1/player/zomambient3.wav",
-  "zombiepanic/b1/player/zomambient4.wav",
-  "zombiepanic/b1/player/zomambient5.wav",
-  "zombiepanic/b1/player/zomambient6.wav",
-  "zombiepanic/b1/player/zomambient7.wav",
-  "zombiepanic/b1/player/zomambient8.wav",
-  "zombiepanic/b1/player/zomambient9.wav",
-  "zombiepanic/b1/player/zomambient10.wav",
-  "zombiepanic/b1/player/zomambient11.wav",
-  "zombiepanic/b1/player/zomambient12.wav",
-  "zombiepanic/b1/player/zomambient13.wav",
-  "zombiepanic/b1/player/zomambient14.wav",
-  "zombiepanic/b1/player/zomambient15.wav"
-};
-
-stock const ZP_ZOMBIE_DEATH_SOUNDS[][] = {
-  "zombiepanic/b1/player/zombiedeath1.wav",
-  "zombiepanic/b1/player/zombiedeath2.wav",
-  "zombiepanic/b1/player/zombiedeath3.wav"
-};
-
-stock const ZP_HUMAN_DEATH_SOUNDS[][] = {
-  "zombiepanic/b1/player/deathscream1.wav",
-  "zombiepanic/b1/player/deathscream2.wav",
-  "zombiepanic/b1/player/deathscream3.wav"
-};
-
-stock const ZP_PANIC_SOUNDS[][] = {
-  "zombiepanic/b1/player/panicscream1.wav",
-  "zombiepanic/b1/player/panicscream2.wav",
 };
 
 stock const ZP_WEAPON_SWIPE_MISS_SOUNDS[][] = {
@@ -203,9 +166,5 @@ stock const ZP_WEAPON_MAGNUM_SHOT_SOUNDS[][] = {
 stock const ZP_WEAPON_PISTOL_SHOT_SOUND[] = "zombiepanic/b1/weapons/pl_gun3.wav";
 stock const ZP_WEAPON_PISTOL_RELOAD_START_SOUND[] = "items/9mmclip1.wav";
 stock const ZP_WEAPON_PISTOL_RELOAD_END_SOUND[] = "items/9mmclip2.wav";
-
-stock const ZP_CHARACTERS[][] = {
-  "male"
-};
 
 stock const ZP_OBJECTIVE_MARK_SPRITE[] = "sprites/zombiepanic/b2/objective_mark.spr";

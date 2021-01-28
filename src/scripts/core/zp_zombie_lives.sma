@@ -44,7 +44,7 @@ public Native_RespawnAsZombie(iPluginId, iArgc) {
   SetupRespawnTask(pPlayer);
 }
 
-public Zp_Fw_PlayerJoined(pPlayer) {
+public ZP_Fw_PlayerJoined(pPlayer) {
     ExecuteHam(Ham_Player_PreThink, pPlayer);
 
     if (!is_user_alive(pPlayer)) {

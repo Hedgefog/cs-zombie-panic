@@ -11,8 +11,6 @@
 #define PLUGIN "[Zombie Panic] Zombie"
 #define AUTHOR "Hedgehog Fog"
 
-#define TASKID_AMBIENT 100
-
 new const g_rgszPickupEntities[][] = {
   "armoury_entity",
   "item_battery",
@@ -23,23 +21,12 @@ new const g_rgszPickupEntities[][] = {
   "grenade"
 };
 
-public plugin_precache() {
-    for (new i = 0; i < sizeof(ZP_ZOMBIE_DEATH_SOUNDS); ++i) {
-      precache_sound(ZP_ZOMBIE_DEATH_SOUNDS[i]);
-    }
-
-    for (new i = 0; i < sizeof(ZP_ZOMBIE_AMBIENT_SOUNDS); ++i) {
-      precache_sound(ZP_ZOMBIE_AMBIENT_SOUNDS[i]);
-    }
-}
-
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
     RegisterHam(Ham_Item_PreFrame, "player", "OnPlayerItemPreFrame_Post", .Post = 1);
     RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage", .Post = 0);
-    RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
 
     RegisterHam(Ham_Use, "func_button", "OnButtonUse", .Post = 0);
 
@@ -50,23 +37,12 @@ public plugin_init() {
 
 public plugin_natives() {
   register_native("ZP_Player_IsZombie", "Native_IsPlayerZombie");
-  register_native("ZP_Player_PlayZombieAmbient", "Native_PlayAmbient");
 }
 
 public bool:Native_IsPlayerZombie(iPluginId, iArgc) {
   new pPlayer = get_param(1);
 
   return IsPlayerZombie(pPlayer);
-}
-
-public Native_PlayAmbient(iPluginId, iArgc) {
-  new pPlayer = get_param(1);
-
-  if (!ZP_Player_IsZombie(pPlayer)) {
-    return;
-  }
-
-  PlayAmbient(pPlayer);
 }
 
 public OnButtonUse(pEntity, pToucher) {
@@ -79,7 +55,6 @@ public OnButtonUse(pEntity, pToucher) {
   }
 
   if (pev(pEntity, pev_spawnflags) & ZP_BUTTON_FLAG_HUMAN_ONLY) {
-    PlayAmbient(pToucher);
     return HAM_SUPERCEDE;
   }
 
@@ -97,16 +72,6 @@ public OnPlayerSpawn_Post(pPlayer) {
 
   SetPlayerZombie(pPlayer);
   emit_sound(pPlayer, CHAN_ITEM, "common/null.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-
-  return HAM_HANDLED;
-}
-
-public OnPlayerKilled_Post(pPlayer) {
-  if (!ZP_Player_IsZombie(pPlayer)) {
-    return HAM_IGNORED;
-  }
-
-  emit_sound(pPlayer, CHAN_VOICE, ZP_ZOMBIE_DEATH_SOUNDS[random(sizeof(ZP_ZOMBIE_DEATH_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
   return HAM_HANDLED;
 }
@@ -157,27 +122,4 @@ bool:IsPlayerZombie(pPlayer) {
 
 SetPlayerZombie(pPlayer) {
   set_member(pPlayer, m_iTeam, ZP_ZOMBIE_TEAM);
-  set_task(0.1, "TaskAmbient", TASKID_AMBIENT + pPlayer);
-}
-
-public TaskAmbient(iTaskId) {
-  new pPlayer = iTaskId - TASKID_AMBIENT;
-  
-  if (!is_user_alive(pPlayer)) {
-    return;
-  }
-
-  if (!ZP_Player_IsZombie(pPlayer)) {
-    return;
-  }
-
-  if (random(100) < 50) {
-    PlayAmbient(pPlayer);
-  }
-
-  set_task(random_float(10.0, 20.0), "TaskAmbient", TASKID_AMBIENT + pPlayer);
-}
-
-PlayAmbient(pPlayer) {
-  emit_sound(pPlayer, CHAN_VOICE, ZP_ZOMBIE_AMBIENT_SOUNDS[random(sizeof(ZP_ZOMBIE_AMBIENT_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 }

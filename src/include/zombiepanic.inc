@@ -7,12 +7,6 @@
 
 #include <zombiepanic_const>
 
-enum ZP_CharacterModels {
-  CharacterModel_Human,
-  CharacterModel_Zombie,
-  CharacterModel_Swipe
-}
-
 // Player
 
 native bool:ZP_Player_IsZombie(pPlayer);
@@ -20,26 +14,20 @@ native bool:ZP_Player_Panic(pPlayer);
 native bool:ZP_Player_InPanic(pPlayer);
 native bool:ZP_Player_ToggleFlashlight(pPlayer);
 native bool:ZP_Player_ToggleZombieVision(pPlayer);
-native ZP_Player_PlayZombieAmbient(pPlayer);
 
-forward Zp_Fw_PlayerJoined(pPlayer);
+forward ZP_Fw_PlayerJoined(pPlayer);
+forward ZP_Fw_PlayerPanic(pPlayer);
+forward ZP_Fw_PlayerZombieVision(pPlayer, bool:bValue);
 
 // Player inventory
 
 native ZP_Player_UpdateSpeed(pPlayer);
-native ZP_Player_GetCharacter(pPlayer);
 native ZP_Player_DropBackpack(pPlayer);
 native ZP_Player_GetAmmo(pPlayer, const szAmmo[]);
 native ZP_Player_SetAmmo(pPlayer, const szAmmo[], iValue);
 native ZP_Player_AddAmmo(pPlayer, const szAmmo[], iValue);
 native ZP_Player_NextAmmo(pPlayer);
 native ZP_Player_DropAmmo(pPlayer);
-
-// Characters
-
-native ZP_GetCharacterModelPath(iCharacter, const szPath[], iLen);
-native ZP_GetCharacterCount();
-native ZP_GetCharacterModel(iCharacter, ZP_CharacterModels:iModel, szOut[], iLen);
 
 // Ammo
 

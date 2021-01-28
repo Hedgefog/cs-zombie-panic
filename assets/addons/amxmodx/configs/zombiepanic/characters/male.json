@@ -1,0 +1,45 @@
+{
+  "name": "male",
+  "models": {
+    "zombie": "models/zombiepanic/b1/characters/male/zombie.mdl",
+    "human": "models/zombiepanic/b1/characters/male/human.mdl",
+    "swipe": "models/zombiepanic/b1/characters/male/swipe.mdl"
+  },
+  "sounds": {
+    "human": {
+      "panic": [
+        "zombiepanic/b1/player/panicscream1.wav",
+        "zombiepanic/b1/player/panicscream2.wav"
+      ],
+      "death": [
+        "zombiepanic/b1/player/deathscream1.wav",
+        "zombiepanic/b1/player/deathscream2.wav",
+        "zombiepanic/b1/player/deathscream3.wav"
+      ]
+    },
+    "zombie": {
+      "ambient": [
+        "zombiepanic/b1/player/zomambient1.wav",
+        "zombiepanic/b1/player/zomambient2.wav",
+        "zombiepanic/b1/player/zomambient3.wav",
+        "zombiepanic/b1/player/zomambient4.wav",
+        "zombiepanic/b1/player/zomambient5.wav",
+        "zombiepanic/b1/player/zomambient6.wav",
+        "zombiepanic/b1/player/zomambient7.wav",
+        "zombiepanic/b1/player/zomambient8.wav",
+        "zombiepanic/b1/player/zomambient9.wav",
+        "zombiepanic/b1/player/zomambient10.wav",
+        "zombiepanic/b1/player/zomambient11.wav",
+        "zombiepanic/b1/player/zomambient12.wav",
+        "zombiepanic/b1/player/zomambient13.wav",
+        "zombiepanic/b1/player/zomambient14.wav",
+        "zombiepanic/b1/player/zomambient15.wav"
+      ],
+      "death": [
+        "zombiepanic/b1/player/zombiedeath1.wav",
+        "zombiepanic/b1/player/zombiedeath2.wav",
+        "zombiepanic/b1/player/zombiedeath3.wav"
+      ]
+    }
+  }
+}
