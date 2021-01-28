@@ -407,6 +407,7 @@ CreateTeamMenu() {
     menu_additem(iMenu, "Join Zombies");
     menu_addblank2(iMenu);
     menu_addblank2(iMenu);
+    menu_addblank2(iMenu);
     menu_additem(iMenu, "Spectate");
     menu_setprop(iMenu, MPROP_EXIT, MEXIT_NEVER);
 
