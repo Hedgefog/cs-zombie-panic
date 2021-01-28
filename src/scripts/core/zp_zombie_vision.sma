@@ -52,6 +52,8 @@ public OnPlayerSpawn(pPlayer) {
     return HAM_IGNORED;
   }
 
+  SetZombieVision(pPlayer, true);
+
   return HAM_HANDLED;
 }
 
