@@ -30,33 +30,15 @@ public OnPlayerSpawnEquip(pPlayer) {
   set_member(pPlayer, m_iKevlar, 0);
 
   if (Round_IsRoundStarted()) {
-    EquipPlayer(pPlayer);
+    strip_user_weapons(pPlayer);
+
+    if (ZP_Player_IsZombie(pPlayer)) {
+      CW_GiveWeapon(pPlayer, ZP_WEAPON_SWIPE);
+    } else {
+      CW_GiveWeapon(pPlayer, ZP_WEAPON_CROWBAR);
+      CW_GiveWeapon(pPlayer, ZP_WEAPON_PISTOL);
+    }
   }
 
   return HC_SUPERCEDE;
-}
-
-public Round_Fw_RoundStart() {
-  for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
-    if (!is_user_connected(pPlayer)) {
-        continue;
-    }
-
-    if (!is_user_alive(pPlayer)) {
-        continue;
-    }
-
-    EquipPlayer(pPlayer);
-  }
-}
-
-EquipPlayer(pPlayer) {
-  strip_user_weapons(pPlayer);
-
-  if (ZP_Player_IsZombie(pPlayer)) {
-    CW_GiveWeapon(pPlayer, ZP_WEAPON_SWIPE);
-  } else {
-    CW_GiveWeapon(pPlayer, ZP_WEAPON_CROWBAR);
-    CW_GiveWeapon(pPlayer, ZP_WEAPON_PISTOL);
-  }
 }
