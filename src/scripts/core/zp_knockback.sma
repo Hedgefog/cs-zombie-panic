@@ -13,6 +13,7 @@ new Float:g_rgflPlayerVelocity[MAX_PLAYERS + 1][3];
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+
     RegisterHam(Ham_TakeDamage, "player", "OnPlayerTraceAttack", .Post = 0);
     RegisterHam(Ham_TakeDamage, "player", "OnPlayerTraceAttack_Post", .Post = 1);
 }

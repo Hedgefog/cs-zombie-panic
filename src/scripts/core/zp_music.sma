@@ -14,6 +14,7 @@
 
 new bool:g_bPlayerMusic[MAX_PLAYERS + 1];
 new g_pCvarMusic;
+new g_pCvarJoinMusic;
 
 public plugin_precache() {
   precache_generic(ZP_STARTUP_SOUND);
@@ -29,11 +30,15 @@ public plugin_init() {
   RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
 
   g_pCvarMusic = register_cvar("zp_music", "1");
+  g_pCvarJoinMusic = register_cvar("zp_join_music", "1");
 }
 
 public client_connect(pPlayer) {
   g_bPlayerMusic[pPlayer] = false;
-  PlayMusic(pPlayer, ZP_STARTUP_SOUND, true);
+
+  if (get_pcvar_num(g_pCvarJoinMusic) > 0) {
+    PlayMusic(pPlayer, ZP_STARTUP_SOUND, true);
+  }
 }
 
 public OnPlayerSpawn_Post(pPlayer) {

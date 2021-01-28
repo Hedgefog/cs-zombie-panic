@@ -38,6 +38,8 @@ new g_iMarkModelIndex;
 
 new g_rgPlayerData[MAX_PLAYERS][12][PlayerData];
 
+new g_pCvarEnabled;
+
 public plugin_precache() {
     g_irgMarks = ArrayCreate();
     g_iMarkModelIndex = precache_model(ZP_OBJECTIVE_MARK_SPRITE);
@@ -63,6 +65,8 @@ public plugin_init() {
     register_forward(FM_AddToFullPack, "OnAddToFullPack", 0);
     register_forward(FM_AddToFullPack, "OnAddToFullPack_Post", 1);
     register_forward(FM_CheckVisibility, "OnCheckVisibility");
+
+    g_pCvarEnabled = register_cvar("zp_objective_marks", "1");
 }
 
 public plugin_end() {
@@ -99,6 +103,10 @@ public OnAddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
 
     if (!equal(szClassname, MARK_CLASSNAME)) {
         return FMRES_IGNORED;
+    }
+
+    if (get_pcvar_num(g_pCvarEnabled) <= 0) {
+        return FMRES_SUPERCEDE;
     }
 
     if (!is_user_alive(pHost)) {
@@ -145,6 +153,10 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     pev(pEntity, pev_classname, szClassname, charsmax(szClassname));
 
     if (!equal(szClassname, MARK_CLASSNAME)) {
+        return FMRES_IGNORED;
+    }
+
+    if (get_pcvar_num(g_pCvarEnabled) <= 0) {
         return FMRES_IGNORED;
     }
 

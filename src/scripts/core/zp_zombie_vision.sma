@@ -16,6 +16,8 @@ new bool:g_bPlayerVision[MAX_PLAYERS + 1];
 new g_iFwZombieVision;
 new g_iFwResult;
 
+new g_pCvarAuto;
+
 public plugin_init() {
   register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
@@ -25,6 +27,8 @@ public plugin_init() {
   register_forward(FM_AddToFullPack, "OnAddToFullPack_Post", 1);
 
   g_iFwZombieVision = CreateMultiForward("ZP_Fw_PlayerZombieVision", ET_IGNORE, FP_CELL, FP_CELL);
+
+  g_pCvarAuto = register_cvar("zp_zombievision_auto", "1");
 }
 
 public plugin_natives() {
@@ -52,7 +56,9 @@ public OnPlayerSpawn(pPlayer) {
     return HAM_IGNORED;
   }
 
-  SetZombieVision(pPlayer, true);
+  if (get_pcvar_num(g_pCvarAuto) > 0) {
+    SetZombieVision(pPlayer, true);
+  }
 
   return HAM_HANDLED;
 }

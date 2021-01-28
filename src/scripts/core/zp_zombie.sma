@@ -70,7 +70,7 @@ public OnPlayerSpawn_Post(pPlayer) {
     return HAM_IGNORED;
   }
 
-  SetPlayerZombie(pPlayer);
+  set_member(pPlayer, m_iTeam, ZP_ZOMBIE_TEAM);
   emit_sound(pPlayer, CHAN_ITEM, "common/null.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
   return HAM_HANDLED;
@@ -118,8 +118,4 @@ public OnItemTouch(pEntity, pToucher) {
 
 bool:IsPlayerZombie(pPlayer) {
   return get_member(pPlayer, m_iTeam) == ZP_ZOMBIE_TEAM;
-}
-
-SetPlayerZombie(pPlayer) {
-  set_member(pPlayer, m_iTeam, ZP_ZOMBIE_TEAM);
 }
