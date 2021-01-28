@@ -2,6 +2,7 @@
 
 #include <amxmodx>
 #include <hamsandwich>
+#include <reapi>
 
 #include <zombiepanic>
 #include <zombiepanic_utils>
@@ -62,6 +63,10 @@ public OnPlayerSpawn_Post(pPlayer) {
 
 bool:Panic(pPlayer) {
   if (g_bPlayerPanic[pPlayer]) {
+    return false;
+  }
+
+  if (get_member_game(m_bFreezePeriod)) {
     return false;
   }
   
