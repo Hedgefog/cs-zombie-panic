@@ -65,10 +65,7 @@ public OnPlayerSpawn_Post(pPlayer) {
     return HAM_IGNORED;
   }
 
-  if (ZP_Player_IsZombie(pPlayer)) {
-    SetPlayerFlashlight(pPlayer, false);
-  }
-
+  SetPlayerFlashlight(pPlayer, false);
   g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] = FLASHLIGHT_CHARGE_DEF;
   set_pev(pPlayer, pev_framerate, 1.0);
   
