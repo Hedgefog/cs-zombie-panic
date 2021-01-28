@@ -85,12 +85,7 @@ public @Weapon_SecondaryAttack(this) {
 }
 
 public @Weapon_Deploy(this) {
-  new pPlayer = CW_GetPlayer(this);
-  new iCharacter = ZP_Player_GetCharacter(pPlayer);
-  
-  static szVModel[64];
-  ZP_GetCharacterModel(iCharacter, CharacterModel_Swipe, szVModel, charsmax(szVModel));
-  CW_DefaultDeploy(this, szVModel, "", 1, "dualpistols");
+  CW_DefaultDeploy(this, "", "", 1, "dualpistols");
 }
 
 public @Weapon_Idle(this) {
