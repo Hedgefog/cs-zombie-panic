@@ -16,11 +16,10 @@
 #define FLASHLIGHT_CHARGE_MAX 100.0
 #define FLASHLIGHT_CHARGE_DEF FLASHLIGHT_CHARGE_MAX
 #define FLASHLIGHT_RATE 0.025
-#define FLASHLIGHT_CONSUMPTION_RATE 0.5
-#define FLASHLIGHT_RECOVERY_RATE 0.5
 #define FLASHLIGHT_MAX_DISTANCE 1024.0
 #define FLASHLIGHT_MAX_CHARGE 100.0
 #define FLASHLIGHT_MIN_CHARGE 0.0
+#define FLASHLIGHT_MIN_CHARGE_TO_ACTIVATE 10.0
 
 #define TASKID_FLASHLIGHT 100
 #define TASKID_FLASHLIGHT_HUD 200
@@ -36,6 +35,9 @@ new gmsgFlashlight;
 
 new g_playerFlashlight[MAX_PLAYERS + 1][PlayerFlashlight];
 
+new g_pCvarConsumptionRate;
+new g_pCvarRecoveryRate;
+
 public plugin_precache() {
   precache_sound(ZP_FLASHLIGHT_SOUND);
   precache_model(ZP_FLASHLIGHT_LIGHTCONE_MODEL);
@@ -49,6 +51,9 @@ public plugin_init() {
   RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
 
   gmsgFlashlight = get_user_msgid("Flashlight");
+
+  g_pCvarConsumptionRate = register_cvar("zp_flashlight_consumption_rate", "0.5");
+  g_pCvarRecoveryRate = register_cvar("zp_flashlight_recovery_rate", "0.5");
 }
 
 public plugin_natives() {
@@ -91,6 +96,10 @@ bool:SetPlayerFlashlight(pPlayer, bool:bValue) {
   }
 
   if (bValue && (ZP_Player_IsZombie(pPlayer) || !is_user_alive(pPlayer))) {
+    return false;
+  }
+
+  if (bValue && g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] < FLASHLIGHT_MIN_CHARGE_TO_ACTIVATE) {
     return false;
   }
 
@@ -167,14 +176,14 @@ public FlashlightThink(pPlayer) {
   if (g_playerFlashlight[pPlayer][PlayerFlashlight_On]) {
     if (g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] > FLASHLIGHT_MIN_CHARGE) {
       CreatePlayerFlashlightLight(pPlayer);
-      g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] -= (FLASHLIGHT_CONSUMPTION_RATE * flDelta);
+      g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] -= (get_pcvar_float(g_pCvarConsumptionRate) * flDelta);
       g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] = floatmax(g_playerFlashlight[pPlayer][PlayerFlashlight_Charge], FLASHLIGHT_MIN_CHARGE);
       set_pev(pPlayer, pev_framerate, 0.5);
     } else {
        SetPlayerFlashlight(pPlayer, false);
     }
   } else if (g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] < FLASHLIGHT_MAX_CHARGE) {
-    g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] += (FLASHLIGHT_RECOVERY_RATE * flDelta);
+    g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] += (get_pcvar_float(g_pCvarRecoveryRate) * flDelta);
     g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] = floatmin(g_playerFlashlight[pPlayer][PlayerFlashlight_Charge], FLASHLIGHT_MAX_CHARGE);
   }
 

@@ -1,8 +1,6 @@
 #pragma semicolon 1
 
 #include <amxmodx>
-#include <hamsandwich>
-#include <reapi>
 
 #include <zombiepanic>
 
