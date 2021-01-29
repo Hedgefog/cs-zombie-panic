@@ -20,7 +20,7 @@
 #define MARK_UPDATE_DELAY 0.1
 #define MARK_MAX_VELOCITY 200.0
 #define MARK_MAX_MOVE_STEP_LENGTH 1000.0
-#define MARK_MAX_SCALE_STEP 0.0625
+#define MARK_MAX_SCALE_STEP 0.125
 #define MARK_MAX_SCALE_STEP_LENGTH 100.0
 
 enum _:Frame { TopLeft, TopRight, BottomLeft, BottomRight };
