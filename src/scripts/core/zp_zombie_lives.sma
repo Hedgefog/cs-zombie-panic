@@ -13,7 +13,7 @@
 
 #define TASKID_PLAYER_RESPAWN 100
 
-#define SPAWN_DELAY 5.0
+new g_pCvarRespawnTime;
 
 new g_iLives = 0;
 
@@ -22,6 +22,8 @@ public plugin_init() {
 
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
     RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
+    
+    g_pCvarRespawnTime = register_cvar("zp_zombie_respawn_time", "6.0");
 }
 
 public plugin_natives() {
@@ -69,8 +71,8 @@ public OnPlayerKilled_Post(pPlayer) {
 }
 
 SetupRespawnTask(pPlayer) {
-    remove_task(pPlayer);
-    set_task(SPAWN_DELAY, "Task_RespawnPlayer", TASKID_PLAYER_RESPAWN + pPlayer);
+    remove_task(TASKID_PLAYER_RESPAWN + pPlayer);
+    set_task(get_pcvar_float(g_pCvarRespawnTime), "Task_RespawnPlayer", TASKID_PLAYER_RESPAWN + pPlayer);
 }
 
 RespawnPlayer(pPlayer) {
