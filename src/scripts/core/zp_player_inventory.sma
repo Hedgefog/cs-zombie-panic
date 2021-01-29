@@ -45,6 +45,7 @@ public plugin_precache() {
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
+    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
     RegisterHam(Ham_Killed, "player", "OnPlayerKilled", .Post = 0);
 }
 
@@ -100,22 +101,12 @@ public Native_AddAmmo(iPluginId, iArgc) {
 }
 
 public OnPlayerKilled(pPlayer) {
-  // for (new iSlot = 0; iSlot < 6; ++iSlot) {
-  //   new pItem = get_pdata_cbase(pPlayer, m_rgpPlayerItems + iSlot, 5);
-
-  //   while (pItem != -1) {
-  //     new iId = get_pdata_int(pItem, m_iId, 4);
-  //     log_amx("(%d) Slot %d Weapon %d Id %d", pPlayer, iSlot, pItem, iId);
-  //     pItem = get_pdata_cbase(pItem, m_pNext, 4);
-  //   }
-  // }
-
-  // for (new iAmmoId = 0; iAmmoId < AMMO_COUNT; ++iAmmoId) {
-  //   new iBpAmmo = get_pdata_int(pPlayer, m_rgAmmo + iAmmoId, 5);
-  //   log_amx("(%d) Ammo %d Count %d", pPlayer, iAmmoId, iBpAmmo);
-  // }
-
   DropBackpack(pPlayer);
+}
+
+public OnPlayerSpawn_Post(pPlayer) {
+  g_pPlayerSelectedAmmo[pPlayer] = -1;
+  SelectNextPlayerAmmo(pPlayer, false);
 }
 
 DropBackpack(pPlayer) {
@@ -285,55 +276,6 @@ DropPlayerItem(pPlayer, pItem, iSlot) {
   return iWeaponBox;
 }
 
-// PackPlayerItems(pPlayer, iWeaponBox) {
-//   set_member(pPlayer, m_pActiveItem, -1);
-
-//   new pItemCount = 0;
-//   for (new iSlot = 0; iSlot < 6; ++iSlot) {
-//     new pItem = get_member(pPlayer, m_rgpPlayerItems, iSlot);
-
-//     new iFirstItem = -1;
-//     new iPrevItem = -1;
-
-//     while (pItem != -1) {
-//       new iNextItem = get_member(pItem, m_pNext);
-//       new iId = get_member(pItem, m_iId);
-
-//       if (iId != CSW_KNIFE) {
-//         set_pev(pItem, pev_spawnflags, pev(pItem, pev_spawnflags) | SF_NORESPAWN);
-//         set_pev(pItem, pev_effects, EF_NODRAW);
-//         set_pev(pItem, pev_movetype, MOVETYPE_NONE);
-//         set_pev(pItem, pev_solid, SOLID_NOT);
-//         set_pev(pItem, pev_model, 0);
-//         set_pev(pItem, pev_modelindex, 0);
-//         set_pev(pItem, pev_owner, iWeaponBox);
-//         set_member(pItem, m_pPlayer, -1);
-
-//         if (iFirstItem == -1) {
-//           iFirstItem = pItem;
-//         }
-
-//         if (iPrevItem > 0) {
-//           set_member(iPrevItem, m_pNext, pItem);
-//         }
-
-//         iPrevItem = pItem;
-//         set_member(pPlayer, m_rgpPlayerItems, -1, iSlot);
-//         pItemCount++;
-//       }
-
-//       set_member(pItem, m_pNext, -1);
-//       pItem = iNextItem;
-//     }
-    
-//     if (iFirstItem > 0) {
-//       set_member(iWeaponBox, m_WeaponBox_rgpPlayerItems, iFirstItem, iSlot);
-//     }
-//   }
-
-//   return pItemCount;
-// }
-
 PackPlayerAmmo(pPlayer, iWeaponBox) {
   new iWeaponBoxAmmoIndex = 0;
   for (new iAmmoId = 0; iAmmoId < AMMO_COUNT; ++iAmmoId) {
@@ -350,7 +292,7 @@ PackPlayerAmmo(pPlayer, iWeaponBox) {
   return iWeaponBoxAmmoIndex;
 }
 
-SelectNextPlayerAmmo(pPlayer) {
+SelectNextPlayerAmmo(pPlayer, bool:bShowMessage = true) {
   new iAmmoIndex = g_pPlayerSelectedAmmo[pPlayer];
   do {
     iAmmoIndex++;
@@ -364,7 +306,10 @@ SelectNextPlayerAmmo(pPlayer) {
 
   static szAmmoName[32];
   ZP_Ammo_GetName(g_pPlayerSelectedAmmo[pPlayer], szAmmoName, charsmax(szAmmoName));
-  client_print(pPlayer, print_chat, "Selected %s ammo", szAmmoName);
+
+  if (bShowMessage) {
+    client_print(pPlayer, print_chat, "Selected %s ammo", szAmmoName);
+  }
 }
 
 DropPlayerSelectedAmmo(pPlayer) {
