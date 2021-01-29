@@ -41,6 +41,8 @@ new g_iPlayerCharacter[MAX_PLAYERS + 1] = { -1, ... };
 
 new CW:g_iCwSwipeHandler;
 
+new gmsgClCorpse;
+
 public plugin_precache() {
   precache_model(DEFAULT_PLAYER_MODEL);
 
@@ -54,11 +56,15 @@ public plugin_precache() {
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
+    gmsgClCorpse = get_user_msgid("ClCorpse");
+
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
     RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
     RegisterHam(Ham_Item_Deploy, "weapon_knife", "OnKnifeDeploy_Post", .Post = 1);
 
     register_forward(FM_SetClientKeyValue, "OnSetClientKeyValue");
+
+    register_message(gmsgClCorpse, "OnMessage_ClCorpse");
 
     g_iCwSwipeHandler = CW_GetHandler(ZP_WEAPON_SWIPE);
 }
@@ -122,6 +128,16 @@ public OnSetClientKeyValue(pPlayer, const szInfoBuffer[], const szKey[], const s
   return FMRES_IGNORED;
 }
 
+public OnMessage_ClCorpse(iMsgId, iMsgDest, pPlayer) {
+  new pTargetPlayer = get_msg_arg_int(12);
+  new iCharacter = g_iPlayerCharacter[pTargetPlayer];
+
+  static szPlayerModel[PATH_MAX_LEN];
+  ArrayGetString(Array:g_rgCharactersData[ZP_Player_IsZombie(pTargetPlayer) ? Character_ZombieModel : Character_HumanModel], iCharacter, szPlayerModel, charsmax(szPlayerModel));
+
+  set_msg_arg_string(1, szPlayerModel);
+}
+
 /*--------------------------------[ Tasks ]--------------------------------*/
 
 public Task_Ambient(iTaskId) {
@@ -134,10 +150,11 @@ public Task_Ambient(iTaskId) {
 /*--------------------------------[ Methods ]--------------------------------*/
 
 UpdatePlayerModel(pPlayer) {
-  static szPlayerModel[PATH_MAX_LEN];
+  new iCharacter = g_iPlayerCharacter[pPlayer];
 
+  static szPlayerModel[PATH_MAX_LEN];
   if (g_iPlayerCharacter[pPlayer] != -1) {
-    ArrayGetString(Array:g_rgCharactersData[ZP_Player_IsZombie(pPlayer) ? Character_ZombieModel : Character_HumanModel], g_iPlayerCharacter[pPlayer], szPlayerModel, charsmax(szPlayerModel));
+    ArrayGetString(Array:g_rgCharactersData[ZP_Player_IsZombie(pPlayer) ? Character_ZombieModel : Character_HumanModel], iCharacter, szPlayerModel, charsmax(szPlayerModel));
   } else {
     copy(szPlayerModel, charsmax(szPlayerModel), DEFAULT_PLAYER_MODEL);
   }
