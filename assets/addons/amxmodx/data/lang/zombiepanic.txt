@@ -1,0 +1,25 @@
+[en]
+ZP_HUMAN_OBJECTIVE = Survive to the end of the round or kill all zombies
+ZP_ZOMBIE_OBJECTIVE = Kill all survivors
+ZPO_HUMAN_OBJECTIVE = Follow the marks to complete objectives
+ZPO_ZOMBIE_OBJECTIVE = Don't let survivors complete the objectives
+ZP_SPEED_WARN = A large amount of ammo and weapons slows you down^nDon't forget to get rid of unnecessary ammo
+ZP_PANIC_HINT = Panic may help you escape from the zombies^nPress <O> to Panic
+ZP_DROP_AMMO_HINT = You can drop your ammo pressing <X>^nPress <Z> to select ammo type
+ZP_PICKUP_HINT = Press <E> to pickup items on dinstance
+ZP_ZOMBIE_NO_LIVES = No more lives^nWait for more lives to appear
+ZP_ZOMBIE_RESPAWN = You will be respawned soon...^nWatch the lives in the lower right corner
+ZP_HUMAN_RESPAWN = You will be respawned as zombie soon...
+
+[ru]
+ZP_HUMAN_OBJECTIVE = Прoдeржитecь дo кoнцa рayндa или yбeйтe вceх зoмби
+ZP_ZOMBIE_OBJECTIVE = yбeйтe вceх выживших
+ZPO_HUMAN_OBJECTIVE = Cлeдyйтe к oтмeткaм для выпoлнeния цeлeй
+ZPO_ZOMBIE_OBJECTIVE = Нe дaйтe выжившим выпoлнить цeль
+ZP_SPEED_WARN = Нe зaбывaйтe избaвлятьcя oт нeнyжных пaтрoнoв, чтoб пoддeрживaть cкoрocть
+ZP_PANIC_HINT = Пaникa мoжeт пoмoчь вaм yбeжaть oт зoмби^nНaжмитe <O> для aктивaции
+ZP_DROP_AMMO_HINT = Вы мoжeтe выбрocить пaтрoны нaжaв <X>^nНaжмитe <Z> для выбoрa типa пaтрoнoв
+ZP_PICKUP_HINT = Нaжмитe <E> для тoгo, чтoб пoдoбрaть прeдмeты нa рaccтoянии
+ZP_ZOMBIE_NO_LIVES = Жизнeй бoльшe нeт^noжидaйтe, пoкa пoявитcя бoльшe жизнeй
+ZP_ZOMBIE_RESPAWN = Вы вcкoрe вoзрoдитecь^ncлeдитe зa жизнями в прaвoй нижнeй чacти экрaнa
+ZP_HUMAN_RESPAWN = Вы вcкoрe вoздрoдитecь зa зoмби...
