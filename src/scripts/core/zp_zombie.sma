@@ -76,7 +76,7 @@ public OnPlayerSpawn_Post(pPlayer) {
   return HAM_HANDLED;
 }
 
-public OnPlayerTakeDamage(pPlayer, iInflictor, iAttacker, Float:flDamage, iDamageBits) {
+public OnPlayerTakeDamage(pPlayer, iInflictor, pAttacker, Float:flDamage, iDamageBits) {
   if (!ZP_Player_IsZombie(pPlayer)) {
     return HAM_IGNORED;
   }

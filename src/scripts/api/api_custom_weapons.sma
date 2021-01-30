@@ -1540,7 +1540,7 @@ FindHullIntersection(const Float:vecSrc[3], &tr, const Float:vecMins[3], const F
   }
 }
 
-_RadiusDamage(const Float:vecOrigin[3], iInflictor, iAttacker, Float:flDamage, Float:flRadius, iClassIgnore, iDamageBits) {
+_RadiusDamage(const Float:vecOrigin[3], iInflictor, pAttacker, Float:flDamage, Float:flRadius, iClassIgnore, iDamageBits) {
   #pragma unused iClassIgnore
 
   static Float:vecSrc[3];
@@ -1551,8 +1551,8 @@ _RadiusDamage(const Float:vecOrigin[3], iInflictor, iAttacker, Float:flDamage, F
 
   vecSrc[2] += 1.0; // in case grenade is lying on the ground
 
-  if ( !iAttacker ) {
-    iAttacker = iInflictor;
+  if (!pAttacker) {
+    pAttacker = iInflictor;
   }
 
   new pTr = create_tr2();
@@ -1568,7 +1568,7 @@ _RadiusDamage(const Float:vecOrigin[3], iInflictor, iAttacker, Float:flDamage, F
       continue;
     }
 
-    if (ExecuteHam(Ham_IsPlayer, pEntity) && !rg_is_player_can_takedamage(pEntity, iAttacker)) {
+    if (ExecuteHam(Ham_IsPlayer, pEntity) && !rg_is_player_can_takedamage(pEntity, pAttacker)) {
       continue;
     }
 
@@ -1627,9 +1627,9 @@ _RadiusDamage(const Float:vecOrigin[3], iInflictor, iAttacker, Float:flDamage, F
 
       rg_multidmg_clear();
       ExecuteHamB(Ham_TraceAttack, pEntity, iInflictor, flAdjustedDamage, vecDir, pTr, iDamageBits);
-      rg_multidmg_apply(iInflictor, iAttacker);
+      rg_multidmg_apply(iInflictor, pAttacker);
     } else {
-      ExecuteHamB(Ham_TakeDamage, pEntity, iInflictor, iAttacker, flAdjustedDamage, iDamageBits);
+      ExecuteHamB(Ham_TakeDamage, pEntity, iInflictor, pAttacker, flAdjustedDamage, iDamageBits);
     }
 
     iPrevEntity = pEntity;
