@@ -11,7 +11,7 @@
 #define AUTHOR "Hedgehog Fog"
 
 #define PANIC_DURATION 5.0
-#define PANIC_DELAY 60.0
+#define PANIC_DELAY 55.0
 
 new bool:g_bPlayerPanic[MAX_PLAYERS + 1];
 new Float:g_flPlayerLastPanic[MAX_PLAYERS + 1];
