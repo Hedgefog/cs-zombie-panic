@@ -47,7 +47,7 @@ public plugin_init() {
 }
 
 public OnItemTouch(pPlayer) {
-  return get_pcvar_num(g_pCvarUsePickup) && g_bBlockTouch ? HAM_SUPERCEDE : HAM_HANDLED;
+  return get_pcvar_num(g_pCvarUsePickup) && g_bBlockTouch && !is_user_bot(pPlayer) ? HAM_SUPERCEDE : HAM_HANDLED;
 }
 
 public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
