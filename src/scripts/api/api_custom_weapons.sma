@@ -825,6 +825,7 @@ FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:
   new shared_rand = pPlayer > 0 ? get_member(pPlayer, random_seed) : 0;
 
   new tr = create_tr2();
+
   static Float:vecRight[3];
   get_global_vector(GL_v_right, vecRight);
 
@@ -851,7 +852,6 @@ FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:
     for (new i = 0; i < 3; ++i) {
       vecDir[i] = vecDirShooting[i] + (vecMultiplier[0] * vecSpread[0] * vecRight[i]) + (vecMultiplier[1] * vecSpread[1] * vecUp[i]);
     }
-
 
     static Float:vecEnd[3];
     for (new i = 0; i < 3; ++i) {
@@ -1153,7 +1153,7 @@ bool:DefaultShot(this, Float:flDamage, Float:flRate, Float:flSpread[3], iShots, 
   new pPlayer = GetPlayer(this);
 
   static Float:vecDirShooting[3];
-  ExecuteHam(Ham_CS_Player_GetAutoaimVector, pPlayer, AUTOAIM_2DEGREES, vecDirShooting);
+  MakeAimDir(pPlayer, 1.0, vecDirShooting);
 
   static Float:vecSrc[3];
   ExecuteHam(Ham_Player_GetGunPosition, pPlayer, vecSrc);
@@ -1209,13 +1209,8 @@ DefaultSwing(this, Float:flDamage, Float:flRate, Float:flDistance) {
   static Float:vecSrc[3];
   ExecuteHam(Ham_Player_GetGunPosition, pPlayer, vecSrc);
 
-  static Float:vecAngles[3];
-  pev(pPlayer, pev_v_angle, vecAngles);
-  engfunc(EngFunc_MakeVectors, vecAngles);
-
   static Float:vecEnd[3];
-  get_global_vector(GL_v_forward, vecEnd);
-  xs_vec_mul_scalar(vecEnd, flDistance, vecEnd);
+  MakeAimDir(pPlayer, flDistance, vecEnd);
   xs_vec_add(vecSrc, vecEnd, vecEnd);
 
   new tr = create_tr2();
@@ -1641,6 +1636,15 @@ _RadiusDamage(const Float:vecOrigin[3], iInflictor, iAttacker, Float:flDamage, F
   }
 
   free_tr2(pTr);
+}
+
+MakeAimDir(pPlayer, Float:flDistance, Float:vecOut[3]) {
+  static Float:vecAngles[3];
+  pev(pPlayer, pev_v_angle, vecAngles);
+  engfunc(EngFunc_MakeVectors, vecAngles);
+
+  get_global_vector(GL_v_forward, vecOut);
+  xs_vec_mul_scalar(vecOut, flDistance, vecOut);
 }
 
 // ANCHOR: Storages
