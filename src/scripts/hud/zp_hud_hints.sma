@@ -8,7 +8,7 @@
 #include <zombiepanic>
 #include <api_rounds>
 
-#define PLUGIN "[Zombie Panic] Info HUD"
+#define PLUGIN "[Zombie Panic] Hints HUD"
 #define AUTHOR "Hedgehog Fog"
 
 #define MESSAGE_COLOR 0, 72, 128
