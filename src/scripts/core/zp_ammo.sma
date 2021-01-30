@@ -27,8 +27,8 @@ public plugin_precache() {
     RegisterAmmo(ZP_AMMO_RIFLE, 4, 30, ZP_AMMO_RIFLE_MODEL, 240);
     RegisterAmmo(ZP_AMMO_SHOTGUN, 5, 6, ZP_AMMO_SHOTGUN_MODEL, 60);
     RegisterAmmo(ZP_AMMO_MAGNUM, 1, 6, ZP_AMMO_MAGNUM_MODEL, 36);
-    RegisterAmmo(ZP_AMMO_SATCHEL, 14, -1, "", 3);
-    RegisterAmmo(ZP_AMMO_GRENADE, 12, -1, "", 3);
+    RegisterAmmo(ZP_AMMO_SATCHEL, 14, -1, NULL_STRING, 1);
+    RegisterAmmo(ZP_AMMO_GRENADE, 12, -1, NULL_STRING, 1);
 }
 
 public plugin_init() {
