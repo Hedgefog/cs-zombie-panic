@@ -48,20 +48,23 @@ public OnTouch(pEntity, pToucher) {
         return HAM_SUPERCEDE;
     }
 
-    new Float:flArmorValue;
-    pev(pToucher, pev_armorvalue, flArmorValue);
+    if (GetHamReturnStatus() < HAM_SUPERCEDE) {
+        if (!get_member_game(m_bFreezePeriod)) {
+            new Float:flArmorValue;
+            pev(pToucher, pev_armorvalue, flArmorValue);
 
-    if (flArmorValue < 100.0) {
-        flArmorValue = floatmin(100.0, flArmorValue + 20.0);
-        set_member(pToucher, m_iKevlar, 1);
-        set_pev(pToucher, pev_armorvalue, flArmorValue);
+            if (flArmorValue < 100.0) {
+                flArmorValue = floatmin(100.0, flArmorValue + 20.0);
+                set_member(pToucher, m_iKevlar, 1);
+                set_pev(pToucher, pev_armorvalue, flArmorValue);
 
-        set_pev(pEntity, pev_effects, pev(pEntity, pev_effects) | EF_NODRAW);
-        set_pev(pEntity, pev_solid, SOLID_NOT);
+                set_pev(pEntity, pev_effects, pev(pEntity, pev_effects) | EF_NODRAW);
+                set_pev(pEntity, pev_solid, SOLID_NOT);
 
-        emit_sound(pToucher, CHAN_ITEM, "items/tr_kevlar.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+                emit_sound(pToucher, CHAN_ITEM, "items/tr_kevlar.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+            }
+        }
     }
-
 
     return HAM_SUPERCEDE;
 }
