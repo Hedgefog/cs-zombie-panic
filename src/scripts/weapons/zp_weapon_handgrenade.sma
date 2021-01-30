@@ -217,7 +217,7 @@ ShootTimed(pOwner, const Float:vecStart[3], const Float:vecVelocity[3], Float:fl
   set_pev(pGrenade, pev_friction, 0.8);
 
   engfunc(EngFunc_SetModel, pGrenade, ZP_WEAPON_GRENADE_W_MODEL);
-  set_pev(pGrenade, pev_dmg, 200.0);
+  set_pev(pGrenade, pev_dmg, 300.0);
 
   return pGrenade;
 }
@@ -321,7 +321,7 @@ public Detonate(this) {
   new Float:flDamage;
   pev(this, pev_dmg, flDamage);
 
-  CW_GrenadeDetonate(this, flDamage * 2.5);
+  CW_GrenadeDetonate(this, flDamage, flDamage * 0.125);
   SetThink(this, "GrenadeSmoke");
   set_pev(this, pev_nextthink, get_gametime() + 0.1);
 }
