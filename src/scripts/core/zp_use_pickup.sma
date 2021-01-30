@@ -46,8 +46,12 @@ public plugin_init() {
     g_iFwAimItem = CreateMultiForward("ZP_Fw_Player_AimItem", ET_IGNORE, FP_CELL, FP_CELL);
 }
 
-public OnItemTouch(pPlayer) {
-  return get_pcvar_num(g_pCvarUsePickup) && g_bBlockTouch && !is_user_bot(pPlayer) ? HAM_SUPERCEDE : HAM_HANDLED;
+public OnItemTouch(pEntity, pToucher) {
+  if (!UTIL_IsPlayer(pToucher)) {
+    return HAM_IGNORED;
+  }
+
+  return get_pcvar_num(g_pCvarUsePickup) && g_bBlockTouch && !is_user_bot(pToucher) ? HAM_SUPERCEDE : HAM_HANDLED;
 }
 
 public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
