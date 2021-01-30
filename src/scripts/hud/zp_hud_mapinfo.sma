@@ -10,7 +10,7 @@
 #define AUTHOR "Hedgehog Fog"
 
 new g_szMotdTitle[32];
-new g_szMotdData[2048];
+new g_szMotdData[MAX_MOTD_LENGTH];
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
@@ -28,6 +28,10 @@ public Native_Show(iPluginId, iArgc) {
 }
 
 ShowMotd(pPlayer) {
+  if (g_szMotdData[0] == '^0') {
+    return;
+  }
+
   show_motd(pPlayer, g_szMotdData, g_szMotdTitle);
 }
 
@@ -37,6 +41,10 @@ BuildMotd() {
 
   static szFile[48];
   format(szFile, charsmax(szMap), "maps/%s.txt", szMap);
+
+  if (!file_exists(szFile)) {
+    return;
+  }
 
   copy(g_szMotdData, charsmax(g_szMotdData), MOTD_STYLES);
 
