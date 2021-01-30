@@ -223,8 +223,10 @@ ShootTimed(pOwner, const Float:vecStart[3], const Float:vecVelocity[3], Float:fl
 }
 
 public BounceTouch(this, pOther) {
+  new pOwner = pev(this, pev_owner);
+
   // don't hit the guy that launched this grenade
-  if (pOther == pev(this, pev_owner)) {
+  if (pOther == pOwner) {
     return;
   }
 
@@ -233,13 +235,13 @@ public BounceTouch(this, pOther) {
 
   // only do damage if we're moving fairly fast
   if (get_member(this, m_flNextAttack) < get_gametime() && xs_vec_len(vecVelocity) > 100.0) {
-    if (pev(this, pev_owner)) {
+    if (pOwner && rg_is_player_can_takedamage(pOther, pOwner)) {
       new tr = create_tr2();
       rg_multidmg_clear();
       static Float:vecForward[3];
       get_global_vector(GL_v_forward, vecForward);
-      ExecuteHamB(Ham_TraceAttack, pOther, pev(this, pev_owner), 1.0, vecForward, tr, DMG_CLUB); 
-      rg_multidmg_apply(this, pev(this, pev_owner));
+      ExecuteHamB(Ham_TraceAttack, pOther, pOwner, 1.0, vecForward, tr, DMG_CLUB); 
+      rg_multidmg_apply(this, pOwner);
       free_tr2(tr);
     }
 
