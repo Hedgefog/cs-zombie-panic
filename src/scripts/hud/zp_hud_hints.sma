@@ -119,6 +119,10 @@ public OnPlayerKilled_Post(pPlayer) {
         return HAM_IGNORED;
     }
 
+    if (Round_IsRoundEnd()) {
+        return HAM_IGNORED;
+    }
+
     SetupMessage(MESSAGE_COLOR, MESSAGE_POS_RESPAWN, MESSAGE_HOLD_TIME, MESSAGE_FADEIN_TIME, MESSAGE_FADEOUT_TIME);
     ShowMessageTitle(pPlayer, "%L", pPlayer, "ZP_RESPAWN_TITLE");
 
