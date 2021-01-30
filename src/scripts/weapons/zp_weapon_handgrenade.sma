@@ -8,6 +8,7 @@
 #include <reapi>
 
 #include <zombiepanic>
+#include <zombiepanic_utils>
 #include <api_custom_weapons>
 
 #define PLUGIN "[Zombie Panic] Weapon Grenade"
