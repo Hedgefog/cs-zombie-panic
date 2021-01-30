@@ -124,10 +124,10 @@ public @Weapon_Idle(this) {
         g_bPlayerRedeploy[pPlayer] = false;
     } else {
         CW_PlayAnimation(this, 0, 5.5);
+    }
 
-        if (get_member(pPlayer, m_rgAmmo, g_iAmmoId) <= 0 && !g_bPlayerChargeReady[pPlayer]) {
-            CW_RemovePlayerItem(this);
-        }
+    if (get_member(pPlayer, m_rgAmmo, g_iAmmoId) <= 0 && !g_bPlayerChargeReady[pPlayer]) {
+        RemovePlayerItem(this);
     }
 }
 
@@ -193,9 +193,10 @@ Detonate(this) {
     while ((pEntity = engfunc(EngFunc_FindEntityByString, pEntity, "classname", "zp_satchel_charge")) != 0) {
         if (pev(pEntity, pev_owner) == pPlayer) {
             ExecuteHamB(Ham_Use, pEntity, pPlayer, pPlayer, USE_ON, 0.0);
-            g_bPlayerChargeReady[pPlayer] = false;
         }
     }
+
+    g_bPlayerChargeReady[pPlayer] = false;
 
     set_member(this, m_Weapon_flNextPrimaryAttack, 0.5);
     set_member(this, m_Weapon_flNextSecondaryAttack, 0.5);
@@ -336,7 +337,7 @@ public GrenadeSmoke(this) {
 }
 
 public Round_Fw_NewRound() {
-    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         DeactivateSatchels(pPlayer);
     }
 }
