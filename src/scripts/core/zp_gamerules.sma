@@ -83,7 +83,7 @@ public client_disconnected(pPlayer) {
 }
 
 public Round_Fw_NewRound() {
-    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         if (!is_user_connected(pPlayer)) {
             continue;
         }
@@ -197,7 +197,7 @@ public OnCheckWinConditions() {
 /*--------------------------------[ Methods ]--------------------------------*/
 
 DistributeTeams() {
-    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         if (!is_user_connected(pPlayer)) {
             continue;
         }
@@ -223,7 +223,7 @@ DistributeTeams() {
         }
     }
     
-    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         if (!is_user_connected(pPlayer)) {
             continue;
         }
@@ -240,7 +240,7 @@ DistributeTeams() {
 ProcessZombiePlayers(iMaxZombies) {
     new iZombieCount = 0;
 
-    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         if (!is_user_connected(pPlayer)) {
             continue;
         }
@@ -270,7 +270,7 @@ ChooseRandomZombie() {
     static rgpPlayers[MAX_PLAYERS + 1];
     new pPlayerCount = 0;
 
-    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         if (!is_user_connected(pPlayer)) {
             continue;
         }
@@ -296,7 +296,7 @@ ChooseRandomZombie() {
 CalculatePlayerCount() {
     new pPlayerCount = 0;
 
-    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         if (!is_user_connected(pPlayer)) {
             continue;
         }
@@ -318,7 +318,7 @@ CheckWinConditions(pIgnorePlayer = 0) {
     new iZombieCount = 0;
     new iPlayerCount = 0;
 
-    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         if (pPlayer == pIgnorePlayer) {
             continue;
         }
@@ -358,7 +358,7 @@ CheckWinConditions(pIgnorePlayer = 0) {
 ShuffleTeams() {
     new Array:irgPlayers = ArrayCreate();
 
-    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         if (!is_user_connected(pPlayer)) {
             continue;
         }

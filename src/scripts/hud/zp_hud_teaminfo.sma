@@ -49,7 +49,7 @@ public OnEvent() {
   static szTeam[16];
   read_data(2, szTeam, charsmax(szTeam));
 
-  for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
+  for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
     if (!is_user_connected(pPlayer)) {
       continue;
     }
@@ -60,7 +60,7 @@ public OnEvent() {
 }
 
 Reset(pPlayer) {
-  for (new iTargetPlayer = 1; iTargetPlayer <= MAX_PLAYERS; ++iTargetPlayer) {
+  for (new iTargetPlayer = 1; iTargetPlayer <= MaxClients; ++iTargetPlayer) {
     if (!is_user_connected(iTargetPlayer)) {
       continue;
     }

@@ -85,7 +85,7 @@ public @Weapon_SecondaryAttack(this) {
 }
 
 public @Weapon_Deploy(this) {
-  CW_DefaultDeploy(this, "", "", 1, "dualpistols");
+  CW_DefaultDeploy(this, NULL_STRING, NULL_STRING, 1, "dualpistols");
 }
 
 public @Weapon_Idle(this) {
@@ -120,6 +120,7 @@ public OnPlayerKilled_Post() {
 
 public OnPlayerSpawn_Post(pPlayer) {
   UpdateZombieLives();
+  UpdatePlayerZombieLives(pPlayer);
   return HAM_HANDLED;
 }
 
@@ -139,7 +140,7 @@ public OnPlayerTraceAttack(this, pAttacker, Float:flDamage, Float:vecDir[3], pTr
 }
 
 UpdateZombieLives() {
-  for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
+  for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
     if (!is_user_connected(pPlayer)) {
       continue;
     }

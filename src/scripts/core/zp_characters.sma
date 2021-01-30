@@ -15,7 +15,6 @@
 
 #define TASKID_AMBIENT 100
 
-#define PATH_MAX_LEN 64
 #define RESERVED_CHARACTER_COUNT 4
 #define RESERVED_SOUND_COUNT 3
 #define CHARACTER_KEY "zp_character"
@@ -31,7 +30,7 @@ enum CharacterData {
   Character_ZombieDeathSounds
 }
 
-new g_szCharacterDir[PATH_MAX_LEN];
+new g_szCharacterDir[MAX_RESOURCE_PATH_LENGTH];
 
 new Array:g_rgCharactersData[CharacterData];
 new Trie:g_iCharactersMap;
@@ -132,7 +131,7 @@ public OnMessage_ClCorpse(iMsgId, iMsgDest, pPlayer) {
   new pTargetPlayer = get_msg_arg_int(12);
   new iCharacter = g_iPlayerCharacter[pTargetPlayer];
 
-  static szPlayerModel[PATH_MAX_LEN];
+  static szPlayerModel[MAX_RESOURCE_PATH_LENGTH];
   ArrayGetString(Array:g_rgCharactersData[ZP_Player_IsZombie(pTargetPlayer) ? Character_ZombieModel : Character_HumanModel], iCharacter, szPlayerModel, charsmax(szPlayerModel));
 
   set_msg_arg_string(1, szPlayerModel);
@@ -152,7 +151,7 @@ public Task_Ambient(iTaskId) {
 UpdatePlayerModel(pPlayer) {
   new iCharacter = g_iPlayerCharacter[pPlayer];
 
-  static szPlayerModel[PATH_MAX_LEN];
+  static szPlayerModel[MAX_RESOURCE_PATH_LENGTH];
   if (g_iPlayerCharacter[pPlayer] != -1) {
     ArrayGetString(Array:g_rgCharactersData[ZP_Player_IsZombie(pPlayer) ? Character_ZombieModel : Character_HumanModel], iCharacter, szPlayerModel, charsmax(szPlayerModel));
   } else {
@@ -161,7 +160,7 @@ UpdatePlayerModel(pPlayer) {
 
   new iModelIndex = engfunc(EngFunc_ModelIndex, szPlayerModel);
 
-  set_user_info(pPlayer, "model", "");
+  set_user_info(pPlayer, "model", NULL_STRING);
   set_pev(pPlayer, pev_modelindex, iModelIndex);
   set_member(pPlayer, m_modelIndexPlayer, iModelIndex);
 }
@@ -203,7 +202,7 @@ PlayVoiceFromCharacterData(pPlayer, CharacterData:iCharacterData) {
 
   new Array:irgSounds = ArrayGetCell(Array:g_rgCharactersData[iCharacterData], g_iPlayerCharacter[pPlayer]);
 
-  static szSound[PATH_MAX_LEN];
+  static szSound[MAX_RESOURCE_PATH_LENGTH];
   ArrayGetString(irgSounds, random(ArraySize(irgSounds)), szSound, charsmax(szSound));
   emit_sound(pPlayer, CHAN_VOICE, szSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 }
@@ -233,7 +232,7 @@ DestroyCharacter(iCharacter) {
 }
 
 CrateCharacterSoundsData(iCharacter, CharacterData:iCharacterData) {
-  new Array:irgSounds = ArrayCreate(PATH_MAX_LEN, RESERVED_SOUND_COUNT);
+  new Array:irgSounds = ArrayCreate(MAX_RESOURCE_PATH_LENGTH, RESERVED_SOUND_COUNT);
   ArraySetCell(Array:g_rgCharactersData[iCharacterData], iCharacter, irgSounds);
 }
 
@@ -271,7 +270,7 @@ LoadCharacters() {
 }
 
 LoadCharacter(const szName[]) {
-  new szFilePath[PATH_MAX_LEN];
+  new szFilePath[MAX_RESOURCE_PATH_LENGTH];
   format(szFilePath, charsmax(szFilePath), "%s/%s.json", g_szCharacterDir, szName);
 
   new iCharacter = CreateCharacter();
@@ -294,7 +293,7 @@ LoadCharacter(const szName[]) {
 }
 
 LoadCharacterModelData(iCharacter, JSON:iModelsDoc, const szKey[], CharacterData:iCharacterData) {
-  new szBuffer[PATH_MAX_LEN];
+  new szBuffer[MAX_RESOURCE_PATH_LENGTH];
 
   json_object_get_string(iModelsDoc, szKey, szBuffer, charsmax(szBuffer));
   ArraySetString(Array:g_rgCharactersData[iCharacterData], iCharacter, szBuffer);
@@ -302,7 +301,7 @@ LoadCharacterModelData(iCharacter, JSON:iModelsDoc, const szKey[], CharacterData
 }
 
 LoadCharacterSoundsData(iCharacter, JSON:iSoundDoc, const szKey[], CharacterData:iCharacterData) {
-  new szBuffer[PATH_MAX_LEN];
+  new szBuffer[MAX_RESOURCE_PATH_LENGTH];
 
   new JSON:iSoundsDoc = json_object_get_value(iSoundDoc, szKey, true);
   new Array:irgSounds = ArrayGetCell(Array:g_rgCharactersData[iCharacterData], iCharacter);
@@ -316,9 +315,9 @@ LoadCharacterSoundsData(iCharacter, JSON:iSoundDoc, const szKey[], CharacterData
 InitializeCharactersStore() {
   g_iCharactersMap = TrieCreate();
 
-  g_rgCharactersData[Character_HumanModel] = ArrayCreate(PATH_MAX_LEN, RESERVED_CHARACTER_COUNT);
-  g_rgCharactersData[Character_ZombieModel] = ArrayCreate(PATH_MAX_LEN, RESERVED_CHARACTER_COUNT);
-  g_rgCharactersData[Character_SwipeModel] = ArrayCreate(PATH_MAX_LEN, RESERVED_CHARACTER_COUNT);
+  g_rgCharactersData[Character_HumanModel] = ArrayCreate(MAX_RESOURCE_PATH_LENGTH, RESERVED_CHARACTER_COUNT);
+  g_rgCharactersData[Character_ZombieModel] = ArrayCreate(MAX_RESOURCE_PATH_LENGTH, RESERVED_CHARACTER_COUNT);
+  g_rgCharactersData[Character_SwipeModel] = ArrayCreate(MAX_RESOURCE_PATH_LENGTH, RESERVED_CHARACTER_COUNT);
   g_rgCharactersData[Character_HumanDeathSounds] = ArrayCreate(_, RESERVED_CHARACTER_COUNT);
   g_rgCharactersData[Character_PanicSounds] = ArrayCreate(_, RESERVED_CHARACTER_COUNT);
   g_rgCharactersData[Character_ZombieAmbientSounds] = ArrayCreate(_, RESERVED_CHARACTER_COUNT);

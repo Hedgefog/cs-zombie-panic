@@ -23,7 +23,7 @@ public plugin_init()
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
-  for (new pTargetPlayer = 1; pTargetPlayer <= MAX_PLAYERS; ++pTargetPlayer) {
+  for (new pTargetPlayer = 1; pTargetPlayer <= MaxClients; ++pTargetPlayer) {
     if (!is_user_connected(pTargetPlayer)) {
       continue;
     }
@@ -39,7 +39,7 @@ public OnMessage(iMsgId, iDest, pPlayer) {
 public OnEvent(pPlayer) {
   new pTargetPlayer = read_data(1);
 
-  for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
+  for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
     if (!is_user_connected(pPlayer)) {
       continue;
     }

@@ -924,7 +924,7 @@ GrenadeExplode(this, pTr, iDamageBits, Float:flRadius, Float:flMagnitude) {
     new Float:flDamage;
     pev(this, pev_dmg, flDamage);
 
-    set_pev(this, pev_model, "");
+    set_pev(this, pev_model, NULL_STRING);
     set_pev(this, pev_solid, SOLID_NOT);
     set_pev(this, pev_takedamage, DAMAGE_NO);
 
@@ -963,7 +963,7 @@ GrenadeExplode(this, pTr, iDamageBits, Float:flRadius, Float:flMagnitude) {
     // SetThink( &CGrenade::Smoke );
     // GrenadeSmoke(vecOrigin, flDamage);
 
-    set_pev(this, pev_velocity, Float:{0.0, 0.0, 0.0});
+    set_pev(this, pev_velocity, NULL_VECTOR);
     set_pev(this, pev_nextthink, get_gametime() + 0.1);
 
     if (PointContents(vecOrigin) != CONTENTS_WATER) {
@@ -987,13 +987,13 @@ public Smack(this) {
   MakeDecal(tr, pHit, iDecalIndex, false);
   free_tr2(tr);
 
-  SetThink(this, "");
+  SetThink(this, NULL_STRING);
 }
 
 public DisablePrediction(this) {
   new pPlayer = GetPlayer(this);
   SetWeaponPrediction(pPlayer, false);
-  SetThink(this, "");
+  SetThink(this, NULL_STRING);
 }
 
 // ANCHOR: Weapon Entity Default Methods

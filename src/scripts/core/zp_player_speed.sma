@@ -47,7 +47,7 @@ new const Float:g_fWeaponWeight[CSW_P90 + 1] = {
 };
 
 new const Float:g_fAmmoWeight[AMMO_TYPE_COUNT] = {
-  0.0, // ""
+  0.0,
   0.1083, // "338Magnum"
   0.07, // "762Nato"
   0.07, // "556NatoBox"

@@ -204,7 +204,7 @@ ShootTimed(pOwner, const Float:vecStart[3], const Float:vecVelocity[3], Float:fl
 
   if (flTime < 0.1) {
     set_pev(pGrenade, pev_nextthink, get_gametime());
-    set_pev(pGrenade, pev_velocity, Float:{0.0, 0.0, 0.0});
+    set_pev(pGrenade, pev_velocity, NULL_VECTOR);
   }
 
   set_pev(pGrenade, pev_sequence, random_num(3, 7));

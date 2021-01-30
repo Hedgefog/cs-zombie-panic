@@ -75,8 +75,8 @@ Reset(iIndex) {
     pev(target, pev_target, szTarget, charsmax(szTarget));
     set_pev(pEntity, pev_target, szTarget);
 
-    set_pev(pEntity, pev_velocity, Float:{0.0, 0.0, 0.0});
-    set_pev(pEntity, pev_avelocity, Float:{0.0, 0.0, 0.0});
+    set_pev(pEntity, pev_velocity, NULL_VECTOR);
+    set_pev(pEntity, pev_avelocity, NULL_VECTOR);
     set_pev(pEntity, pev_enemy, 0);
     set_pev(pEntity, pev_message, 0);
     set_pev(pEntity, pev_spawnflags, pev(pEntity, pev_spawnflags) | SF_TRAIN_WAIT_RETRIGGER);

@@ -29,7 +29,7 @@ public OnMessage_DeathMsg(iMsgId, iDest, pPlayer) {
     static szWeapon[32];
     get_msg_arg_string(4, szWeapon, charsmax(szWeapon));
   
-    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
       if (!is_user_connected(pPlayer)) {
         continue;
       }

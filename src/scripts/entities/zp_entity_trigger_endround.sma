@@ -89,7 +89,7 @@ public OnTouch_Post(pEntity, pToucher) {
 }
 
 public Round_Fw_NewRound() {
-    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         g_bPlayerTouched[pPlayer] = false;
     }
 }
@@ -98,7 +98,7 @@ bool:CheckWinConditions(pEntity) {
     new pToucherCount = 0;
     new iHumanCount = 0;
 
-    for (new pPlayer = 1; pPlayer <= MAX_PLAYERS; ++pPlayer) {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         if (!is_user_connected(pPlayer)) {
             continue;
         }
