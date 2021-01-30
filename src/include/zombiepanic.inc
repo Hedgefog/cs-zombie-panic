@@ -18,6 +18,7 @@ native bool:ZP_Player_ToggleZombieVision(pPlayer);
 forward ZP_Fw_PlayerJoined(pPlayer);
 forward ZP_Fw_PlayerPanic(pPlayer);
 forward ZP_Fw_PlayerZombieVision(pPlayer, bool:bValue);
+forward ZP_Fw_Player_AimItem(pPlayer, pItem);
 
 // Player inventory
 

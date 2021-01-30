@@ -12,18 +12,17 @@
 #define AUTHOR "Hedgehog Fog"
 
 #define MESSAGE_COLOR 0, 72, 128
-#define MESSAGE_TIME 5.0
 #define MESSAGE_POS_INFO -1.0, 0.10
 #define MESSAGE_POS_WARN -1.0, 0.75
 #define MESSAGE_POS_AMMO_WARN MESSAGE_POS_WARN
 #define MESSAGE_POS_HINT MESSAGE_POS_INFO
 #define MESSAGE_POS_OBJECTIVE MESSAGE_POS_WARN
 #define MESSAGE_POS_RESPAWN MESSAGE_POS_WARN
-#define MESSAGE_FADEIN_TIME 1.0
-#define MESSAGE_FADEOUT_TIME 1.0
+#define MESSAGE_POS_PICKUP -1.0, 0.65
 
 new bool:g_bShowObjectiveMessage[MAX_PLAYERS + 1] = { true, ... };
 new bool:g_bPlayerShowSpeedWarning[MAX_PLAYERS + 1] = { true, ... };
+new Float:g_flPlayerLastPickupHint[MAX_PLAYERS + 1] = { 0.0, ... };
 
 new g_pCvarEnabled;
 
@@ -108,6 +107,7 @@ public Round_Fw_NewRound() {
     for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         g_bShowObjectiveMessage[pPlayer] = true;
         g_bPlayerShowSpeedWarning[pPlayer] = true;
+        g_flPlayerLastPickupHint[pPlayer] = 0.0;
     }
 }
 
@@ -136,6 +136,17 @@ public OnItemPickup(pPlayer) {
     return PLUGIN_CONTINUE;
 }
 
-SetHudMessage(Float:flPosX, Float:flPosY) {
-    set_dhudmessage(MESSAGE_COLOR, flPosX, flPosY, 0, 0.0, MESSAGE_TIME, MESSAGE_FADEIN_TIME, MESSAGE_FADEOUT_TIME);
+public ZP_Fw_Player_AimItem(pPlayer) {
+    if (get_gametime() - g_flPlayerLastPickupHint[pPlayer] < 1.0) {
+        return;
+    }
+
+    SetHudMessage(MESSAGE_POS_PICKUP, 0.5, 0.5, 1.0);
+    show_dhudmessage(pPlayer, "%L", pPlayer, "ZP_ITEM_PICKUP");
+
+    g_flPlayerLastPickupHint[pPlayer] = get_gametime();
+}
+
+SetHudMessage(Float:flPosX, Float:flPosY, Float:flDuration = 5.0, Float:flFadeInTime = 1.0, Float:flFadeOutTime = 1.0) {
+    set_dhudmessage(MESSAGE_COLOR, flPosX, flPosY, 0, 0.0, flDuration, flFadeInTime, flFadeOutTime);
 }
