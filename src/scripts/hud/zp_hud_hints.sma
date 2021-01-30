@@ -141,7 +141,7 @@ public ZP_Fw_Player_AimItem(pPlayer) {
         return;
     }
 
-    SetHudMessage(MESSAGE_POS_PICKUP, 0.5, 0.5, 1.0);
+    SetHudMessage(MESSAGE_POS_PICKUP, 0.75, 0.5, 1.0);
     show_dhudmessage(pPlayer, "%L", pPlayer, "ZP_ITEM_PICKUP");
 
     g_flPlayerLastPickupHint[pPlayer] = get_gametime();
