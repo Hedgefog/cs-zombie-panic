@@ -325,7 +325,7 @@ public GrenadeDetonate(this) {
     new Float:flDamage;
     pev(this, pev_dmg, flDamage);
 
-    CW_GrenadeDetonate(this, flDamage, flDamage * 0.125);
+    CW_GrenadeDetonate(this, flDamage * 0.75, flDamage * 0.125);
     SetThink(this, "GrenadeSmoke");
     set_pev(this, pev_nextthink, get_gametime() + 0.1);
 }
