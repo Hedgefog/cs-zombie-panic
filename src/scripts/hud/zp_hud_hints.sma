@@ -14,10 +14,11 @@
 #define MESSAGE_COLOR 0, 72, 128
 #define MESSAGE_TIME 5.0
 #define MESSAGE_POS_INFO -1.0, 0.10
-#define MESSAGE_POS_HINT MESSAGE_POS_INFO
-#define MESSAGE_POS_OBJECTIVE MESSAGE_POS_HINT
-#define MESSAGE_POS_RESPAWN MESSAGE_POS_HINT
 #define MESSAGE_POS_WARN -1.0, 0.75
+#define MESSAGE_POS_AMMO_WARN MESSAGE_POS_WARN
+#define MESSAGE_POS_HINT MESSAGE_POS_INFO
+#define MESSAGE_POS_OBJECTIVE MESSAGE_POS_WARN
+#define MESSAGE_POS_RESPAWN MESSAGE_POS_WARN
 #define MESSAGE_FADEIN_TIME 1.0
 #define MESSAGE_FADEOUT_TIME 1.0
 
@@ -127,7 +128,7 @@ public OnItemPickup(pPlayer) {
     pev(pPlayer, pev_maxspeed, flMaxSpeed);
 
     if (flMaxSpeed < ZP_ZOMBIE_SPEED) {
-        SetHudMessage(MESSAGE_POS_WARN);
+        SetHudMessage(MESSAGE_POS_AMMO_WARN);
         show_dhudmessage(pPlayer, "%L", pPlayer, "ZP_SPEED_WARN");
         g_bPlayerShowSpeedWarning[pPlayer] = false;
     }
