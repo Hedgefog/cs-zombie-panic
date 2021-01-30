@@ -74,8 +74,8 @@ bool:Panic(pPlayer) {
     return false;
   }
 
-  ZP_Player_DropBackpack(pPlayer);
   g_bPlayerPanic[pPlayer] = true;
+  ZP_Player_DropBackpack(pPlayer);
 
   set_task(PANIC_DURATION, "TaskEndPanic", pPlayer);
 
