@@ -11,7 +11,15 @@
 #define PLUGIN "[Zombie Panic] Zombie Vision"
 #define AUTHOR "Hedgehog Fog"
 
+#define TASKID_FIX_FADE 100
+
+#define VISION_SCREEN_FADE_COLOR 255, 195, 195
+#define VISION_EFFECT_TIME 0.5
+#define VISION_ALPHA 20
+
 new bool:g_bPlayerVision[MAX_PLAYERS + 1];
+new bool:g_bPlayerExternalFade[MAX_PLAYERS + 1];
+new bool:g_bIgnoreFadeMessage;
 
 new g_iFwZombieVision;
 new g_iFwResult;
@@ -23,6 +31,8 @@ public plugin_init() {
 
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn", .Post = 1);
     RegisterHam(Ham_Killed, "player", "OnPlayerKilled", .Post = 1);
+
+    register_message(get_user_msgid("ScreenFade"), "OnMessage_ScreenFade");
 
     register_forward(FM_AddToFullPack, "OnAddToFullPack_Post", 1);
 
@@ -38,6 +48,15 @@ public plugin_natives() {
 public bool:Native_Toggle(iPluginId, iArgc) {
     new pPlayer = get_param(1);
     return Toggle(pPlayer);
+}
+
+public client_connect(pPlayer) {
+    g_bPlayerVision[pPlayer] = false;
+    g_bPlayerExternalFade[pPlayer] = false;
+}
+
+public client_disconnected(pPlayer) {
+    remove_task(TASKID_FIX_FADE + pPlayer);
 }
 
 public OnClCmd_ZombieVision(pPlayer) {
@@ -119,6 +138,20 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     return FMRES_HANDLED;
 }
 
+public OnMessage_ScreenFade(iMsgId, iMsgDest, pPlayer) {
+    if (g_bIgnoreFadeMessage) {
+        return PLUGIN_CONTINUE;
+    }
+
+    new Float:flHoldTime = float(get_msg_arg_int(2) * (1>>12));
+    if (flHoldTime > 0.0) {
+        g_bPlayerExternalFade[pPlayer] = true;
+        set_task(flHoldTime, "Task_FixVisionScreenFade", TASKID_FIX_FADE + pPlayer);
+    }
+
+    return PLUGIN_CONTINUE;
+}
+
 bool:Toggle(pPlayer) {
     SetZombieVision(pPlayer, !g_bPlayerVision[pPlayer]);
     return g_bPlayerVision[pPlayer];
@@ -129,22 +162,32 @@ SetZombieVision(pPlayer, bool:bValue) {
         return;
     }
 
-    g_bPlayerVision[pPlayer] = bValue;
-
-    remove_task(pPlayer);
-
-    if (bValue) {
-        set_task(0.1, "TaskLight", pPlayer, _, _, "b");
+    if (bValue == g_bPlayerVision[pPlayer]) {
+        return;
     }
+
+    VisionFadeEffect(pPlayer, bValue);
+    g_bPlayerVision[pPlayer] = bValue;
 
     ExecuteForward(g_iFwZombieVision, g_iFwResult, pPlayer, bValue);
 }
 
-public TaskLight(iTaskId) {
-    new pPlayer = iTaskId;
+VisionFadeEffect(pPlayer, bool:bValue) {
+    if (g_bPlayerExternalFade[pPlayer]) {
+        return;
+    }
 
-    static Float:vecOrigin[3];
-    pev(pPlayer, pev_origin, vecOrigin);
+    g_bIgnoreFadeMessage = true;
+    UTIL_ScreenFade(pPlayer, {VISION_SCREEN_FADE_COLOR}, VISION_EFFECT_TIME, 0.0, VISION_ALPHA, (bValue ? FFADE_OUT | FFADE_STAYOUT : FFADE_IN), .bExternal = true);
+    g_bIgnoreFadeMessage = false;
+}
 
-    UTIL_ScreenFade(pPlayer, {255, 195, 195}, 1.0, 0.1125, 20, FFADE_IN, .bExternal = true);
+public Task_FixVisionScreenFade(iTaskId) {
+    new pPlayer = iTaskId - TASKID_FIX_FADE;
+
+    if (is_user_connected(pPlayer) && g_bPlayerVision[pPlayer]) {
+        VisionFadeEffect(pPlayer, true);
+    }
+
+    g_bPlayerExternalFade[pPlayer] = false;
 }
