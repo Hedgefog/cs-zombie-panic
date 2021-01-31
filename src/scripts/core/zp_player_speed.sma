@@ -11,7 +11,7 @@
 #define PLUGIN "[Zombie Panic] Player Speed"
 #define AUTHOR "Hedgehog Fog"
 
-new const Float:g_pFweaponWeight[CSW_P90 + 1] = {
+new const Float:g_pFweaponWeight[CSW_LAST_WEAPON + 1] = {
     1.0, // weapon_p228
     0.0, // weapon_shield
     2.2, // weapon_scout
