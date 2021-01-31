@@ -258,7 +258,9 @@ DropPlayerItem(pPlayer, pItem, iSlot) {
 
 PackPlayerAmmo(pPlayer, pWeaponBox) {
     new iWeaponBoxAmmoIndex = 0;
-    for (new iAmmoId = 0; iAmmoId < sizeof(AMMO_LIST); ++iAmmoId) {
+
+    new iSize = sizeof(AMMO_LIST);
+    for (new iAmmoId = 0; iAmmoId < iSize; ++iAmmoId) {
         new iBpAmmo = get_member(pPlayer, m_rgAmmo, iAmmoId);
 
         if (iBpAmmo > 0) {

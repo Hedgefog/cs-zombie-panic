@@ -305,7 +305,8 @@ LoadCharacterSoundsData(iCharacter, JSON:iSoundDoc, const szKey[], CharacterData
 
     new JSON:iSoundsDoc = json_object_get_value(iSoundDoc, szKey, true);
     new Array:irgSounds = ArrayGetCell(Array:g_rgCharactersData[iCharacterData], iCharacter);
-    for (new i = 0; i < json_array_get_count(iSoundsDoc); ++i) {
+    new iSize = json_array_get_count(iSoundsDoc);
+    for (new i = 0; i < iSize; ++i) {
         json_array_get_string(iSoundsDoc, i, szBuffer, charsmax(szBuffer));
         ArrayPushString(irgSounds, szBuffer);
         precache_sound(szBuffer);

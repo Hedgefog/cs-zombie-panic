@@ -203,7 +203,8 @@ FindPlayerItemById(pPlayer, iId) {
 }
 
 GetAmmoId(const szAmmoName[]) {
-    for (new iAmmoId = 0; iAmmoId < sizeof(AMMO_LIST); ++iAmmoId) {
+    new iSize = sizeof(AMMO_LIST);
+    for (new iAmmoId = 0; iAmmoId < iSize; ++iAmmoId) {
         if (equal(AMMO_LIST[iAmmoId], szAmmoName)) {
             return iAmmoId;
         }

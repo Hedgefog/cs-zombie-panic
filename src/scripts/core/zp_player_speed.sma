@@ -201,7 +201,8 @@ Float:CalculatePlayerWeaponsWeight(pPlayer) {
 Float:CalculatePlayerAmmoWeight(pPlayer) {
     new Float:flWeight = 0.0;
 
-    for (new iAmmoId = 0; iAmmoId < sizeof(g_fAmmoWeight); ++iAmmoId) {
+    new iSize = sizeof(g_fAmmoWeight);
+    for (new iAmmoId = 0; iAmmoId < iSize; ++iAmmoId) {
         new iBpAmmo = get_member(pPlayer, m_rgAmmo, iAmmoId);
         flWeight += iBpAmmo * g_fAmmoWeight[iAmmoId];
     }
