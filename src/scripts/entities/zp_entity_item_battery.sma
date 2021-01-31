@@ -61,7 +61,7 @@ public OnTouch(pEntity, pToucher) {
                 set_pev(pEntity, pev_effects, pev(pEntity, pev_effects) | EF_NODRAW);
                 set_pev(pEntity, pev_solid, SOLID_NOT);
 
-                emit_sound(pToucher, CHAN_ITEM, "items/tr_kevlar.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+                emit_sound(pEntity, CHAN_ITEM, "items/tr_kevlar.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
             }
         }
     }
