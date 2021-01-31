@@ -1367,7 +1367,7 @@ GiveWeapon(pPlayer, CW:iHandler) {
   new pWeapon = SpawnWeapon(iHandler);
   if(ExecuteHam(Ham_AddPlayerItem, pPlayer, pWeapon)) {
       ExecuteHam(Ham_Item_AttachToPlayer, pWeapon, pPlayer);
-      emit_sound(pPlayer, CHAN_ITEM, "items/gunpickup2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+      emit_sound(pWeapon, CHAN_ITEM, "items/gunpickup2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
   }
 }
 
