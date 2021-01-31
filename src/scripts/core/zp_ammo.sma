@@ -23,6 +23,7 @@ new g_iAmmoCount = 0;
 
 public plugin_precache() {
     InitStorage();
+
     RegisterAmmo(ZP_AMMO_PISTOL, 10, 7, ZP_AMMO_PISTOL_MODEL, 70);
     RegisterAmmo(ZP_AMMO_RIFLE, 4, 30, ZP_AMMO_RIFLE_MODEL, 240);
     RegisterAmmo(ZP_AMMO_SHOTGUN, 5, 6, ZP_AMMO_SHOTGUN_MODEL, 60);
@@ -47,15 +48,7 @@ public plugin_natives() {
 }
 
 public plugin_end() {
-    for (new i = 0; i < _:AmmoData; ++i) {
-        new Array:irgData = Array:g_rgAmmo[AmmoData:i];
-
-        if (irgData != Invalid_Array) {
-            ArrayDestroy(irgData);
-        }
-    }
-
-    TrieDestroy(g_iAmmoMap);
+    DestroyStorage();
 }
 
 public Native_GetHandler(iPluginId, iArgc) {
@@ -118,15 +111,6 @@ public Native_GetMaxAmount(iPluginId, iArgc) {
     return ArrayGetCell(Array:g_rgAmmo[Ammo_MaxAmount], iHandler);
 }
 
-InitStorage() {
-    g_rgAmmo[Ammo_Name] = ArrayCreate(32, 1);
-    g_rgAmmo[Ammo_Id] = ArrayCreate(1, 1);
-    g_rgAmmo[Ammo_PackSize] = ArrayCreate(1, 1);
-    g_rgAmmo[Ammo_PackModel] = ArrayCreate(64, 1);
-    g_rgAmmo[Ammo_MaxAmount] = ArrayCreate(1, 1);
-    g_iAmmoMap = TrieCreate();
-}
-
 RegisterAmmo(const szName[], iAmmoId, iPackSize, const szModel[], iMaxAmount) {
     if (szModel[0] != '^0') {
         precache_model(szModel);
@@ -145,4 +129,25 @@ RegisterAmmo(const szName[], iAmmoId, iPackSize, const szModel[], iMaxAmount) {
 
 GetHandlerById(iAmmoId) {
     return g_rgAmmoMap[iAmmoId];
+}
+
+InitStorage() {
+    g_rgAmmo[Ammo_Name] = ArrayCreate(32, 1);
+    g_rgAmmo[Ammo_Id] = ArrayCreate(1, 1);
+    g_rgAmmo[Ammo_PackSize] = ArrayCreate(1, 1);
+    g_rgAmmo[Ammo_PackModel] = ArrayCreate(64, 1);
+    g_rgAmmo[Ammo_MaxAmount] = ArrayCreate(1, 1);
+    g_iAmmoMap = TrieCreate();
+}
+
+DestroyStorage() {
+    for (new i = 0; i < _:AmmoData; ++i) {
+        new Array:irgData = Array:g_rgAmmo[AmmoData:i];
+
+        if (irgData != Invalid_Array) {
+            ArrayDestroy(irgData);
+        }
+    }
+
+    TrieDestroy(g_iAmmoMap);
 }

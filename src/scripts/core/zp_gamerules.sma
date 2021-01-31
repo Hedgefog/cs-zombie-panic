@@ -36,18 +36,20 @@ public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
     Round_HookCheckWinConditions("OnCheckWinConditions");
+
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn", .Post = 0);
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
     RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
+
+    register_forward(FM_ClientKill, "OnClientKill");
+
+    register_message(get_user_msgid("ShowMenu"), "OnMessage_ShowMenu");
+    register_message(get_user_msgid("VGUIMenu"), "OnMessage_VGUIMenu");
 
     register_clcmd("chooseteam", "OnPlayerChangeTeam");
     register_clcmd("jointeam", "OnPlayerChangeTeam");
     register_clcmd("joinclass", "OnPlayerChangeTeam");
     register_clcmd("drop", "OnClCmd_Drop");
-    register_forward(FM_ClientKill, "OnClientKill");
-
-    register_message(get_user_msgid("ShowMenu"), "OnMessage_ShowMenu");
-    register_message(get_user_msgid("VGUIMenu"), "OnMessage_VGUIMenu");
 
     g_iFwPlayerJoined = CreateMultiForward("ZP_Fw_PlayerJoined", ET_IGNORE, FP_CELL);
 

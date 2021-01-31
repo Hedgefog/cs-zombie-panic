@@ -13,46 +13,46 @@ new g_szMotdTitle[32];
 new g_szMotdData[MAX_MOTD_LENGTH];
 
 public plugin_init() {
-    register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+        register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    BuildMotd();
+        BuildMotd();
 }
 
 public plugin_natives() {
-    register_native("ZP_ShowMapInfo", "Native_Show");
+        register_native("ZP_ShowMapInfo", "Native_Show");
 }
 
 public Native_Show(iPluginId, iArgc) {
-  new pPlayer = get_param(1);
-  ShowMotd(pPlayer);
+    new pPlayer = get_param(1);
+    ShowMotd(pPlayer);
 }
 
 ShowMotd(pPlayer) {
-  if (g_szMotdData[0] == '^0') {
-    return;
-  }
+    if (g_szMotdData[0] == '^0') {
+        return;
+    }
 
-  show_motd(pPlayer, g_szMotdData, g_szMotdTitle);
+    show_motd(pPlayer, g_szMotdData, g_szMotdTitle);
 }
 
 BuildMotd() {
-  static szMap[32];
-  get_mapname(szMap, charsmax(szMap));
+    static szMap[32];
+    get_mapname(szMap, charsmax(szMap));
 
-  static szFile[48];
-  format(szFile, charsmax(szMap), "maps/%s.txt", szMap);
+    static szFile[48];
+    format(szFile, charsmax(szMap), "maps/%s.txt", szMap);
 
-  if (!file_exists(szFile)) {
-    return;
-  }
+    if (!file_exists(szFile)) {
+        return;
+    }
 
-  copy(g_szMotdData, charsmax(g_szMotdData), MOTD_STYLES);
+    copy(g_szMotdData, charsmax(g_szMotdData), MOTD_STYLES);
 
-  new iLine = 0;
-  static szLine[128];
-  while (read_file(szFile, iLine++, szLine, charsmax(szLine)) != 0) {
-      format(g_szMotdData, charsmax(g_szMotdData), "%s<br>%s", g_szMotdData, szLine);
-  }
+    new iLine = 0;
+    static szLine[128];
+    while (read_file(szFile, iLine++, szLine, charsmax(szLine)) != 0) {
+            format(g_szMotdData, charsmax(g_szMotdData), "%s<br>%s", g_szMotdData, szLine);
+    }
 
-  copy(g_szMotdTitle, charsmax(g_szMotdTitle), szMap);
+    copy(g_szMotdTitle, charsmax(g_szMotdTitle), szMap);
 }

@@ -19,9 +19,9 @@ public plugin_init() {
 }
 
 public OnPlayerTraceAttack(pPlayer) {
-  pev(pPlayer, pev_velocity, g_rgflPlayerVelocity[pPlayer]);
+    pev(pPlayer, pev_velocity, g_rgflPlayerVelocity[pPlayer]);
 }
 
 public OnPlayerTraceAttack_Post(pPlayer) {
-  set_pev(pPlayer, pev_velocity, g_rgflPlayerVelocity[pPlayer]); // reset knockback
+    set_pev(pPlayer, pev_velocity, g_rgflPlayerVelocity[pPlayer]); // reset knockback
 }

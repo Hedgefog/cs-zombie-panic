@@ -43,8 +43,8 @@ new const g_rgszDelayEntities[][] = {
     "trigger_push"
 };
 
+new g_pCvarRoundTime;
 new g_iFwEntitySpawn;
-new g_iCvarRoundTime;
 new Array:g_irgObjectiveEntities;
 
 public plugin_precache() {
@@ -56,7 +56,7 @@ public plugin_precache() {
 
     RegisterHam(Ham_Spawn, "game_score", "OnGameScoreSpawn", .Post = 1);
 
-    g_iCvarRoundTime = get_cvar_pointer("mp_roundtime");
+    g_pCvarRoundTime = get_cvar_pointer("mp_roundtime");
 }
 
 public plugin_init() {
@@ -84,7 +84,7 @@ public OnSpawn(pEntity) {
         ArrayPushCell(g_irgObjectiveEntities, pEntity);
     } else if (IsDelayEntity(pEntity)) {
         if (get_ent_data_float(pEntity, "CBaseToggle", "m_flWait") < 0.0) {
-            set_ent_data_float(pEntity, "CBaseToggle", "m_flWait", get_pcvar_num(g_iCvarRoundTime) * 60.0 + 1.0);
+            set_ent_data_float(pEntity, "CBaseToggle", "m_flWait", get_pcvar_num(g_pCvarRoundTime) * 60.0 + 1.0);
         }
     }
 
