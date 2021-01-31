@@ -83,6 +83,14 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
 }
 
 public OnPlayerPreThink_Post(pPlayer) {
+  new iButtons = pev(pPlayer, pev_button);
+  new iOldButtons = pev(pPlayer, pev_oldbuttons);
+  new bool:bUsePressed = (iButtons & IN_USE && ~iOldButtons & IN_USE);
+  
+  if (!bUsePressed && get_gametime() - g_flPlayerLastFind[pPlayer] < 0.1) {
+    return HAM_IGNORED;
+  }
+
   new pPrevAimItem = g_pPlayerAimItem[pPlayer];
   g_pPlayerAimItem[pPlayer] = -1;
   
@@ -91,14 +99,6 @@ public OnPlayerPreThink_Post(pPlayer) {
   }
 
   if (get_member_game(m_bFreezePeriod)) {
-    return HAM_IGNORED;
-  }
-
-  new iButtons = pev(pPlayer, pev_button);
-  new iOldButtons = pev(pPlayer, pev_oldbuttons);
-  new bool:bUsePressed = (iButtons & IN_USE && ~iOldButtons & IN_USE);
-
-  if (!bUsePressed && get_gametime() - g_flPlayerLastFind[pPlayer] < 0.1) {
     return HAM_IGNORED;
   }
 
