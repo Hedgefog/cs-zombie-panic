@@ -15,6 +15,7 @@ public plugin_init() {
 }
 
 public OnPlayerTakeDamage_Post(pPlayer) {
-  set_member(pPlayer, m_flVelocityModifier, 1.0);
-  return HAM_HANDLED;
+    set_member(pPlayer, m_flVelocityModifier, 1.0);
+
+    return HAM_HANDLED;
 }

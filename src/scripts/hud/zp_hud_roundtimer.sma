@@ -24,11 +24,11 @@ public plugin_init() {
 
 public OnResetHUD(pPlayer) {
     if (!ZP_GameRules_GetObjectiveMode()) {
-      return PLUGIN_CONTINUE;
+        return PLUGIN_CONTINUE;
     }
 
     if (get_member_game(m_bFreezePeriod)) {
-       return PLUGIN_CONTINUE;
+        return PLUGIN_CONTINUE;
     }
 
     emessage_begin(MSG_ONE, gmsgHideWeapon, _, pPlayer);
@@ -40,13 +40,13 @@ public OnResetHUD(pPlayer) {
 
 public OnMessage_HideWeapon(iMsgId, iMsgDest, pPlayer) {
     if (!ZP_GameRules_GetObjectiveMode()) {
-      return PLUGIN_CONTINUE;
+        return PLUGIN_CONTINUE;
     }
 
     if (get_member_game(m_bFreezePeriod)) {
-       return PLUGIN_CONTINUE;
+        return PLUGIN_CONTINUE;
     }
-  
+
     set_msg_arg_int(1, ARG_BYTE, get_msg_arg_int(1) | HIDEHUD_TIMER);
     g_iPlayerHideWeapon[pPlayer] = get_msg_arg_int(1);
 

@@ -35,14 +35,14 @@ public plugin_init() {
 }
 
 public plugin_destroy() {
-  ArrayDestroy(g_iTrainEntity);
-  ArrayDestroy(g_fTrainSpeed);
-  ArrayDestroy(g_szTrainFirstTarget);
+    ArrayDestroy(g_iTrainEntity);
+    ArrayDestroy(g_fTrainSpeed);
+    ArrayDestroy(g_szTrainFirstTarget);
 }
 
 public OnSpawn(pEntity) {
     if (!pev_valid(pEntity)) {
-        return HAM_IGNORED;
+            return HAM_IGNORED;
     }
 
     new szTarget[32];
@@ -61,9 +61,9 @@ public OnSpawn(pEntity) {
 }
 
 public Round_Fw_RoundStart() {
-  for (new i = 0; i < g_iTrainEntityCount; ++i) {
-    Reset(i);
-  }
+    for (new i = 0; i < g_iTrainEntityCount; ++i) {
+        Reset(i);
+    }
 }
 
 Reset(iIndex) {

@@ -17,5 +17,6 @@ public OnGetGameDescription() {
     static szGameName[32];
     format(szGameName, charsmax(szGameName), "%s %s", ZP_TITLE, ZP_VERSION);
     forward_return(FMV_STRING, szGameName);
+
     return FMRES_SUPERCEDE;
 }

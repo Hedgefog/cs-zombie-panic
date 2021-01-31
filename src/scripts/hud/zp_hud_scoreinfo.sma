@@ -11,43 +11,42 @@
 
 new gmsgScoreInfo;
 
-public plugin_init()
-{
-  register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+public plugin_init() {
+    register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-  gmsgScoreInfo = get_user_msgid("ScoreInfo");
-  register_event("ScoreInfo", "OnEvent", "a");
-  register_message(gmsgScoreInfo, "OnMessage");
+    gmsgScoreInfo = get_user_msgid("ScoreInfo");
+    register_event("ScoreInfo", "OnEvent", "a");
+    register_message(gmsgScoreInfo, "OnMessage");
 
-  RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
-  for (new pTargetPlayer = 1; pTargetPlayer <= MaxClients; ++pTargetPlayer) {
-    if (!is_user_connected(pTargetPlayer)) {
-      continue;
-    }
+    for (new pTargetPlayer = 1; pTargetPlayer <= MaxClients; ++pTargetPlayer) {
+        if (!is_user_connected(pTargetPlayer)) {
+            continue;
+        }
 
-    Update(pPlayer, pTargetPlayer);
-  }
+        Update(pPlayer, pTargetPlayer);
+    }
 }
 
 public OnMessage(iMsgId, iDest, pPlayer) {
-  return pPlayer ? PLUGIN_CONTINUE : PLUGIN_HANDLED;
+    return pPlayer ? PLUGIN_CONTINUE : PLUGIN_HANDLED;
 }
 
 public OnEvent(pPlayer) {
-  new pTargetPlayer = read_data(1);
+new pTargetPlayer = read_data(1);
 
-  for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
+for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
     if (!is_user_connected(pPlayer)) {
-      continue;
+        continue;
     }
 
     Update(pPlayer, pTargetPlayer);
-  }
+}
 
-  return PLUGIN_HANDLED;
+return PLUGIN_HANDLED;
 }
 
 Update(pPlayer, pTargetPlayer) {
@@ -60,11 +59,11 @@ Update(pPlayer, pTargetPlayer) {
 }
 
 SendMessage(pPlayer, pTargetPlayer, iScore, iDeaths, iClassId, iTeam) {
-  emessage_begin(MSG_ONE, gmsgScoreInfo, _, pPlayer);
-  ewrite_byte(pTargetPlayer);
-  ewrite_short(iScore);
-  ewrite_short(iDeaths);
-  ewrite_short(iClassId);
-  ewrite_short(iTeam);
-  emessage_end();
+    emessage_begin(MSG_ONE, gmsgScoreInfo, _, pPlayer);
+    ewrite_byte(pTargetPlayer);
+    ewrite_short(iScore);
+    ewrite_short(iDeaths);
+    ewrite_short(iClassId);
+    ewrite_short(iTeam);
+    emessage_end();
 }

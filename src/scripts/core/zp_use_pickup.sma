@@ -15,13 +15,13 @@
 #define HIGHLIGHT_COLOR 96, 64, 16
 
 new const g_rgszPickupEntities[][] = {
-  "armoury_entity",
-  "item_battery",
-  "item_healthkit",
-  "armoury_entity",
-  "weaponbox",
-  "weapon_shield",
-  "grenade"
+    "armoury_entity",
+    "item_battery",
+    "item_healthkit",
+    "armoury_entity",
+    "weaponbox",
+    "weapon_shield",
+    "grenade"
 };
 
 new bool:g_bBlockTouch = true;
@@ -38,7 +38,7 @@ public plugin_init() {
     RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
 
     for (new i = 0; i < sizeof(g_rgszPickupEntities); ++i) {
-      RegisterHam(Ham_Touch, g_rgszPickupEntities[i], "OnItemTouch", .Post = 0);
+        RegisterHam(Ham_Touch, g_rgszPickupEntities[i], "OnItemTouch", .Post = 0);
     }
 
     register_forward(FM_AddToFullPack, "OnAddToFullPack_Post", 1);
@@ -48,108 +48,108 @@ public plugin_init() {
 }
 
 public OnItemTouch(pEntity, pToucher) {
-  if (!UTIL_IsPlayer(pToucher)) {
-    return HAM_IGNORED;
-  }
+    if (!UTIL_IsPlayer(pToucher)) {
+        return HAM_IGNORED;
+    }
 
-  return get_pcvar_num(g_pCvarUsePickup) && g_bBlockTouch && !is_user_bot(pToucher) ? HAM_SUPERCEDE : HAM_HANDLED;
+    return get_pcvar_num(g_pCvarUsePickup) && g_bBlockTouch && !is_user_bot(pToucher) ? HAM_SUPERCEDE : HAM_HANDLED;
 }
 
 public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
-  if (!get_pcvar_num(g_pCvarUsePickup)) {
-    return FMRES_IGNORED;
-  }
+    if (!get_pcvar_num(g_pCvarUsePickup)) {
+        return FMRES_IGNORED;
+    }
 
-  if (!UTIL_IsPlayer(pHost)) {
-    return FMRES_IGNORED;
-  }
+    if (!UTIL_IsPlayer(pHost)) {
+        return FMRES_IGNORED;
+    }
 
-  if (!is_user_alive(pHost)) {
-    return FMRES_IGNORED;
-  }
+    if (!is_user_alive(pHost)) {
+        return FMRES_IGNORED;
+    }
 
-  if (!pev_valid(pEntity)) {
-    return FMRES_IGNORED;
-  }
+    if (!pev_valid(pEntity)) {
+        return FMRES_IGNORED;
+    }
 
-  if (pEntity == g_pPlayerAimItem[pHost]) {
-    set_es(es, ES_RenderMode, kRenderNormal);
-    set_es(es, ES_RenderFx, kRenderFxGlowShell);
-    set_es(es, ES_RenderAmt, 1);
-    set_es(es, ES_RenderColor, {HIGHLIGHT_COLOR});
-  }
+    if (pEntity == g_pPlayerAimItem[pHost]) {
+        set_es(es, ES_RenderMode, kRenderNormal);
+        set_es(es, ES_RenderFx, kRenderFxGlowShell);
+        set_es(es, ES_RenderAmt, 1);
+        set_es(es, ES_RenderColor, {HIGHLIGHT_COLOR});
+    }
 
-  return FMRES_HANDLED;
+    return FMRES_HANDLED;
 }
 
 public OnPlayerPreThink_Post(pPlayer) {
-  new iButtons = pev(pPlayer, pev_button);
-  new iOldButtons = pev(pPlayer, pev_oldbuttons);
-  new bool:bUsePressed = (iButtons & IN_USE && ~iOldButtons & IN_USE);
-  
-  if (!bUsePressed && get_gametime() - g_flPlayerLastFind[pPlayer] < 0.1) {
-    return HAM_IGNORED;
-  }
+    new iButtons = pev(pPlayer, pev_button);
+    new iOldButtons = pev(pPlayer, pev_oldbuttons);
+    new bool:bUsePressed = (iButtons & IN_USE && ~iOldButtons & IN_USE);
 
-  new pPrevAimItem = g_pPlayerAimItem[pPlayer];
-  g_pPlayerAimItem[pPlayer] = -1;
-  
-  if (ZP_Player_IsZombie(pPlayer)) {
-    return HAM_IGNORED;
-  }
-
-  if (get_member_game(m_bFreezePeriod)) {
-    return HAM_IGNORED;
-  }
-
-  static Float:vecSrc[3];
-  ExecuteHam(Ham_Player_GetGunPosition, pPlayer, vecSrc);
-
-  static Float:vecEnd[3];
-  pev(pPlayer, pev_v_angle, vecEnd);
-  engfunc(EngFunc_MakeVectors, vecEnd);
-  get_global_vector(GL_v_forward, vecEnd);
-
-  for (new i = 0; i < 3; ++i) {
-    vecEnd[i] = vecSrc[i] + (vecEnd[i] * 64.0);
-  }
-
-  new pTr = create_tr2();
-  engfunc(EngFunc_TraceLine, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, pPlayer, pTr);
-  get_tr2(pTr, TR_vecEndPos, vecEnd);
-  free_tr2(pTr);
-
-  new pEntity;
-  while ((pEntity = engfunc(EngFunc_FindEntityInSphere, pEntity, vecEnd, 1.0)) != 0) {
-    if (pev(pEntity, pev_solid) == SOLID_NOT) {
-      continue;
+    if (!bUsePressed && get_gametime() - g_flPlayerLastFind[pPlayer] < 0.1) {
+        return HAM_IGNORED;
     }
 
-    if (~pev(pEntity, pev_flags) & FL_ONGROUND) {
-      continue;
+    new pPrevAimItem = g_pPlayerAimItem[pPlayer];
+    g_pPlayerAimItem[pPlayer] = -1;
+    
+    if (ZP_Player_IsZombie(pPlayer)) {
+        return HAM_IGNORED;
     }
 
-    static szClassname[32];
-    pev(pEntity, pev_classname, szClassname, charsmax(szClassname));
-
-    if (equal(szClassname, "weaponbox") || equali(szClassname, "item_", 5)) {
-      g_pPlayerAimItem[pPlayer] = pEntity;
-
-      if (pEntity != pPrevAimItem) {
-        ExecuteForward(g_iFwAimItem, g_iFwResult, pPlayer, pEntity);
-      }
-
-      if (bUsePressed) {
-          g_bBlockTouch = false;
-          ExecuteHamB(Ham_Touch, pEntity, pPlayer);
-          g_bBlockTouch = true;
-      }
-
-      break;
+    if (get_member_game(m_bFreezePeriod)) {
+        return HAM_IGNORED;
     }
-  }
 
-  g_flPlayerLastFind[pPlayer] = get_gametime();
+    static Float:vecSrc[3];
+    ExecuteHam(Ham_Player_GetGunPosition, pPlayer, vecSrc);
 
-  return HAM_HANDLED;
+    static Float:vecEnd[3];
+    pev(pPlayer, pev_v_angle, vecEnd);
+    engfunc(EngFunc_MakeVectors, vecEnd);
+    get_global_vector(GL_v_forward, vecEnd);
+
+    for (new i = 0; i < 3; ++i) {
+        vecEnd[i] = vecSrc[i] + (vecEnd[i] * 64.0);
+    }
+
+    new pTr = create_tr2();
+    engfunc(EngFunc_TraceLine, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, pPlayer, pTr);
+    get_tr2(pTr, TR_vecEndPos, vecEnd);
+    free_tr2(pTr);
+
+    new pEntity;
+    while ((pEntity = engfunc(EngFunc_FindEntityInSphere, pEntity, vecEnd, 1.0)) != 0) {
+        if (pev(pEntity, pev_solid) == SOLID_NOT) {
+            continue;
+        }
+
+        if (~pev(pEntity, pev_flags) & FL_ONGROUND) {
+            continue;
+        }
+
+        static szClassname[32];
+        pev(pEntity, pev_classname, szClassname, charsmax(szClassname));
+
+        if (equal(szClassname, "weaponbox") || equali(szClassname, "item_", 5)) {
+            g_pPlayerAimItem[pPlayer] = pEntity;
+
+            if (pEntity != pPrevAimItem) {
+                ExecuteForward(g_iFwAimItem, g_iFwResult, pPlayer, pEntity);
+            }
+
+            if (bUsePressed) {
+                    g_bBlockTouch = false;
+                    ExecuteHamB(Ham_Touch, pEntity, pPlayer);
+                    g_bBlockTouch = true;
+            }
+
+            break;
+        }
+    }
+
+    g_flPlayerLastFind[pPlayer] = get_gametime();
+
+    return HAM_HANDLED;
 }
