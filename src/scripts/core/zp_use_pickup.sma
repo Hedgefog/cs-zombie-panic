@@ -27,6 +27,7 @@ new const g_rgszPickupEntities[][] = {
 new bool:g_bBlockTouch = true;
 new Float:g_flPlayerLastFind[MAX_PLAYERS + 1] = { 0.0, ... };
 new g_pPlayerAimItem[MAX_PLAYERS + 1] = { -1, ... };
+new g_bPlayerPickup[MAX_PLAYERS + 1] = { false, ... };
 
 new g_iFwAimItem;
 new g_iFwResult;
@@ -36,6 +37,7 @@ public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
     RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
+    RegisterHam(Ham_Player_PostThink, "player", "OnPlayerPostThink_Post", .Post = 1);
 
     for (new i = 0; i < sizeof(g_rgszPickupEntities); ++i) {
         RegisterHam(Ham_Touch, g_rgszPickupEntities[i], "OnItemTouch", .Post = 0);
@@ -83,11 +85,9 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
 }
 
 public OnPlayerPreThink_Post(pPlayer) {
-    new iButtons = pev(pPlayer, pev_button);
-    new iOldButtons = pev(pPlayer, pev_oldbuttons);
-    new bool:bUsePressed = (iButtons & IN_USE && ~iOldButtons & IN_USE);
+    g_bPlayerPickup[pPlayer] = pev(pPlayer, pev_button) & IN_USE && ~pev(pPlayer, pev_oldbuttons) & IN_USE;
 
-    if (!bUsePressed && get_gametime() - g_flPlayerLastFind[pPlayer] < 0.1) {
+    if (get_gametime() - g_flPlayerLastFind[pPlayer] < 0.1) {
         return HAM_IGNORED;
     }
 
@@ -139,17 +139,30 @@ public OnPlayerPreThink_Post(pPlayer) {
                 ExecuteForward(g_iFwAimItem, g_iFwResult, pPlayer, pEntity);
             }
 
-            if (bUsePressed) {
-                    g_bBlockTouch = false;
-                    ExecuteHamB(Ham_Touch, pEntity, pPlayer);
-                    g_bBlockTouch = true;
-            }
-
             break;
         }
     }
 
     g_flPlayerLastFind[pPlayer] = get_gametime();
+
+    return HAM_HANDLED;
+}
+
+public OnPlayerPostThink_Post(pPlayer) {
+    if (g_pPlayerAimItem[pPlayer] == -1) {
+        return HAM_IGNORED;
+    }
+
+    if (!g_bPlayerPickup[pPlayer]) {
+        return HAM_IGNORED;
+    }
+
+    g_bBlockTouch = false;
+    ExecuteHamB(Ham_Touch, g_pPlayerAimItem[pPlayer], pPlayer);
+    g_bBlockTouch = true;
+
+    g_bPlayerPickup[pPlayer] = false;
+    g_pPlayerAimItem[pPlayer] = -1;
 
     return HAM_HANDLED;
 }
