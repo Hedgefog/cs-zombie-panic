@@ -4,6 +4,7 @@
 #include <engine>
 #include <fakemeta>
 #include <hamsandwich>
+#include <reapi>
 
 #include <zombiepanic>
 #include <zombiepanic_utils>
@@ -63,6 +64,10 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     return FMRES_IGNORED;
   }
 
+  if (!is_user_alive(pHost)) {
+    return FMRES_IGNORED;
+  }
+
   if (!pev_valid(pEntity)) {
     return FMRES_IGNORED;
   }
@@ -78,7 +83,14 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
 }
 
 public OnPlayerPreThink_Post(pPlayer) {
+  new pPrevAimItem = g_pPlayerAimItem[pPlayer];
+  g_pPlayerAimItem[pPlayer] = -1;
+  
   if (ZP_Player_IsZombie(pPlayer)) {
+    return HAM_IGNORED;
+  }
+
+  if (get_member_game(m_bFreezePeriod)) {
     return HAM_IGNORED;
   }
 
@@ -89,9 +101,6 @@ public OnPlayerPreThink_Post(pPlayer) {
   if (!bUsePressed && get_gametime() - g_flPlayerLastFind[pPlayer] < 0.1) {
     return HAM_IGNORED;
   }
-
-  new pPrevAimItem = g_pPlayerAimItem[pPlayer];
-  g_pPlayerAimItem[pPlayer] = -1;
 
   static Float:vecSrc[3];
   ExecuteHam(Ham_Player_GetGunPosition, pPlayer, vecSrc);
