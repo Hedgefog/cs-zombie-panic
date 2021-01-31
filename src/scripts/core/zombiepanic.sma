@@ -2,6 +2,7 @@
 
 #include <amxmodx>
 #include <amxmisc>
+#include <fakemeta>
 
 #include <zombiepanic>
 
