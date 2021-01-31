@@ -14,23 +14,13 @@
 
 #define HIGHLIGHT_COLOR 96, 64, 16
 
-new const g_rgszPickupEntities[][] = {
-    "armoury_entity",
-    "item_battery",
-    "item_healthkit",
-    "armoury_entity",
-    "weaponbox",
-    "weapon_shield",
-    "grenade"
-};
-
 new bool:g_bBlockTouch = true;
 new Float:g_flPlayerLastFind[MAX_PLAYERS + 1] = { 0.0, ... };
 new g_pPlayerAimItem[MAX_PLAYERS + 1] = { -1, ... };
 new g_bPlayerPickup[MAX_PLAYERS + 1] = { false, ... };
 
-new g_iFwAimItem;
-new g_iFwResult;
+new g_pFwAimItem;
+new g_pFwResult;
 new g_pCvarUsePickup;
 
 public plugin_init() {
@@ -39,14 +29,14 @@ public plugin_init() {
     RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
     RegisterHam(Ham_Player_PostThink, "player", "OnPlayerPostThink_Post", .Post = 1);
 
-    for (new i = 0; i < sizeof(g_rgszPickupEntities); ++i) {
-        RegisterHam(Ham_Touch, g_rgszPickupEntities[i], "OnItemTouch", .Post = 0);
+    for (new i = 0; i < sizeof(ITEMS_LIST); ++i) {
+        RegisterHam(Ham_Touch, ITEMS_LIST[i], "OnItemTouch", .Post = 0);
     }
 
     register_forward(FM_AddToFullPack, "OnAddToFullPack_Post", 1);
 
     g_pCvarUsePickup = register_cvar("zp_use_pickup", "1");
-    g_iFwAimItem = CreateMultiForward("ZP_Fw_Player_AimItem", ET_IGNORE, FP_CELL, FP_CELL);
+    g_pFwAimItem = CreateMultiForward("ZP_Fw_Player_AimItem", ET_IGNORE, FP_CELL, FP_CELL);
 }
 
 public OnItemTouch(pEntity, pToucher) {
@@ -136,7 +126,7 @@ public OnPlayerPreThink_Post(pPlayer) {
             g_pPlayerAimItem[pPlayer] = pEntity;
 
             if (pEntity != pPrevAimItem) {
-                ExecuteForward(g_iFwAimItem, g_iFwResult, pPlayer, pEntity);
+                ExecuteForward(g_pFwAimItem, g_pFwResult, pPlayer, pEntity);
             }
 
             break;
@@ -149,11 +139,11 @@ public OnPlayerPreThink_Post(pPlayer) {
 }
 
 public OnPlayerPostThink_Post(pPlayer) {
-    if (g_pPlayerAimItem[pPlayer] == -1) {
+    if (!g_bPlayerPickup[pPlayer]) {
         return HAM_IGNORED;
     }
 
-    if (!g_bPlayerPickup[pPlayer]) {
+    if (g_pPlayerAimItem[pPlayer] == -1) {
         return HAM_IGNORED;
     }
 

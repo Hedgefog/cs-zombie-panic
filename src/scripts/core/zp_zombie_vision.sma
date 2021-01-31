@@ -21,8 +21,8 @@ new bool:g_bPlayerVision[MAX_PLAYERS + 1];
 new bool:g_bPlayerExternalFade[MAX_PLAYERS + 1];
 new bool:g_bIgnoreFadeMessage;
 
-new g_iFwZombieVision;
-new g_iFwResult;
+new g_pFwZombieVision;
+new g_pFwResult;
 
 new g_pCvarAuto;
 
@@ -36,7 +36,7 @@ public plugin_init() {
 
     register_forward(FM_AddToFullPack, "OnAddToFullPack_Post", 1);
 
-    g_iFwZombieVision = CreateMultiForward("ZP_Fw_PlayerZombieVision", ET_IGNORE, FP_CELL, FP_CELL);
+    g_pFwZombieVision = CreateMultiForward("ZP_Fw_PlayerZombieVision", ET_IGNORE, FP_CELL, FP_CELL);
 
     g_pCvarAuto = register_cvar("zp_zombievision_auto", "1");
 }
@@ -126,7 +126,7 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
             pev(pEntity, pev_health, flHealth);
 
             new Float:flBrightness = (1.0 - (flHealth / flMaxHealth)) * 255.0;
-            new iColor[3] = {0, 0, 0};
+            static iColor[3] = {0, 0, 0};
             iColor[0] = floatround(flBrightness);
 
             set_es(es, ES_RenderColor, iColor);
@@ -158,18 +158,20 @@ bool:Toggle(pPlayer) {
 }
 
 SetZombieVision(pPlayer, bool:bValue) {
-    if (bValue && !ZP_Player_IsZombie(pPlayer)) {
-        return;
-    }
+    if (bValue) {
+        if (!ZP_Player_IsZombie(pPlayer)) {
+            return;
+        }
 
-    if (bValue == g_bPlayerVision[pPlayer]) {
-        return;
+        if (g_bPlayerVision[pPlayer]) {
+            return;
+        }
     }
 
     VisionFadeEffect(pPlayer, bValue);
     g_bPlayerVision[pPlayer] = bValue;
 
-    ExecuteForward(g_iFwZombieVision, g_iFwResult, pPlayer, bValue);
+    ExecuteForward(g_pFwZombieVision, g_pFwResult, pPlayer, bValue);
 }
 
 VisionFadeEffect(pPlayer, bool:bValue) {

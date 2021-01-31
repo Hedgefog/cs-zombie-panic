@@ -16,6 +16,7 @@
 #define PRIMARY_AMMO_ID 13
 
 new CW:g_iCwHandler;
+new gmsgAmmoX;
 
 public plugin_precache() {
     precache_generic(ZP_WEAPON_SWIPE_HUD_TXT);
@@ -39,6 +40,8 @@ public plugin_precache() {
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+
+    gmsgAmmoX = get_user_msgid("AmmoX");
 
     RegisterHam(Ham_TraceAttack, "player", "OnPlayerTraceAttack", .Post = 0);
     RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
@@ -158,7 +161,7 @@ UpdateZombieLives() {
 }
 
 UpdatePlayerZombieLives(pPlayer) {
-    message_begin(MSG_ONE, get_user_msgid("AmmoX"), _, pPlayer);
+    message_begin(MSG_ONE, gmsgAmmoX, _, pPlayer);
     write_byte(PRIMARY_AMMO_ID);
     write_byte(ZP_GameRules_GetZombieLives());
     message_end();

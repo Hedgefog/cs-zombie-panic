@@ -16,24 +16,6 @@
 
 #define MAX_AMMO_SLOTS 32
 
-new const g_rgszAmmoName[][] = {
-    "", 
-    "338Magnum", 
-    "762Nato",
-    "556NatoBox", 
-    "556Nato",
-    "buckshot", 
-    "45ACP", 
-    "57mm", 
-    "50AE", 
-    "357SIG",
-    "9mm", 
-    "Flashbang",
-    "HEGrenade", 
-    "SmokeGrenade", 
-    "C4"
-};
-
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
@@ -221,8 +203,8 @@ FindPlayerItemById(pPlayer, iId) {
 }
 
 GetAmmoId(const szAmmoName[]) {
-    for (new iAmmoId = 0; iAmmoId < sizeof(g_rgszAmmoName); ++iAmmoId) {
-        if (equal(g_rgszAmmoName[iAmmoId], szAmmoName)) {
+    for (new iAmmoId = 0; iAmmoId < sizeof(AMMO_LIST); ++iAmmoId) {
+        if (equal(AMMO_LIST[iAmmoId], szAmmoName)) {
             return iAmmoId;
         }
     }

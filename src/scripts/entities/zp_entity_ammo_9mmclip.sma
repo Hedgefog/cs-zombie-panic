@@ -35,10 +35,10 @@ public OnSpawn(pEntity) {
     pev(pEntity, pev_angles, vecAngles);
 
     new iAmmoHandler = ZP_Ammo_GetHandler(ZP_AMMO_PISTOL);
-    new iWeaponBox = UTIL_CreateAmmoBox(ZP_Ammo_GetId(iAmmoHandler), ZP_Ammo_GetPackSize(iAmmoHandler));
-    engfunc(EngFunc_SetOrigin, iWeaponBox, vecOrigin);
-    set_pev(iWeaponBox, pev_angles, vecAngles);
-    engfunc(EngFunc_SetModel, iWeaponBox, AMMO_BOX_MODEL);
+    new pWeaponBox = UTIL_CreateAmmoBox(ZP_Ammo_GetId(iAmmoHandler), ZP_Ammo_GetPackSize(iAmmoHandler));
+    engfunc(EngFunc_SetOrigin, pWeaponBox, vecOrigin);
+    set_pev(pWeaponBox, pev_angles, vecAngles);
+    engfunc(EngFunc_SetModel, pWeaponBox, AMMO_BOX_MODEL);
 
     if (ZP_AMMO_RESPAWN_TIME > 0.0) {
         SetThink(pEntity, "ThinkSpawn");

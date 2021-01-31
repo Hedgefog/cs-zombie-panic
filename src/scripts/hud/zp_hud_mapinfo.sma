@@ -13,13 +13,13 @@ new g_szMotdTitle[32];
 new g_szMotdData[MAX_MOTD_LENGTH];
 
 public plugin_init() {
-        register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+    register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-        BuildMotd();
+    BuildMotd();
 }
 
 public plugin_natives() {
-        register_native("ZP_ShowMapInfo", "Native_Show");
+    register_native("ZP_ShowMapInfo", "Native_Show");
 }
 
 public Native_Show(iPluginId, iArgc) {

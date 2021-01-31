@@ -16,7 +16,7 @@
 
 #define ENTITY_NAME "item_battery"
 
-new g_iModel;
+new g_iModelIndex;
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
@@ -26,13 +26,13 @@ public plugin_init() {
 
 public plugin_precache() {
     precache_sound("items/tr_kevlar.wav");
-    g_iModel = precache_model(ZP_ITEM_BATTERY_MODEL);
+    g_iModelIndex = precache_model(ZP_ITEM_BATTERY_MODEL);
 
     RegisterHam(Ham_Spawn, ENTITY_NAME, "OnSpawn_Post", .Post = 1);
 }
 
 public OnSpawn_Post(pEntity) {
-    set_pev(pEntity, pev_modelindex, g_iModel);
+    set_pev(pEntity, pev_modelindex, g_iModelIndex);
     set_pev(pEntity, pev_solid, SOLID_TRIGGER);
     set_pev(pEntity, pev_effects, pev(pEntity, pev_effects) & ~EF_NODRAW);
 
@@ -61,7 +61,7 @@ public OnTouch(pEntity, pToucher) {
                 set_pev(pEntity, pev_effects, pev(pEntity, pev_effects) | EF_NODRAW);
                 set_pev(pEntity, pev_solid, SOLID_NOT);
 
-                emit_sound(pEntity, CHAN_ITEM, "items/tr_kevlar.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+                emit_sound(pPlayer, CHAN_ITEM, "items/tr_kevlar.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
             }
         }
     }

@@ -44,14 +44,14 @@ public plugin_end() {
 }
 
 public OnKvd_Post(pEntity, pKvdHandle) {
-    static szKey[32];
+    new szKey[32];
     get_kvd(pKvdHandle, KV_KeyName, szKey, charsmax(szKey));
 
     if (!equal(szKey, "spawnobject")) {
         return HAM_IGNORED;
     }
 
-    static szValue[32];
+    new szValue[32];
     get_kvd(pKvdHandle, KV_Value, szValue, charsmax(szValue));
 
     if (szValue[0] == '^0') {
@@ -82,17 +82,18 @@ public OnTakeDamage_Post(pEntity) {
     static Float:vecAngles[3];
     pev(pEntity, pev_angles, vecAngles);
 
-    static szSpawnObject[32];
     new iszSpawnObject = get_ent_data(pEntity, "CBreakable", "m_iszSpawnObject");
+
+    static szSpawnObject[32];
     engfunc(EngFunc_SzFromIndex, iszSpawnObject, szSpawnObject, charsmax(szSpawnObject));
 
-    new pSpawnObject = -1;
-    new CW:iCwHandler = CW_INVALID_HANDLER;
-    new iAmmoHandler = -1;
+    new CW:iCwHandler = CW_GetHandler(szSpawnObject);
+    new iAmmoHandler = ZP_Ammo_GetHandler(szSpawnObject);
 
-    if ((iCwHandler = CW_GetHandler(szSpawnObject)) != CW_INVALID_HANDLER) {
+    new pSpawnObject = -1;
+    if (iCwHandler != CW_INVALID_HANDLER) {
         pSpawnObject = CW_SpawnWeaponBox(iCwHandler);
-    } else if ((iAmmoHandler = ZP_Ammo_GetHandler(szSpawnObject)) != -1) {
+    } else if (iAmmoHandler != -1) {
         pSpawnObject = UTIL_CreateAmmoBox(ZP_Ammo_GetId(iAmmoHandler), ZP_Ammo_GetPackSize(iAmmoHandler));
 
         static szModel[64];

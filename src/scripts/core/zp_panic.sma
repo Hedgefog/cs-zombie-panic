@@ -16,8 +16,8 @@
 new bool:g_bPlayerPanic[MAX_PLAYERS + 1];
 new Float:g_flPlayerLastPanic[MAX_PLAYERS + 1];
 
-new g_iFwPanic;
-new g_iFwResult;
+new g_pFwPanic;
+new g_pFwResult;
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
@@ -25,7 +25,7 @@ public plugin_init() {
     RegisterHam(Ham_Touch, "weaponbox", "OnItemTouch", .Post = 0);
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
 
-    g_iFwPanic = CreateMultiForward("ZP_Fw_PlayerPanic", ET_IGNORE, FP_CELL);
+    g_pFwPanic = CreateMultiForward("ZP_Fw_PlayerPanic", ET_IGNORE, FP_CELL);
 }
 
 public plugin_natives() {
@@ -76,10 +76,11 @@ bool:Panic(pPlayer) {
 
     g_bPlayerPanic[pPlayer] = true;
     ZP_Player_DropBackpack(pPlayer);
+    ZP_Player_UpdateSpeed(pPlayer);
 
     set_task(PANIC_DURATION, "Task_EndPanic", pPlayer);
 
-    ExecuteForward(g_iFwPanic, g_iFwResult, pPlayer);
+    ExecuteForward(g_pFwPanic, g_pFwResult, pPlayer);
 
     return true;
 }

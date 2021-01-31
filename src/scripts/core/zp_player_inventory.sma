@@ -13,24 +13,6 @@
 #define PLUGIN "[Zombie Panic] Player Inventory"
 #define AUTHOR "Hedgehog Fog"
 
-new const g_rgszAmmoName[][] = {
-    "",
-    "338Magnum", 
-    "762Nato",
-    "556NatoBox", 
-    "556Nato",
-    "buckshot", 
-    "45ACP", 
-    "57mm", 
-    "50AE", 
-    "357SIG",
-    "9mm", 
-    "Flashbang",
-    "HEGrenade", 
-    "SmokeGrenade", 
-    "C4"
-};
-
 new g_pPlayerSelectedAmmo[MAX_PLAYERS + 1];
 new g_iszWeaponBox;
 
@@ -117,15 +99,15 @@ DropBackpack(pPlayer) {
     }
 
     // drop unactive items
-    new iWeaponBox = DropPlayerWeaponBox(pPlayer);
-    // new pItemsCount = PackPlayerItems(pPlayer, iWeaponBox);
+    new pWeaponBox = DropPlayerWeaponBox(pPlayer);
+    // new pItemsCount = PackPlayerItems(pPlayer, pWeaponBox);
     DropPlayerItems(pPlayer);
-    new iAmmoTypesCount = PackPlayerAmmo(pPlayer, iWeaponBox);
+    new iAmmoTypesCount = PackPlayerAmmo(pPlayer, pWeaponBox);
 
     if (iAmmoTypesCount) {
-        engfunc(EngFunc_SetModel, iWeaponBox, ZP_WEAPONBOX_MODEL);
+        engfunc(EngFunc_SetModel, pWeaponBox, ZP_WEAPONBOX_MODEL);
     } else {
-        engfunc(EngFunc_RemoveEntity, iWeaponBox);
+        engfunc(EngFunc_RemoveEntity, pWeaponBox);
     }
 
     if (pActiveItem != -1) {
@@ -139,12 +121,12 @@ DropBackpack(pPlayer) {
 }
 
 DropPlayerWeaponBox(pPlayer) {
-    new iWeaponBox = engfunc(EngFunc_CreateNamedEntity, g_iszWeaponBox);
-    dllfunc(DLLFunc_Spawn, iWeaponBox);
+    new pWeaponBox = engfunc(EngFunc_CreateNamedEntity, g_iszWeaponBox);
+    dllfunc(DLLFunc_Spawn, pWeaponBox);
 
-    ThrowPlayerItem(pPlayer, iWeaponBox);
+    ThrowPlayerItem(pPlayer, pWeaponBox);
 
-    return iWeaponBox;
+    return pWeaponBox;
 }
 
 ThrowPlayerItem(pPlayer, pEntity) {
@@ -214,10 +196,10 @@ DropPlayerItems(pPlayer) {
                 if (iClip == -1 && iPrimaryAmmoType > 0) {
                     new iPrimaryAmmoAmount = get_member(pPlayer, m_rgAmmo, iPrimaryAmmoType);
                     if (iPrimaryAmmoAmount > 0) {
-                        new iWeaponBox = DropPlayerItem(pPlayer, pItem, iSlot);
-                        set_member(iWeaponBox, m_WeaponBox_rgAmmo, iPrimaryAmmoAmount, iPrimaryAmmoType);
-                        set_member(iWeaponBox, m_WeaponBox_rgiszAmmo, g_rgszAmmoName[iPrimaryAmmoType], iPrimaryAmmoType);
-                        set_member(iWeaponBox, m_WeaponBox_cAmmoTypes, 1);
+                        new pWeaponBox = DropPlayerItem(pPlayer, pItem, iSlot);
+                        set_member(pWeaponBox, m_WeaponBox_rgAmmo, iPrimaryAmmoAmount, iPrimaryAmmoType);
+                        set_member(pWeaponBox, m_WeaponBox_rgiszAmmo, AMMO_LIST[iPrimaryAmmoType], iPrimaryAmmoType);
+                        set_member(pWeaponBox, m_WeaponBox_cAmmoTypes, 1);
                         set_member(pPlayer, m_rgAmmo, 0, iPrimaryAmmoType);
                     }
                 } else {
@@ -242,7 +224,7 @@ DropPlayerItems(pPlayer) {
 }
 
 DropPlayerItem(pPlayer, pItem, iSlot) {
-    new iWeaponBox = DropPlayerWeaponBox(pPlayer);
+    new pWeaponBox = DropPlayerWeaponBox(pPlayer);
 
     set_pev(pItem, pev_spawnflags, pev(pItem, pev_spawnflags) | SF_NORESPAWN);
     set_pev(pItem, pev_effects, EF_NODRAW);
@@ -250,7 +232,7 @@ DropPlayerItem(pPlayer, pItem, iSlot) {
     set_pev(pItem, pev_solid, SOLID_NOT);
     set_pev(pItem, pev_model, 0);
     set_pev(pItem, pev_modelindex, 0);
-    set_pev(pItem, pev_owner, iWeaponBox);
+    set_pev(pItem, pev_owner, pWeaponBox);
 
     new iWeaponId = get_member(pItem, m_iId);
     set_pev(pPlayer, pev_weapons, pev(pPlayer, pev_weapons) &~ (1<<iWeaponId));
@@ -258,30 +240,30 @@ DropPlayerItem(pPlayer, pItem, iSlot) {
     set_member(pItem, m_pPlayer, -1);
     set_member(pItem, m_pNext, -1);
 
-    set_member(iWeaponBox, m_WeaponBox_rgpPlayerItems, pItem, iSlot);
+    set_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, pItem, iSlot);
 
     static Float:vecVelocity[3];
     vecVelocity[0] = random_float(-350.0, 350.0);
     vecVelocity[1] = random_float(-350.0, 350.0);
     vecVelocity[2] = random_float(0.0, 350.0);
 
-    set_pev(iWeaponBox, pev_velocity, vecVelocity);
+    set_pev(pWeaponBox, pev_velocity, vecVelocity);
 
-    dllfunc(DLLFunc_Spawn, iWeaponBox); // fix model
+    dllfunc(DLLFunc_Spawn, pWeaponBox); // fix model
 
     ZP_Player_UpdateSpeed(pPlayer);
 
-    return iWeaponBox;
+    return pWeaponBox;
 }
 
-PackPlayerAmmo(pPlayer, iWeaponBox) {
+PackPlayerAmmo(pPlayer, pWeaponBox) {
     new iWeaponBoxAmmoIndex = 0;
-    for (new iAmmoId = 0; iAmmoId < sizeof(g_rgszAmmoName); ++iAmmoId) {
+    for (new iAmmoId = 0; iAmmoId < sizeof(AMMO_LIST); ++iAmmoId) {
         new iBpAmmo = get_member(pPlayer, m_rgAmmo, iAmmoId);
 
         if (iBpAmmo > 0) {
-            set_member(iWeaponBox, m_WeaponBox_rgiszAmmo, g_rgszAmmoName[iAmmoId], iWeaponBoxAmmoIndex);
-            set_member(iWeaponBox, m_WeaponBox_rgAmmo, iBpAmmo, iWeaponBoxAmmoIndex);
+            set_member(pWeaponBox, m_WeaponBox_rgiszAmmo, AMMO_LIST[iAmmoId], iWeaponBoxAmmoIndex);
+            set_member(pWeaponBox, m_WeaponBox_rgAmmo, iBpAmmo, iWeaponBoxAmmoIndex);
             set_member(pPlayer, m_rgAmmo, 0, iAmmoId);
             iWeaponBoxAmmoIndex++;
         }
@@ -320,14 +302,14 @@ DropPlayerSelectedAmmo(pPlayer) {
     }
 
     new iPackSize = min(ZP_Ammo_GetPackSize(iAmmoIndex), iBpAmmo);
-    new iWeaponBox = UTIL_CreateAmmoBox(iAmmoId, iPackSize);
-    ThrowPlayerItem(pPlayer, iWeaponBox);
+    new pWeaponBox = UTIL_CreateAmmoBox(iAmmoId, iPackSize);
+    ThrowPlayerItem(pPlayer, pWeaponBox);
 
     set_member(pPlayer, m_rgAmmo, iBpAmmo - iPackSize, iAmmoId);
 
     static szAmmoModel[64];
     ZP_Ammo_GetPackModel(iAmmoIndex, szAmmoModel, charsmax(szAmmoModel));
-    engfunc(EngFunc_SetModel, iWeaponBox, szAmmoModel);
+    engfunc(EngFunc_SetModel, pWeaponBox, szAmmoModel);
 
     static Float:vecThrowAngle[3];
     pev(pPlayer, pev_v_angle, vecThrowAngle);
@@ -336,7 +318,7 @@ DropPlayerSelectedAmmo(pPlayer) {
     static Float:vecVelocity[3];
     get_global_vector(GL_v_forward, vecVelocity);
     xs_vec_mul_scalar(vecVelocity, random_float(400.0, 450.0), vecVelocity);
-    set_pev(iWeaponBox, pev_velocity, vecVelocity);
+    set_pev(pWeaponBox, pev_velocity, vecVelocity);
 
     ZP_Player_UpdateSpeed(pPlayer);
 }

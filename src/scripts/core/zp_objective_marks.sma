@@ -35,7 +35,7 @@ enum PlayerData {
 
 new Array:g_irgMarks;
 new g_iMarkModelIndex;
-new g_rgPlayerData[MAX_PLAYERS][12][PlayerData];
+new g_rgPlayerData[MAX_PLAYERS + 1][12][PlayerData];
 
 new g_pCvarEnabled;
 
