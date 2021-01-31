@@ -22,6 +22,8 @@ public plugin_precache() {
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
+    register_forward(FM_GetGameDescription, "OnGetGameDescription");
+
     g_pCvarVersion = register_cvar("zombiepanic_version", ZP_VERSION);
 
     hook_cvar_change(g_pCvarVersion, "OnVersionCvarChange");
@@ -42,14 +44,6 @@ public plugin_natives() {
 }
 
 public plugin_cfg() {
-    LoadConfig();
-}
-
-public OnVersionCvarChange() {
-    set_pcvar_string(g_pCvarVersion, ZP_VERSION);
-}
-
-LoadConfig() {
     new szConfigDir[32];
     get_configsdir(szConfigDir, charsmax(szConfigDir));
 
@@ -57,4 +51,15 @@ LoadConfig() {
     server_exec();
     
     ExecuteForward(g_fwConfigLoaded, g_fwResult);
+}
+
+public OnVersionCvarChange() {
+    set_pcvar_string(g_pCvarVersion, ZP_VERSION);
+}
+
+public OnGetGameDescription() {
+    static szGameName[32];
+    format(szGameName, charsmax(szGameName), "%s %s", ZP_TITLE, ZP_VERSION);
+    forward_return(FMV_STRING, szGameName);
+    return FMRES_SUPERCEDE;
 }

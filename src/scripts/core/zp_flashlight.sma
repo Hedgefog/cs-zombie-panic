@@ -13,6 +13,8 @@
 #define PLUGIN "[Zombie Panic] Flashlight"
 #define AUTHOR "Hedgehog Fog"
 
+#define TASKID_FLASHLIGHT_HUD 100
+
 #define FLASHLIGHT_CHARGE_MAX 100.0
 #define FLASHLIGHT_CHARGE_DEF FLASHLIGHT_CHARGE_MAX
 #define FLASHLIGHT_RATE 0.025
@@ -20,9 +22,6 @@
 #define FLASHLIGHT_MAX_CHARGE 100.0
 #define FLASHLIGHT_MIN_CHARGE 0.0
 #define FLASHLIGHT_MIN_CHARGE_TO_ACTIVATE 10.0
-
-#define TASKID_FLASHLIGHT 100
-#define TASKID_FLASHLIGHT_HUD 200
 
 enum PlayerFlashlight {
     bool:PlayerFlashlight_On,
@@ -46,11 +45,11 @@ public plugin_precache() {
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
+    gmsgFlashlight = get_user_msgid("Flashlight");
+
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
     RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
     RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
-
-    gmsgFlashlight = get_user_msgid("Flashlight");
 
     g_pCvarConsumptionRate = register_cvar("zp_flashlight_consumption_rate", "0.5");
     g_pCvarRecoveryRate = register_cvar("zp_flashlight_recovery_rate", "0.5");
@@ -63,6 +62,10 @@ public plugin_natives() {
 public bool:Native_Toggle(iPluginId, iArgc) {
     new pPlayer = get_param(1);
     return SetPlayerFlashlight(pPlayer, !g_playerFlashlight[pPlayer][PlayerFlashlight_On]);
+}
+
+public client_disconnected(pPlayer) {
+    SetPlayerFlashlight(pPlayer, false);
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
@@ -79,11 +82,35 @@ public OnPlayerSpawn_Post(pPlayer) {
 
 public OnPlayerKilled_Post(pPlayer) {
     SetPlayerFlashlight(pPlayer, false);
+
     return HAM_HANDLED;
 }
 
 public OnPlayerPreThink_Post(pPlayer) {
     FlashlightThink(pPlayer);
+}
+
+public FlashlightThink(pPlayer) {
+    new Float:flDelta = get_gametime() - g_playerFlashlight[pPlayer][PlayerFlashlight_LastThink];
+    if (flDelta < FLASHLIGHT_RATE) {
+        return;
+    }
+
+    if (g_playerFlashlight[pPlayer][PlayerFlashlight_On]) {
+        if (g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] > FLASHLIGHT_MIN_CHARGE) {
+            CreatePlayerFlashlightLight(pPlayer);
+            g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] -= (get_pcvar_float(g_pCvarConsumptionRate) * flDelta);
+            g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] = floatmax(g_playerFlashlight[pPlayer][PlayerFlashlight_Charge], FLASHLIGHT_MIN_CHARGE);
+            set_pev(pPlayer, pev_framerate, 0.5);
+        } else {
+             SetPlayerFlashlight(pPlayer, false);
+        }
+    } else if (g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] < FLASHLIGHT_MAX_CHARGE) {
+        g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] += (get_pcvar_float(g_pCvarRecoveryRate) * flDelta);
+        g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] = floatmin(g_playerFlashlight[pPlayer][PlayerFlashlight_Charge], FLASHLIGHT_MAX_CHARGE);
+    }
+
+    g_playerFlashlight[pPlayer][PlayerFlashlight_LastThink] = get_gametime();
 }
 
 bool:SetPlayerFlashlight(pPlayer, bool:bValue) {
@@ -105,18 +132,19 @@ bool:SetPlayerFlashlight(pPlayer, bool:bValue) {
 
     g_playerFlashlight[pPlayer][PlayerFlashlight_On] = bValue;
 
-    remove_task(pPlayer + TASKID_FLASHLIGHT);
-    remove_task(pPlayer + TASKID_FLASHLIGHT_HUD);
+    remove_task(TASKID_FLASHLIGHT_HUD + pPlayer);
 
     if (bValue) {
         ShowLightConeEntity(pPlayer);
-        set_task(1.0, "TaskFlashlightHud", pPlayer + TASKID_FLASHLIGHT_HUD, _, _, "b");
+        set_task(1.0, "Task_FlashlightHud", TASKID_FLASHLIGHT_HUD + pPlayer, _, _, "b");
     } else {
         HideLightConeEntity(pPlayer);
     }
 
-    UpdateFlashlightHud(pPlayer);
-    emit_sound(pPlayer, CHAN_ITEM, ZP_FLASHLIGHT_SOUND, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    if (is_user_connected(pPlayer)) {
+        UpdateFlashlightHud(pPlayer);
+        emit_sound(pPlayer, CHAN_ITEM, ZP_FLASHLIGHT_SOUND, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    }
 
     return true;
 }
@@ -167,29 +195,6 @@ UpdateFlashlightHud(pPlayer) {
     message_end();
 }
 
-public FlashlightThink(pPlayer) {
-    new Float:flDelta = get_gametime() - g_playerFlashlight[pPlayer][PlayerFlashlight_LastThink];
-    if (flDelta < FLASHLIGHT_RATE) {
-        return;
-    }
-
-    if (g_playerFlashlight[pPlayer][PlayerFlashlight_On]) {
-        if (g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] > FLASHLIGHT_MIN_CHARGE) {
-            CreatePlayerFlashlightLight(pPlayer);
-            g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] -= (get_pcvar_float(g_pCvarConsumptionRate) * flDelta);
-            g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] = floatmax(g_playerFlashlight[pPlayer][PlayerFlashlight_Charge], FLASHLIGHT_MIN_CHARGE);
-            set_pev(pPlayer, pev_framerate, 0.5);
-        } else {
-             SetPlayerFlashlight(pPlayer, false);
-        }
-    } else if (g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] < FLASHLIGHT_MAX_CHARGE) {
-        g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] += (get_pcvar_float(g_pCvarRecoveryRate) * flDelta);
-        g_playerFlashlight[pPlayer][PlayerFlashlight_Charge] = floatmin(g_playerFlashlight[pPlayer][PlayerFlashlight_Charge], FLASHLIGHT_MAX_CHARGE);
-    }
-
-    g_playerFlashlight[pPlayer][PlayerFlashlight_LastThink] = get_gametime();
-}
-
 CreatePlayerFlashlightLight(pPlayer) {
     static Float:vecViewOfs[3];
     pev(pPlayer, pev_view_ofs, vecViewOfs);
@@ -227,7 +232,7 @@ CreatePlayerFlashlightLight(pPlayer) {
     }
 }
 
-public TaskFlashlightHud(iTaskId) {
+public Task_FlashlightHud(iTaskId) {
     new pPlayer = iTaskId - TASKID_FLASHLIGHT_HUD;
 
     UpdateFlashlightHud(pPlayer);

@@ -13,6 +13,7 @@
 #define MUSIC_DELAY 3.0
 
 new bool:g_bPlayerMusic[MAX_PLAYERS + 1];
+
 new g_pCvarMusic;
 new g_pCvarJoinMusic;
 
@@ -44,7 +45,7 @@ public client_connect(pPlayer) {
 public OnPlayerSpawn_Post(pPlayer) {
     if (get_pcvar_num(g_pCvarMusic)) {
         if (!g_bPlayerMusic[pPlayer]) {
-            set_task(MUSIC_DELAY, "TaskPlay", TASKID_PLAY_NEXT_TRACK + pPlayer);
+            set_task(MUSIC_DELAY, "Task_Play", TASKID_PLAY_NEXT_TRACK + pPlayer);
             g_bPlayerMusic[pPlayer] = true;
         }
     } else {
@@ -53,12 +54,12 @@ public OnPlayerSpawn_Post(pPlayer) {
     }
 }
 
-public TaskPlay(iTaskId) {
+public Task_Play(iTaskId) {
     new pPlayer = iTaskId - TASKID_PLAY_NEXT_TRACK;
 
     new iIndex = random(sizeof(ZP_MUSIC_LIST));
     PlayMusic(pPlayer, ZP_MUSIC_LIST[iIndex][ZP_Music_Path], false);
-    set_task(MUSIC_DELAY + (ZP_MUSIC_LIST[iIndex][ZP_Music_Duration] * 60.0), "TaskPlay", TASKID_PLAY_NEXT_TRACK + pPlayer);
+    set_task(MUSIC_DELAY + (ZP_MUSIC_LIST[iIndex][ZP_Music_Duration] * 60.0), "Task_Play", TASKID_PLAY_NEXT_TRACK + pPlayer);
 }
 
 PlayMusic(pPlayer, const szPath[], bool:bLoop) {

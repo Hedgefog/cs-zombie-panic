@@ -11,8 +11,6 @@
 #define PLUGIN "[Zombie Panic] Player Speed"
 #define AUTHOR "Hedgehog Fog"
 
-#define AMMO_TYPE_COUNT 16
-
 new const Float:g_fWeaponWeight[CSW_P90 + 1] = {
     1.0, // weapon_p228
     0.0, // weapon_shield
@@ -46,7 +44,7 @@ new const Float:g_fWeaponWeight[CSW_P90 + 1] = {
     2.2, // weapon_p90
 };
 
-new const Float:g_fAmmoWeight[AMMO_TYPE_COUNT] = {
+new const Float:g_fAmmoWeight[] = {
     0.0,
     0.1083, // "338Magnum"
     0.07, // "762Nato"
@@ -199,8 +197,7 @@ Float:CalculatePlayerWeaponsWeight(pPlayer) {
 Float:CalculatePlayerAmmoWeight(pPlayer) {
     new Float:flWeight = 0.0;
 
-    new iAmmoCount = AMMO_TYPE_COUNT;
-    for (new iAmmoId = 0; iAmmoId < iAmmoCount; ++iAmmoId) {
+    for (new iAmmoId = 0; iAmmoId < sizeof(g_fAmmoWeight); ++iAmmoId) {
         new iBpAmmo = get_member(pPlayer, m_rgAmmo, iAmmoId);
         flWeight += iBpAmmo * g_fAmmoWeight[iAmmoId];
     }

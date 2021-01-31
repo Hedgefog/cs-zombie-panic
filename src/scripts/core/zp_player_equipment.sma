@@ -12,6 +12,8 @@
 #define PLUGIN "[Zombie Panic] Player Equipment"
 #define AUTHOR "Hedgehog Fog"
 
+#define PLAYER_IDLE_ANIMEXT "c4"
+
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
@@ -21,7 +23,7 @@ public plugin_init() {
 public OnPlayerSpawnEquip(pPlayer) {
     rg_remove_all_items(pPlayer);
 
-    set_member(pPlayer, m_szAnimExtention, "c4");
+    set_member(pPlayer, m_szAnimExtention, PLAYER_IDLE_ANIMEXT);
 
     new Float:flMaxHealth = ZP_Player_IsZombie(pPlayer) ? ZP_ZOMBIE_HEALTH : 100.0;
     set_pev(pPlayer, pev_max_health, flMaxHealth);

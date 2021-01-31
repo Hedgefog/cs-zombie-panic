@@ -86,7 +86,6 @@ bool:Panic(pPlayer) {
 
 public Task_EndPanic(iTaskId) {
     new pPlayer = iTaskId;
-
     g_bPlayerPanic[pPlayer] = false;
     g_flPlayerLastPanic[pPlayer] = get_gametime();
     ZP_Player_UpdateSpeed(pPlayer);

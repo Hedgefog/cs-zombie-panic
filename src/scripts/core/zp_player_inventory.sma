@@ -13,9 +13,7 @@
 #define PLUGIN "[Zombie Panic] Player Inventory"
 #define AUTHOR "Hedgehog Fog"
 
-#define AMMO_COUNT 15
-
-new const g_rgszAmmoName[AMMO_COUNT][] = {
+new const g_rgszAmmoName[][] = {
     "",
     "338Magnum", 
     "762Nato",
@@ -278,7 +276,7 @@ DropPlayerItem(pPlayer, pItem, iSlot) {
 
 PackPlayerAmmo(pPlayer, iWeaponBox) {
     new iWeaponBoxAmmoIndex = 0;
-    for (new iAmmoId = 0; iAmmoId < AMMO_COUNT; ++iAmmoId) {
+    for (new iAmmoId = 0; iAmmoId < sizeof(g_rgszAmmoName); ++iAmmoId) {
         new iBpAmmo = get_member(pPlayer, m_rgAmmo, iAmmoId);
 
         if (iBpAmmo > 0) {
@@ -344,23 +342,23 @@ DropPlayerSelectedAmmo(pPlayer) {
 }
 
 GetAmmo(pPlayer, const szAmmo[]) {
-    new iHandler = ZP_Ammo_GetHandler(szAmmo);
-    if (iHandler == -1) {
+    new iAmmoHandler = ZP_Ammo_GetHandler(szAmmo);
+    if (iAmmoHandler == -1) {
         return 0;
     }
 
-    new iId = ZP_Ammo_GetId(iHandler);
+    new iId = ZP_Ammo_GetId(iAmmoHandler);
 
     return get_member(pPlayer, m_rgAmmo, iId);
 }
 
 bool:SetAmmo(pPlayer, const szAmmo[], iValue) {
-    new iHandler = ZP_Ammo_GetHandler(szAmmo);
-    if (iHandler == -1) {
+    new iAmmoHandler = ZP_Ammo_GetHandler(szAmmo);
+    if (iAmmoHandler == -1) {
         return false;
     }
 
-    new iId = ZP_Ammo_GetId(iHandler);
+    new iId = ZP_Ammo_GetId(iAmmoHandler);
     set_member(pPlayer, m_rgAmmo, iValue, iId);
 
     ZP_Player_UpdateSpeed(pPlayer);
@@ -369,14 +367,14 @@ bool:SetAmmo(pPlayer, const szAmmo[], iValue) {
 }
 
 AddAmmo(pPlayer, const szAmmo[], iValue) {
-    new iHandler = ZP_Ammo_GetHandler(szAmmo);
-    if (iHandler == -1) {
+    new iAmmoHandler = ZP_Ammo_GetHandler(szAmmo);
+    if (iAmmoHandler == -1) {
         return 0;
     }
 
-    new iId = ZP_Ammo_GetId(iHandler);
+    new iId = ZP_Ammo_GetId(iAmmoHandler);
     new iAmount = get_member(pPlayer, m_rgAmmo, iId);
-    new iNewAmount = min(iAmount + iValue, ZP_Ammo_GetMaxAmount(iHandler));
+    new iNewAmount = min(iAmount + iValue, ZP_Ammo_GetMaxAmount(iAmmoHandler));
     set_member(pPlayer, m_rgAmmo, iNewAmount, iId);
 
     ZP_Player_UpdateSpeed(pPlayer);
