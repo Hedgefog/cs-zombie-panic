@@ -36,17 +36,17 @@ public OnMessage(iMsgId, iDest, pPlayer) {
 }
 
 public OnEvent(pPlayer) {
-new pTargetPlayer = read_data(1);
+    new pTargetPlayer = read_data(1);
 
-for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
-    if (!is_user_connected(pPlayer)) {
-        continue;
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
+        if (!is_user_connected(pPlayer)) {
+            continue;
+        }
+
+        Update(pPlayer, pTargetPlayer);
     }
 
-    Update(pPlayer, pTargetPlayer);
-}
-
-return PLUGIN_HANDLED;
+    return PLUGIN_HANDLED;
 }
 
 Update(pPlayer, pTargetPlayer) {
