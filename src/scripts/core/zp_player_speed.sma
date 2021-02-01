@@ -12,54 +12,54 @@
 #define AUTHOR "Hedgehog Fog"
 
 new const Float:g_pFweaponWeight[CSW_LAST_WEAPON + 1] = {
-    PISTOL_WEIGHT, // weapon_p228
+    ZP_WEIGHT_PISTOL, // weapon_p228
     0.0, // weapon_shield
-    SNIPER_WEIGHT, // weapon_scout
+    ZP_WEIGHT_SNIPER, // weapon_scout
     0.0, // weapon_hegrenade
-    RIFLE_WEIGHT, // weapon_xm1014
+    ZP_WEIGHT_RIFLE, // weapon_xm1014
     0.0, // weapon_c4
-    RIFLE_WEIGHT, // weapon_mac10
-    RIFLE_WEIGHT, // weapon_aug
+    ZP_WEIGHT_RIFLE, // weapon_mac10
+    ZP_WEIGHT_RIFLE, // weapon_aug
     0.0, // weapon_smokegrenade
-    PISTOL_WEIGHT, // weapon_elite
-    PISTOL_WEIGHT, // weapon_fiveseven
-    RIFLE_WEIGHT, // weapon_ump45
-    RIFLE_WEIGHT, // weapon_sg550
-    RIFLE_WEIGHT, // weapon_galil
-    RIFLE_WEIGHT, // weapon_famas
-    PISTOL_WEIGHT, // weapon_usp
-    PISTOL_WEIGHT, // weapon_glock18
-    SNIPER_WEIGHT, // weapon_awp
-    RIFLE_WEIGHT, // weapon_mp5navy
-    BFF_WEIGHT, // weapon_m249
-    RIFLE_WEIGHT, // weapon_m3
-    RIFLE_WEIGHT, // weapon_m4a1
-    RIFLE_WEIGHT, // weapon_tmp
-    SNIPER_WEIGHT, // weapon_g3sg1
+    ZP_WEIGHT_PISTOL, // weapon_elite
+    ZP_WEIGHT_PISTOL, // weapon_fiveseven
+    ZP_WEIGHT_RIFLE, // weapon_ump45
+    ZP_WEIGHT_RIFLE, // weapon_sg550
+    ZP_WEIGHT_RIFLE, // weapon_galil
+    ZP_WEIGHT_RIFLE, // weapon_famas
+    ZP_WEIGHT_PISTOL, // weapon_usp
+    ZP_WEIGHT_PISTOL, // weapon_glock18
+    ZP_WEIGHT_SNIPER, // weapon_awp
+    ZP_WEIGHT_RIFLE, // weapon_mp5navy
+    ZP_WEIGHT_BFF, // weapon_m249
+    ZP_WEIGHT_RIFLE, // weapon_m3
+    ZP_WEIGHT_RIFLE, // weapon_m4a1
+    ZP_WEIGHT_RIFLE, // weapon_tmp
+    ZP_WEIGHT_SNIPER, // weapon_g3sg1
     0.0, // weapon_flashbang
-    MAGNUM_WEIGHT, // weapon_deagle
-    RIFLE_WEIGHT, // weapon_sg552
-    RIFLE_WEIGHT, // weapon_ak47
-    MELEE_WEIGHT, // weapon_knife
-    RIFLE_WEIGHT, // weapon_p90
+    ZP_WEIGHT_MAGNUM, // weapon_deagle
+    ZP_WEIGHT_RIFLE, // weapon_sg552
+    ZP_WEIGHT_RIFLE, // weapon_ak47
+    ZP_WEIGHT_MELEE, // weapon_knife
+    ZP_WEIGHT_RIFLE, // weapon_p90
 };
 
 new const Float:g_fAmmoWeight[] = {
     0.0,
-    MAGNUM_AMMO_WEIGHT, // "338Magnum"
-    RIFLE_AMMO_WEIGHT, // "762Nato"
-    RIFLE_AMMO_WEIGHT, // "556NatoBox"
-    RIFLE_AMMO_WEIGHT, // "556Nato"
-    0SHOTGUN_AMMO_WEIGHT, // "buckshot"
-    PISTOL_AMMO_WEIGHT, // "45ACP"
-    PISTOL_AMMO_WEIGHT, // "57mm"
-    PISTOL_AMMO_WEIGHT, // "50AE"
-    PISTOL_AMMO_WEIGHT, // "357SIG"
-    PISTOL_AMMO_WEIGHT, // "9mm"
-    GRENADE_WEIGHT, // "Flashbang"
-    GRENADE_WEIGHT, // "HEGrenade"
-    GRENADE_WEIGHT, // "SmokeGrenade"
-    GRENADE_WEIGHT // "C4"
+    ZP_WEIGHT_MAGNUM_AMMO, // "338Magnum"
+    ZP_WEIGHT_RIFLE_AMMO, // "762Nato"
+    ZP_WEIGHT_RIFLE_AMMO, // "556NatoBox"
+    ZP_WEIGHT_RIFLE_AMMO, // "556Nato"
+    ZP_WEIGHT_SHOTGUN_AMMO, // "buckshot"
+    ZP_WEIGHT_PISTOL_AMMO, // "45ACP"
+    ZP_WEIGHT_PISTOL_AMMO, // "57mm"
+    ZP_WEIGHT_PISTOL_AMMO, // "50AE"
+    ZP_WEIGHT_PISTOL_AMMO, // "357SIG"
+    ZP_WEIGHT_PISTOL_AMMO, // "9mm"
+    ZP_WEIGHT_GRENADE, // "Flashbang"
+    ZP_WEIGHT_GRENADE, // "HEGrenade"
+    ZP_WEIGHT_GRENADE, // "SmokeGrenade"
+    ZP_WEIGHT_GRENADE // "C4"
 };
 
 new Float:g_flPlayerBaseSpeed[MAX_PLAYERS + 1];
