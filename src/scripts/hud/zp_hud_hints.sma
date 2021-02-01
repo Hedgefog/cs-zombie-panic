@@ -71,20 +71,20 @@ public OnPlayerSpawn_Post(pPlayer) {
             SetupMessage(MESSAGE_COLOR, MESSAGE_POS_OBJECTIVE, MESSAGE_HOLD_TIME, MESSAGE_FADEIN_TIME, MESSAGE_FADEOUT_TIME);
 
             if (ZP_GameRules_GetObjectiveMode()) {
-                ShowMessageTitle(pPlayer, "%L", pPlayer, "ZPO_GAMEMODE_TITLE");
+                ShowMessageTitle(pPlayer, "%L", pPlayer, "ZPO_OBJECTIVE_TITLE");
 
                 if (ZP_Player_IsZombie(pPlayer)) {
-                    ShowMessage(pPlayer, "%L", pPlayer, "ZPO_ZOMBIE_OBJECTIVE");
+                    ShowMessage(pPlayer, "%L", pPlayer, "ZPO_OBJECTIVE_ZOMBIE");
                 } else {
-                    ShowMessage(pPlayer, "%L", pPlayer, "ZPO_HUMAN_OBJECTIVE");
+                    ShowMessage(pPlayer, "%L", pPlayer, "ZPO_OBJECTIVE_HUMAN");
                 }
             } else {
-                ShowMessageTitle(pPlayer, "%L", pPlayer, "ZP_GAMEMODE_TITLE");
+                ShowMessageTitle(pPlayer, "%L", pPlayer, "ZP_OBJECTIVE_TITLE");
 
                 if (ZP_Player_IsZombie(pPlayer)) {
-                    ShowMessage(pPlayer, "%L", pPlayer, "ZP_ZOMBIE_OBJECTIVE");
+                    ShowMessage(pPlayer, "%L", pPlayer, "ZP_OBJECTIVE_ZOMBIE");
                 } else {
-                    ShowMessage(pPlayer, "%L", pPlayer, "ZP_HUMAN_OBJECTIVE");
+                    ShowMessage(pPlayer, "%L", pPlayer, "ZP_OBJECTIVE_HUMAN");
                 }
             }
 
@@ -96,13 +96,13 @@ public OnPlayerSpawn_Post(pPlayer) {
 
         switch (random(2)) {
             case 0: {
-                ShowMessage(pPlayer, "%L", pPlayer, "ZP_PANIC_HINT");
+                ShowMessage(pPlayer, "%L", pPlayer, "ZP_HINT_PANIC");
             }
             case 1: {
-                ShowMessage(pPlayer, "%L", pPlayer, "ZP_DROP_AMMO_HINT");
+                ShowMessage(pPlayer, "%L", pPlayer, "ZP_HINT_DROP_AMMO");
             }
             case 2: {
-                ShowMessage(pPlayer, "%L", pPlayer, "ZP_PICKUP_HINT");
+                ShowMessage(pPlayer, "%L", pPlayer, "ZP_HINT_PICKUP");
             }
         }
     }
@@ -128,12 +128,12 @@ public OnPlayerKilled_Post(pPlayer) {
 
     if (ZP_Player_IsZombie(pPlayer)) {
         if (ZP_GameRules_GetZombieLives() > 0) {
-            ShowMessage(pPlayer, "%L", pPlayer, "ZP_ZOMBIE_RESPAWN");
+            ShowMessage(pPlayer, "%L", pPlayer, "ZP_RESPAWN_ZOMBIE");
         } else {
-            ShowMessage(pPlayer, "%L", pPlayer, "ZP_ZOMBIE_NO_LIVES");
+            ShowMessage(pPlayer, "%L", pPlayer, "ZP_RESPAWN_NOLIVES");
         }
     } else {
-        ShowMessage(pPlayer, "%L", pPlayer, "ZP_HUMAN_RESPAWN");
+        ShowMessage(pPlayer, "%L", pPlayer, "ZP_RESPAWN_HUMAN");
     }
 
     return HAM_IGNORED;
@@ -170,7 +170,7 @@ public OnItemPickup(pPlayer) {
     if (flMaxSpeed < ZP_ZOMBIE_SPEED) {
         SetupMessage(MESSAGE_COLOR_WARN, MESSAGE_POS_AMMO_WARN, MESSAGE_HOLD_TIME, MESSAGE_FADEIN_TIME, MESSAGE_FADEOUT_TIME);
         ShowMessageTitle(pPlayer, "%L", pPlayer, "ZP_WARN_TITLE");
-        ShowMessage(pPlayer, "%L", pPlayer, "ZP_SPEED_WARN");
+        ShowMessage(pPlayer, "%L", pPlayer, "ZP_WARN_SPEED");
         g_bPlayerShowSpeedWarning[pPlayer] = false;
     }
 
