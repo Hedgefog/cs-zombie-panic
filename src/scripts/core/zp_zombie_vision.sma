@@ -143,10 +143,19 @@ public OnMessage_ScreenFade(iMsgId, iMsgDest, pPlayer) {
         return PLUGIN_CONTINUE;
     }
 
-    new Float:flHoldTime = float(get_msg_arg_int(2) * (1>>12));
+    new Float:flHoldTime = float(get_msg_arg_int(2)) / (1<<12);
     if (flHoldTime > 0.0) {
-        g_bPlayerExternalFade[pPlayer] = true;
-        set_task(flHoldTime, "Task_FixVisionScreenFade", TASKID_FIX_FADE + pPlayer);
+        if (pPlayer > 0) {
+            HandleExternalFade(pPlayer, flHoldTime);
+        } else {
+            for (new pTargetPlayer = 1; pTargetPlayer <= MaxClients; ++pTargetPlayer) {
+                if (!is_user_connected(pTargetPlayer)) {
+                    continue;
+                }
+
+                HandleExternalFade(pTargetPlayer, flHoldTime);
+            }
+        }
     }
 
     return PLUGIN_CONTINUE;
@@ -182,6 +191,11 @@ VisionFadeEffect(pPlayer, bool:bValue) {
     g_bIgnoreFadeMessage = true;
     UTIL_ScreenFade(pPlayer, {VISION_SCREEN_FADE_COLOR}, VISION_EFFECT_TIME, 0.0, VISION_ALPHA, (bValue ? FFADE_OUT | FFADE_STAYOUT : FFADE_IN), .bExternal = true);
     g_bIgnoreFadeMessage = false;
+}
+
+HandleExternalFade(pPlayer, Float:flHoldTime) {
+    g_bPlayerExternalFade[pPlayer] = true;
+    set_task(flHoldTime, "Task_FixVisionScreenFade", TASKID_FIX_FADE + pPlayer);
 }
 
 public Task_FixVisionScreenFade(iTaskId) {
