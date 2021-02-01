@@ -170,7 +170,7 @@ public @Weapon_Deploy(this) {
 }
 
 public Float:@Weapon_GetMaxSpeed(this) {
-    return ZP_HUMAN_SPEED - 10.0;
+    return ZP_HUMAN_SPEED;
 }
 
 public @Weapon_Spawn(this) {
