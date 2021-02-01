@@ -31,24 +31,24 @@ public OnPlayerTakeDamage_Post(pPlayer) {
 
     remove_task(TASKID_REGENERATE + pPlayer);
     remove_task(TASKID_START_REGENERATE + pPlayer);
-    set_task(REGENERATION_START_DELAY, "TaskStartRegenerate", TASKID_START_REGENERATE + pPlayer);
+    set_task(REGENERATION_START_DELAY, "Task_StartRegenerate", TASKID_START_REGENERATE + pPlayer);
 
     return HAM_HANDLED;
 }
 
-public TaskStartRegenerate(iTaskId) {
+SetupRegenerateTask(pPlayer) {
+    set_task(REGENERATION_DELAY, "Task_Regenerate", TASKID_REGENERATE + pPlayer);
+}
+
+public Task_StartRegenerate(iTaskId) {
     new pPlayer = iTaskId - TASKID_START_REGENERATE;
     SetupRegenerateTask(pPlayer);
 }
 
-public TaskRegenerate(iTaskId) {
+public Task_Regenerate(iTaskId) {
     new pPlayer = iTaskId - TASKID_REGENERATE;
 
     if (ExecuteHamB(Ham_TakeHealth, pPlayer, (get_pcvar_float(g_pCvarRegenerationRate) * REGENERATION_DELAY), 0)) {
         SetupRegenerateTask(pPlayer);
     }
-}
-
-SetupRegenerateTask(pPlayer) {
-    set_task(REGENERATION_DELAY, "TaskRegenerate", TASKID_REGENERATE + pPlayer);
 }

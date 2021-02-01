@@ -22,7 +22,7 @@ new g_rgAmmoMap[15] = { -1, ... };
 new g_iAmmoCount = 0;
 
 public plugin_precache() {
-    InitStorage();
+    InitStorages();
 
     RegisterAmmo(ZP_AMMO_PISTOL, 10, 7, ZP_AMMO_PISTOL_MODEL, 70);
     RegisterAmmo(ZP_AMMO_RIFLE, 4, 30, ZP_AMMO_RIFLE_MODEL, 240);
@@ -48,7 +48,7 @@ public plugin_natives() {
 }
 
 public plugin_end() {
-    DestroyStorage();
+    DestroyStorages();
 }
 
 public Native_GetHandler(iPluginId, iArgc) {
@@ -131,7 +131,7 @@ GetHandlerById(iAmmoId) {
     return g_rgAmmoMap[iAmmoId];
 }
 
-InitStorage() {
+InitStorages() {
     g_rgAmmo[Ammo_Name] = ArrayCreate(32, 1);
     g_rgAmmo[Ammo_Id] = ArrayCreate(1, 1);
     g_rgAmmo[Ammo_PackSize] = ArrayCreate(1, 1);
@@ -140,7 +140,7 @@ InitStorage() {
     g_iAmmoMap = TrieCreate();
 }
 
-DestroyStorage() {
+DestroyStorages() {
     for (new i = 0; i < _:AmmoData; ++i) {
         new Array:irgData = Array:g_rgAmmo[AmmoData:i];
 

@@ -11,27 +11,16 @@
 #define PLUGIN "[Zombie Panic] Zombie"
 #define AUTHOR "Hedgehog Fog"
 
-new const g_rgszPickupEntities[][] = {
-    "armoury_entity",
-    "item_battery",
-    "item_healthkit",
-    "armoury_entity",
-    "weaponbox",
-    "weapon_shield",
-    "grenade"
-};
-
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
     RegisterHam(Ham_Item_PreFrame, "player", "OnPlayerItemPreFrame_Post", .Post = 1);
     RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage", .Post = 0);
-
     RegisterHam(Ham_Use, "func_button", "OnButtonUse", .Post = 0);
 
-    for (new i = 0; i < sizeof(g_rgszPickupEntities); ++i) {
-        RegisterHam(Ham_Touch, g_rgszPickupEntities[i], "OnItemTouch", .Post = 0);
+    for (new i = 0; i < sizeof(ITEMS_LIST); ++i) {
+        RegisterHam(Ham_Touch, ITEMS_LIST[i], "OnItemTouch", .Post = 0);
     }
 }
 

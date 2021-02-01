@@ -46,13 +46,13 @@ public Native_RespawnAsZombie(iPluginId, iArgc) {
 }
 
 public ZP_Fw_PlayerJoined(pPlayer) {
-        ExecuteHam(Ham_Player_PreThink, pPlayer);
+    ExecuteHam(Ham_Player_PreThink, pPlayer);
 
-        if (!is_user_alive(pPlayer)) {
-            SetupRespawnTask(pPlayer);
-        }
+    if (!is_user_alive(pPlayer)) {
+        SetupRespawnTask(pPlayer);
+    }
 
-        return PLUGIN_HANDLED;
+    return PLUGIN_HANDLED;
 }
 
 public OnPlayerSpawn_Post(pPlayer) {

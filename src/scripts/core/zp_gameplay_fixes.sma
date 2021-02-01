@@ -44,7 +44,7 @@ new const g_rgszDelayEntities[][] = {
 };
 
 new g_pCvarRoundTime;
-new g_iFwEntitySpawn;
+new g_pFwEntitySpawn;
 new Array:g_irgObjectiveEntities;
 
 public plugin_precache() {
@@ -52,7 +52,7 @@ public plugin_precache() {
 
     CreateHiddenBuyZone();
 
-    g_iFwEntitySpawn = register_forward(FM_Spawn, "OnSpawn");
+    g_pFwEntitySpawn = register_forward(FM_Spawn, "OnSpawn");
 
     RegisterHam(Ham_Spawn, "game_score", "OnGameScoreSpawn", .Post = 1);
 
@@ -62,7 +62,7 @@ public plugin_precache() {
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    unregister_forward(FM_Spawn, g_iFwEntitySpawn);
+    unregister_forward(FM_Spawn, g_pFwEntitySpawn);
 
     RemoveObjectiveEntities();
 }

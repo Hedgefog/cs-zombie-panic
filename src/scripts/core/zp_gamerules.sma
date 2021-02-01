@@ -25,8 +25,8 @@ enum TeamPreference {
 
 new g_pCvarLives;
 
-new g_iFwPlayerJoined;
-new g_iFwResult;
+new g_pFwPlayerJoined;
+new g_pFwResult;
 
 new g_iTeamMenu;
 new bool:g_bObjectiveMode = false;
@@ -51,9 +51,10 @@ public plugin_init() {
     register_clcmd("joinclass", "OnPlayerChangeTeam");
     register_clcmd("drop", "OnClCmd_Drop");
 
-    g_iFwPlayerJoined = CreateMultiForward("ZP_Fw_PlayerJoined", ET_IGNORE, FP_CELL);
-
     g_pCvarLives = register_cvar("zp_zombie_lives", "20");
+
+    g_pFwPlayerJoined = CreateMultiForward("ZP_Fw_PlayerJoined", ET_IGNORE, FP_CELL);
+
     g_iTeamMenu = CreateTeamMenu();
 }
 
@@ -398,7 +399,7 @@ public TaskJoin(pPlayer) {
     set_member(pPlayer, m_iTeam, 2);
     set_member(pPlayer, m_iJoiningState, 5);
 
-    ExecuteForward(g_iFwPlayerJoined, g_iFwResult, pPlayer);
+    ExecuteForward(g_pFwPlayerJoined, g_pFwResult, pPlayer);
 }
 
 /*--------------------------------[ Team Menu ]--------------------------------*/

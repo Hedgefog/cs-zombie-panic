@@ -35,7 +35,7 @@ enum PlayerData {
 
 new Array:g_irgMarks;
 new g_iMarkModelIndex;
-new g_rgPlayerData[MAX_PLAYERS][12][PlayerData];
+new g_rgPlayerData[MAX_PLAYERS + 1][12][PlayerData];
 
 new g_pCvarEnabled;
 
@@ -79,7 +79,8 @@ public OnButtonSpawn_Post(pButton) {
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
-    for (new iMarkIndex = 0; iMarkIndex < ArraySize(g_irgMarks); ++iMarkIndex) {
+    new iMarkCount = ArraySize(g_irgMarks);
+    for (new iMarkIndex = 0; iMarkIndex < iMarkCount; ++iMarkIndex) {
         g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkUpdateTime] = 0.0;
     }
 }

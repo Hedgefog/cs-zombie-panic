@@ -15,7 +15,7 @@ public plugin_init() {
 }
 
 public OnMessage_SendAudio()  {
-    static szAudio[32];
+    static szAudio[8];
     get_msg_arg_string(2, szAudio, charsmax(szAudio));
 
     return equali(szAudio, "%!MRAD_", 7) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;

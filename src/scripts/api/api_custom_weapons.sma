@@ -18,83 +18,81 @@
 #define VEC_DUCK_HULL_MIN Float:{-16.0, -16.0, -18.0}
 #define VEC_DUCK_HULL_MAX Float:{16.0, 16.0, 18.0}
 
-#define AUTOAIM_2DEGREES  0.0348994967025
-
 #define TOKEN 743647146
 
 enum CW_Data {
-  CW_Data_PluginId,
-  CW_Data_Name,
-  CW_Data_Icon,
-  CW_Data_Id,
-  CW_Data_ClipSize,
-  CW_Data_PrimaryAmmoType,
-  CW_Data_PrimaryAmmoMaxAmount,
-  CW_Data_SecondaryAmmoType,
-  CW_Data_SecondaryAmmoMaxAmount,
-  CW_Data_SlotId,
-  CW_Data_Position,
-  CW_Data_WeaponFlags,
-  CW_Data_Bindings
+    CW_Data_PluginId,
+    CW_Data_Name,
+    CW_Data_Icon,
+    CW_Data_Id,
+    CW_Data_ClipSize,
+    CW_Data_PrimaryAmmoType,
+    CW_Data_PrimaryAmmoMaxAmount,
+    CW_Data_SecondaryAmmoType,
+    CW_Data_SecondaryAmmoMaxAmount,
+    CW_Data_SlotId,
+    CW_Data_Position,
+    CW_Data_WeaponFlags,
+    CW_Data_Bindings
 }
 
 enum _:WeaponListMessage {
-  WL_WeaponName[32],
-  WL_PrimaryAmmoType,
-  WL_PrimaryAmmoMaxAmount,
-  WL_SecondaryAmmoType,
-  WL_SecondaryAmmoMaxAmount,
-  WL_SlotId,
-  WL_NumberInSlot,
-  WL_WeaponId,
-  WL_Flags
+    WL_WeaponName[32],
+    WL_PrimaryAmmoType,
+    WL_PrimaryAmmoMaxAmount,
+    WL_SecondaryAmmoType,
+    WL_SecondaryAmmoMaxAmount,
+    WL_SlotId,
+    WL_NumberInSlot,
+    WL_WeaponId,
+    WL_Flags
 }
 
 enum _:Function {
-  Function_PluginId,
-  Function_FunctionId
+    Function_PluginId,
+    Function_FunctionId
 }
 
-new const g_rgszWeaponNames[CSW_P90 + 1][] = {
-  "",
-  "weapon_p228",
-  "weapon_shield",
-  "weapon_scout",
-  "weapon_hegrenade",
-  "weapon_xm1014",
-  "weapon_c4",
-  "weapon_mac10",
-  "weapon_aug",
-  "weapon_smokegrenade",
-  "weapon_elite",
-  "weapon_fiveseven",
-  "weapon_ump45",
-  "weapon_sg550",
-  "weapon_galil",
-  "weapon_famas",
-  "weapon_usp",
-  "weapon_glock18",
-  "weapon_awp",
-  "weapon_mp5navy",
-  "weapon_m249",
-  "weapon_m3",
-  "weapon_m4a1",
-  "weapon_tmp",
-  "weapon_g3sg1",
-  "weapon_flashbang",
-  "weapon_deagle",
-  "weapon_sg552",
-  "weapon_ak47",
-  "weapon_knife",
-  "weapon_p90"
+new const g_rgszWeaponNames[CSW_LAST_WEAPON + 1][] = {
+    "",
+    "weapon_p228",
+    "weapon_shield",
+    "weapon_scout",
+    "weapon_hegrenade",
+    "weapon_xm1014",
+    "weapon_c4",
+    "weapon_mac10",
+    "weapon_aug",
+    "weapon_smokegrenade",
+    "weapon_elite",
+    "weapon_fiveseven",
+    "weapon_ump45",
+    "weapon_sg550",
+    "weapon_galil",
+    "weapon_famas",
+    "weapon_usp",
+    "weapon_glock18",
+    "weapon_awp",
+    "weapon_mp5navy",
+    "weapon_m249",
+    "weapon_m3",
+    "weapon_m4a1",
+    "weapon_tmp",
+    "weapon_g3sg1",
+    "weapon_flashbang",
+    "weapon_deagle",
+    "weapon_sg552",
+    "weapon_ak47",
+    "weapon_knife",
+    "weapon_p90"
 };
 
-new g_iszWeaponNames[CSW_P90 + 1];
-new bool:g_bWeaponHooks[CSW_P90 + 1];
-new g_weaponListDefaults[CSW_P90 + 1][WeaponListMessage];
+new g_iszWeaponNames[CSW_LAST_WEAPON + 1];
+new bool:g_bWeaponHooks[CSW_LAST_WEAPON + 1];
+new g_weaponListDefaults[CSW_LAST_WEAPON + 1][WeaponListMessage];
 
-new Array:g_weapons[CW_Data];
-new Trie:g_weaponsMap;
+new Array:g_rgWeapons[CW_Data];
+new Trie:g_rgWeaponsMap;
 new g_iWeaponCount;
 
 new g_iszWeaponBox;
@@ -105,305 +103,305 @@ new gmsgWeaponList;
 new bool:g_bPrecache;
 
 public plugin_precache() {
-  g_bPrecache = true;
-  
-  AllocateStrings();
-  InitStorages();
+    g_bPrecache = true;
+    
+    AllocateStrings();
+    InitStorages();
 
-  register_forward(FM_UpdateClientData, "OnUpdateClientData_Post", 1);
-  register_forward(FM_PrecacheEvent, "OnPrecacheEvent_Post", 1);
-  register_forward(FM_SetModel, "OnSetModel_Post", 1);
+    register_forward(FM_UpdateClientData, "OnUpdateClientData_Post", 1);
+    register_forward(FM_PrecacheEvent, "OnPrecacheEvent_Post", 1);
+    register_forward(FM_SetModel, "OnSetModel_Post", 1);
 
-  RegisterHam(Ham_Spawn, "weaponbox", "OnWeaponboxSpawn_Post");
-  RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage", .Post = 0);
-  RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage_Post", .Post = 1);
+    RegisterHam(Ham_Spawn, "weaponbox", "OnWeaponboxSpawn_Post");
+    RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage", .Post = 0);
+    RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage_Post", .Post = 1);
 
-  register_message(get_user_msgid("DeathMsg"), "OnMessage_DeathMsg");
+    register_message(get_user_msgid("DeathMsg"), "OnMessage_DeathMsg");
 
-  precache_model(WALL_PUFF_SPRITE);
+    precache_model(WALL_PUFF_SPRITE);
 }
 
 public plugin_init() {
-  g_bPrecache = false;
+    g_bPrecache = false;
 
-  register_plugin(PLUGIN, VERSION, AUTHOR);
+    register_plugin(PLUGIN, VERSION, AUTHOR);
 
-  gmsgWeaponList = get_user_msgid("WeaponList");
+    gmsgWeaponList = get_user_msgid("WeaponList");
 
-  register_message(gmsgWeaponList, "OnMessage_WeaponList");
+    register_message(gmsgWeaponList, "OnMessage_WeaponList");
 
-  InitWeaponHooks();
+    InitWeaponHooks();
 }
 
 public plugin_natives() {
-  register_library("api_custom_weapons");
+    register_library("api_custom_weapons");
 
-  register_native("CW_Register", "Native_Register");
-  register_native("CW_GetHandlerByEntity", "Native_GetHandlerByEntity");
-  register_native("CW_GetHandler", "Native_GetHandler");
-  register_native("CW_GiveWeapon", "Native_GiveWeapon");
-  register_native("CW_SpawnWeapon", "Native_SpawnWeapon");
-  register_native("CW_SpawnWeaponBox", "Native_SpawnWeaponBox");
+    register_native("CW_Register", "Native_Register");
+    register_native("CW_GetHandlerByEntity", "Native_GetHandlerByEntity");
+    register_native("CW_GetHandler", "Native_GetHandler");
+    register_native("CW_GiveWeapon", "Native_GiveWeapon");
+    register_native("CW_SpawnWeapon", "Native_SpawnWeapon");
+    register_native("CW_SpawnWeaponBox", "Native_SpawnWeaponBox");
 
-  register_native("CW_Reload", "Native_Reload");
-  register_native("CW_PrimaryAttack", "Native_PrimaryAttack");
-  register_native("CW_SecondaryAttack", "Native_SecondaryAttack");
+    register_native("CW_Reload", "Native_Reload");
+    register_native("CW_PrimaryAttack", "Native_PrimaryAttack");
+    register_native("CW_SecondaryAttack", "Native_SecondaryAttack");
 
-  register_native("CW_FireBulletsPlayer", "Native_FireBulletsPlayer");
-  register_native("CW_EjectWeaponBrass", "Native_EjectWeaponBrass");
-  register_native("CW_PlayAnimation", "Native_PlayAnimation");
-  register_native("CW_GetPlayer", "Native_GetPlayer");
+    register_native("CW_FireBulletsPlayer", "Native_FireBulletsPlayer");
+    register_native("CW_EjectWeaponBrass", "Native_EjectWeaponBrass");
+    register_native("CW_PlayAnimation", "Native_PlayAnimation");
+    register_native("CW_GetPlayer", "Native_GetPlayer");
 
-  register_native("CW_DefaultDeploy", "Native_DefaultDeploy");
-  register_native("CW_DefaultShot", "Native_DefaultShot");
-  register_native("CW_DefaultShotgunShot", "Native_DefaultShotgunShot");
-  register_native("CW_DefaultSwing", "Native_DefaultSwing");
-  register_native("CW_DefaultReload", "Native_DefaultReload");
-  register_native("CW_DefaultShotgunReload", "Native_DefaultShotgunReload");
-  register_native("CW_DefaultShotgunIdle", "Native_DefaultShotgunIdle");
-  
-  register_native("CW_GrenadeDetonate", "Native_GrenadeDetonate");
-  register_native("CW_GrenadeSmoke", "Native_GrenadeSmoke");
-  register_native("CW_RemovePlayerItem", "Native_RemovePlayerItem");
+    register_native("CW_DefaultDeploy", "Native_DefaultDeploy");
+    register_native("CW_DefaultShot", "Native_DefaultShot");
+    register_native("CW_DefaultShotgunShot", "Native_DefaultShotgunShot");
+    register_native("CW_DefaultSwing", "Native_DefaultSwing");
+    register_native("CW_DefaultReload", "Native_DefaultReload");
+    register_native("CW_DefaultShotgunReload", "Native_DefaultShotgunReload");
+    register_native("CW_DefaultShotgunIdle", "Native_DefaultShotgunIdle");
+    
+    register_native("CW_GrenadeDetonate", "Native_GrenadeDetonate");
+    register_native("CW_GrenadeSmoke", "Native_GrenadeSmoke");
+    register_native("CW_RemovePlayerItem", "Native_RemovePlayerItem");
 
-  register_native("CW_Bind", "Native_Bind");
+    register_native("CW_Bind", "Native_Bind");
 }
 
 public plugin_end() {
-  DestroyStorages();
+    DestroyStorages();
 }
 
 // ANCHOR: Natives
 
 public Native_Bind(iPluginId, iArgc) {
-  new CW:iHandler = CW:get_param(1);
-  new iBinding = get_param(2);
+    new CW:iHandler = CW:get_param(1);
+    new iBinding = get_param(2);
 
-  new szFunctionName[32];
-  get_string(3, szFunctionName, charsmax(szFunctionName));
+    new szFunctionName[32];
+    get_string(3, szFunctionName, charsmax(szFunctionName));
 
-  Bind(iHandler, iBinding, iPluginId, get_func_id(szFunctionName, iPluginId));
+    Bind(iHandler, iBinding, iPluginId, get_func_id(szFunctionName, iPluginId));
 }
 
 public CW:Native_GetHandlerByEntity(iPluginId, iArgc) {
-  new pEntity = get_param(1);
-  return GetHandlerByEntity(pEntity);
+    new pEntity = get_param(1);
+    return GetHandlerByEntity(pEntity);
 }
 
 public CW:Native_GetHandler(iPluginId, iArgc) {
-  static szName[64];
-  get_string(1, szName, charsmax(szName));
+    static szName[64];
+    get_string(1, szName, charsmax(szName));
 
-  return GetHandler(szName);
+    return GetHandler(szName);
 }
 
 public CW:Native_Register(iPluginId, iArgc) {
-  new szName[64];
-  get_string(1, szName, charsmax(szName));
+    new szName[64];
+    get_string(1, szName, charsmax(szName));
 
-  new iWeaponId = get_param(2);
-  new iClipSize = get_param(3);
-  new iPrimaryAmmoType = get_param(4);
-  new iPrimaryAmmoMaxAmount = get_param(5);
-  new iSecondaryAmmoType = get_param(6);
-  new iSecondaryAmmoMaxAmount = get_param(7);
-  new iSlotId = get_param(8);
-  new iPosition = get_param(9);
-  new iWeaponFlags = get_param(10);
+    new iWeaponId = get_param(2);
+    new iClipSize = get_param(3);
+    new iPrimaryAmmoType = get_param(4);
+    new iPrimaryAmmoMaxAmount = get_param(5);
+    new iSecondaryAmmoType = get_param(6);
+    new iSecondaryAmmoMaxAmount = get_param(7);
+    new iSlotId = get_param(8);
+    new iPosition = get_param(9);
+    new iWeaponFlags = get_param(10);
 
-  new szIcon[16];
-  get_string(11, szIcon, charsmax(szIcon));
+    new szIcon[16];
+    get_string(11, szIcon, charsmax(szIcon));
 
-  return RegisterWeapon(iPluginId, szName, iWeaponId, iClipSize, iPrimaryAmmoType, iPrimaryAmmoMaxAmount, iSecondaryAmmoType, iSecondaryAmmoMaxAmount, iSlotId, iPosition, iWeaponFlags, szIcon);
+    return RegisterWeapon(iPluginId, szName, iWeaponId, iClipSize, iPrimaryAmmoType, iPrimaryAmmoMaxAmount, iSecondaryAmmoType, iSecondaryAmmoMaxAmount, iSlotId, iPosition, iWeaponFlags, szIcon);
 }
 
 public Native_GiveWeapon(iPluginId, iArgc) {
-  new pPlayer = get_param(1);
-  
-  static szWeapon[64];
-  get_string(2, szWeapon, charsmax(szWeapon));
+    new pPlayer = get_param(1);
+    
+    static szWeapon[64];
+    get_string(2, szWeapon, charsmax(szWeapon));
 
-  new CW:iHandler;
-  if (TrieGetCell(g_weaponsMap, szWeapon, iHandler)) {
-    GiveWeapon(pPlayer, iHandler);
-  }
+    new CW:iHandler;
+    if (TrieGetCell(g_rgWeaponsMap, szWeapon, iHandler)) {
+        GiveWeapon(pPlayer, iHandler);
+    }
 }
 
 public Native_SpawnWeapon(iPluginId, iArgc) {
-  new CW:iHandler = CW:get_param(1);
-  return SpawnWeapon(iHandler);
+    new CW:iHandler = CW:get_param(1);
+    return SpawnWeapon(iHandler);
 }
 
 public Native_SpawnWeaponBox(iPluginId, iArgc) {
-  new CW:iHandler = CW:get_param(1);
-  return SpawnWeaponBox(iHandler);
+    new CW:iHandler = CW:get_param(1);
+    return SpawnWeaponBox(iHandler);
 }
 
 public bool:Native_DefaultDeploy(iPluginId, iArgc) {
-  new pWeapon = get_param(1);
+    new pWeapon = get_param(1);
 
-  static szViewModel[64];
-  get_string(2, szViewModel, charsmax(szViewModel));
+    static szViewModel[64];
+    get_string(2, szViewModel, charsmax(szViewModel));
 
-  static szWeaponModel[64];
-  get_string(3, szWeaponModel, charsmax(szWeaponModel));
+    static szWeaponModel[64];
+    get_string(3, szWeaponModel, charsmax(szWeaponModel));
 
-  new iAnim = get_param(4);
+    new iAnim = get_param(4);
 
-  static szAnimExt[16];
-  get_string(5, szAnimExt, charsmax(szAnimExt));
+    static szAnimExt[16];
+    get_string(5, szAnimExt, charsmax(szAnimExt));
 
-  return DefaultDeploy(pWeapon, szViewModel, szWeaponModel, iAnim, szAnimExt);
+    return DefaultDeploy(pWeapon, szViewModel, szWeaponModel, iAnim, szAnimExt);
 }
 
 public Native_FireBulletsPlayer(iPluginId, iArgc) {
-  new pWeapon = get_param(1);
-  new iShots = get_param(2);
+    new pWeapon = get_param(1);
+    new iShots = get_param(2);
 
-  static Float:vecSrc[3];
-  get_array_f(3, vecSrc, sizeof(vecSrc));
-  
-  static Float:vecDirShooting[3];
-  get_array_f(4, vecDirShooting, sizeof(vecDirShooting));
+    static Float:vecSrc[3];
+    get_array_f(3, vecSrc, sizeof(vecSrc));
+    
+    static Float:vecDirShooting[3];
+    get_array_f(4, vecDirShooting, sizeof(vecDirShooting));
 
-  static Float:vecSpread[3];
-  get_array_f(5, vecSpread, sizeof(vecSpread));
+    static Float:vecSpread[3];
+    get_array_f(5, vecSpread, sizeof(vecSpread));
 
-  new Float:flDistance = get_param_f(6);
-  new Float:flDamage = get_param_f(7);
-  new pevAttacker = get_param(8);
+    new Float:flDistance = get_param_f(6);
+    new Float:flDamage = get_param_f(7);
+    new pevAttacker = get_param(8);
 
-  static Float:vecOut[3];
+    static Float:vecOut[3];
 
-  FireBulletsPlayer(pWeapon, iShots, vecSrc, vecDirShooting, vecSpread, flDistance, flDamage, pevAttacker, vecOut);
+    FireBulletsPlayer(pWeapon, iShots, vecSrc, vecDirShooting, vecSpread, flDistance, flDamage, pevAttacker, vecOut);
 
-  set_array_f(9, vecOut, sizeof(vecOut));
+    set_array_f(9, vecOut, sizeof(vecOut));
 }
 
 public bool:Native_EjectWeaponBrass(iPluginId, iArgc) {
-  new pItem = get_param(1);
-  new iModelIndex = get_param(2);
-  new iSoundType = get_param(3);
+    new pItem = get_param(1);
+    new iModelIndex = get_param(2);
+    new iSoundType = get_param(3);
 
-  return EjectWeaponBrass(pItem, iModelIndex, iSoundType);
+    return EjectWeaponBrass(pItem, iModelIndex, iSoundType);
 }
 
 public bool:Native_DefaultShot(iPluginId, iArgc) {
-  new pItem = get_param(1);
-  new Float:flDamage = get_param_f(2);
-  new Float:flRate = get_param_f(3);
+    new pItem = get_param(1);
+    new Float:flDamage = get_param_f(2);
+    new Float:flRate = get_param_f(3);
 
-  static Float:vecSpread[3];
-  get_array_f(4, vecSpread, sizeof(vecSpread));
+    static Float:vecSpread[3];
+    get_array_f(4, vecSpread, sizeof(vecSpread));
 
-  new iShots = get_param(5);
-  new Float:flDistance = get_param_f(6);
+    new iShots = get_param(5);
+    new Float:flDistance = get_param_f(6);
 
-  return DefaultShot(pItem, flDamage, flRate, vecSpread, iShots, flDistance);
+    return DefaultShot(pItem, flDamage, flRate, vecSpread, iShots, flDistance);
 }
 
 public bool:Native_DefaultShotgunShot(iPluginId, iArgc) {
-  new pItem = get_param(1);
-  new Float:flDamage = get_param_f(2);
-  new Float:flRate = get_param_f(3);
-  new Float:flPumpDelay = get_param_f(4);
+    new pItem = get_param(1);
+    new Float:flDamage = get_param_f(2);
+    new Float:flRate = get_param_f(3);
+    new Float:flPumpDelay = get_param_f(4);
 
-  static Float:vecSpread[3];
-  get_array_f(5, vecSpread, sizeof(vecSpread));
+    static Float:vecSpread[3];
+    get_array_f(5, vecSpread, sizeof(vecSpread));
 
-  new iShots = get_param(6);
-  new Float:flDistance = get_param_f(7);
+    new iShots = get_param(6);
+    new Float:flDistance = get_param_f(7);
 
-  return DefaultShotgunShot(pItem, flDamage, flRate, flPumpDelay, vecSpread, iShots, flDistance);
+    return DefaultShotgunShot(pItem, flDamage, flRate, flPumpDelay, vecSpread, iShots, flDistance);
 }
 
 public Native_DefaultSwing(iPluginId, iArgc) {
-  new pItem = get_param(1);
-  new Float:flDamage = get_param_f(2);
-  new Float:flRate = get_param_f(3);
-  new Float:flDistance = get_param_f(4);
+    new pItem = get_param(1);
+    new Float:flDamage = get_param_f(2);
+    new Float:flRate = get_param_f(3);
+    new Float:flDistance = get_param_f(4);
 
-  return DefaultSwing(pItem, flDamage, flRate, flDistance);
+    return DefaultSwing(pItem, flDamage, flRate, flDistance);
 }
 
 public Native_PlayAnimation(iPluginID, argc) {
-  new pItem = get_param(1);
-  new iSequence = get_param(2);
-  new Float:flDuration = get_param_f(3);
+    new pItem = get_param(1);
+    new iSequence = get_param(2);
+    new Float:flDuration = get_param_f(3);
 
-  PlayWeaponAnim(pItem, iSequence, flDuration);
+    PlayWeaponAnim(pItem, iSequence, flDuration);
 }
 
 public Native_GetPlayer(iPluginID, argc) {
-  new pItem = get_param(1);
-  return GetPlayer(pItem);
+    new pItem = get_param(1);
+    return GetPlayer(pItem);
 }
 
 public bool:Native_DefaultReload(iPluginId, iArgc) {
-  new pItem = get_param(1);
-  new iAnim = get_param(2);
-  new Float:flDelay = get_param_f(3);
+    new pItem = get_param(1);
+    new iAnim = get_param(2);
+    new Float:flDelay = get_param_f(3);
 
-  return DefaultReload(pItem, iAnim, flDelay);
+    return DefaultReload(pItem, iAnim, flDelay);
 }
 
 public bool:Native_DefaultShotgunReload(iPluginId, iArgc) {
-  new pItem = get_param(1);
-  new iStartAnim = get_param(2);
-  new iEndAnim = get_param(3);
-  new Float:flDelay = get_param_f(4);
-  new Float:flDuration = get_param_f(5);
+    new pItem = get_param(1);
+    new iStartAnim = get_param(2);
+    new iEndAnim = get_param(3);
+    new Float:flDelay = get_param_f(4);
+    new Float:flDuration = get_param_f(5);
 
-  return DefaultShotgunReload(pItem, iStartAnim, iEndAnim, flDelay, flDuration);
+    return DefaultShotgunReload(pItem, iStartAnim, iEndAnim, flDelay, flDuration);
 }
 
 public bool:Native_DefaultShotgunIdle(iPluginId, iArgc) {
-  new pItem = get_param(1);
-  new iAnim = get_param(2);
-  new iReloadEndAnim = get_param(3);
-  new Float:flDuration = get_param_f(4);
-  new Float:flReloadEndDuration = get_param_f(5);
-  
-  static szPumpSound[64];
-  get_string(6, szPumpSound, charsmax(szPumpSound));
+    new pItem = get_param(1);
+    new iAnim = get_param(2);
+    new iReloadEndAnim = get_param(3);
+    new Float:flDuration = get_param_f(4);
+    new Float:flReloadEndDuration = get_param_f(5);
+    
+    static szPumpSound[64];
+    get_string(6, szPumpSound, charsmax(szPumpSound));
 
-  return DefaultShotgunIdle(pItem, iAnim, iReloadEndAnim, flDuration, flReloadEndDuration, szPumpSound);
+    return DefaultShotgunIdle(pItem, iAnim, iReloadEndAnim, flDuration, flReloadEndDuration, szPumpSound);
 }
 
 public Native_Reload(iPluginId, iArgc) {
-  new pItem = get_param(1);
-  Reload(pItem);
+    new pItem = get_param(1);
+    Reload(pItem);
 }
 public Native_PrimaryAttack(iPluginId, iArgc) {
-  new pItem = get_param(1);
-  PrimaryAttack(pItem);
+    new pItem = get_param(1);
+    PrimaryAttack(pItem);
 }
 public Native_SecondaryAttack(iPluginId, iArgc) {
-  new pItem = get_param(1);
-  SecondaryAttack(pItem);
+    new pItem = get_param(1);
+    SecondaryAttack(pItem);
 }
 
 public Native_GrenadeDetonate(iPluginId, iArgc) {
-  new pGrenade = get_param(1);
-  new Float:flRadius = get_param_f(2);
-  new Float:flMagnitude = get_param_f(3);
-  GrenadeDetonate(pGrenade, flRadius, flMagnitude);
+    new pGrenade = get_param(1);
+    new Float:flRadius = get_param_f(2);
+    new Float:flMagnitude = get_param_f(3);
+    GrenadeDetonate(pGrenade, flRadius, flMagnitude);
 }
 
 public Native_GrenadeSmoke(iPluginId, iArgc) {
-  new pGrenade = get_param(1);
-  GrenadeSmoke(pGrenade);
+    new pGrenade = get_param(1);
+    GrenadeSmoke(pGrenade);
 }
 
 public Native_RemovePlayerItem(iPluginId, iArgc) {
-  new pItem = get_param(1);
-  RemovePlayerItem(pItem);
+    new pItem = get_param(1);
+    RemovePlayerItem(pItem);
 }
 
 // ANCHOR: Forwards
 
 public client_disconnected(pPlayer) {
-  SetWeaponPrediction(pPlayer, true);
+    SetWeaponPrediction(pPlayer, true);
 }
 
 // ANCHOR: Hook Callbacks
@@ -411,7 +409,7 @@ public client_disconnected(pPlayer) {
 public OnItemDeploy(this) {
     new CW:iHandler = GetHandlerByEntity(this);
     if (iHandler == CW_INVALID_HANDLER) {
-      return HAM_IGNORED;
+        return HAM_IGNORED;
     }
 
     WeaponDeploy(this);
@@ -422,7 +420,7 @@ public OnItemDeploy(this) {
 public OnItemHolster(this) {
     new CW:iHandler = GetHandlerByEntity(this);
     if (iHandler == CW_INVALID_HANDLER) {
-      return HAM_IGNORED;
+        return HAM_IGNORED;
     }
 
     WeaponHolster(this);
@@ -433,7 +431,7 @@ public OnItemHolster(this) {
 public OnItemPostFrame(this) {
     new CW:iHandler = GetHandlerByEntity(this);
     if (iHandler == CW_INVALID_HANDLER) {
-      return HAM_IGNORED;
+        return HAM_IGNORED;
     }
 
     ItemPostFrame(this);
@@ -442,29 +440,29 @@ public OnItemPostFrame(this) {
 }
 
 public OnUpdateClientData_Post(pPlayer, iSendWeapons, pCdHandle) {
-  if (!is_user_alive(pPlayer)) {
-    return FMRES_IGNORED;
-  }
+    if (!is_user_alive(pPlayer)) {
+        return FMRES_IGNORED;
+    }
 
-  new pItem = get_member(pPlayer, m_pActiveItem);
-  if (pItem == -1) {
-    return FMRES_IGNORED;
-  }
+    new pItem = get_member(pPlayer, m_pActiveItem);
+    if (pItem == -1) {
+        return FMRES_IGNORED;
+    }
 
-  new CW:iHandler = GetHandlerByEntity(pItem);
-  if (iHandler == CW_INVALID_HANDLER) {
-    return HAM_IGNORED;
-  }
+    new CW:iHandler = GetHandlerByEntity(pItem);
+    if (iHandler == CW_INVALID_HANDLER) {
+        return HAM_IGNORED;
+    }
 
-  set_cd(pCdHandle, CD_flNextAttack, get_gametime() + 0.001); // block default animation
+    set_cd(pCdHandle, CD_flNextAttack, get_gametime() + 0.001); // block default animation
 
-  return FMRES_HANDLED;
+    return FMRES_HANDLED;
 }
 
 public OnItemSlot(this) {
     new CW:iHandler = GetHandlerByEntity(this);
     if (iHandler == CW_INVALID_HANDLER) {
-      return HAM_IGNORED;
+        return HAM_IGNORED;
     }
 
     new iSlot = GetData(iHandler, CW_Data_SlotId);
@@ -473,16 +471,16 @@ public OnItemSlot(this) {
     return HAM_SUPERCEDE;
 }
 
-public OnCSItemGetMaxSpeed(this) {  
+public OnCSItemGetMaxSpeed(this) {    
     new CW:iHandler = GetHandlerByEntity(this);
     if (iHandler == CW_INVALID_HANDLER) {
-      return HAM_IGNORED;
+        return HAM_IGNORED;
     }
 
     new Float:flMaxSpeed = ExecuteBindedFunction(CWB_GetMaxSpeed, this);
     if (_:flMaxSpeed != PLUGIN_CONTINUE) {
-      SetHamReturnFloat(flMaxSpeed);
-      return HAM_OVERRIDE;
+        SetHamReturnFloat(flMaxSpeed);
+        return HAM_OVERRIDE;
     }
 
     return HAM_IGNORED;
@@ -491,433 +489,429 @@ public OnCSItemGetMaxSpeed(this) {
 public OnItemAddToPlayer_Post(this, pPlayer) {
     new pPlayer = GetPlayer(this);
     if (!ExecuteHam(Ham_IsPlayer, pPlayer)) {
-      return HAM_IGNORED;
+        return HAM_IGNORED;
     }
 
     new CW:iHandler = GetHandlerByEntity(this);
     if (iHandler == CW_INVALID_HANDLER) {
-      new iWeaponId = get_member(this, m_iId);
-      ResetWeaponList(pPlayer, iWeaponId);
+        new iWeaponId = get_member(this, m_iId);
+        ResetWeaponList(pPlayer, iWeaponId);
     } else {
-        set_member(this, m_Weapon_iPrimaryAmmoType, GetData(iHandler, CW_Data_PrimaryAmmoType));
-        UpdateWeaponList(pPlayer, iHandler);
+            set_member(this, m_Weapon_iPrimaryAmmoType, GetData(iHandler, CW_Data_PrimaryAmmoType));
+            UpdateWeaponList(pPlayer, iHandler);
     }
 
     return HAM_HANDLED;
 }
 
 public OnSpawn_Post(this) {
-  new CW:iHandler = GetHandlerByEntity(this);
-  if (iHandler == CW_INVALID_HANDLER) {
+    new CW:iHandler = GetHandlerByEntity(this);
+    if (iHandler == CW_INVALID_HANDLER) {
+        return HAM_IGNORED;
+    }
+
+    ExecuteBindedFunction(CWB_Spawn, this);
+
     return HAM_IGNORED;
-  }
-
-  ExecuteBindedFunction(CWB_Spawn, this);
-
-  return HAM_IGNORED;
 }
 
 public OnWeaponboxSpawn_Post(this) {
-  g_pNewWeaponboxEnt = this;
+    g_pNewWeaponboxEnt = this;
 }
 
 public OnPlayerTakeDamage(pPlayer, pInflictor, pAttacker) {
-  g_pKillerItem = pInflictor;
+    g_pKillerItem = pInflictor;
 }
 
 public OnPlayerTakeDamage_Post() {
-  g_pKillerItem = -1;
+    g_pKillerItem = -1;
 }
 
 public OnMessage_DeathMsg(iMsgId, iDest, pPlayer) {
-  if (g_pKillerItem == -1) {
+    if (g_pKillerItem == -1) {
+        return PLUGIN_CONTINUE;
+    }
+
+    new pKiller = get_msg_arg_int(1);
+    if (!pKiller) {
+        return PLUGIN_CONTINUE;
+    }
+
+    if (!ExecuteHam(Ham_IsPlayer, pKiller)) {
+        return PLUGIN_CONTINUE;
+    }
+
+    if (!is_user_alive(pKiller)) {
+        return PLUGIN_CONTINUE;
+    }
+
+    new CW:iHandler = GetHandlerByEntity(g_pKillerItem);
+    if (iHandler == CW_INVALID_HANDLER) {
+        return PLUGIN_CONTINUE;
+    }
+
+    static szIcon[64];
+    GetStringData(iHandler, CW_Data_Icon, szIcon, charsmax(szIcon));
+    if (szIcon[0] == '^0') {
+        GetStringData(iHandler, CW_Data_Name, szIcon, charsmax(szIcon));
+    }
+
+    set_msg_arg_string(4, szIcon);
+
     return PLUGIN_CONTINUE;
-  }
-
-  new pKiller = get_msg_arg_int(1);
-  if (!pKiller) {
-    return PLUGIN_CONTINUE;
-  }
-
-  if (!ExecuteHam(Ham_IsPlayer, pKiller)) {
-    return PLUGIN_CONTINUE;
-  }
-
-  if (!is_user_alive(pKiller)) {
-    return PLUGIN_CONTINUE;
-  }
-
-  new CW:iHandler = GetHandlerByEntity(g_pKillerItem);
-  if (iHandler == CW_INVALID_HANDLER) {
-    return PLUGIN_CONTINUE;
-  }
-
-  static szIcon[16];
-  GetStringData(iHandler, CW_Data_Icon, szIcon, charsmax(szIcon));
-  set_msg_arg_string(4, szIcon);
-
-  return PLUGIN_CONTINUE;
 }
 
 public OnSetModel_Post(this, const szModel[]) {
-  if (!pev_valid(this)) {
-    return FMRES_IGNORED;
-  }
+    if (!pev_valid(this)) {
+        return FMRES_IGNORED;
+    }
 
-  if (!g_pNewWeaponboxEnt) {
-    return FMRES_IGNORED;
-  }
+    if (!g_pNewWeaponboxEnt) {
+        return FMRES_IGNORED;
+    }
 
-  if (this != g_pNewWeaponboxEnt) {
-    return FMRES_IGNORED;
-  }
+    if (this != g_pNewWeaponboxEnt) {
+        return FMRES_IGNORED;
+    }
 
-  static szClassname[32];
-  pev(this, pev_classname, szClassname, charsmax(szClassname));
+    static szClassname[32];
+    pev(this, pev_classname, szClassname, charsmax(szClassname));
 
-  if (!equal(szClassname, "weaponbox")) {
+    if (!equal(szClassname, "weaponbox")) {
+        g_pNewWeaponboxEnt = 0;
+        return FMRES_IGNORED;
+    }
+
+    new pItem = FindWeaponBoxSingleItem(this);
+    if (pItem == -1) {
+        return FMRES_IGNORED;
+    }
+
+    new CW:iHandler = GetHandlerByEntity(pItem);
+    if (iHandler == CW_INVALID_HANDLER) {
+        return FMRES_IGNORED;
+    }
+
+    ExecuteBindedFunction(CWB_WeaponBoxModelUpdate, pItem, this);
     g_pNewWeaponboxEnt = 0;
-    return FMRES_IGNORED;
-  }
 
-  new pItem = FindWeaponBoxSingleItem(this);
-  if (pItem == -1) {
-    return FMRES_IGNORED;
-  }
-
-  new CW:iHandler = GetHandlerByEntity(pItem);
-  if (iHandler == CW_INVALID_HANDLER) {
-    return FMRES_IGNORED;
-  }
-
-  ExecuteBindedFunction(CWB_WeaponBoxModelUpdate, pItem, this);
-  g_pNewWeaponboxEnt = 0;
-
-  return FMRES_HANDLED;
+    return FMRES_HANDLED;
 }
 
 public OnWeaponClCmd(pPlayer) {
-  static szName[64];
-  read_argv(0, szName, charsmax(szName));
+    static szName[64];
+    read_argv(0, szName, charsmax(szName));
 
-  new CW:iHandler;
-  TrieGetCell(g_weaponsMap, szName, iHandler);
+    new CW:iHandler;
+    TrieGetCell(g_rgWeaponsMap, szName, iHandler);
 
-  new iWeapon = GetData(iHandler, CW_Data_Id);
+    new iWeapon = GetData(iHandler, CW_Data_Id);
 
-  static szBaseName[32];
-  get_weaponname(iWeapon, szBaseName, charsmax(szBaseName));
-  client_cmd(pPlayer, szBaseName);
+    static szBaseName[32];
+    get_weaponname(iWeapon, szBaseName, charsmax(szBaseName));
+    client_cmd(pPlayer, szBaseName);
 
-  return PLUGIN_HANDLED;
+    return PLUGIN_HANDLED;
 }
 
 public OnCanDrop(this) {
-  new CW:iHandler = GetHandlerByEntity(this);
-  if (iHandler == CW_INVALID_HANDLER) {
-    return HAM_IGNORED;
-  }
+    new CW:iHandler = GetHandlerByEntity(this);
+    if (iHandler == CW_INVALID_HANDLER) {
+        return HAM_IGNORED;
+    }
 
-  new bool:bCanDrop = ExecuteBindedFunction(CWB_CanDrop, this) == PLUGIN_CONTINUE;
+    SetHamReturnInteger(
+        ExecuteBindedFunction(CWB_CanDrop, this) == PLUGIN_CONTINUE ? 1 : 0
+    );
 
-  SetHamReturnInteger(bCanDrop ? 1 : 0);
-  return HAM_OVERRIDE;
+    return HAM_OVERRIDE;
 }
 
 public OnMessage_WeaponList(iMsgId, iMsgDest, pPlayer) {
-  new iWeaponId = get_msg_arg_int(8);
+    new iWeaponId = get_msg_arg_int(8);
 
-  if (g_weaponListDefaults[iWeaponId][WL_WeaponId] == iWeaponId) {
-    return PLUGIN_CONTINUE; // already initialized
-  }
+    if (g_weaponListDefaults[iWeaponId][WL_WeaponId] == iWeaponId) {
+        return PLUGIN_CONTINUE; // already initialized
+    }
 
-  get_msg_arg_string(1, g_weaponListDefaults[iWeaponId][WL_WeaponName], 31);
-  g_weaponListDefaults[iWeaponId][WL_PrimaryAmmoType] = get_msg_arg_int(2);
-  g_weaponListDefaults[iWeaponId][WL_PrimaryAmmoMaxAmount] = get_msg_arg_int(3);
-  g_weaponListDefaults[iWeaponId][WL_SecondaryAmmoType] = get_msg_arg_int(4);
-  g_weaponListDefaults[iWeaponId][WL_SecondaryAmmoMaxAmount] = get_msg_arg_int(5);
-  g_weaponListDefaults[iWeaponId][WL_SlotId] = get_msg_arg_int(6);
-  g_weaponListDefaults[iWeaponId][WL_NumberInSlot] = get_msg_arg_int(7);
-  g_weaponListDefaults[iWeaponId][WL_WeaponId] = iWeaponId;
-  g_weaponListDefaults[iWeaponId][WL_Flags] = get_msg_arg_int(9);
+    get_msg_arg_string(1, g_weaponListDefaults[iWeaponId][WL_WeaponName], 31);
+    g_weaponListDefaults[iWeaponId][WL_PrimaryAmmoType] = get_msg_arg_int(2);
+    g_weaponListDefaults[iWeaponId][WL_PrimaryAmmoMaxAmount] = get_msg_arg_int(3);
+    g_weaponListDefaults[iWeaponId][WL_SecondaryAmmoType] = get_msg_arg_int(4);
+    g_weaponListDefaults[iWeaponId][WL_SecondaryAmmoMaxAmount] = get_msg_arg_int(5);
+    g_weaponListDefaults[iWeaponId][WL_SlotId] = get_msg_arg_int(6);
+    g_weaponListDefaults[iWeaponId][WL_NumberInSlot] = get_msg_arg_int(7);
+    g_weaponListDefaults[iWeaponId][WL_WeaponId] = iWeaponId;
+    g_weaponListDefaults[iWeaponId][WL_Flags] = get_msg_arg_int(9);
 
-  return PLUGIN_CONTINUE;
+    return PLUGIN_CONTINUE;
 }
 
 // ANCHOR: Weapon Entity Methods
 
 CompleteReload(this) {
-  new CW:iHandler = GetHandlerByEntity(this);
-  new pPlayer = GetPlayer(this);
-  new iMaxClip = GetData(iHandler, CW_Data_ClipSize);
-  new iClip = get_member(this, m_Weapon_iClip);
-  new iPrimaryAmmoIndex = get_member(this, m_Weapon_iPrimaryAmmoType);
-  new iBpAmmo = get_member(pPlayer, m_rgAmmo, iPrimaryAmmoIndex);
-  new iSize = min(iMaxClip - iClip, iBpAmmo);
+    new CW:iHandler = GetHandlerByEntity(this);
+    new pPlayer = GetPlayer(this);
+    new iMaxClip = GetData(iHandler, CW_Data_ClipSize);
+    new iClip = get_member(this, m_Weapon_iClip);
+    new iPrimaryAmmoIndex = get_member(this, m_Weapon_iPrimaryAmmoType);
+    new iBpAmmo = get_member(pPlayer, m_rgAmmo, iPrimaryAmmoIndex);
+    new iSize = min(iMaxClip - iClip, iBpAmmo);
 
-  set_member(this, m_Weapon_iClip, iClip + iSize);
-  set_member(pPlayer, m_rgAmmo, iBpAmmo - iSize, iPrimaryAmmoIndex);
-  set_member(this, m_Weapon_fInReload, 0);
+    set_member(this, m_Weapon_iClip, iClip + iSize);
+    set_member(pPlayer, m_rgAmmo, iBpAmmo - iSize, iPrimaryAmmoIndex);
+    set_member(this, m_Weapon_fInReload, 0);
 
-  ExecuteBindedFunction(CWB_DefaultReloadEnd, this);
+    ExecuteBindedFunction(CWB_DefaultReloadEnd, this);
 }
 
 ItemPostFrame(this) {
-  new CW:iHandler = GetHandlerByEntity(this);
-  new pPlayer = GetPlayer(this);
-  new flInReload = get_member(this, m_Weapon_fInReload);
-  new iMaxClip = GetData(iHandler, CW_Data_ClipSize);
-  new iFlags = GetData(iHandler, CW_Data_WeaponFlags);
-  new Float:flNextAttack = get_member(pPlayer, m_flNextAttack);
-  new button = pev(pPlayer, pev_button);
-  new iPrimaryAmmoIndex = get_member(this, m_Weapon_iPrimaryAmmoType);
-  new iSecondaryAmmoIndex = 0;
-  new Float:flNextPrimaryAttack = get_member(this, m_Weapon_flNextPrimaryAttack);
-  new Float:flNextSecondaryAttack = get_member(this, m_Weapon_flNextSecondaryAttack);
-  new iPrimaryAmmoAmount = get_member(pPlayer, m_rgAmmo, iPrimaryAmmoIndex);
-  new iSecondaryAmmoAmount = get_member(pPlayer, m_rgAmmo, iSecondaryAmmoIndex);
+    new CW:iHandler = GetHandlerByEntity(this);
+    new pPlayer = GetPlayer(this);
+    new flInReload = get_member(this, m_Weapon_fInReload);
+    new iMaxClip = GetData(iHandler, CW_Data_ClipSize);
+    new iFlags = GetData(iHandler, CW_Data_WeaponFlags);
+    new Float:flNextAttack = get_member(pPlayer, m_flNextAttack);
+    new button = pev(pPlayer, pev_button);
+    new iPrimaryAmmoIndex = get_member(this, m_Weapon_iPrimaryAmmoType);
+    new iSecondaryAmmoIndex = 0;
+    new Float:flNextPrimaryAttack = get_member(this, m_Weapon_flNextPrimaryAttack);
+    new Float:flNextSecondaryAttack = get_member(this, m_Weapon_flNextSecondaryAttack);
+    new iPrimaryAmmoAmount = get_member(pPlayer, m_rgAmmo, iPrimaryAmmoIndex);
+    new iSecondaryAmmoAmount = get_member(pPlayer, m_rgAmmo, iSecondaryAmmoIndex);
 
-  if (flInReload && flNextAttack <= 0.0) {
-    CompleteReload(this);
-  }
-
-  new Float:flReloadEndTime = get_member(this, m_Weapon_flNextReload);
-  if (flReloadEndTime && flReloadEndTime < get_gametime()) {
-    set_member(this, m_Weapon_flNextReload, 0.0);
-    ExecuteBindedFunction(CWB_Pump, this);
-  }
-
-  if ((button & IN_ATTACK2) && flNextSecondaryAttack <= 0) {
-    if (iSecondaryAmmoIndex > 0 && !iSecondaryAmmoAmount) {
-      set_member(this, m_Weapon_fFireOnEmpty, 1);
+    if (flInReload && flNextAttack <= 0.0) {
+        CompleteReload(this);
     }
 
-    SecondaryAttack(this);
-  } else if ((button & IN_ATTACK) && flNextPrimaryAttack <= 0) {
-    if ((!get_member(this, m_Weapon_iClip) && iPrimaryAmmoIndex > 0) || (iMaxClip == -1 && !iPrimaryAmmoAmount)) {
-      set_member(this, m_Weapon_fFireOnEmpty, 1);
+    new Float:flReloadEndTime = get_member(this, m_Weapon_flNextReload);
+    if (flReloadEndTime && flReloadEndTime < get_gametime()) {
+        set_member(this, m_Weapon_flNextReload, 0.0);
+        ExecuteBindedFunction(CWB_Pump, this);
     }
 
-    PrimaryAttack(this);
-  } else if ((button & IN_RELOAD) && iMaxClip != WEAPON_NOCLIP && !flInReload) {
-    Reload(this);
-  } else if (!(button & (IN_ATTACK|IN_ATTACK2))) {
-    set_member(this, m_Weapon_fFireOnEmpty, 0);
+    if ((button & IN_ATTACK2) && flNextSecondaryAttack <= 0) {
+        if (iSecondaryAmmoIndex > 0 && !iSecondaryAmmoAmount) {
+            set_member(this, m_Weapon_fFireOnEmpty, 1);
+        }
 
-    if (!IsUseable(this) && flNextPrimaryAttack < 0.0) {
-      // if (!(iFlags & ITEM_FLAG_NOAUTOSWITCHEMPTY) && g_pGameRules->GetNextBestWeapon(m_pPlayer, this)) {
-      //   set_member(this, m_Weapon_flNextPrimaryAttack, 0.3);
-      // 	return;
-      // }
-    } else {
-      if (!get_member(this, m_Weapon_iClip) && !(iFlags & ITEM_FLAG_NOAUTORELOAD) && flNextPrimaryAttack < 0.0) {
+        SecondaryAttack(this);
+    } else if ((button & IN_ATTACK) && flNextPrimaryAttack <= 0) {
+        if ((!get_member(this, m_Weapon_iClip) && iPrimaryAmmoIndex > 0) || (iMaxClip == -1 && !iPrimaryAmmoAmount)) {
+            set_member(this, m_Weapon_fFireOnEmpty, 1);
+        }
+
+        PrimaryAttack(this);
+    } else if ((button & IN_RELOAD) && iMaxClip != WEAPON_NOCLIP && !flInReload) {
         Reload(this);
+    } else if (!(button & (IN_ATTACK|IN_ATTACK2))) {
+        set_member(this, m_Weapon_fFireOnEmpty, 0);
+
+        if (!IsUseable(this) && flNextPrimaryAttack < 0.0) {
+            // if (!(iFlags & ITEM_FLAG_NOAUTOSWITCHEMPTY) && g_pGameRules->GetNextBestWeapon(m_pPlayer, this)) {
+            //     set_member(this, m_Weapon_flNextPrimaryAttack, 0.3);
+            // 	return;
+            // }
+        } else {
+            if (!get_member(this, m_Weapon_iClip) && !(iFlags & ITEM_FLAG_NOAUTORELOAD) && flNextPrimaryAttack < 0.0) {
+                Reload(this);
+                return;
+            }
+        }
+
+        set_member(this, m_Weapon_iShotsFired, 0);
+        WeaponIdle(this);
         return;
-      }
     }
 
-    set_member(this, m_Weapon_iShotsFired, 0);
-    WeaponIdle(this);
-    return;
-  }
-
-  if (ShouldWeaponIdle(this)) {
-    WeaponIdle(this);
-  }
+    if (ShouldWeaponIdle(this)) {
+        WeaponIdle(this);
+    }
 }
 
 SecondaryAttack(this) {
-  if (ExecuteBindedFunction(CWB_SecondaryAttack, this) > PLUGIN_CONTINUE) {
-    return;
-  }
+    if (ExecuteBindedFunction(CWB_SecondaryAttack, this) > PLUGIN_CONTINUE) {
+        return;
+    }
 }
 
 PrimaryAttack(this) {
-  if (get_member_game(m_bFreezePeriod)) {
-    return;
-  }
+    if (get_member_game(m_bFreezePeriod)) {
+        return;
+    }
 
-  if (ExecuteBindedFunction(CWB_PrimaryAttack, this) > PLUGIN_CONTINUE) {
-    return;
-  }
+    if (ExecuteBindedFunction(CWB_PrimaryAttack, this) > PLUGIN_CONTINUE) {
+        return;
+    }
 }
 
 Reload(this) {
-  if (ExecuteBindedFunction(CWB_Reload, this) > PLUGIN_CONTINUE) {
-    return;
-  }
+    if (ExecuteBindedFunction(CWB_Reload, this) > PLUGIN_CONTINUE) {
+        return;
+    }
 }
 
 WeaponIdle(this) {
-  if (get_member(this, m_Weapon_flTimeWeaponIdle) > 0.0) {
-    return;
-  }
+    if (get_member(this, m_Weapon_flTimeWeaponIdle) > 0.0) {
+        return;
+    }
 
-  if (ExecuteBindedFunction(CWB_Idle, this) > PLUGIN_CONTINUE) {
-    return;
-  }
+    if (ExecuteBindedFunction(CWB_Idle, this) > PLUGIN_CONTINUE) {
+        return;
+    }
 }
 
 WeaponHolster(this) {
-  new pPlayer = GetPlayer(this);
-  SetWeaponPrediction(pPlayer, true);
-  set_member(this, m_Weapon_fInReload, 0);
-  set_member(this, m_Weapon_fInSpecialReload, 0);
+    new pPlayer = GetPlayer(this);
+    SetWeaponPrediction(pPlayer, true);
+    set_member(this, m_Weapon_fInReload, 0);
+    set_member(this, m_Weapon_fInSpecialReload, 0);
 
-  if (ExecuteBindedFunction(CWB_Holster, this) > PLUGIN_CONTINUE) {
-    return;
-  }
+    if (ExecuteBindedFunction(CWB_Holster, this) > PLUGIN_CONTINUE) {
+        return;
+    }
 }
 
 WeaponDeploy(this) {
-  if (ExecuteBindedFunction(CWB_Deploy, this) > PLUGIN_CONTINUE) {
-    return;
-  }
+    if (ExecuteBindedFunction(CWB_Deploy, this) > PLUGIN_CONTINUE) {
+        return;
+    }
 
-  SetThink(this, "DisablePrediction");
-  set_pev(this, pev_nextthink, get_gametime() + 0.1);
+    SetThink(this, "DisablePrediction");
+    set_pev(this, pev_nextthink, get_gametime() + 0.1);
 }
 
 bool:ShouldWeaponIdle(this) {
-  #pragma unused this
-  return false;
+    #pragma unused this
+    return false;
 }
 
 bool:IsUseable(this) {
-  new CW:iHandler = GetHandlerByEntity(this);
-  new pPlayer = GetPlayer(this);
-  new iPrimaryAmmoIndex = get_member(this, m_Weapon_iPrimaryAmmoType);
-  new iMaxAmmo1 = GetData(iHandler, CW_Data_PrimaryAmmoMaxAmount);
-  new iClip = get_member(this, m_Weapon_iClip);
-  new iBpAmmo = get_member(pPlayer, m_rgAmmo, iPrimaryAmmoIndex);
+    new CW:iHandler = GetHandlerByEntity(this);
+    new pPlayer = GetPlayer(this);
+    new iPrimaryAmmoIndex = get_member(this, m_Weapon_iPrimaryAmmoType);
+    new iMaxAmmo1 = GetData(iHandler, CW_Data_PrimaryAmmoMaxAmount);
+    new iClip = get_member(this, m_Weapon_iClip);
+    new iBpAmmo = get_member(pPlayer, m_rgAmmo, iPrimaryAmmoIndex);
 
-  if (iClip <= 0) {
-    if (iBpAmmo <= 0 && iMaxAmmo1 != -1) {
-      return false;
+    if (iClip <= 0) {
+        if (iBpAmmo <= 0 && iMaxAmmo1 != -1) {
+            return false;
+        }
     }
-  }
 
-  return true;
+    return true;
 }
 
 PlayWeaponAnim(this, iSequence, Float:flDuration) {
-  SendWeaponAnim(this, iSequence);
-  set_member(this, m_Weapon_flTimeWeaponIdle, flDuration);
+    SendWeaponAnim(this, iSequence);
+    set_member(this, m_Weapon_flTimeWeaponIdle, flDuration);
 }
 
 SendWeaponAnim(this, iAnim) {
-  ExecuteHamB(Ham_CS_Weapon_SendWeaponAnim, this, iAnim, 0);
-  // new pPlayer = GetPlayer(this);
-  // set_pev(pPlayer, pev_weaponanim, iAnim);
-
-  // message_begin(MSG_ONE_UNRELIABLE, SVC_WEAPONANIM, _, pPlayer);
-  // write_byte(iAnim);
-  // write_byte(pev(pPlayer, pev_body));
-  // message_end();
+    ExecuteHamB(Ham_CS_Weapon_SendWeaponAnim, this, iAnim, 0);
 }
 
 GetPlayer(this) {
-  return get_member(this, m_pPlayer);
+    return get_member(this, m_pPlayer);
 }
 
 FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:vecSpread[3], Float:flDistance, Float:flDamage, pAttacker, Float:vecOut[3]) {
-  new pPlayer = GetPlayer(this);
-  new shared_rand = pPlayer > 0 ? get_member(pPlayer, random_seed) : 0;
+    new pPlayer = GetPlayer(this);
+    new shared_rand = pPlayer > 0 ? get_member(pPlayer, random_seed) : 0;
 
-  new tr = create_tr2();
+    new tr = create_tr2();
 
-  static Float:vecRight[3];
-  get_global_vector(GL_v_right, vecRight);
+    static Float:vecRight[3];
+    get_global_vector(GL_v_right, vecRight);
 
-  static Float:vecUp[3];
-  get_global_vector(GL_v_up, vecUp);
+    static Float:vecUp[3];
+    get_global_vector(GL_v_up, vecUp);
 
-  static Float:vecMultiplier[3];
+    static Float:vecMultiplier[3];
 
-  if (!pAttacker) {
-    pAttacker = this;  // the default attacker is ourselves
-  }
-
-  // ClearMultiDamage();
-  // gMultiDamage.type = DMG_BULLET | DMG_NEVERGIB;
-
-  for (new iShot = 1; iShot <= cShots; iShot++) {
-    //Use player's random seed.
-    // get circular gaussian spread
-    vecMultiplier[0] = SharedRandomFloat( shared_rand + iShot, -0.5, 0.5 ) + SharedRandomFloat( shared_rand + ( 1 + iShot ) , -0.5, 0.5 );
-    vecMultiplier[1] = SharedRandomFloat( shared_rand + ( 2 + iShot ), -0.5, 0.5 ) + SharedRandomFloat( shared_rand + ( 3 + iShot ), -0.5, 0.5 );
-    vecMultiplier[2] = vecMultiplier[0] * vecMultiplier[0] + vecMultiplier[1] * vecMultiplier[1];
-
-    static Float:vecDir[3];
-    for (new i = 0; i < 3; ++i) {
-      vecDir[i] = vecDirShooting[i] + (vecMultiplier[0] * vecSpread[0] * vecRight[i]) + (vecMultiplier[1] * vecSpread[1] * vecUp[i]);
+    if (!pAttacker) {
+        pAttacker = this;    // the default attacker is ourselves
     }
 
-    static Float:vecEnd[3];
-    for (new i = 0; i < 3; ++i) {
-      vecEnd[i] = vecSrc[i] + (vecDir[i] * flDistance);
+    // ClearMultiDamage();
+    // gMultiDamage.type = DMG_BULLET | DMG_NEVERGIB;
+
+    for (new iShot = 1; iShot <= cShots; iShot++) {
+        //Use player's random seed.
+        // get circular gaussian spread
+        vecMultiplier[0] = SharedRandomFloat( shared_rand + iShot, -0.5, 0.5 ) + SharedRandomFloat( shared_rand + ( 1 + iShot ) , -0.5, 0.5 );
+        vecMultiplier[1] = SharedRandomFloat( shared_rand + ( 2 + iShot ), -0.5, 0.5 ) + SharedRandomFloat( shared_rand + ( 3 + iShot ), -0.5, 0.5 );
+        vecMultiplier[2] = vecMultiplier[0] * vecMultiplier[0] + vecMultiplier[1] * vecMultiplier[1];
+
+        static Float:vecDir[3];
+        for (new i = 0; i < 3; ++i) {
+            vecDir[i] = vecDirShooting[i] + (vecMultiplier[0] * vecSpread[0] * vecRight[i]) + (vecMultiplier[1] * vecSpread[1] * vecUp[i]);
+        }
+
+        static Float:vecEnd[3];
+        for (new i = 0; i < 3; ++i) {
+            vecEnd[i] = vecSrc[i] + (vecDir[i] * flDistance);
+        }
+
+        engfunc(EngFunc_TraceLine, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, this, tr);
+
+        new Float:flFraction;
+        get_tr2(tr, TR_flFraction, flFraction);
+        
+        // do damage, paint decals
+        if (flFraction != 1.0) {
+            new pHit = get_tr2(tr, TR_pHit);
+
+            if (pHit < 0) {
+                pHit = 0;
+            }
+
+            
+            rg_multidmg_clear();
+            ExecuteHamB(Ham_TraceAttack, pHit, pAttacker, flDamage, vecDir, tr, DMG_BULLET | DMG_NEVERGIB);
+            rg_multidmg_apply(this, pAttacker);
+        
+            // TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
+            // DecalGunshot( &tr, iBulletType );
+
+            new iDecalIndex = random_num(get_decal_index("{shot1"), get_decal_index("{shot5") + 1);
+            // new iDecalIndex = ExecuteHam(Ham_DamageDecal, pHit, DMG_BULLET);
+            // DecalTrace2(tr, iDecalIndex);
+
+            if (!ExecuteHam(Ham_IsPlayer, pHit)) {
+                BulletSmoke(tr);
+                MakeDecal(tr, pHit, iDecalIndex);
+            }
+        }
+
+        // make bullet trails
+        static Float:vecEndPos[3];
+        get_tr2(tr, TR_vecEndPos, vecEndPos);
+
+        BubbleTrail(vecSrc, vecEndPos, floatround((flDistance * flFraction) / 64.0));
     }
 
-    engfunc(EngFunc_TraceLine, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, this, tr);
+    vecOut[0] = vecMultiplier[0] * vecSpread[0];
+    vecOut[1] = vecMultiplier[1] * vecSpread[1];
+    vecOut[2] = 0.0;
 
-    new Float:flFraction;
-    get_tr2(tr, TR_flFraction, flFraction);
-    
-    // do damage, paint decals
-    if (flFraction != 1.0) {
-      new pHit = get_tr2(tr, TR_pHit);
-
-      if (pHit < 0) {
-        pHit = 0;
-      }
-
-      
-      rg_multidmg_clear();
-      ExecuteHamB(Ham_TraceAttack, pHit, pAttacker, flDamage, vecDir, tr, DMG_BULLET | DMG_NEVERGIB);
-      rg_multidmg_apply(this, pAttacker);
-    
-      // TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
-      // DecalGunshot( &tr, iBulletType );
-
-      new iDecalIndex = random_num(get_decal_index("{shot1"), get_decal_index("{shot5") + 1);
-      // new iDecalIndex = ExecuteHam(Ham_DamageDecal, pHit, DMG_BULLET);
-      // DecalTrace2(tr, iDecalIndex);
-
-      if (!ExecuteHam(Ham_IsPlayer, pHit)) {
-        BulletSmoke(tr);
-        MakeDecal(tr, pHit, iDecalIndex);
-      }
-
-      // GunshotDecalTrace(tr, iDecalIndex);
-    }
-
-    // make bullet trails
-    static Float:vecEndPos[3];
-    get_tr2(tr, TR_vecEndPos, vecEndPos);
-
-    BubbleTrail(vecSrc, vecEndPos, floatround((flDistance * flFraction) / 64.0));
-  }
-
-  vecOut[0] = vecMultiplier[0] * vecSpread[0];
-  vecOut[1] = vecMultiplier[1] * vecSpread[1];
-  vecOut[2] = 0.0;
-
-  free_tr2(tr);
+    free_tr2(tr);
 }
 
 GrenadeDetonate(this, Float:flRadius, Float:flMagnitude) {
-  static Float:vecStart[3];
-  pev(this, pev_origin, vecStart);
-  vecStart[2] += 8.0;
+    static Float:vecStart[3];
+    pev(this, pev_origin, vecStart);
+    vecStart[2] += 8.0;
 
-  static Float:vecEnd[3];
-  xs_vec_copy(vecStart, vecEnd);
-  vecEnd[2] -= 40.0;
+    static Float:vecEnd[3];
+    xs_vec_copy(vecStart, vecEnd);
+    vecEnd[2] -= 40.0;
 
-  new pTr = create_tr2();
-  engfunc(EngFunc_TraceLine, vecStart, vecEnd, IGNORE_MONSTERS, this, pTr);
-  GrenadeExplode(this, pTr, DMG_GRENADE | DMG_ALWAYSGIB, flRadius, flMagnitude);
-  free_tr2(pTr);
+    new pTr = create_tr2();
+    engfunc(EngFunc_TraceLine, vecStart, vecEnd, IGNORE_MONSTERS, this, pTr);
+    GrenadeExplode(this, pTr, DMG_GRENADE | DMG_ALWAYSGIB, flRadius, flMagnitude);
+    free_tr2(pTr);
 }
 
 GrenadeExplode(this, pTr, iDamageBits, Float:flRadius, Float:flMagnitude) {
@@ -941,7 +935,7 @@ GrenadeExplode(this, pTr, iDamageBits, Float:flRadius, Float:flMagnitude) {
         get_tr2(pTr, TR_vecEndPos, vecOrigin);
 
         for (new i = 0; i < 3; ++i) {
-            vecOrigin[i] += (vecPlaneNormal[i] * (flMagnitude ? flMagnitude : flDamage - 24.0) * 0.6);
+                vecOrigin[i] += (vecPlaneNormal[i] * (flMagnitude ? flMagnitude : flDamage - 24.0) * 0.6);
         }
 
         set_pev(this, pev_origin, vecOrigin);
@@ -967,840 +961,840 @@ GrenadeExplode(this, pTr, iDamageBits, Float:flRadius, Float:flMagnitude) {
     set_pev(this, pev_nextthink, get_gametime() + 0.1);
 
     if (PointContents(vecOrigin) != CONTENTS_WATER) {
-        new iSparkCount = random(4);
-        for (new i = 0; i < iSparkCount; ++i) {
-            SparkShower(vecOrigin, vecPlaneNormal, 0);
-        }
+            new iSparkCount = random(4);
+            for (new i = 0; i < iSparkCount; ++i) {
+                    SparkShower(vecOrigin, vecPlaneNormal, 0);
+            }
     }
 }
 
 // ANCHOR: Weapon Callbacks
 
 public Smack(this) {
-  new tr = pev(this, pev_iuser1);
-  new pHit = get_tr2(tr, TR_pHit);
-  if (pHit < 0) {
-    pHit = 0;
-  }
+    new tr = pev(this, pev_iuser1);
+    new pHit = get_tr2(tr, TR_pHit);
+    if (pHit < 0) {
+        pHit = 0;
+    }
 
-  new iDecalIndex = random_num(get_decal_index("{shot1"), get_decal_index("{shot5") + 1);
-  MakeDecal(tr, pHit, iDecalIndex, false);
-  free_tr2(tr);
+    new iDecalIndex = random_num(get_decal_index("{shot1"), get_decal_index("{shot5") + 1);
+    MakeDecal(tr, pHit, iDecalIndex, false);
+    free_tr2(tr);
 
-  SetThink(this, NULL_STRING);
+    SetThink(this, NULL_STRING);
 }
 
 public DisablePrediction(this) {
-  new pPlayer = GetPlayer(this);
-  SetWeaponPrediction(pPlayer, false);
-  SetThink(this, NULL_STRING);
+    new pPlayer = GetPlayer(this);
+    SetWeaponPrediction(pPlayer, false);
+    SetThink(this, NULL_STRING);
 }
 
 // ANCHOR: Weapon Entity Default Methods
 
 bool:DefaultReload(this, iAnim, Float:flDelay) {
-  new CW:iHandler = GetHandlerByEntity(this);
-  new pPlayer = GetPlayer(this);
-  new iPrimaryAmmoIndex = get_member(this, m_Weapon_iPrimaryAmmoType);
-  new iPrimaryAmmoAmount = get_member(pPlayer, m_rgAmmo, iPrimaryAmmoIndex);
+    new CW:iHandler = GetHandlerByEntity(this);
+    new pPlayer = GetPlayer(this);
+    new iPrimaryAmmoIndex = get_member(this, m_Weapon_iPrimaryAmmoType);
+    new iPrimaryAmmoAmount = get_member(pPlayer, m_rgAmmo, iPrimaryAmmoIndex);
 
-  if (iPrimaryAmmoAmount <= 0) {
-    return false;
-  }
+    if (iPrimaryAmmoAmount <= 0) {
+        return false;
+    }
 
-  new iClip = get_member(this, m_Weapon_iClip);
-  new iClipSize = GetData(iHandler, CW_Data_ClipSize);
+    new iClip = get_member(this, m_Weapon_iClip);
+    new iClipSize = GetData(iHandler, CW_Data_ClipSize);
 
-  new size = min(iClipSize - iClip, iPrimaryAmmoAmount);	
-  if (size == 0) {
-    return false;
-  }
+    new size = min(iClipSize - iClip, iPrimaryAmmoAmount);	
+    if (size == 0) {
+        return false;
+    }
 
-  if (get_member(this, m_Weapon_fInReload)) {
-    return false;
-  }
+    if (get_member(this, m_Weapon_fInReload)) {
+        return false;
+    }
 
-  set_member(pPlayer, m_flNextAttack, flDelay);
-  set_member(this, m_Weapon_fInReload, 1);
+    set_member(pPlayer, m_flNextAttack, flDelay);
+    set_member(this, m_Weapon_fInReload, 1);
 
-  PlayWeaponAnim(this, iAnim, 3.0);
-  rg_set_animation(pPlayer, PLAYER_RELOAD);
+    PlayWeaponAnim(this, iAnim, 3.0);
+    rg_set_animation(pPlayer, PLAYER_RELOAD);
 
-  return true;
+    return true;
 }
 
 bool:DefaultShotgunReload(this, iStartAnim, iEndAnim, Float:flDelay, Float:flDuration) {
-  new pPlayer = GetPlayer(this);
-  new iClip = get_member(this, m_Weapon_iClip);
-  new iPrimaryAmmoType = get_member(this, m_Weapon_iPrimaryAmmoType);
-  new CW:iHandler = GetHandlerByEntity(this);
-  new iClipSize = GetData(iHandler, CW_Data_ClipSize);
+    new pPlayer = GetPlayer(this);
+    new iClip = get_member(this, m_Weapon_iClip);
+    new iPrimaryAmmoType = get_member(this, m_Weapon_iPrimaryAmmoType);
+    new CW:iHandler = GetHandlerByEntity(this);
+    new iClipSize = GetData(iHandler, CW_Data_ClipSize);
 
-  if (get_member(pPlayer, m_rgAmmo, iPrimaryAmmoType) <= 0 || iClip == iClipSize) {
-    return false;
-  }
-
-  // don't reload until recoil is done
-  new Float:flNextPrimaryAttack = get_member(this, m_Weapon_flNextPrimaryAttack);
-  new flInSpecialReload = get_member(this, m_Weapon_fInSpecialReload);
-  if (flNextPrimaryAttack > 0.0) {
-    return false;
-  }
-
-  new Float:flTimeWeaponIdle = get_member(this, m_Weapon_flTimeWeaponIdle);
-  // check to see if we're ready to reload
-  if (flInSpecialReload == 0) {
-    rg_set_animation(pPlayer, PLAYER_RELOAD);
-    PlayWeaponAnim(this, iStartAnim, flDelay);
-
-    set_member(this, m_Weapon_fInSpecialReload, 1);
-    set_member(pPlayer, m_flNextAttack, flDelay);
-    set_member(this, m_Weapon_flNextPrimaryAttack, 1.0);
-    set_member(this, m_Weapon_flNextSecondaryAttack, 1.0);
-  } else if (flInSpecialReload == 1) {
-    if (flTimeWeaponIdle > 0.0) {
-      return false;
+    if (get_member(pPlayer, m_rgAmmo, iPrimaryAmmoType) <= 0 || iClip == iClipSize) {
+        return false;
     }
 
-    set_member(this, m_Weapon_fInSpecialReload, 2);
+    // don't reload until recoil is done
+    new Float:flNextPrimaryAttack = get_member(this, m_Weapon_flNextPrimaryAttack);
+    new flInSpecialReload = get_member(this, m_Weapon_fInSpecialReload);
+    if (flNextPrimaryAttack > 0.0) {
+        return false;
+    }
 
-    // if (RANDOM_LONG(0,1))
-    // 	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/reload1.wav", 1, ATTN_NORM, 0, 85 + RANDOM_LONG(0,0x1f));
-    // else
-    // 	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/reload3.wav", 1, ATTN_NORM, 0, 85 + RANDOM_LONG(0,0x1f));
+    new Float:flTimeWeaponIdle = get_member(this, m_Weapon_flTimeWeaponIdle);
+    // check to see if we're ready to reload
+    if (flInSpecialReload == 0) {
+        rg_set_animation(pPlayer, PLAYER_RELOAD);
+        PlayWeaponAnim(this, iStartAnim, flDelay);
 
-    PlayWeaponAnim(this, iEndAnim, flDuration);
-  } else {
-    // Add them to the clip
-    set_member(this, m_Weapon_iClip, ++iClip);
-    set_member(this, m_Weapon_fInSpecialReload, 1);
-    set_member(pPlayer, m_rgAmmo, get_member(pPlayer, m_rgAmmo, iPrimaryAmmoType) - 1, iPrimaryAmmoType);
-  }
+        set_member(this, m_Weapon_fInSpecialReload, 1);
+        set_member(pPlayer, m_flNextAttack, flDelay);
+        set_member(this, m_Weapon_flNextPrimaryAttack, 1.0);
+        set_member(this, m_Weapon_flNextSecondaryAttack, 1.0);
+    } else if (flInSpecialReload == 1) {
+        if (flTimeWeaponIdle > 0.0) {
+            return false;
+        }
 
-  return true;
+        set_member(this, m_Weapon_fInSpecialReload, 2);
+
+        // if (RANDOM_LONG(0,1))
+        // 	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/reload1.wav", 1, ATTN_NORM, 0, 85 + RANDOM_LONG(0,0x1f));
+        // else
+        // 	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/reload3.wav", 1, ATTN_NORM, 0, 85 + RANDOM_LONG(0,0x1f));
+
+        PlayWeaponAnim(this, iEndAnim, flDuration);
+    } else {
+        // Add them to the clip
+        set_member(this, m_Weapon_iClip, ++iClip);
+        set_member(this, m_Weapon_fInSpecialReload, 1);
+        set_member(pPlayer, m_rgAmmo, get_member(pPlayer, m_rgAmmo, iPrimaryAmmoType) - 1, iPrimaryAmmoType);
+    }
+
+    return true;
 }
 
 bool:DefaultShotgunIdle(this, iAnim, iReloadEndAnim, Float:flDuration, Float:flReloadEndDuration, const szPumpSound[]) {
-  new CW:iHandler = GetHandlerByEntity(this);
-  if (iHandler == CW_INVALID_HANDLER) {
-    return false;
-  }
-
-  new Float:flTimeWeaponIdle = get_member(this, m_Weapon_flTimeWeaponIdle);
-  if (flTimeWeaponIdle < 0.0) {
-    new pPlayer = get_member(this, m_pPlayer);
-    new iPrimaryAmmoType = get_member(this, m_Weapon_iPrimaryAmmoType);
-    new iPrimaryAmmoAmount = get_member(pPlayer, m_rgAmmo, iPrimaryAmmoType);
-    new flInSpecialReload = get_member(this, m_Weapon_fInSpecialReload);
-    new iClip = get_member(this, m_Weapon_iClip);
-  
-    if (!iClip && flInSpecialReload == 0 && iPrimaryAmmoAmount) {
-      Reload(this);
-    } else if (flInSpecialReload != 0) {
-      new iClipSize = GetData(iHandler, CW_Data_ClipSize);
-      if (iClip < iClipSize && iPrimaryAmmoAmount) {
-        Reload(this);
-      } else {
-        set_member(this, m_Weapon_fInSpecialReload, 0);
-        emit_sound(pPlayer, CHAN_ITEM, szPumpSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-        PlayWeaponAnim(this, iReloadEndAnim, flReloadEndDuration);
-      }
-    } else {
-      PlayWeaponAnim(this, iAnim, flDuration);
+    new CW:iHandler = GetHandlerByEntity(this);
+    if (iHandler == CW_INVALID_HANDLER) {
+        return false;
     }
-  }
 
-  return true;
+    new Float:flTimeWeaponIdle = get_member(this, m_Weapon_flTimeWeaponIdle);
+    if (flTimeWeaponIdle < 0.0) {
+        new pPlayer = get_member(this, m_pPlayer);
+        new iPrimaryAmmoType = get_member(this, m_Weapon_iPrimaryAmmoType);
+        new iPrimaryAmmoAmount = get_member(pPlayer, m_rgAmmo, iPrimaryAmmoType);
+        new flInSpecialReload = get_member(this, m_Weapon_fInSpecialReload);
+        new iClip = get_member(this, m_Weapon_iClip);
+    
+        if (!iClip && flInSpecialReload == 0 && iPrimaryAmmoAmount) {
+            Reload(this);
+        } else if (flInSpecialReload != 0) {
+            new iClipSize = GetData(iHandler, CW_Data_ClipSize);
+            if (iClip < iClipSize && iPrimaryAmmoAmount) {
+                Reload(this);
+            } else {
+                set_member(this, m_Weapon_fInSpecialReload, 0);
+                emit_sound(pPlayer, CHAN_ITEM, szPumpSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+                PlayWeaponAnim(this, iReloadEndAnim, flReloadEndDuration);
+            }
+        } else {
+            PlayWeaponAnim(this, iAnim, flDuration);
+        }
+    }
+
+    return true;
 }
 
 bool:DefaultDeploy(this, const szViewModel[], const szWeaponModel[], iAnim, const szAnimExt[]) {
-  // if (!CanDeploy(this)) {
-  // 	return false;
-  // }
+    // if (!CanDeploy(this)) {
+    // 	return false;
+    // }
 
-  // new CW:iHandler = GetHandlerByEntity(this);
-  new pPlayer = GetPlayer(this);
-  set_pev(pPlayer, pev_viewmodel2, szViewModel); 
-  set_pev(pPlayer, pev_weaponmodel2, szWeaponModel); 
+    // new CW:iHandler = GetHandlerByEntity(this);
+    new pPlayer = GetPlayer(this);
+    set_pev(pPlayer, pev_viewmodel2, szViewModel); 
+    set_pev(pPlayer, pev_weaponmodel2, szWeaponModel); 
 
-  // strcpy( m_pPlayer->m_szAnimExtention, szAnimExt );
-  SendWeaponAnim(this, iAnim);
+    // strcpy( m_pPlayer->m_szAnimExtention, szAnimExt );
+    SendWeaponAnim(this, iAnim);
 
-  if (szAnimExt[0] != '^0') {
-    set_member(pPlayer, m_szAnimExtention, szAnimExt);
-  }
+    if (szAnimExt[0] != '^0') {
+        set_member(pPlayer, m_szAnimExtention, szAnimExt);
+    }
 
-  set_member(this, m_Weapon_iShotsFired, 0);
-  set_member(this, m_Weapon_flTimeWeaponIdle, 1.0);
-  set_member(this, m_Weapon_flLastFireTime, 0.0);
-  set_member(this, m_Weapon_flDecreaseShotsFired, get_gametime());
+    set_member(this, m_Weapon_iShotsFired, 0);
+    set_member(this, m_Weapon_flTimeWeaponIdle, 1.0);
+    set_member(this, m_Weapon_flLastFireTime, 0.0);
+    set_member(this, m_Weapon_flDecreaseShotsFired, get_gametime());
 
-  set_member(pPlayer, m_flNextAttack, 0.5);
-  set_member(pPlayer, m_iFOV, DEFAULT_FOV);
-  set_member(pPlayer, m_iLastZoom, DEFAULT_FOV);
-  set_member(pPlayer, m_bResumeZoom, 0);
-  set_pev(pPlayer, pev_fov, float(DEFAULT_FOV));
+    set_member(pPlayer, m_flNextAttack, 0.5);
+    set_member(pPlayer, m_iFOV, DEFAULT_FOV);
+    set_member(pPlayer, m_iLastZoom, DEFAULT_FOV);
+    set_member(pPlayer, m_bResumeZoom, 0);
+    set_pev(pPlayer, pev_fov, float(DEFAULT_FOV));
 
-  return true;
+    return true;
 }
 
 bool:DefaultShot(this, Float:flDamage, Float:flRate, Float:flSpread[3], iShots, Float:flDistance) {
-  new iClip = get_member(this, m_Weapon_iClip);
-  if (iClip <= 0) {
-    return false;
-  }
+    new iClip = get_member(this, m_Weapon_iClip);
+    if (iClip <= 0) {
+        return false;
+    }
 
-  new pPlayer = GetPlayer(this);
+    new pPlayer = GetPlayer(this);
 
-  static Float:vecDirShooting[3];
-  MakeAimDir(pPlayer, 1.0, vecDirShooting);
+    static Float:vecDirShooting[3];
+    MakeAimDir(pPlayer, 1.0, vecDirShooting);
 
-  static Float:vecSrc[3];
-  ExecuteHam(Ham_Player_GetGunPosition, pPlayer, vecSrc);
+    static Float:vecSrc[3];
+    ExecuteHam(Ham_Player_GetGunPosition, pPlayer, vecSrc);
 
-  static Float:vecOut[3];
-  FireBulletsPlayer(this, iShots, vecSrc, vecDirShooting, flSpread, flDistance, flDamage, pPlayer, vecOut);
+    static Float:vecOut[3];
+    FireBulletsPlayer(this, iShots, vecSrc, vecDirShooting, flSpread, flDistance, flDamage, pPlayer, vecOut);
 
-  set_member(this, m_Weapon_iClip, --iClip);
+    set_member(this, m_Weapon_iClip, --iClip);
 
-  set_member(this, m_Weapon_flNextPrimaryAttack, flRate);
-  set_member(this, m_Weapon_flNextSecondaryAttack, flRate);
+    set_member(this, m_Weapon_flNextPrimaryAttack, flRate);
+    set_member(this, m_Weapon_flNextSecondaryAttack, flRate);
 
-  new iShotsFired = get_member(this, m_Weapon_iShotsFired);
-  set_member(this, m_Weapon_iShotsFired, ++iShotsFired);
+    new iShotsFired = get_member(this, m_Weapon_iShotsFired);
+    set_member(this, m_Weapon_iShotsFired, ++iShotsFired);
 
-  rg_set_animation(pPlayer, PLAYER_ATTACK1);
+    rg_set_animation(pPlayer, PLAYER_ATTACK1);
 
-  return true;
+    return true;
 }
 
 bool:DefaultShotgunShot(this, Float:flDamage, Float:flRate, Float:flPumpDelay, Float:flSpread[3], iShots, Float:flDistance) {
-  new iClip = get_member(this, m_Weapon_iClip);
-  if (iClip <= 0) {
-    Reload(this);
-    if (iClip == 0) {
-      // PlayEmptySound();
+    new iClip = get_member(this, m_Weapon_iClip);
+    if (iClip <= 0) {
+        Reload(this);
+        if (iClip == 0) {
+            // PlayEmptySound();
+        }
+
+        return false;
     }
 
-    return false;
-  }
+    // m_pPlayer->m_iWeaponVolume = LOUD_GUN_VOLUME;
+    // m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 
-  // m_pPlayer->m_iWeaponVolume = LOUD_GUN_VOLUME;
-  // m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
+    // m_pPlayer->pev->effects = (int)(m_pPlayer->pev->effects) | EF_MUZZLEFLASH;
 
-  // m_pPlayer->pev->effects = (int)(m_pPlayer->pev->effects) | EF_MUZZLEFLASH;
+    if (!DefaultShot(this, flDamage, flRate, flSpread, iShots, flDistance)) {
+        return false;
+    }
 
-  if (!DefaultShot(this, flDamage, flRate, flSpread, iShots, flDistance)) {
-    return false;
-  }
+    set_member(this, m_Weapon_fInSpecialReload, 0);
 
-  set_member(this, m_Weapon_fInSpecialReload, 0);
+    if (iClip != 0) {
+        set_member(this, m_Weapon_flNextReload, get_gametime() + flPumpDelay);
+    }
 
-  if (iClip != 0) {
-    set_member(this, m_Weapon_flNextReload, get_gametime() + flPumpDelay);
-  }
-
-  return true;
+    return true;
 }
 
 DefaultSwing(this, Float:flDamage, Float:flRate, Float:flDistance) {
-  new pPlayer = GetPlayer(this);
+    new pPlayer = GetPlayer(this);
 
-  static Float:vecSrc[3];
-  ExecuteHam(Ham_Player_GetGunPosition, pPlayer, vecSrc);
+    static Float:vecSrc[3];
+    ExecuteHam(Ham_Player_GetGunPosition, pPlayer, vecSrc);
 
-  static Float:vecEnd[3];
-  MakeAimDir(pPlayer, flDistance, vecEnd);
-  xs_vec_add(vecSrc, vecEnd, vecEnd);
+    static Float:vecEnd[3];
+    MakeAimDir(pPlayer, flDistance, vecEnd);
+    xs_vec_add(vecSrc, vecEnd, vecEnd);
 
-  new tr = create_tr2();
-  engfunc(EngFunc_TraceLine, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, this, tr);
+    new tr = create_tr2();
+    engfunc(EngFunc_TraceLine, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, this, tr);
 
-  new Float:flFraction;
-  get_tr2(tr, TR_flFraction, flFraction);
-
-  if (flFraction >= 1.0) {
-    engfunc(EngFunc_TraceHull, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, HULL_HEAD, this, tr);
+    new Float:flFraction;
     get_tr2(tr, TR_flFraction, flFraction);
 
-    if (flFraction < 1.0) {
-      // Calculate the point of interANCHOR of the line (or hull) and the object we hit
-      // This is and approximation of the "best" interANCHOR
-      new pHit = get_tr2(tr, TR_pHit);
-      if (pHit != -1) {
-        FindHullIntersection(vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, this);
-      }
+    if (flFraction >= 1.0) {
+        engfunc(EngFunc_TraceHull, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, HULL_HEAD, this, tr);
+        get_tr2(tr, TR_flFraction, flFraction);
 
-      get_tr2(tr, TR_vecEndPos, vecEnd); // This is the point on the actual surface (the hull could have hit space)
-      get_tr2(tr, TR_flFraction, flFraction);
+        if (flFraction < 1.0) {
+            // Calculate the point of interANCHOR of the line (or hull) and the object we hit
+            // This is and approximation of the "best" interANCHOR
+            new pHit = get_tr2(tr, TR_pHit);
+            if (pHit != -1) {
+                FindHullIntersection(vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, this);
+            }
+
+            get_tr2(tr, TR_vecEndPos, vecEnd); // This is the point on the actual surface (the hull could have hit space)
+            get_tr2(tr, TR_flFraction, flFraction);
+        }
     }
-  }
 
-  new iShotsFired = get_member(this, m_Weapon_iShotsFired);
-  set_member(this, m_Weapon_iShotsFired, iShotsFired + 1);
+    new iShotsFired = get_member(this, m_Weapon_iShotsFired);
+    set_member(this, m_Weapon_iShotsFired, iShotsFired + 1);
 
-  set_member(this, m_Weapon_flNextPrimaryAttack, flRate);
+    set_member(this, m_Weapon_flNextPrimaryAttack, flRate);
 
-  rg_set_animation(pPlayer, PLAYER_ATTACK1);
+    rg_set_animation(pPlayer, PLAYER_ATTACK1);
 
-  if (flFraction >= 1.0) {
-    free_tr2(tr);
-    return -1;
-  }
+    if (flFraction >= 1.0) {
+        free_tr2(tr);
+        return -1;
+    }
 
-  new pHit = get_tr2(tr, TR_pHit);
-  if (pHit < 0) {
-    set_tr2(tr, TR_pHit, 0);
-    pHit = 0;
-  }
+    new pHit = get_tr2(tr, TR_pHit);
+    if (pHit < 0) {
+        set_tr2(tr, TR_pHit, 0);
+        pHit = 0;
+    }
 
-  rg_multidmg_clear();
+    rg_multidmg_clear();
 
-  // if (get_member(this, m_Weapon_flNextPrimaryAttack) + 1.0 < 0.0) {
-  // first swing does full damage
-  static Float:vecDir[3];
-  xs_vec_sub(vecSrc, vecEnd, vecDir);
-  xs_vec_normalize(vecDir, vecDir);
+    // if (get_member(this, m_Weapon_flNextPrimaryAttack) + 1.0 < 0.0) {
+    // first swing does full damage
+    static Float:vecDir[3];
+    xs_vec_sub(vecSrc, vecEnd, vecDir);
+    xs_vec_normalize(vecDir, vecDir);
 
-  ExecuteHamB(Ham_TraceAttack, pHit, pPlayer, flDamage, vecDir, tr, DMG_CLUB); 
-  // }
+    ExecuteHamB(Ham_TraceAttack, pHit, pPlayer, flDamage, vecDir, tr, DMG_CLUB); 
+    // }
 
-  rg_multidmg_apply(this, pPlayer);
+    rg_multidmg_apply(this, pPlayer);
 
-  set_pev(this, pev_iuser1, tr);
-  SetThink(this, "Smack");
-  set_pev(this, pev_nextthink, get_gametime() + (flRate * 0.5));
+    set_pev(this, pev_iuser1, tr);
+    SetThink(this, "Smack");
+    set_pev(this, pev_nextthink, get_gametime() + (flRate * 0.5));
 
-  return pHit;
+    return pHit;
 }
 
 // ANCHOR: Weapon Methods
 
 CW:RegisterWeapon(iPluginId, const szName[], iWeaponId, iClipSize, iPrimaryAmmoType, iPrimaryAmmoMaxAmount, iSecondaryAmmoType, iSecondaryAmmoMaxAmount, iSlotId, iPosition, iWeaponFlags, const szIcon[]) {
-  new CW:iHandler = CreateWeaponData(szName);
-  SetData(iHandler, CW_Data_PluginId, iPluginId);
-  SetStringData(iHandler, CW_Data_Name, szName);
-  SetData(iHandler, CW_Data_Id, iWeaponId);
-  SetData(iHandler, CW_Data_ClipSize, iClipSize);
-  SetData(iHandler, CW_Data_PrimaryAmmoType, iPrimaryAmmoType);
-  SetData(iHandler, CW_Data_PrimaryAmmoMaxAmount, iPrimaryAmmoMaxAmount);
-  SetData(iHandler, CW_Data_SecondaryAmmoType, iSecondaryAmmoType);
-  SetData(iHandler, CW_Data_SecondaryAmmoMaxAmount, iSecondaryAmmoMaxAmount);
-  SetData(iHandler, CW_Data_SlotId, iSlotId);
-  SetData(iHandler, CW_Data_Position, iPosition);
-  SetData(iHandler, CW_Data_WeaponFlags, iWeaponFlags);
-  SetStringData(iHandler, CW_Data_Icon, szIcon);
+    new CW:iHandler = CreateWeaponData(szName);
+    SetData(iHandler, CW_Data_PluginId, iPluginId);
+    SetStringData(iHandler, CW_Data_Name, szName);
+    SetData(iHandler, CW_Data_Id, iWeaponId);
+    SetData(iHandler, CW_Data_ClipSize, iClipSize);
+    SetData(iHandler, CW_Data_PrimaryAmmoType, iPrimaryAmmoType);
+    SetData(iHandler, CW_Data_PrimaryAmmoMaxAmount, iPrimaryAmmoMaxAmount);
+    SetData(iHandler, CW_Data_SecondaryAmmoType, iSecondaryAmmoType);
+    SetData(iHandler, CW_Data_SecondaryAmmoMaxAmount, iSecondaryAmmoMaxAmount);
+    SetData(iHandler, CW_Data_SlotId, iSlotId);
+    SetData(iHandler, CW_Data_Position, iPosition);
+    SetData(iHandler, CW_Data_WeaponFlags, iWeaponFlags);
+    SetStringData(iHandler, CW_Data_Icon, szIcon);
 
-  if (!g_bPrecache && !g_bWeaponHooks[iWeaponId]) { // we are not able to get weapon name in precache state
-    RegisterWeaponHooks(iWeaponId);
-  }
+    if (!g_bPrecache && !g_bWeaponHooks[iWeaponId]) { // we are not able to get weapon name in precache state
+        RegisterWeaponHooks(iWeaponId);
+    }
 
-  register_clcmd(szName, "OnWeaponClCmd");
+    register_clcmd(szName, "OnWeaponClCmd");
 
-  return iHandler;
+    return iHandler;
 }
 
 CW:GetHandler(const szName[]) {
-  new CW:iHandler;
-  if (!TrieGetCell(g_weaponsMap, szName, iHandler)) {
-    return CW_INVALID_HANDLER;
-  }
+    new CW:iHandler;
+    if (!TrieGetCell(g_rgWeaponsMap, szName, iHandler)) {
+        return CW_INVALID_HANDLER;
+    }
 
-  return iHandler;
+    return iHandler;
 }
 
 CW:GetHandlerByEntity(pEntity) {
-  new iToken = pev(pEntity, pev_impulse);
+    new iToken = pev(pEntity, pev_impulse);
 
-  if (iToken >= TOKEN && iToken < TOKEN + g_iWeaponCount) {
-    return CW:(iToken - TOKEN);
-  }
+    if (iToken >= TOKEN && iToken < TOKEN + g_iWeaponCount) {
+        return CW:(iToken - TOKEN);
+    }
 
-  return CW_INVALID_HANDLER;
+    return CW_INVALID_HANDLER;
 }
 
 SpawnWeapon(CW:iHandler) {
-  new iWeaponId = GetData(iHandler, CW_Data_Id);
+    new iWeaponId = GetData(iHandler, CW_Data_Id);
 
-  new pEntity = engfunc(EngFunc_CreateNamedEntity, g_iszWeaponNames[iWeaponId]);
-  set_pev(pEntity, pev_impulse, TOKEN + _:iHandler);
-  dllfunc(DLLFunc_Spawn, pEntity);
+    new pEntity = engfunc(EngFunc_CreateNamedEntity, g_iszWeaponNames[iWeaponId]);
+    set_pev(pEntity, pev_impulse, TOKEN + _:iHandler);
+    dllfunc(DLLFunc_Spawn, pEntity);
 
-  new iPrimaryAmmoType = GetData(iHandler, CW_Data_PrimaryAmmoType);
+    new iPrimaryAmmoType = GetData(iHandler, CW_Data_PrimaryAmmoType);
 
-  set_member(pEntity, m_Weapon_iClip, GetData(iHandler, CW_Data_ClipSize));
-  set_member(pEntity, m_Weapon_iPrimaryAmmoType, iPrimaryAmmoType);
-  set_member(pEntity, m_Weapon_iDefaultAmmo, 0);
-  // set_member(pEntity, m_Weapon_iShell, 0);
-  // set_member(pEntity, m_Weapon_bDelayFire, true);
-  // set_member(pEntity, m_Weapon_fFireOnEmpty, true);
+    set_member(pEntity, m_Weapon_iClip, GetData(iHandler, CW_Data_ClipSize));
+    set_member(pEntity, m_Weapon_iPrimaryAmmoType, iPrimaryAmmoType);
+    set_member(pEntity, m_Weapon_iDefaultAmmo, 0);
+    // set_member(pEntity, m_Weapon_iShell, 0);
+    // set_member(pEntity, m_Weapon_bDelayFire, true);
+    // set_member(pEntity, m_Weapon_fFireOnEmpty, true);
 
-  ExecuteBindedFunction(CWB_Spawn, pEntity);
+    ExecuteBindedFunction(CWB_Spawn, pEntity);
 
-  return pEntity;
+    return pEntity;
 }
 
 SpawnWeaponBox(CW:iHandler) {
-  new pWeaponBox = engfunc(EngFunc_CreateNamedEntity, g_iszWeaponBox);
-  dllfunc(DLLFunc_Spawn, pWeaponBox);
+    new pWeaponBox = engfunc(EngFunc_CreateNamedEntity, g_iszWeaponBox);
+    dllfunc(DLLFunc_Spawn, pWeaponBox);
 
-  new pItem = SpawnWeapon(iHandler);
-  set_pev(pItem, pev_spawnflags, pev(pItem, pev_spawnflags) | SF_NORESPAWN);
-  set_pev(pItem, pev_effects, EF_NODRAW);
-  set_pev(pItem, pev_movetype, MOVETYPE_NONE);
-  set_pev(pItem, pev_solid, SOLID_NOT);
-  set_pev(pItem, pev_model, 0);
-  set_pev(pItem, pev_modelindex, 0);
-  set_pev(pItem, pev_owner, pWeaponBox);
+    new pItem = SpawnWeapon(iHandler);
+    set_pev(pItem, pev_spawnflags, pev(pItem, pev_spawnflags) | SF_NORESPAWN);
+    set_pev(pItem, pev_effects, EF_NODRAW);
+    set_pev(pItem, pev_movetype, MOVETYPE_NONE);
+    set_pev(pItem, pev_solid, SOLID_NOT);
+    set_pev(pItem, pev_model, 0);
+    set_pev(pItem, pev_modelindex, 0);
+    set_pev(pItem, pev_owner, pWeaponBox);
 
-  new iSlot = GetData(iHandler, CW_Data_SlotId);
-  set_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, pItem, iSlot);
+    new iSlot = GetData(iHandler, CW_Data_SlotId);
+    set_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, pItem, iSlot);
 
-  dllfunc(DLLFunc_Spawn, pWeaponBox);
+    dllfunc(DLLFunc_Spawn, pWeaponBox);
 
-  return pWeaponBox;
+    return pWeaponBox;
 }
 
 // ANCHOR: Player Methods
 
 GiveWeapon(pPlayer, CW:iHandler) {
-  new pWeapon = SpawnWeapon(iHandler);
-  if(ExecuteHam(Ham_AddPlayerItem, pPlayer, pWeapon)) {
-      ExecuteHam(Ham_Item_AttachToPlayer, pWeapon, pPlayer);
-      emit_sound(pWeapon, CHAN_ITEM, "items/gunpickup2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-  }
+    new pWeapon = SpawnWeapon(iHandler);
+    if(ExecuteHam(Ham_AddPlayerItem, pPlayer, pWeapon)) {
+            ExecuteHam(Ham_Item_AttachToPlayer, pWeapon, pPlayer);
+            emit_sound(pWeapon, CHAN_ITEM, "items/gunpickup2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    }
 }
 
 UpdateWeaponList(pPlayer, CW:iHandler) {
-  new iWeaponId = GetData(iHandler, CW_Data_Id);
+    new iWeaponId = GetData(iHandler, CW_Data_Id);
 
-  static szName[64];
-  GetStringData(iHandler, CW_Data_Name, szName, charsmax(szName));
-  
-  new iPrimaryAmmoType = GetData(iHandler, CW_Data_PrimaryAmmoType);
-  new iPrimaryAmmoMaxCount = GetData(iHandler, CW_Data_PrimaryAmmoMaxAmount);
-  new iSecondaryAmmoType = GetData(iHandler, CW_Data_SecondaryAmmoType);
-  new iSecondaryAmmoMaxCount = GetData(iHandler, CW_Data_SecondaryAmmoMaxAmount);
-  new iSlotId = GetData(iHandler, CW_Data_SlotId);
-  new iPosition = GetData(iHandler, CW_Data_Position);
-  new iFlags = GetData(iHandler, CW_Data_WeaponFlags);
+    static szName[64];
+    GetStringData(iHandler, CW_Data_Name, szName, charsmax(szName));
+    
+    new iPrimaryAmmoType = GetData(iHandler, CW_Data_PrimaryAmmoType);
+    new iPrimaryAmmoMaxCount = GetData(iHandler, CW_Data_PrimaryAmmoMaxAmount);
+    new iSecondaryAmmoType = GetData(iHandler, CW_Data_SecondaryAmmoType);
+    new iSecondaryAmmoMaxCount = GetData(iHandler, CW_Data_SecondaryAmmoMaxAmount);
+    new iSlotId = GetData(iHandler, CW_Data_SlotId);
+    new iPosition = GetData(iHandler, CW_Data_Position);
+    new iFlags = GetData(iHandler, CW_Data_WeaponFlags);
 
-  emessage_begin(MSG_ONE, gmsgWeaponList, _, pPlayer);
-  ewrite_string(szName);
-  ewrite_byte(iPrimaryAmmoType);
-  ewrite_byte(iPrimaryAmmoMaxCount);
-  ewrite_byte(iSecondaryAmmoType);
-  ewrite_byte(iSecondaryAmmoMaxCount);
-  ewrite_byte(iSlotId);
-  ewrite_byte(iPosition);
-  ewrite_byte(iWeaponId);
-  ewrite_byte(iFlags);
-  emessage_end();
+    emessage_begin(MSG_ONE, gmsgWeaponList, _, pPlayer);
+    ewrite_string(szName);
+    ewrite_byte(iPrimaryAmmoType);
+    ewrite_byte(iPrimaryAmmoMaxCount);
+    ewrite_byte(iSecondaryAmmoType);
+    ewrite_byte(iSecondaryAmmoMaxCount);
+    ewrite_byte(iSlotId);
+    ewrite_byte(iPosition);
+    ewrite_byte(iWeaponId);
+    ewrite_byte(iFlags);
+    emessage_end();
 }
 
 ResetWeaponList(pPlayer, iWeaponId) {
-  message_begin(MSG_ONE, gmsgWeaponList, _, pPlayer);
-  write_string(g_weaponListDefaults[iWeaponId][WL_WeaponName]);
-  write_byte(g_weaponListDefaults[iWeaponId][WL_PrimaryAmmoType]);
-  write_byte(g_weaponListDefaults[iWeaponId][WL_PrimaryAmmoMaxAmount]);
-  write_byte(g_weaponListDefaults[iWeaponId][WL_SecondaryAmmoType]);
-  write_byte(g_weaponListDefaults[iWeaponId][WL_SecondaryAmmoMaxAmount]);
-  write_byte(g_weaponListDefaults[iWeaponId][WL_SlotId]);
-  write_byte(g_weaponListDefaults[iWeaponId][WL_NumberInSlot]);
-  write_byte(g_weaponListDefaults[iWeaponId][WL_WeaponId]);
-  write_byte(g_weaponListDefaults[iWeaponId][WL_Flags]);
-  message_end();
+    message_begin(MSG_ONE, gmsgWeaponList, _, pPlayer);
+    write_string(g_weaponListDefaults[iWeaponId][WL_WeaponName]);
+    write_byte(g_weaponListDefaults[iWeaponId][WL_PrimaryAmmoType]);
+    write_byte(g_weaponListDefaults[iWeaponId][WL_PrimaryAmmoMaxAmount]);
+    write_byte(g_weaponListDefaults[iWeaponId][WL_SecondaryAmmoType]);
+    write_byte(g_weaponListDefaults[iWeaponId][WL_SecondaryAmmoMaxAmount]);
+    write_byte(g_weaponListDefaults[iWeaponId][WL_SlotId]);
+    write_byte(g_weaponListDefaults[iWeaponId][WL_NumberInSlot]);
+    write_byte(g_weaponListDefaults[iWeaponId][WL_WeaponId]);
+    write_byte(g_weaponListDefaults[iWeaponId][WL_Flags]);
+    message_end();
 }
 
 SetWeaponPrediction(pPlayer, bool:bValue) {
-  new pszInfoBuffer = engfunc(EngFunc_GetInfoKeyBuffer, pPlayer);
-  engfunc(EngFunc_SetClientKeyValue, pPlayer, pszInfoBuffer, "cl_lw", bValue ? "1" : "0");
+    new pszInfoBuffer = engfunc(EngFunc_GetInfoKeyBuffer, pPlayer);
+    engfunc(EngFunc_SetClientKeyValue, pPlayer, pszInfoBuffer, "cl_lw", bValue ? "1" : "0");
 }
 
 RemovePlayerItem(pItem) {
-  new pPlayer = GetPlayer(pItem);
+    new pPlayer = GetPlayer(pItem);
 
-  new iWeaponId = get_member(pItem, m_iId);
+    new iWeaponId = get_member(pItem, m_iId);
 
-  if (pItem == get_member(pPlayer, m_pActiveItem)) {
-    ExecuteHamB(Ham_Weapon_RetireWeapon, pItem);
-  }
+    if (pItem == get_member(pPlayer, m_pActiveItem)) {
+        ExecuteHamB(Ham_Weapon_RetireWeapon, pItem);
+    }
 
-  ExecuteHamB(Ham_RemovePlayerItem, pPlayer, pItem);
-  ExecuteHamB(Ham_Item_Kill, pItem);
-  set_pev(pPlayer, pev_weapons, pev(pPlayer, pev_weapons) & ~(1<<iWeaponId));
+    ExecuteHamB(Ham_RemovePlayerItem, pPlayer, pItem);
+    ExecuteHamB(Ham_Item_Kill, pItem);
+    set_pev(pPlayer, pev_weapons, pev(pPlayer, pev_weapons) & ~(1<<iWeaponId));
 }
 
 // ANCHOR: Utils
 
 FindWeaponBoxSingleItem(pWeaponBox) {
-  new pItem = -1;
-  for (new iSlot = 0; iSlot < 6; ++iSlot) {
-    new _pItem = get_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, iSlot);
-    if (_pItem == -1) {
-      continue;
+    new pItem = -1;
+    for (new iSlot = 0; iSlot < 6; ++iSlot) {
+        new _pItem = get_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, iSlot);
+        if (_pItem == -1) {
+            continue;
+        }
+
+        if (pItem != -1) {
+            return -1; // only single item is allowed
+        }
+
+        if (get_member(_pItem, m_pNext) != -1) {
+            return -1; // only single item is allowed
+        }
+
+        pItem = _pItem;
     }
 
-    if (pItem != -1) {
-      return -1; // only single item is allowed
-    }
-
-    if (get_member(_pItem, m_pNext) != -1) {
-      return -1; // only single item is allowed
-    }
-
-    pItem = _pItem;
-  }
-
-  return pItem;
+    return pItem;
 }
 
 Float:WaterLevel(const Float:vecPosition[3], Float:flMinZ, Float:flMaxZ) {
-  static Float:vecMidUp[3];
-  xs_vec_copy(vecPosition, vecMidUp);
+    static Float:vecMidUp[3];
+    xs_vec_copy(vecPosition, vecMidUp);
 
-  vecMidUp[2] = flMinZ;
-  if (PointContents(vecMidUp) != CONTENTS_WATER) {
-    return flMinZ;
-  }
-
-  vecMidUp[2] = flMaxZ;
-  if (PointContents(vecMidUp) == CONTENTS_WATER) {
-    return flMaxZ;
-  }
-
-  new Float:flDiff = flMaxZ - flMinZ;
-  while (flDiff > 1.0) {
-    vecMidUp[2] = flMinZ + (flDiff / 2.0);
-
-    if (PointContents(vecMidUp) == CONTENTS_WATER) {
-      flMinZ = vecMidUp[2];
-    } else {
-      flMaxZ = vecMidUp[2];
+    vecMidUp[2] = flMinZ;
+    if (PointContents(vecMidUp) != CONTENTS_WATER) {
+        return flMinZ;
     }
 
-    flDiff = flMaxZ - flMinZ;
-  }
+    vecMidUp[2] = flMaxZ;
+    if (PointContents(vecMidUp) == CONTENTS_WATER) {
+        return flMaxZ;
+    }
 
-  return vecMidUp[2];
+    new Float:flDiff = flMaxZ - flMinZ;
+    while (flDiff > 1.0) {
+        vecMidUp[2] = flMinZ + (flDiff / 2.0);
+
+        if (PointContents(vecMidUp) == CONTENTS_WATER) {
+            flMinZ = vecMidUp[2];
+        } else {
+            flMaxZ = vecMidUp[2];
+        }
+
+        flDiff = flMaxZ - flMinZ;
+    }
+
+    return vecMidUp[2];
 }
 
 FindHullIntersection(const Float:vecSrc[3], &tr, const Float:vecMins[3], const Float:vecMaxs[3], pEntity) {
-  new Float:flDistance = 8192.0;
+    new Float:flDistance = 8192.0;
 
-  static Float:rgvecMinsMaxs[2][3];
-  for (new i = 0; i < 3; ++i) {
-    rgvecMinsMaxs[0][i] = vecMins[i];
-    rgvecMinsMaxs[1][i] = vecMaxs[i];
-  }
-
-  static Float:vecHullEnd[3];
-  get_tr2(tr, TR_vecEndPos, vecHullEnd);
-
-  for (new i = 0; i < 3; ++i) {
-    vecHullEnd[i] = vecSrc[i] + ((vecHullEnd[i] - vecSrc[i]) * 2.0);
-  }
-
-  new tmpTrace = create_tr2();
-  engfunc(EngFunc_TraceLine, vecSrc, vecHullEnd, DONT_IGNORE_MONSTERS, pEntity, tmpTrace);
-
-  new Float:flFraction;
-  get_tr2(tmpTrace, TR_flFraction, flFraction);
-
-  if (flFraction < 1.0) {
-    free_tr2(tr);
-    tr = tmpTrace;
-    return;
-  }
-
-  static Float:vecEnd[3];
-  for (new i = 0; i < 2; i++) {
-    for (new j = 0; j < 2; j++) {
-      for (new k = 0; k < 2; k++) {
-        vecEnd[0] = vecHullEnd[0] + rgvecMinsMaxs[i][0];
-        vecEnd[1] = vecHullEnd[1] + rgvecMinsMaxs[j][1];
-        vecEnd[2] = vecHullEnd[2] + rgvecMinsMaxs[k][2];
-
-        engfunc(EngFunc_TraceLine, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, pEntity, tmpTrace);
-        get_tr2(tmpTrace, TR_flFraction, flFraction);
-
-        new Float:vecEndPos[3];
-        get_tr2(tmpTrace, TR_vecEndPos, vecEndPos);
-
-        if (flFraction < 1.0) {
-          new Float:flThisDistance = get_distance_f(vecEndPos, vecSrc);
-          if (flThisDistance < flDistance) {
-            free_tr2(tr);
-            tr = tmpTrace;
-            flDistance = flThisDistance;
-          }
-        }
-      }
-    }
-  }
-}
-
-_RadiusDamage(const Float:vecOrigin[3], iInflictor, pAttacker, Float:flDamage, Float:flRadius, iClassIgnore, iDamageBits) {
-  #pragma unused iClassIgnore
-
-  static Float:vecSrc[3];
-  xs_vec_copy(vecOrigin, vecSrc);
-
-  new Float:flFalloff = flRadius ? (flDamage / flRadius) : 1.0;
-  new bool:bInWater = (PointContents(vecSrc) == CONTENTS_WATER);
-
-  vecSrc[2] += 1.0; // in case grenade is lying on the ground
-
-  if (!pAttacker) {
-    pAttacker = iInflictor;
-  }
-
-  new pTr = create_tr2();
-
-  new pEntity;
-  new iPrevEntity;
-  while ((pEntity = engfunc(EngFunc_FindEntityInSphere, pEntity, vecSrc, flRadius)) != 0) {
-    if (iPrevEntity >= pEntity) {
-      break;
+    static Float:rgvecMinsMaxs[2][3];
+    for (new i = 0; i < 3; ++i) {
+        rgvecMinsMaxs[0][i] = vecMins[i];
+        rgvecMinsMaxs[1][i] = vecMaxs[i];
     }
 
-    if (!pev_valid(pEntity)) {
-      continue;
+    static Float:vecHullEnd[3];
+    get_tr2(tr, TR_vecEndPos, vecHullEnd);
+
+    for (new i = 0; i < 3; ++i) {
+        vecHullEnd[i] = vecSrc[i] + ((vecHullEnd[i] - vecSrc[i]) * 2.0);
     }
 
-    if (ExecuteHam(Ham_IsPlayer, pEntity) && !rg_is_player_can_takedamage(pEntity, pAttacker)) {
-      continue;
-    }
+    new tmpTrace = create_tr2();
+    engfunc(EngFunc_TraceLine, vecSrc, vecHullEnd, DONT_IGNORE_MONSTERS, pEntity, tmpTrace);
 
-    if (pev(pEntity, pev_takedamage) == DAMAGE_NO) {
-      continue;
-    }
+    new Float:flFraction;
+    get_tr2(tmpTrace, TR_flFraction, flFraction);
 
-    static szClassname[32];
-    pev(pEntity, pev_classname, szClassname, charsmax(szClassname));
-
-    // UNDONE: this should check a damage mask, not an ignore
-    // if ( iClassIgnore != CLASS_NONE && pEntity->Classify() == iClassIgnore ) {// houndeyes don't hurt other houndeyes with their attack
-    //   continue;
-    // }
-
-    new iWaterLevel = pev(pEntity, pev_waterlevel);
-
-    if (bInWater && iWaterLevel == 0) {
-      continue;
-    }
-
-    if (!bInWater && iWaterLevel == 3) {
-      continue;
-    }
-
-    static Float:vecSpot[3];
-    ExecuteHamB(Ham_BodyTarget, pEntity, vecSrc, vecSpot);
-    engfunc(EngFunc_TraceLine, vecSrc, vecSpot, IGNORE_MONSTERS, iInflictor, pTr);
-
-    static Float:flFraction;
-    get_tr2(pTr, TR_flFraction, flFraction);
-
-    if (flFraction != 1.0 && get_tr2(pTr, TR_pHit) != pEntity) {
-      continue;
-    }
-
-    if (get_tr2(pTr, TR_StartSolid)) {
-      set_tr2(pTr, TR_vecEndPos, vecSrc);
-      set_tr2(pTr, TR_flFraction, 0.0);
-      flFraction = 0.0;
+    if (flFraction < 1.0) {
+        free_tr2(tr);
+        tr = tmpTrace;
+        return;
     }
 
     static Float:vecEnd[3];
-    get_tr2(pTr, TR_vecEndPos, vecEnd);
+    for (new i = 0; i < 2; i++) {
+        for (new j = 0; j < 2; j++) {
+            for (new k = 0; k < 2; k++) {
+                vecEnd[0] = vecHullEnd[0] + rgvecMinsMaxs[i][0];
+                vecEnd[1] = vecHullEnd[1] + rgvecMinsMaxs[j][1];
+                vecEnd[2] = vecHullEnd[2] + rgvecMinsMaxs[k][2];
 
-    new Float:flAdjustedDamage = flDamage - (get_distance_f(vecSrc, vecEnd) * flFalloff);
+                engfunc(EngFunc_TraceLine, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, pEntity, tmpTrace);
+                get_tr2(tmpTrace, TR_flFraction, flFraction);
 
-    if (flAdjustedDamage < 0.0) {
-      flAdjustedDamage = 0.0;
+                new Float:vecEndPos[3];
+                get_tr2(tmpTrace, TR_vecEndPos, vecEndPos);
+
+                if (flFraction < 1.0) {
+                    new Float:flThisDistance = get_distance_f(vecEndPos, vecSrc);
+                    if (flThisDistance < flDistance) {
+                        free_tr2(tr);
+                        tr = tmpTrace;
+                        flDistance = flThisDistance;
+                    }
+                }
+            }
+        }
+    }
+}
+
+_RadiusDamage(const Float:vecOrigin[3], iInflictor, pAttacker, Float:flDamage, Float:flRadius, iClassIgnore, iDamageBits) {
+    #pragma unused iClassIgnore
+
+    static Float:vecSrc[3];
+    xs_vec_copy(vecOrigin, vecSrc);
+
+    new Float:flFalloff = flRadius ? (flDamage / flRadius) : 1.0;
+    new bool:bInWater = (PointContents(vecSrc) == CONTENTS_WATER);
+
+    vecSrc[2] += 1.0; // in case grenade is lying on the ground
+
+    if (!pAttacker) {
+        pAttacker = iInflictor;
     }
 
-    if (flFraction != 1.0) {
-      static Float:vecDir[3];
-      xs_vec_sub(vecEnd, vecSrc, vecDir);
-      xs_vec_normalize(vecDir, vecDir);
+    new pTr = create_tr2();
 
-      rg_multidmg_clear();
-      ExecuteHamB(Ham_TraceAttack, pEntity, iInflictor, flAdjustedDamage, vecDir, pTr, iDamageBits);
-      rg_multidmg_apply(iInflictor, pAttacker);
-    } else {
-      ExecuteHamB(Ham_TakeDamage, pEntity, iInflictor, pAttacker, flAdjustedDamage, iDamageBits);
+    new pEntity;
+    new iPrevEntity;
+    while ((pEntity = engfunc(EngFunc_FindEntityInSphere, pEntity, vecSrc, flRadius)) != 0) {
+        if (iPrevEntity >= pEntity) {
+            break;
+        }
+
+        if (!pev_valid(pEntity)) {
+            continue;
+        }
+
+        if (ExecuteHam(Ham_IsPlayer, pEntity) && !rg_is_player_can_takedamage(pEntity, pAttacker)) {
+            continue;
+        }
+
+        if (pev(pEntity, pev_takedamage) == DAMAGE_NO) {
+            continue;
+        }
+
+        static szClassname[32];
+        pev(pEntity, pev_classname, szClassname, charsmax(szClassname));
+
+        // UNDONE: this should check a damage mask, not an ignore
+        // if ( iClassIgnore != CLASS_NONE && pEntity->Classify() == iClassIgnore ) {// houndeyes don't hurt other houndeyes with their attack
+        //     continue;
+        // }
+
+        new iWaterLevel = pev(pEntity, pev_waterlevel);
+
+        if (bInWater && iWaterLevel == 0) {
+            continue;
+        }
+
+        if (!bInWater && iWaterLevel == 3) {
+            continue;
+        }
+
+        static Float:vecSpot[3];
+        ExecuteHamB(Ham_BodyTarget, pEntity, vecSrc, vecSpot);
+        engfunc(EngFunc_TraceLine, vecSrc, vecSpot, IGNORE_MONSTERS, iInflictor, pTr);
+
+        static Float:flFraction;
+        get_tr2(pTr, TR_flFraction, flFraction);
+
+        if (flFraction != 1.0 && get_tr2(pTr, TR_pHit) != pEntity) {
+            continue;
+        }
+
+        if (get_tr2(pTr, TR_StartSolid)) {
+            set_tr2(pTr, TR_vecEndPos, vecSrc);
+            set_tr2(pTr, TR_flFraction, 0.0);
+            flFraction = 0.0;
+        }
+
+        static Float:vecEnd[3];
+        get_tr2(pTr, TR_vecEndPos, vecEnd);
+
+        new Float:flAdjustedDamage = flDamage - (get_distance_f(vecSrc, vecEnd) * flFalloff);
+
+        if (flAdjustedDamage < 0.0) {
+            flAdjustedDamage = 0.0;
+        }
+
+        if (flFraction != 1.0) {
+            static Float:vecDir[3];
+            xs_vec_sub(vecEnd, vecSrc, vecDir);
+            xs_vec_normalize(vecDir, vecDir);
+
+            rg_multidmg_clear();
+            ExecuteHamB(Ham_TraceAttack, pEntity, iInflictor, flAdjustedDamage, vecDir, pTr, iDamageBits);
+            rg_multidmg_apply(iInflictor, pAttacker);
+        } else {
+            ExecuteHamB(Ham_TakeDamage, pEntity, iInflictor, pAttacker, flAdjustedDamage, iDamageBits);
+        }
+
+        iPrevEntity = pEntity;
     }
 
-    iPrevEntity = pEntity;
-  }
-
-  free_tr2(pTr);
+    free_tr2(pTr);
 }
 
 MakeAimDir(pPlayer, Float:flDistance, Float:vecOut[3]) {
-  static Float:vecAngles[3];
-  pev(pPlayer, pev_v_angle, vecAngles);
-  engfunc(EngFunc_MakeVectors, vecAngles);
+    static Float:vecAngles[3];
+    pev(pPlayer, pev_v_angle, vecAngles);
+    engfunc(EngFunc_MakeVectors, vecAngles);
 
-  get_global_vector(GL_v_forward, vecOut);
-  xs_vec_mul_scalar(vecOut, flDistance, vecOut);
+    get_global_vector(GL_v_forward, vecOut);
+    xs_vec_mul_scalar(vecOut, flDistance, vecOut);
 }
 
 // ANCHOR: Storages
 
 AllocateStrings() {
-  g_iszWeaponBox = engfunc(EngFunc_AllocString, "weaponbox");
+    g_iszWeaponBox = engfunc(EngFunc_AllocString, "weaponbox");
 
-  for (new iWeaponId = 0; iWeaponId <= CSW_P90; ++iWeaponId) {
-    if (g_rgszWeaponNames[iWeaponId][0] == '^0') {
-      continue;
+    for (new iWeaponId = 0; iWeaponId <= CSW_LAST_WEAPON; ++iWeaponId) {
+        if (g_rgszWeaponNames[iWeaponId][0] == '^0') {
+            continue;
+        }
+
+        g_iszWeaponNames[iWeaponId] = engfunc(EngFunc_AllocString, g_rgszWeaponNames[iWeaponId]);
     }
-
-    g_iszWeaponNames[iWeaponId] = engfunc(EngFunc_AllocString, g_rgszWeaponNames[iWeaponId]);
-  }
 }
 
 InitStorages() {
-  g_weapons[CW_Data_Name] = ArrayCreate(64, 1);
-  g_weapons[CW_Data_Icon] = ArrayCreate(16, 1);
+    g_rgWeapons[CW_Data_Name] = ArrayCreate(64, 1);
+    g_rgWeapons[CW_Data_Icon] = ArrayCreate(16, 1);
 
-  for (new i = 0; i < _:CW_Data; ++i) {
-    if (!g_weapons[CW_Data:i]) {
-      g_weapons[CW_Data:i] = ArrayCreate(1, 1);
+    for (new i = 0; i < _:CW_Data; ++i) {
+        if (!g_rgWeapons[CW_Data:i]) {
+            g_rgWeapons[CW_Data:i] = ArrayCreate(1, 1);
+        }
     }
-  }
 
-  g_weaponsMap = TrieCreate();
+    g_rgWeaponsMap = TrieCreate();
 }
 
 DestroyStorages() {
-  for (new CW:iHandler = CW:0; _:iHandler < g_iWeaponCount; ++iHandler) {
-    DestroyWeaponData(iHandler);
-  }
+    for (new CW:iHandler = CW:0; _:iHandler < g_iWeaponCount; ++iHandler) {
+        DestroyWeaponData(iHandler);
+    }
 
-  for (new i = 0; i < _:CW_Data; ++i) {
-      ArrayDestroy(Array:g_weapons[CW_Data:i]);
-  }
+    for (new i = 0; i < _:CW_Data; ++i) {
+            ArrayDestroy(Array:g_rgWeapons[CW_Data:i]);
+    }
 
-  TrieDestroy(g_weaponsMap);
+    TrieDestroy(g_rgWeaponsMap);
 }
 
 // ANCHOR: Weapon Data
 
 CW:CreateWeaponData(const szName[]) {
-  new CW:iHandler = CW:g_iWeaponCount;
+    new CW:iHandler = CW:g_iWeaponCount;
 
-  for (new iParam = 0; iParam < _:CW_Data; ++iParam) {
-    ArrayPushCell(Array:g_weapons[CW_Data:iParam], 0);
-  }
+    for (new iParam = 0; iParam < _:CW_Data; ++iParam) {
+        ArrayPushCell(Array:g_rgWeapons[CW_Data:iParam], 0);
+    }
 
-  TrieSetCell(g_weaponsMap, szName, iHandler);
+    TrieSetCell(g_rgWeaponsMap, szName, iHandler);
 
-  InitBindings(iHandler);
+    InitBindings(iHandler);
 
-  g_iWeaponCount++;
+    g_iWeaponCount++;
 
-  return iHandler;
+    return iHandler;
 }
 
 DestroyWeaponData(CW:iHandler) {
-  DestroyBindings(iHandler);
+    DestroyBindings(iHandler);
 }
 
 any:GetData(CW:iHandler, CW_Data:iParam) {
-  return ArrayGetCell(Array:g_weapons[iParam], _:iHandler);
+    return ArrayGetCell(Array:g_rgWeapons[iParam], _:iHandler);
 }
 
 GetStringData(CW:iHandler, CW_Data:iParam, szOut[], iLen) {
-  ArrayGetString(Array:g_weapons[iParam], _:iHandler, szOut, iLen);
+    ArrayGetString(Array:g_rgWeapons[iParam], _:iHandler, szOut, iLen);
 }
 
 SetData(CW:iHandler, CW_Data:iParam, any:value) {
-  ArraySetCell(Array:g_weapons[iParam], _:iHandler, value);
+    ArraySetCell(Array:g_rgWeapons[iParam], _:iHandler, value);
 }
 
 SetStringData(CW:iHandler, CW_Data:iParam, const szValue[]) {
-  ArraySetString(Array:g_weapons[iParam], _:iHandler, szValue);
+    ArraySetString(Array:g_rgWeapons[iParam], _:iHandler, szValue);
 }
 
 // ANCHOR: Weapon Bindings
 
 Array:InitBindings(CW:iHandler) {
-  new Array:irgBindings = ArrayCreate(Function, _:CW_Binding);
-  for (new i = 0; i < _:CW_Binding; ++i) {
-    new rgBinding[Function]= {-1, -1};
-    ArrayPushArray(irgBindings, rgBinding);
-  }
+    new Array:irgBindings = ArrayCreate(Function, _:CW_Binding);
+    for (new i = 0; i < _:CW_Binding; ++i) {
+        new rgBinding[Function]= {-1, -1};
+        ArrayPushArray(irgBindings, rgBinding);
+    }
 
-  SetData(iHandler, CW_Data_Bindings, irgBindings);
+    SetData(iHandler, CW_Data_Bindings, irgBindings);
 }
 
 DestroyBindings(CW:iHandler) {
-  new Array:irgBindings = GetData(iHandler, CW_Data_Bindings);
-  ArrayDestroy(irgBindings);
+    new Array:irgBindings = GetData(iHandler, CW_Data_Bindings);
+    ArrayDestroy(irgBindings);
 }
 
 Bind(CW:iHandler, iBinding, iPluginId, iFunctionid) {
-  new rgBinding[Function];
-  rgBinding[Function_PluginId] = iPluginId;
-  rgBinding[Function_FunctionId] = iFunctionid;
+    new rgBinding[Function];
+    rgBinding[Function_PluginId] = iPluginId;
+    rgBinding[Function_FunctionId] = iFunctionid;
 
-  new Array:irgBindings = GetData(iHandler, CW_Data_Bindings);
-  ArraySetArray(irgBindings, iBinding, rgBinding);
+    new Array:irgBindings = GetData(iHandler, CW_Data_Bindings);
+    ArraySetArray(irgBindings, iBinding, rgBinding);
 }
 
 GetBinding(CW:iHandler, CW_Binding:iBinding, &iPluginId, &iFunctionId) {
-  new Array:iszBindings = GetData(iHandler, CW_Data_Bindings);
+    new Array:iszBindings = GetData(iHandler, CW_Data_Bindings);
 
-  static rgBinding[Function];
-  ArrayGetArray(iszBindings, _:iBinding, rgBinding, sizeof(rgBinding));
+    static rgBinding[Function];
+    ArrayGetArray(iszBindings, _:iBinding, rgBinding, sizeof(rgBinding));
 
-  if (rgBinding[Function_PluginId] == -1) {
-    return false;
-  }
+    if (rgBinding[Function_PluginId] == -1) {
+        return false;
+    }
 
-  if (rgBinding[Function_FunctionId] == -1) {
-    return false;
-  }
+    if (rgBinding[Function_FunctionId] == -1) {
+        return false;
+    }
 
-  iPluginId = rgBinding[Function_PluginId];
-  iFunctionId = rgBinding[Function_FunctionId];
+    iPluginId = rgBinding[Function_PluginId];
+    iFunctionId = rgBinding[Function_FunctionId];
 
-  return true;
+    return true;
 }
 
 any:ExecuteBindedFunction(CW_Binding:iBinding, this, any:...) {
-  new CW:iHandler = GetHandlerByEntity(this);
+    new CW:iHandler = GetHandlerByEntity(this);
 
-  new iPluginId, iFunctionId;
-  if (!GetBinding(iHandler, iBinding, iPluginId, iFunctionId)) {
-    return PLUGIN_CONTINUE;
-  }
-
-  if (callfunc_begin_i(iFunctionId, iPluginId) == 1)  {
-    callfunc_push_int(this);
-  
-    if (iBinding == CWB_WeaponBoxModelUpdate) {
-      new pWeaponBox = getarg(2);
-      callfunc_push_int(pWeaponBox);
+    new iPluginId, iFunctionId;
+    if (!GetBinding(iHandler, iBinding, iPluginId, iFunctionId)) {
+        return PLUGIN_CONTINUE;
     }
 
-    return callfunc_end();
-  }
-  
-  return PLUGIN_CONTINUE;
+    if (callfunc_begin_i(iFunctionId, iPluginId) == 1)    {
+        callfunc_push_int(this);
+    
+        if (iBinding == CWB_WeaponBoxModelUpdate) {
+            new pWeaponBox = getarg(2);
+            callfunc_push_int(pWeaponBox);
+        }
+
+        return callfunc_end();
+    }
+    
+    return PLUGIN_CONTINUE;
 }
 
 // ANCHOR: Weapon hooks
 
 InitWeaponHooks() {
-  for (new CW:iHandler = CW:0; _:iHandler < g_iWeaponCount; ++iHandler) {
-    new iWeaponId = GetData(iHandler, CW_Data_Id);
-    if (!g_bWeaponHooks[iWeaponId]) {
-      RegisterWeaponHooks(iWeaponId);
+    for (new CW:iHandler = CW:0; _:iHandler < g_iWeaponCount; ++iHandler) {
+        new iWeaponId = GetData(iHandler, CW_Data_Id);
+        if (!g_bWeaponHooks[iWeaponId]) {
+            RegisterWeaponHooks(iWeaponId);
+        }
     }
-  }
 }
 
 RegisterWeaponHooks(iWeaponId) {
@@ -1833,17 +1827,17 @@ SparkShower(const Float:vecOrigin[3], const Float:vecAngles[3], iOwner) {
 
 GrenadeExplosion(const Float:vecOrigin[3], Float:flDamage) {
     new iModelIndex = PointContents(vecOrigin) != CONTENTS_WATER
-        ? engfunc(EngFunc_ModelIndex, "sprites/zerogxplode.spr")
-        : engfunc(EngFunc_ModelIndex, "sprites/WXplo1.spr");
+            ? engfunc(EngFunc_ModelIndex, "sprites/zerogxplode.spr")
+            : engfunc(EngFunc_ModelIndex, "sprites/WXplo1.spr");
 
     new iScale = floatround((flDamage - 50.0) * 0.60);
 
     if (iScale < 8) {
-        iScale = 8;
+            iScale = 8;
     }
 
     if (iScale > 255) {
-      iScale = 255;
+        iScale = 255;
     }
 
     engfunc(EngFunc_MessageBegin, MSG_PAS, SVC_TEMPENTITY, vecOrigin, 0);
@@ -1859,115 +1853,115 @@ GrenadeExplosion(const Float:vecOrigin[3], Float:flDamage) {
 }
 
 GrenadeSmoke(pGrenade) {
-  static Float:vecOrigin[3];
-  pev(pGrenade, pev_origin, vecOrigin);
+    static Float:vecOrigin[3];
+    pev(pGrenade, pev_origin, vecOrigin);
 
-  static Float:flDamage;
-  pev(pGrenade, pev_dmg, flDamage);
+    static Float:flDamage;
+    pev(pGrenade, pev_dmg, flDamage);
 
-  if (PointContents(vecOrigin) == CONTENTS_WATER) {
-    static Float:vecSize[3] = {64.0, 64.0, 64.0};
+    if (PointContents(vecOrigin) == CONTENTS_WATER) {
+        static Float:vecSize[3] = {64.0, 64.0, 64.0};
 
-    static Float:vecMins[3];
-    xs_vec_sub(vecOrigin, vecSize, vecMins);
+        static Float:vecMins[3];
+        xs_vec_sub(vecOrigin, vecSize, vecMins);
 
-    static Float:vecMaxs[3];
-    xs_vec_add(vecOrigin, vecSize, vecMaxs);
+        static Float:vecMaxs[3];
+        xs_vec_add(vecOrigin, vecSize, vecMaxs);
 
-    Bubbles(vecMins, vecMaxs, 100);
-  } else {
-    new iModelIndex = engfunc(EngFunc_ModelIndex, "sprites/steam1.spr");
+        Bubbles(vecMins, vecMaxs, 100);
+    } else {
+        new iModelIndex = engfunc(EngFunc_ModelIndex, "sprites/steam1.spr");
 
-    new Float:flRadius = (flDamage - 50.0) * 0.80;
-    if (flRadius < 8.0) {
-        flRadius = 9.0;
+        new Float:flRadius = (flDamage - 50.0) * 0.80;
+        if (flRadius < 8.0) {
+                flRadius = 9.0;
+        }
+            
+        engfunc(EngFunc_MessageBegin, MSG_PAS, SVC_TEMPENTITY, vecOrigin, 0);
+        write_byte(TE_SMOKE);
+        engfunc(EngFunc_WriteCoord, vecOrigin[0]);
+        engfunc(EngFunc_WriteCoord, vecOrigin[1]);
+        engfunc(EngFunc_WriteCoord, vecOrigin[2]);
+        write_short(iModelIndex);
+        write_byte(floatround(flRadius)); // scale * 10
+        write_byte(12); // framerate
+        message_end();
     }
-      
-    engfunc(EngFunc_MessageBegin, MSG_PAS, SVC_TEMPENTITY, vecOrigin, 0);
-    write_byte(TE_SMOKE);
-    engfunc(EngFunc_WriteCoord, vecOrigin[0]);
-    engfunc(EngFunc_WriteCoord, vecOrigin[1]);
-    engfunc(EngFunc_WriteCoord, vecOrigin[2]);
-    write_short(iModelIndex);
-    write_byte(floatround(flRadius)); // scale * 10
-    write_byte(12); // framerate
-    message_end();
-  }
 }
 
 Bubbles(const Float:vecMins[3], const Float:vecMaxs[3], iCount) {
-  static Float:vecMid[3];
-  for (new i = 0; i < 3; ++i) {
-    vecMid[i] = (vecMins[i] + vecMaxs[i]) * 0.5;
-  }
+    static Float:vecMid[3];
+    for (new i = 0; i < 3; ++i) {
+        vecMid[i] = (vecMins[i] + vecMaxs[i]) * 0.5;
+    }
 
-  new Float:flHeight = WaterLevel(vecMid, vecMid[2], vecMid[2] + 1024.0) - vecMins[2];
-  new iModelIndex = engfunc(EngFunc_ModelIndex, "sprites/bubble.spr");
+    new Float:flHeight = WaterLevel(vecMid, vecMid[2], vecMid[2] + 1024.0) - vecMins[2];
+    new iModelIndex = engfunc(EngFunc_ModelIndex, "sprites/bubble.spr");
 
-  engfunc(EngFunc_MessageBegin, MSG_PAS, SVC_TEMPENTITY, vecMid, 0);
-  write_byte(TE_BUBBLES);
-  engfunc(EngFunc_WriteCoord, vecMins[0]);
-  engfunc(EngFunc_WriteCoord, vecMins[1]);
-  engfunc(EngFunc_WriteCoord, vecMins[2]);
-  engfunc(EngFunc_WriteCoord, vecMaxs[0]);
-  engfunc(EngFunc_WriteCoord, vecMaxs[1]);
-  engfunc(EngFunc_WriteCoord, vecMaxs[2]);
-  engfunc(EngFunc_WriteCoord, flHeight); // height
-  write_short(iModelIndex);
-  write_byte(iCount); // count
-  write_coord(8); // speed
-  message_end();
+    engfunc(EngFunc_MessageBegin, MSG_PAS, SVC_TEMPENTITY, vecMid, 0);
+    write_byte(TE_BUBBLES);
+    engfunc(EngFunc_WriteCoord, vecMins[0]);
+    engfunc(EngFunc_WriteCoord, vecMins[1]);
+    engfunc(EngFunc_WriteCoord, vecMins[2]);
+    engfunc(EngFunc_WriteCoord, vecMaxs[0]);
+    engfunc(EngFunc_WriteCoord, vecMaxs[1]);
+    engfunc(EngFunc_WriteCoord, vecMaxs[2]);
+    engfunc(EngFunc_WriteCoord, flHeight); // height
+    write_short(iModelIndex);
+    write_byte(iCount); // count
+    write_coord(8); // speed
+    message_end();
 }
 
 DecalTrace(pTr, iDecal) {
-  if (iDecal < 0) {
-    return;
-  }
-
-  new Float:flFraction;
-  get_tr2(pTr, TR_flFraction, flFraction);
-
-  if (flFraction == 1.0) {
-    return;
-  }
-
-  // Only decal BSP models
-  new pHit = get_tr2(pTr, TR_pHit);
-  if (pHit != -1) {
-    if (pHit && !ExecuteHam(Ham_IsBSPModel, pHit)) {
-      return;
+    if (iDecal < 0) {
+        return;
     }
-  } else {
-    pHit = 0;
-  }
 
-  new iMessage = TE_DECAL;
-  if (pHit != 0) {
-    if (iDecal > 255) {
-      iMessage = TE_DECALHIGH;
-      iDecal -= 256;
-    }
-  } else {
-    iMessage = TE_WORLDDECAL;
-    if (iDecal > 255) {
-      iMessage = TE_WORLDDECALHIGH;
-      iDecal -= 256;
-    }
-  }
+    new Float:flFraction;
+    get_tr2(pTr, TR_flFraction, flFraction);
 
-  static Float:vecEndPos[3];
-  get_tr2(pTr, TR_vecEndPos, vecEndPos);
-  
-  engfunc(EngFunc_MessageBegin, MSG_BROADCAST, SVC_TEMPENTITY, vecEndPos, 0);
-  write_byte(iMessage);
-  engfunc(EngFunc_WriteCoord, vecEndPos[0]);
-  engfunc(EngFunc_WriteCoord, vecEndPos[1]);
-  engfunc(EngFunc_WriteCoord, vecEndPos[2]);
-  write_byte(iDecal);
-  if (pHit) {
-    write_short(pHit);
-  }
-  message_end();
+    if (flFraction == 1.0) {
+        return;
+    }
+
+    // Only decal BSP models
+    new pHit = get_tr2(pTr, TR_pHit);
+    if (pHit != -1) {
+        if (pHit && !ExecuteHam(Ham_IsBSPModel, pHit)) {
+            return;
+        }
+    } else {
+        pHit = 0;
+    }
+
+    new iMessage = TE_DECAL;
+    if (pHit != 0) {
+        if (iDecal > 255) {
+            iMessage = TE_DECALHIGH;
+            iDecal -= 256;
+        }
+    } else {
+        iMessage = TE_WORLDDECAL;
+        if (iDecal > 255) {
+            iMessage = TE_WORLDDECALHIGH;
+            iDecal -= 256;
+        }
+    }
+
+    static Float:vecEndPos[3];
+    get_tr2(pTr, TR_vecEndPos, vecEndPos);
+    
+    engfunc(EngFunc_MessageBegin, MSG_BROADCAST, SVC_TEMPENTITY, vecEndPos, 0);
+    write_byte(iMessage);
+    engfunc(EngFunc_WriteCoord, vecEndPos[0]);
+    engfunc(EngFunc_WriteCoord, vecEndPos[1]);
+    engfunc(EngFunc_WriteCoord, vecEndPos[2]);
+    write_byte(iDecal);
+    if (pHit) {
+        write_short(pHit);
+    }
+    message_end();
 }
 
 BulletSmoke(pTr) {
@@ -1981,7 +1975,7 @@ BulletSmoke(pTr) {
 
     static iModelIndex;
     if (!iModelIndex) {
-      iModelIndex = engfunc(EngFunc_ModelIndex, WALL_PUFF_SPRITE);
+        iModelIndex = engfunc(EngFunc_ModelIndex, WALL_PUFF_SPRITE);
     }
 
     engfunc(EngFunc_MessageBegin, MSG_PAS, SVC_TEMPENTITY, vecEnd, 0);
@@ -1997,161 +1991,161 @@ BulletSmoke(pTr) {
 }
 
 MakeDecal(pTr, pEntity, iDecalIndex, bool:bGunshotDecal = true) {
-  static vecOrigin[3];
-  get_tr2(pTr, TR_vecEndPos, vecOrigin);
+    static vecOrigin[3];
+    get_tr2(pTr, TR_vecEndPos, vecOrigin);
 
-  new pHit;
-  get_tr2(pTr, TR_pHit, pHit);
-    
-  if(pHit) {
-    emessage_begin(MSG_BROADCAST, SVC_TEMPENTITY);
-    ewrite_byte(TE_DECAL);
-    engfunc(EngFunc_WriteCoord, vecOrigin[0]);
-    engfunc(EngFunc_WriteCoord, vecOrigin[1]);
-    engfunc(EngFunc_WriteCoord, vecOrigin[2]);
-    ewrite_byte(iDecalIndex);
-    ewrite_short(pHit);
-    emessage_end();
-  } else {
-    emessage_begin(MSG_BROADCAST, SVC_TEMPENTITY);
-    ewrite_byte(TE_WORLDDECAL);
-    engfunc(EngFunc_WriteCoord, vecOrigin[0]);
-    engfunc(EngFunc_WriteCoord, vecOrigin[1]);
-    engfunc(EngFunc_WriteCoord, vecOrigin[2]);
-    ewrite_byte(iDecalIndex);
-    emessage_end();
-  }
+    new pHit;
+    get_tr2(pTr, TR_pHit, pHit);
+        
+    if(pHit) {
+        emessage_begin(MSG_BROADCAST, SVC_TEMPENTITY);
+        ewrite_byte(TE_DECAL);
+        engfunc(EngFunc_WriteCoord, vecOrigin[0]);
+        engfunc(EngFunc_WriteCoord, vecOrigin[1]);
+        engfunc(EngFunc_WriteCoord, vecOrigin[2]);
+        ewrite_byte(iDecalIndex);
+        ewrite_short(pHit);
+        emessage_end();
+    } else {
+        emessage_begin(MSG_BROADCAST, SVC_TEMPENTITY);
+        ewrite_byte(TE_WORLDDECAL);
+        engfunc(EngFunc_WriteCoord, vecOrigin[0]);
+        engfunc(EngFunc_WriteCoord, vecOrigin[1]);
+        engfunc(EngFunc_WriteCoord, vecOrigin[2]);
+        ewrite_byte(iDecalIndex);
+        emessage_end();
+    }
 
-  if (bGunshotDecal) {
-    message_begin(MSG_BROADCAST, SVC_TEMPENTITY);
-    write_byte(TE_GUNSHOTDECAL);
-    engfunc(EngFunc_WriteCoord, vecOrigin[0]);
-    engfunc(EngFunc_WriteCoord, vecOrigin[1]);
-    engfunc(EngFunc_WriteCoord, vecOrigin[2]);
-    write_short(pEntity);
-    write_byte(iDecalIndex);
-    message_end();
-  }
+    if (bGunshotDecal) {
+        message_begin(MSG_BROADCAST, SVC_TEMPENTITY);
+        write_byte(TE_GUNSHOTDECAL);
+        engfunc(EngFunc_WriteCoord, vecOrigin[0]);
+        engfunc(EngFunc_WriteCoord, vecOrigin[1]);
+        engfunc(EngFunc_WriteCoord, vecOrigin[2]);
+        write_short(pEntity);
+        write_byte(iDecalIndex);
+        message_end();
+    }
 }
 
 BubbleTrail(const Float:from[3], const Float:to[3], count) {
-  new Float:flHeight = WaterLevel(from, from[2], from[2] + 256);
-  flHeight = flHeight - from[2];
+    new Float:flHeight = WaterLevel(from, from[2], from[2] + 256);
+    flHeight = flHeight - from[2];
 
-  if (flHeight < 8) {
-    flHeight = WaterLevel(to, to[2], to[2] + 256.0);
-    flHeight = flHeight - to[2];
     if (flHeight < 8) {
-      return;
+        flHeight = WaterLevel(to, to[2], to[2] + 256.0);
+        flHeight = flHeight - to[2];
+        if (flHeight < 8) {
+            return;
+        }
+
+        // UNDONE: do a ploink sound
+        flHeight = flHeight + to[2] - from[2];
     }
 
-    // UNDONE: do a ploink sound
-    flHeight = flHeight + to[2] - from[2];
-  }
+    if (count > 255) {
+        count = 255;
+    }
 
-  if (count > 255) {
-    count = 255;
-  }
+    static g_sModelIndexBubbles;
+    if (!g_sModelIndexBubbles) {
+        g_sModelIndexBubbles = engfunc(EngFunc_ModelIndex, "sprites/bubble.spr");
+    }
 
-  static g_sModelIndexBubbles;
-  if (!g_sModelIndexBubbles) {
-    g_sModelIndexBubbles = engfunc(EngFunc_ModelIndex, "sprites/bubble.spr");
-  }
-
-  engfunc(EngFunc_MessageBegin, MSG_BROADCAST, SVC_TEMPENTITY, from, 0);
-  write_byte(TE_BUBBLETRAIL);
-  engfunc(EngFunc_WriteCoord, from[0]);
-  engfunc(EngFunc_WriteCoord, from[1]);
-  engfunc(EngFunc_WriteCoord, from[2]);
-  engfunc(EngFunc_WriteCoord, to[0]);
-  engfunc(EngFunc_WriteCoord, to[1]);
-  engfunc(EngFunc_WriteCoord, to[2]);
-  engfunc(EngFunc_WriteCoord, flHeight);
-  write_short(g_sModelIndexBubbles);
-  write_byte(count);
-  write_coord(8);
-  message_end();
+    engfunc(EngFunc_MessageBegin, MSG_BROADCAST, SVC_TEMPENTITY, from, 0);
+    write_byte(TE_BUBBLETRAIL);
+    engfunc(EngFunc_WriteCoord, from[0]);
+    engfunc(EngFunc_WriteCoord, from[1]);
+    engfunc(EngFunc_WriteCoord, from[2]);
+    engfunc(EngFunc_WriteCoord, to[0]);
+    engfunc(EngFunc_WriteCoord, to[1]);
+    engfunc(EngFunc_WriteCoord, to[2]);
+    engfunc(EngFunc_WriteCoord, flHeight);
+    write_short(g_sModelIndexBubbles);
+    write_byte(count);
+    write_coord(8);
+    message_end();
 }
 
 ExplosionDecalTrace(pTr) {
     switch (random(3)) {
         case 0: {
-          DecalTrace(pTr, engfunc(EngFunc_DecalIndex, "{scorch1"));
+            DecalTrace(pTr, engfunc(EngFunc_DecalIndex, "{scorch1"));
         }
         case 1: {
-          DecalTrace(pTr, engfunc(EngFunc_DecalIndex, "{scorch2"));
+            DecalTrace(pTr, engfunc(EngFunc_DecalIndex, "{scorch2"));
         }
         case 2: {
-          DecalTrace(pTr, engfunc(EngFunc_DecalIndex, "{scorch3"));
+            DecalTrace(pTr, engfunc(EngFunc_DecalIndex, "{scorch3"));
         }
     }
 }
 
 DebrisSound(pEntity) {
-  switch (random(3)) {
-      case 0: {
-        emit_sound(pEntity, CHAN_VOICE, "weapons/debris1.wav", 0.55, ATTN_NORM, 0, PITCH_NORM);
-      }
-      case 1: {
-        emit_sound(pEntity, CHAN_VOICE, "weapons/debris2.wav", 0.55, ATTN_NORM, 0, PITCH_NORM);
-      }
-      case 2: {
-        emit_sound(pEntity, CHAN_VOICE, "weapons/debris3.wav", 0.55, ATTN_NORM, 0, PITCH_NORM);
-      }
-  }
+    switch (random(3)) {
+        case 0: {
+            emit_sound(pEntity, CHAN_VOICE, "weapons/debris1.wav", 0.55, ATTN_NORM, 0, PITCH_NORM);
+        }
+        case 1: {
+            emit_sound(pEntity, CHAN_VOICE, "weapons/debris2.wav", 0.55, ATTN_NORM, 0, PITCH_NORM);
+        }
+        case 2: {
+            emit_sound(pEntity, CHAN_VOICE, "weapons/debris3.wav", 0.55, ATTN_NORM, 0, PITCH_NORM);
+        }
+    }
 }
 
 bool:EjectWeaponBrass(this, iModelIndex, iSoundType) {
-  new pPlayer = GetPlayer(this);
+    new pPlayer = GetPlayer(this);
 
-  if (!iModelIndex) {
-    return false;
-  }
-  
-  static Float:vecViewOfs[3];
-  pev(pPlayer, pev_view_ofs, vecViewOfs);
+    if (!iModelIndex) {
+        return false;
+    }
+    
+    static Float:vecViewOfs[3];
+    pev(pPlayer, pev_view_ofs, vecViewOfs);
 
-  static Float:vecAngles[3];
-  pev(pPlayer, pev_angles, vecAngles);
+    static Float:vecAngles[3];
+    pev(pPlayer, pev_angles, vecAngles);
 
-  static Float:vecUp[3];
-  angle_vector(vecAngles, ANGLEVECTOR_UP, vecUp);
+    static Float:vecUp[3];
+    angle_vector(vecAngles, ANGLEVECTOR_UP, vecUp);
 
-  static Float:vecForward[3];
-  angle_vector(vecAngles, ANGLEVECTOR_FORWARD, vecForward);
-  
-  static Float:vecRight[3];
-  angle_vector(vecAngles, ANGLEVECTOR_RIGHT, vecRight);
-  
-  static Float:vecOrigin[3];
-  pev(pPlayer, pev_origin, vecOrigin);
+    static Float:vecForward[3];
+    angle_vector(vecAngles, ANGLEVECTOR_FORWARD, vecForward);
+    
+    static Float:vecRight[3];
+    angle_vector(vecAngles, ANGLEVECTOR_RIGHT, vecRight);
+    
+    static Float:vecOrigin[3];
+    pev(pPlayer, pev_origin, vecOrigin);
 
-  for (new i = 0; i < 3; ++i) {
-    vecOrigin[i] = vecOrigin[i] + vecViewOfs[i] + (vecUp[i]  * -9.0) + (vecForward[i] * 16.0);
-  }
+    for (new i = 0; i < 3; ++i) {
+        vecOrigin[i] = vecOrigin[i] + vecViewOfs[i] + (vecUp[i]    * -9.0) + (vecForward[i] * 16.0);
+    }
 
-  static Float:vecVelocity[3];
-  pev(pPlayer, pev_velocity, vecVelocity);
+    static Float:vecVelocity[3];
+    pev(pPlayer, pev_velocity, vecVelocity);
 
-  for (new i = 0; i < 3; ++i) {
-    vecVelocity[i] = vecVelocity[i] + (vecRight[i] * random_float(50.0, 70.0)) + (vecUp[i] * random_float(100.0, 150.0)) + (vecForward[i] * 25.0);
-  }
+    for (new i = 0; i < 3; ++i) {
+        vecVelocity[i] = vecVelocity[i] + (vecRight[i] * random_float(50.0, 70.0)) + (vecUp[i] * random_float(100.0, 150.0)) + (vecForward[i] * 25.0);
+    }
 
-  engfunc(EngFunc_MessageBegin, MSG_PVS, SVC_TEMPENTITY, vecOrigin, 0);
-  write_byte(TE_MODEL);
-  engfunc(EngFunc_WriteCoord, vecOrigin[0]);
-  engfunc(EngFunc_WriteCoord, vecOrigin[1]);
-  engfunc(EngFunc_WriteCoord, vecOrigin[2]);
-  engfunc(EngFunc_WriteCoord, vecVelocity[0]);
-  engfunc(EngFunc_WriteCoord, vecVelocity[1]);
-  engfunc(EngFunc_WriteCoord, vecVelocity[2]);
-  write_angle(floatround(vecAngles[1]));
-  write_short(iModelIndex);
-  write_byte(iSoundType);
-  write_byte(25);
-  message_end();
+    engfunc(EngFunc_MessageBegin, MSG_PVS, SVC_TEMPENTITY, vecOrigin, 0);
+    write_byte(TE_MODEL);
+    engfunc(EngFunc_WriteCoord, vecOrigin[0]);
+    engfunc(EngFunc_WriteCoord, vecOrigin[1]);
+    engfunc(EngFunc_WriteCoord, vecOrigin[2]);
+    engfunc(EngFunc_WriteCoord, vecVelocity[0]);
+    engfunc(EngFunc_WriteCoord, vecVelocity[1]);
+    engfunc(EngFunc_WriteCoord, vecVelocity[2]);
+    write_angle(floatround(vecAngles[1]));
+    write_short(iModelIndex);
+    write_byte(iSoundType);
+    write_byte(25);
+    message_end();
 
-  return true;
+    return true;
 }
 
 // ANCHOR: Random
@@ -2176,94 +2170,67 @@ new const seed_table[256] = {
 };
 
 Float:SharedRandomFloat(seed, Float:low, Float:high) {
-  new Float:range = high - low;
-  if (!range) {
-    return low;
-  }
+    new Float:range = high - low;
+    if (!range) {
+        return low;
+    }
 
-  new glSeed = U_Srand(seed + floatround(low) + floatround(high));
-  U_Random(glSeed);
-  U_Random(glSeed);
+    new glSeed = U_Srand(seed + floatround(low) + floatround(high));
+    U_Random(glSeed);
+    U_Random(glSeed);
 
-  new tensixrand = U_Random(glSeed) & 65535;
-  new Float:offset = float(tensixrand) / 65536.0;
+    new tensixrand = U_Random(glSeed) & 65535;
+    new Float:offset = float(tensixrand) / 65536.0;
 
-  return (low + offset * range );
+    return (low + offset * range );
 }
 
-U_Random(&glSeed)  {
-  glSeed *= 69069; 
-  glSeed += seed_table[glSeed & 0xff];
+U_Random(&glSeed)    {
+    glSeed *= 69069; 
+    glSeed += seed_table[glSeed & 0xff];
 
-  return (++glSeed & 0x0fffffff);
+    return (++glSeed & 0x0fffffff);
 }
 
 U_Srand(seed) {
-  return seed_table[seed & 0xff];
+    return seed_table[seed & 0xff];
 }
 
 // FireEvent(tr, const szSnd[], const szShellModel[]) {
-//   static Float:flFraction;
-//   get_tr2(tr, TR_flFraction, flFraction);
+//     static Float:flFraction;
+//     get_tr2(tr, TR_flFraction, flFraction);
 
-//   new pHit = get_tr2(tr, TR_pHit);
+//     new pHit = get_tr2(tr, TR_pHit);
 
-//   if (flFraction != 1.0) {
-//       // Native_PlaySoundAtPosition( $origin = $trace_endpos, $sound = weapons/bullet_hit1.wav );
+//     if (flFraction != 1.0) {
+//             // Native_PlaySoundAtPosition( $origin = $trace_endpos, $sound = weapons/bullet_hit1.wav );
 // 			// Native_ImpactParticles( $origin = $trace_endpos );
 // 			// Native_PlaceDecal( $origin = $trace_endpos, $decal = "{shot2", $trace_entity );
 
-//       new iDecalIndex = random_num(get_decal_index("{shot1"), get_decal_index("{shot5") + 1);
-//       MakeDecal(tr, pHit, iDecalIndex);
-//   }
+//             new iDecalIndex = random_num(get_decal_index("{shot1"), get_decal_index("{shot5") + 1);
+//             MakeDecal(tr, pHit, iDecalIndex);
+//     }
 // }
 
 // BeamPoints(const Float:vecStart[3], const Float:vecEnd[3], const color[3]) {
-//     message_begin(MSG_BROADCAST ,SVC_TEMPENTITY);
-//     write_byte(TE_BEAMPOINTS);
-//     write_coord(floatround(vecStart[0]));	// start position
-//     write_coord(floatround(vecStart[1]));
-//     write_coord(floatround(vecStart[2]));
-//     write_coord(floatround(vecEnd[0]));	// end position
-//     write_coord(floatround(vecEnd[1]));
-//     write_coord(floatround(vecEnd[2]));
-//     write_short(engfunc(EngFunc_ModelIndex, "sprites/laserbeam.spr"));	// sprite index
-//     write_byte(0);	// starting frame
-//     write_byte(10);	// frame rate in 0.1's
-//     write_byte(30);	// life in 0.1's
-//     write_byte(2);	// line width in 0.1's
-//     write_byte(1);	// noise amplitude in 0.01's
-//     write_byte(color[0]);	// Red
-//     write_byte(color[1]);	// Green
-//     write_byte(color[2]);	// Blue
-//     write_byte(127);	// brightness
-//     write_byte(10);	// scroll speed in 0.1's
-//     message_end();
-// }
-
-// GunshotDecalTrace(pTrace, iDecalIndex) {
-//   if (iDecalIndex < 0) {
-//     return;
-//   }
-
-//   static Float:vecEndPos[3];
-//   get_tr2(pTrace, TR_vecEndPos, vecEndPos);
-
-//   new Float:flFraction;
-//   get_tr2(pTrace, TR_flFraction, flFraction);
-
-//   if (flFraction == 1.0) {
-// 		return;
-//   }
-
-//   new pHit = get_tr2(pTrace, TR_pHit);
-
-//   engfunc(EngFunc_MessageBegin, MSG_PAS, SVC_TEMPENTITY, vecEndPos, 0);
-//   write_byte(TE_GUNSHOTDECAL);
-//   engfunc(EngFunc_WriteCoord, vecEndPos[0]);
-//   engfunc(EngFunc_WriteCoord, vecEndPos[1]);
-//   engfunc(EngFunc_WriteCoord, vecEndPos[2]);
-//   write_short(pHit);
-//   write_byte(iDecalIndex);
-//   message_end();
+//         message_begin(MSG_BROADCAST ,SVC_TEMPENTITY);
+//         write_byte(TE_BEAMPOINTS);
+//         write_coord(floatround(vecStart[0]));	// start position
+//         write_coord(floatround(vecStart[1]));
+//         write_coord(floatround(vecStart[2]));
+//         write_coord(floatround(vecEnd[0]));	// end position
+//         write_coord(floatround(vecEnd[1]));
+//         write_coord(floatround(vecEnd[2]));
+//         write_short(engfunc(EngFunc_ModelIndex, "sprites/laserbeam.spr"));	// sprite index
+//         write_byte(0);	// starting frame
+//         write_byte(10);	// frame rate in 0.1's
+//         write_byte(30);	// life in 0.1's
+//         write_byte(2);	// line width in 0.1's
+//         write_byte(1);	// noise amplitude in 0.01's
+//         write_byte(color[0]);	// Red
+//         write_byte(color[1]);	// Green
+//         write_byte(color[2]);	// Blue
+//         write_byte(127);	// brightness
+//         write_byte(10);	// scroll speed in 0.1's
+//         message_end();
 // }

@@ -11,7 +11,7 @@
 #define PLUGIN "[Zombie Panic] Player Speed"
 #define AUTHOR "Hedgehog Fog"
 
-new const Float:g_fWeaponWeight[CSW_P90 + 1] = {
+new const Float:g_pFweaponWeight[CSW_LAST_WEAPON + 1] = {
     1.0, // weapon_p228
     0.0, // weapon_shield
     2.2, // weapon_scout
@@ -88,16 +88,19 @@ public Native_UpdateSpeed(iPluginId, iArgc) {
 
 public OnClCmd_Drop(pPlayer) {
     UpdatePlayerSpeed(pPlayer);
+
     return PLUGIN_CONTINUE;
 }
 
 public OnPlayerAddItem_Post(pPlayer) {
     UpdatePlayerSpeed(pPlayer);
+
     return HAM_HANDLED;
 }
 
 public OnMessage_AmmoPickup(iMsgId, iMsgDest, pPlayer) {
     UpdatePlayerSpeed(pPlayer);
+
     return PLUGIN_CONTINUE;
 }
 
@@ -107,6 +110,7 @@ public OnPlayerItemPreFrame_Post(pPlayer) {
     g_fPlayerMaxSpeed[pPlayer] = flMaxSpeed;
 
     UpdatePlayerSpeed(pPlayer);
+
     return HAM_HANDLED;
 }
 
@@ -178,7 +182,7 @@ Float:CalculatePlayerWeaponsWeight(pPlayer) {
         while (pItem != -1) {
             if (pItem != pActiveItem) {
                 new iWeaponId = get_member(pItem, m_iId);
-                flWeight += g_fWeaponWeight[iWeaponId];
+                flWeight += g_pFweaponWeight[iWeaponId];
             }
 
             new iAmmoId = get_member(pItem, m_Weapon_iPrimaryAmmoType);
@@ -197,7 +201,8 @@ Float:CalculatePlayerWeaponsWeight(pPlayer) {
 Float:CalculatePlayerAmmoWeight(pPlayer) {
     new Float:flWeight = 0.0;
 
-    for (new iAmmoId = 0; iAmmoId < sizeof(g_fAmmoWeight); ++iAmmoId) {
+    new iSize = sizeof(g_fAmmoWeight);
+    for (new iAmmoId = 0; iAmmoId < iSize; ++iAmmoId) {
         new iBpAmmo = get_member(pPlayer, m_rgAmmo, iAmmoId);
         flWeight += iBpAmmo * g_fAmmoWeight[iAmmoId];
     }

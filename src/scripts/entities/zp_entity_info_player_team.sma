@@ -25,15 +25,10 @@ public plugin_init() {
 }
 
 public plugin_precache() {
-    CE_Register(
-        .szName = ENTITY_NAME_1
-    );
-
-    CE_Register(
-        .szName = ENTITY_NAME_2
-    );
-
+    CE_Register(ENTITY_NAME_1);
     CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME_1, "OnInfoPlayerTeamSpawn");
+
+    CE_Register(ENTITY_NAME_2);
     CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME_2, "OnInfoPlayerTeamSpawn");
 
     g_iszInfoPlayerStart = engfunc(EngFunc_AllocString, "info_player_start");

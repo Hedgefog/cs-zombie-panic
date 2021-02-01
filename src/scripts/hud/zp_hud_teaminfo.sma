@@ -43,7 +43,7 @@ public OnMessage(iMsgId, iDest, pPlayer) {
 }
 
 public OnEvent() {
-    new iTargetPlayer = read_data(1);
+    new pTargetPlayer = read_data(1);
 
     static szTeam[16];
     read_data(2, szTeam, charsmax(szTeam));
@@ -54,25 +54,25 @@ public OnEvent() {
         }
 
         new iTeam = get_member(pPlayer, m_iTeam);
-        SendMessage(pPlayer, iTargetPlayer, ZP_Player_IsZombie(pPlayer) || is_user_bot(pPlayer) ? szTeam : g_rgszTeams[iTeam]);
+        SendMessage(pPlayer, pTargetPlayer, ZP_Player_IsZombie(pPlayer) || is_user_bot(pPlayer) ? szTeam : g_rgszTeams[iTeam]);
     }
 }
 
 Reset(pPlayer) {
-    for (new iTargetPlayer = 1; iTargetPlayer <= MaxClients; ++iTargetPlayer) {
-        if (!is_user_connected(iTargetPlayer)) {
+    for (new pTargetPlayer = 1; pTargetPlayer <= MaxClients; ++pTargetPlayer) {
+        if (!is_user_connected(pTargetPlayer)) {
             continue;
         }
 
         static szTeam[16];
-        get_user_team(iTargetPlayer, szTeam, charsmax(szTeam));
-        SendMessage(pPlayer, iTargetPlayer, szTeam);
+        get_user_team(pTargetPlayer, szTeam, charsmax(szTeam));
+        SendMessage(pPlayer, pTargetPlayer, szTeam);
     }
 }
 
-SendMessage(pPlayer, iTargetPlayer, const szTeam[]) {
+SendMessage(pPlayer, pTargetPlayer, const szTeam[]) {
     emessage_begin(MSG_ONE, gmsgTeamInfo, _, pPlayer);
-    ewrite_byte(iTargetPlayer);
+    ewrite_byte(pTargetPlayer);
     ewrite_string(szTeam);
     emessage_end();
 }

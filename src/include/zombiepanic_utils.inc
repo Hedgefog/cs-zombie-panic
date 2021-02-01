@@ -4,6 +4,34 @@
 // #define ITEM_FLAG_LIMITINWORLD      8
 // #define ITEM_FLAG_EXHAUSTIBLE       16 // A player can totally exhaust their ammo supply and lose this weapon
 
+stock const AMMO_LIST[15][] = {
+    "",
+    "338Magnum", 
+    "762Nato",
+    "556NatoBox", 
+    "556Nato",
+    "buckshot", 
+    "45ACP", 
+    "57mm", 
+    "50AE", 
+    "357SIG",
+    "9mm", 
+    "Flashbang",
+    "HEGrenade", 
+    "SmokeGrenade", 
+    "C4"
+};
+
+stock const ITEMS_LIST[][] = {
+    "armoury_entity",
+    "item_battery",
+    "item_healthkit",
+    "armoury_entity",
+    "weaponbox",
+    "weapon_shield",
+    "grenade"
+};
+
 stock bool:UTIL_IsPlayer(pEntity) {
     static c_iMaxPlayers;
     if (!c_iMaxPlayers) {
@@ -36,37 +64,20 @@ stock UTIL_Message_Dlight(
 
 stock UTIL_CreateAmmoBox(iAmmoId, iAmount) {
     static iszWeaponbox = 0;
-    static const szAmmoList[15][] = {
-        "",
-        "338Magnum", 
-        "762Nato",
-        "556NatoBox", 
-        "556Nato",
-        "buckshot", 
-        "45ACP", 
-        "57mm", 
-        "50AE", 
-        "357SIG",
-        "9mm", 
-        "Flashbang",
-        "HEGrenade", 
-        "SmokeGrenade", 
-        "C4"
-    };
 
     if (!iszWeaponbox) {
         iszWeaponbox = engfunc(EngFunc_AllocString, "weaponbox");
     }
 
 
-    new iWeaponBox = engfunc(EngFunc_CreateNamedEntity, iszWeaponbox);
-    dllfunc(DLLFunc_Spawn, iWeaponBox);
+    new pWeaponBox = engfunc(EngFunc_CreateNamedEntity, iszWeaponbox);
+    dllfunc(DLLFunc_Spawn, pWeaponBox);
 
-    set_member(iWeaponBox, m_WeaponBox_rgiszAmmo, szAmmoList[iAmmoId], 0);
-    set_member(iWeaponBox, m_WeaponBox_rgAmmo, iAmount, 0);
-    set_member(iWeaponBox, m_WeaponBox_cAmmoTypes, 1);
+    set_member(pWeaponBox, m_WeaponBox_rgiszAmmo, AMMO_LIST[iAmmoId], 0);
+    set_member(pWeaponBox, m_WeaponBox_rgAmmo, iAmount, 0);
+    set_member(pWeaponBox, m_WeaponBox_cAmmoTypes, 1);
 
-    return iWeaponBox;
+    return pWeaponBox;
 }
 
 stock UTIL_BeamPoints(const Float:vecStart[3], const Float:vecEnd[3], const color[3], iLifetime = 30) {
