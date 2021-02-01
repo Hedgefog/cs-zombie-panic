@@ -88,7 +88,7 @@ public client_disconnected(pPlayer) {
 
 public Round_Fw_NewRound() {
     for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
-        if (!is_user_connected(pPlayer)) {
+        if (!is_user_connected(pPlayer) || is_user_hltv(pPlayer)) {
             continue;
         }
 
@@ -206,7 +206,7 @@ public OnCheckWinConditions() {
 
 DistributeTeams() {
     for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
-        if (!is_user_connected(pPlayer)) {
+        if (!is_user_connected(pPlayer) || is_user_hltv(pPlayer)) {
             continue;
         }
 
@@ -400,6 +400,10 @@ DispatchWin(iTeam) {
 /*--------------------------------[ Tasks ]--------------------------------*/
 
 public TaskJoin(pPlayer) {
+    if (!is_user_connected(pPlayer) || is_user_hltv(pPlayer)) {
+        return;
+    }
+
     set_member(pPlayer, m_bTeamChanged, get_member(pPlayer, m_bTeamChanged) & ~BIT(8));
     set_member(pPlayer, m_iTeam, 2);
     set_member(pPlayer, m_iJoiningState, 5);
