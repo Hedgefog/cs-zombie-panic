@@ -103,9 +103,9 @@ public OnPlayerPreThink_Post(pPlayer) {
 
     new iButtons = pev(pPlayer, pev_button);
     new iOldButtons = pev(pPlayer, pev_oldbuttons);
-    new iSpeedButtons = IN_DUCK | IN_BACK;
+    new iSpeedButtons = IN_DUCK | IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT;
 
-    if (iButtons & IN_BACK) {
+    if (iButtons & IN_BACK || ((iButtons & IN_MOVELEFT || iButtons & IN_MOVERIGHT) && ~iButtons & IN_FORWARD)) {
         g_flPlayerBaseSpeed[pPlayer] *= 0.5;
     }
 
