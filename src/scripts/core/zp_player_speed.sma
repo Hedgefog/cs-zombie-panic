@@ -62,15 +62,15 @@ new const Float:g_fAmmoWeight[] = {
     0.8 // "C4"
 };
 
-new Float:g_fPlayerMaxSpeed[MAX_PLAYERS + 1];
-new bool:g_bPlayerDuck[MAX_PLAYERS + 1];
+new Float:g_flPlayerBaseSpeed[MAX_PLAYERS + 1];
+new Float:g_flPlayerMaxSpeed[MAX_PLAYERS + 1];
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
     RegisterHam(Ham_Item_PreFrame, "player", "OnPlayerItemPreFrame_Post", .Post = 1);
     RegisterHam(Ham_AddPlayerItem, "player", "OnPlayerAddItem_Post", .Post = 1);
-    register_forward(FM_CmdStart, "OnCmdStart");
+    RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
 
     register_message(get_user_msgid("AmmoPickup"), "OnMessage_AmmoPickup");
 
@@ -98,6 +98,28 @@ public OnPlayerAddItem_Post(pPlayer) {
     return HAM_HANDLED;
 }
 
+public OnPlayerPreThink_Post(pPlayer) {
+    g_flPlayerBaseSpeed[pPlayer] = ZP_Player_IsZombie(pPlayer) ? ZP_ZOMBIE_SPEED : ZP_HUMAN_SPEED;
+
+    new iButtons = pev(pPlayer, pev_button);
+    new iOldButtons = pev(pPlayer, pev_oldbuttons);
+    new iSpeedButtons = IN_DUCK | IN_BACK;
+
+    if (iButtons & IN_BACK) {
+        g_flPlayerBaseSpeed[pPlayer] *= 0.5;
+    }
+
+    if (iButtons & IN_DUCK && pev(pPlayer, pev_flags) & FL_DUCKING) {
+        g_flPlayerBaseSpeed[pPlayer] *= 1.125;
+    }
+
+    if ((iButtons & iSpeedButtons) != (iOldButtons & iSpeedButtons)) {
+        UpdatePlayerSpeed(pPlayer);
+    }
+
+    return HAM_HANDLED;
+}
+
 public OnMessage_AmmoPickup(iMsgId, iMsgDest, pPlayer) {
     UpdatePlayerSpeed(pPlayer);
 
@@ -107,20 +129,11 @@ public OnMessage_AmmoPickup(iMsgId, iMsgDest, pPlayer) {
 public OnPlayerItemPreFrame_Post(pPlayer) {
     static Float:flMaxSpeed;
     pev(pPlayer, pev_maxspeed, flMaxSpeed);
-    g_fPlayerMaxSpeed[pPlayer] = flMaxSpeed;
+    g_flPlayerMaxSpeed[pPlayer] = flMaxSpeed;
 
     UpdatePlayerSpeed(pPlayer);
 
     return HAM_HANDLED;
-}
-
-public OnCmdStart(pPlayer, pHandle) {
-    new bool:bDuck = !!(pev(pPlayer, pev_flags) & FL_DUCKING) || !!(get_uc(pHandle, UC_Buttons) & IN_DUCK);
-
-    if (bDuck != g_bPlayerDuck[pPlayer]) {
-        g_bPlayerDuck[pPlayer] = bDuck;
-        UpdatePlayerSpeed(pPlayer);
-    }
 }
 
 public TaskUpdatePlayerSpeed(iTaskId) {
@@ -143,20 +156,18 @@ bool:UpdatePlayerSpeed(pPlayer) {
     return true;
 }
 
-Float:GetPlayerBaseSpeed(pPlayer) {
-    return ZP_Player_IsZombie(pPlayer) ? ZP_ZOMBIE_SPEED : ZP_HUMAN_SPEED;
-}
-
 Float:CalculatePlayerMaxSpeed(pPlayer) {
+    new Float:flBaseSpeed = g_flPlayerBaseSpeed[pPlayer];
+    new Float:flWeight = CalculatePlayerInventoryWeight(pPlayer);
+    new Float:flMaxSpeed = floatmin(flBaseSpeed, g_flPlayerMaxSpeed[pPlayer]);
+
     if (ZP_Player_InPanic(pPlayer)) {
-        return ZP_HUMAN_SPEED * 1.125;
+        flMaxSpeed *= 1.125;
+    } else {
+        flMaxSpeed -= flWeight;
     }
 
-    new Float:flWeight = CalculatePlayerInventoryWeight(pPlayer);
-    new Float:flBaseSpeed = GetPlayerBaseSpeed(pPlayer);
-    new Float:flMaxSpeed = floatmin(flBaseSpeed, g_fPlayerMaxSpeed[pPlayer]);
-
-    return (flMaxSpeed * (g_bPlayerDuck[pPlayer] ? 1.125 : 1.0)) - flWeight;
+    return flMaxSpeed;
 }
 
 Float:CalculatePlayerInventoryWeight(pPlayer) {
