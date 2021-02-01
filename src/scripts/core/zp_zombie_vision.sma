@@ -167,6 +167,10 @@ bool:Toggle(pPlayer) {
 }
 
 SetZombieVision(pPlayer, bool:bValue) {
+    if (bValue == g_bPlayerVision[pPlayer]) {
+        return;
+    }
+    
     if (bValue) {
         if (!ZP_Player_IsZombie(pPlayer)) {
             return;
