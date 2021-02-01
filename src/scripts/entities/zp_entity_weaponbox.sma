@@ -16,8 +16,12 @@
 
 #define MAX_AMMO_SLOTS 32
 
+new gmsgAmmoPickup;
+
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+
+    gmsgAmmoPickup = get_user_msgid("AmmoPickup");
 
     RegisterHam(Ham_Touch, "weaponbox", "OnWeaponBoxTouch", .Post = 0);
 }
@@ -175,7 +179,7 @@ AddAmmo(pPlayer, iAmmoHandler, iAmount) {
     iAmount = ZP_Player_AddAmmo(pPlayer, szAmmo, iAmount);
 
     if (iAmount) {
-        emessage_begin(MSG_ONE, get_user_msgid("AmmoPickup"), _, pPlayer);
+        emessage_begin(MSG_ONE, gmsgAmmoPickup, _, pPlayer);
         ewrite_byte(iAmmoId);
         ewrite_byte(iAmount);
         emessage_end();
