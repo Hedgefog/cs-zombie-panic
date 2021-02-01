@@ -438,7 +438,7 @@ public TeamMenuHandler(pPlayer, iMenu, iItem) {
         case 1: {
             g_iPlayerTeamPreference[pPlayer] = TeamPreference_Zombie;
         }
-        case 4: {
+        case 5: {
             g_iPlayerTeamPreference[pPlayer] = TeamPreference_Spectator;
             set_member(pPlayer, m_iTeam, 3);
 
@@ -464,7 +464,7 @@ public TeamMenuHandler(pPlayer, iMenu, iItem) {
                     }
                 }
             }
-            case 4: {
+            case 5: {
                 CheckWinConditions();
             }
         }
