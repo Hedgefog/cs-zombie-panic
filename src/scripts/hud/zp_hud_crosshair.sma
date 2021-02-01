@@ -32,9 +32,9 @@ public OnMessage_HideWeapon(iMsgId, iMsgDest, pPlayer) {
 }
 
 public OnEvent_CurWeapon(pPlayer) {
-    message_begin(MSG_ONE, gmsgHideWeapon, _, pPlayer);
-    write_byte(g_iPlayerHideWeapon[pPlayer] | HIDEHUD_CROSSHAIR | BIT(7));
-    message_end();
+    emessage_begin(MSG_ONE, gmsgHideWeapon, _, pPlayer);
+    ewrite_byte(g_iPlayerHideWeapon[pPlayer] | HIDEHUD_CROSSHAIR | BIT(7));
+    emessage_end();
 
     message_begin(MSG_ONE, gmsgSetFOV, _, pPlayer);
     write_byte(89);
