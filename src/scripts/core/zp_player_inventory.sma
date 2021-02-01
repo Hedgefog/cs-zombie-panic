@@ -151,29 +151,28 @@ TakePlayerItem(pPlayer, pItemToDrop, &_iSlot = 0) {
     for (new iSlot = 0; iSlot < 6; ++iSlot) {
         new pItem = get_member(pPlayer, m_rgpPlayerItems, iSlot);
 
-        new iPrevItem = -1;
+        new pPrevItem = -1;
         while (pItem != -1) {
-            new iNextItem = get_member(pItem, m_pNext);
+            new pNextItem = get_member(pItem, m_pNext);
 
             if (pItem == pItemToDrop) {
-                if (iPrevItem == -1) {
-                    set_member(pPlayer, m_rgpPlayerItems, iNextItem, iSlot);
+                if (pPrevItem == -1) {
+                    set_member(pPlayer, m_rgpPlayerItems, pNextItem, iSlot);
                 } else {
-                    set_member(iPrevItem, m_pNext, iNextItem);
+                    set_member(pPrevItem, m_pNext, pNextItem);
                 }
 
                 set_member(pItem, m_pNext, -1);
                 set_member(pItem, m_pPlayer, -1);
                 _iSlot = iSlot;
+                ZP_Player_UpdateSpeed(pPlayer);
                 return pItem;
             }
 
-            iPrevItem = pItem;
-            pItem = iNextItem;
+            pPrevItem = pItem;
+            pItem = pNextItem;
         }
     }
-
-    ZP_Player_UpdateSpeed(pPlayer);
 
     return -1;
 }
@@ -219,6 +218,8 @@ DropPlayerItems(pPlayer) {
             pItem = iNextItem;
         }
     }
+
+    set_member(pPlayer, m_pLastItem, -1);
 
     ZP_Player_UpdateSpeed(pPlayer);
 }
