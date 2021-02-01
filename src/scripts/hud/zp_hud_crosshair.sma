@@ -28,10 +28,18 @@ public plugin_init() {
 }
 
 public OnMessage_HideWeapon(iMsgId, iMsgDest, pPlayer) {
+    if (is_user_bot(pPlayer)) {
+        return;
+    }
+
     g_iPlayerHideWeapon[pPlayer] = get_msg_arg_int(1);
 }
 
 public OnEvent_CurWeapon(pPlayer) {
+    if (is_user_bot(pPlayer)) {
+        return;
+    }
+
     emessage_begin(MSG_ONE, gmsgHideWeapon, _, pPlayer);
     ewrite_byte(g_iPlayerHideWeapon[pPlayer] | HIDEHUD_CROSSHAIR | BIT(7));
     emessage_end();
