@@ -99,8 +99,8 @@ bool:PickupWeaponBoxItems(pPlayer, pWeaponBox) {
                     // }
                 }
             } else {
-                if(ExecuteHam(Ham_AddPlayerItem, pPlayer, pItem)) {
-                    ExecuteHam(Ham_Item_AttachToPlayer, pItem, pPlayer); // add item to the player
+                if (ExecuteHamB(Ham_AddPlayerItem, pPlayer, pItem)) {
+                    ExecuteHamB(Ham_Item_AttachToPlayer, pItem, pPlayer); // add item to the player
                     emit_sound(pPlayer, CHAN_ITEM, "items/gunpickup2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
                 }
             }
