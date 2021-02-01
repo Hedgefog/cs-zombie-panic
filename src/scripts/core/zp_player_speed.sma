@@ -11,6 +11,8 @@
 #define PLUGIN "[Zombie Panic] Player Speed"
 #define AUTHOR "Hedgehog Fog"
 
+#define SPEED_BUTTONS (IN_DUCK | IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT)
+
 new const Float:g_pFweaponWeight[CSW_LAST_WEAPON + 1] = {
     ZP_WEIGHT_PISTOL, // weapon_p228
     0.0, // weapon_shield
@@ -62,15 +64,17 @@ new const Float:g_fAmmoWeight[] = {
     ZP_WEIGHT_GRENADE // "C4"
 };
 
-new Float:g_flPlayerBaseSpeed[MAX_PLAYERS + 1];
 new Float:g_flPlayerMaxSpeed[MAX_PLAYERS + 1];
+new bool:g_bPlayerDucking[MAX_PLAYERS + 1];
+new bool:g_bPlayerStrafing[MAX_PLAYERS + 1];
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
     RegisterHam(Ham_Item_PreFrame, "player", "OnPlayerItemPreFrame_Post", .Post = 1);
     RegisterHam(Ham_AddPlayerItem, "player", "OnPlayerAddItem_Post", .Post = 1);
-    RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
+
+    register_forward(FM_CmdStart, "OnCmdStart");
 
     register_message(get_user_msgid("AmmoPickup"), "OnMessage_AmmoPickup");
 
@@ -87,7 +91,7 @@ public Native_UpdateSpeed(iPluginId, iArgc) {
 }
 
 public OnClCmd_Drop(pPlayer) {
-    UpdatePlayerSpeed(pPlayer);
+    set_task(0.1, "Task_UpdateSpeed", pPlayer);
 
     return PLUGIN_CONTINUE;
 }
@@ -98,22 +102,16 @@ public OnPlayerAddItem_Post(pPlayer) {
     return HAM_HANDLED;
 }
 
-public OnPlayerPreThink_Post(pPlayer) {
-    g_flPlayerBaseSpeed[pPlayer] = ZP_Player_IsZombie(pPlayer) ? ZP_ZOMBIE_SPEED : ZP_HUMAN_SPEED;
-
-    new iButtons = pev(pPlayer, pev_button);
+public OnCmdStart(pPlayer, pHandle) {
+    new iFlags = pev(pPlayer, pev_flags);
+    new iButtons = get_uc(pHandle, UC_Buttons);
     new iOldButtons = pev(pPlayer, pev_oldbuttons);
-    new iSpeedButtons = IN_DUCK | IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT;
+    new bool:bPrevDucking = g_bPlayerDucking[pPlayer];
 
-    if (iButtons & IN_BACK || ((iButtons & IN_MOVELEFT || iButtons & IN_MOVERIGHT) && ~iButtons & IN_FORWARD)) {
-        g_flPlayerBaseSpeed[pPlayer] *= 0.85;
-    }
+    g_bPlayerDucking[pPlayer] = iButtons & IN_DUCK && iFlags & FL_DUCKING;
+    g_bPlayerStrafing[pPlayer] = iButtons & IN_BACK || ((iButtons & IN_MOVELEFT || iButtons & IN_MOVERIGHT) && ~iButtons & IN_FORWARD);
 
-    if (iButtons & IN_DUCK && pev(pPlayer, pev_flags) & FL_DUCKING) {
-        g_flPlayerBaseSpeed[pPlayer] *= 1.125;
-    }
-
-    if ((iButtons & iSpeedButtons) != (iOldButtons & iSpeedButtons)) {
+    if ((iButtons & SPEED_BUTTONS) != (iOldButtons & SPEED_BUTTONS) || g_bPlayerDucking[pPlayer] != bPrevDucking) {
         UpdatePlayerSpeed(pPlayer);
     }
 
@@ -157,14 +155,23 @@ bool:UpdatePlayerSpeed(pPlayer) {
 }
 
 Float:CalculatePlayerMaxSpeed(pPlayer) {
-    new Float:flBaseSpeed = g_flPlayerBaseSpeed[pPlayer];
-    new Float:flWeight = CalculatePlayerInventoryWeight(pPlayer);
-    new Float:flMaxSpeed = floatmin(flBaseSpeed, g_flPlayerMaxSpeed[pPlayer]);
+    new Float:flMaxSpeed = floatmin(
+        ZP_Player_IsZombie(pPlayer) ? ZP_ZOMBIE_SPEED : ZP_HUMAN_SPEED,
+        g_flPlayerMaxSpeed[pPlayer]
+    );
+
+    if (g_bPlayerStrafing[pPlayer]) {
+        flMaxSpeed *= 0.85;
+    }
+
+    if (g_bPlayerDucking[pPlayer]) {
+        flMaxSpeed *= 1.125;
+    }
 
     if (ZP_Player_InPanic(pPlayer)) {
         flMaxSpeed *= 1.125;
     } else {
-        flMaxSpeed -= flWeight;
+        flMaxSpeed -= CalculatePlayerInventoryWeight(pPlayer);
     }
 
     return flMaxSpeed;
@@ -219,4 +226,9 @@ Float:CalculatePlayerAmmoWeight(pPlayer) {
     }
 
     return flWeight;
+}
+
+public Task_UpdateSpeed(iTaskId) {
+    new pPlayer = iTaskId;
+    UpdatePlayerSpeed(pPlayer);
 }
