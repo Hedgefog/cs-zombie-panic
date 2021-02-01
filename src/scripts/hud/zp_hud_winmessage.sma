@@ -8,8 +8,9 @@
 #define PLUGIN "[Zombie Panic] Win Message"
 #define AUTHOR "Hedgehog Fog"
 
-public plugin_init()
-{
+new g_iWinnerTeam = 0;
+
+public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
     register_message(get_user_msgid("TextMsg"), "OnMessage_OnTextMsg");
@@ -21,23 +22,37 @@ public OnMessage_OnTextMsg(iMsgId, iDest, pPlayer) {
     get_msg_arg_string(2, szMessage, charsmax(szMessage));
 
     if (equal(szMessage, ZP_ZOMBIE_WIN_MESSAGE)) {
-        ShowWinMessage("%s have conquered...", ZP_ZOMBIE_TEAM_NAME);
+        g_iWinnerTeam = ZP_ZOMBIE_TEAM;
     } else if (equal(szMessage, ZP_HUMAN_WIN_MESSAGE)) {
-        ShowWinMessage("%s win!", ZP_HUMAN_TEAM_NAME);
+        g_iWinnerTeam = ZP_HUMAN_TEAM;
     } else {
         return PLUGIN_CONTINUE;
     }
 
+    set_task(0.1, "Task_WinMessage");
+
     return PLUGIN_HANDLED;
+}
+
+public Task_WinMessage() {
+    switch (g_iWinnerTeam) {
+        case ZP_ZOMBIE_TEAM: {
+            ShowWinMessage("%s have conquered...", ZP_ZOMBIE_TEAM_NAME);
+        }
+        case ZP_HUMAN_TEAM: {
+            ShowWinMessage("%s win!", ZP_HUMAN_TEAM_NAME);
+        }
+    }
 }
 
 ShowWinMessage(const szMessage[], any:...) {
     new szBuffer[128];
     vformat(szBuffer, charsmax(szBuffer), szMessage, 2);
 
-    UTIL_ScreenFade(0, {0, 0, 0}, 1.0, ZP_NEW_ROUND_DELAY, 255, FFADE_OUT | FFADE_STAYOUT);
     set_dhudmessage(255, 255, 255, -1.0, -1.0);
     show_dhudmessage(0, szBuffer);
+    
+    UTIL_ScreenFade(0, {0, 0, 0}, 1.0, ZP_NEW_ROUND_DELAY, 255, FFADE_OUT | FFADE_STAYOUT, .bExternal = true);
 }
 
 public OnMessage_SendAudio(iMsgId, iDest, pPlayer) {
