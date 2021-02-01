@@ -101,7 +101,7 @@ bool:PickupWeaponBoxItems(pPlayer, pWeaponBox) {
             } else {
                 if(ExecuteHam(Ham_AddPlayerItem, pPlayer, pItem)) {
                     ExecuteHam(Ham_Item_AttachToPlayer, pItem, pPlayer); // add item to the player
-                    emit_sound(pWeaponBox, CHAN_ITEM, "items/gunpickup2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+                    emit_sound(pPlayer, CHAN_ITEM, "items/gunpickup2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
                 }
             }
 
@@ -131,7 +131,7 @@ bool:PickupWeaponBoxAmmo(pPlayer, pWeaponBox) {
             continue;
         }
         
-        iAmount -= AddAmmo(pPlayer, iAmmoHandler, iAmount, pWeaponBox);
+        iAmount -= AddAmmo(pPlayer, iAmmoHandler, iAmount);
         set_member(pWeaponBox, m_WeaponBox_rgAmmo, iAmount, iSlot);
 
         if (!iAmount) {
@@ -160,13 +160,13 @@ bool:ExtractAmmo(pItem, pPlayer) {
         return false;
     }
  
-    iAmmoAmount -= AddAmmo(pPlayer, iAmmoHandler, iAmmoAmount, pItem);
+    iAmmoAmount -= AddAmmo(pPlayer, iAmmoHandler, iAmmoAmount);
     set_member(pItem, m_Weapon_iDefaultAmmo, iAmmoAmount);
 
     return !iAmmoAmount;
 }
 
-AddAmmo(pPlayer, iAmmoHandler, iAmount, pEntity = 0) {
+AddAmmo(pPlayer, iAmmoHandler, iAmount) {
     new iAmmoId = ZP_Ammo_GetId(iAmmoHandler);
 
     static szAmmo[16];
@@ -180,7 +180,7 @@ AddAmmo(pPlayer, iAmmoHandler, iAmount, pEntity = 0) {
         ewrite_byte(iAmount);
         emessage_end();
 
-        emit_sound(pEntity ? pEntity : pPlayer, CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+        emit_sound(pPlayer, CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
     }
 
     return iAmount;
