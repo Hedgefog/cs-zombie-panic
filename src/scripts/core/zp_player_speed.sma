@@ -183,18 +183,18 @@ Float:CalculatePlayerInventoryWeight(pPlayer) {
 }
 
 Float:CalculatePlayerWeaponsWeight(pPlayer) {
-    new pActiveItem = get_member(pPlayer, m_pActiveItem);
-    
+    // new pActiveItem = get_member(pPlayer, m_pActiveItem);
+
     new Float:flWeight = 0.0;
 
     for (new iSlot = 0; iSlot < 6; ++iSlot) {
         new pItem = get_member(pPlayer, m_rgpPlayerItems, iSlot);
 
         while (pItem != -1) {
-            if (pItem != pActiveItem) {
-                new iWeaponId = get_member(pItem, m_iId);
-                flWeight += g_pFweaponWeight[iWeaponId];
-            }
+            // if (pItem != pActiveItem) {
+            new iWeaponId = get_member(pItem, m_iId);
+            flWeight += g_pFweaponWeight[iWeaponId];
+            // }
 
             new iAmmoId = get_member(pItem, m_Weapon_iPrimaryAmmoType);
             if (iAmmoId != -1) {
