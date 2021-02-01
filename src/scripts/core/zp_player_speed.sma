@@ -12,54 +12,54 @@
 #define AUTHOR "Hedgehog Fog"
 
 new const Float:g_pFweaponWeight[CSW_LAST_WEAPON + 1] = {
-    1.0, // weapon_p228
+    PISTOL_WEIGHT, // weapon_p228
     0.0, // weapon_shield
-    2.2, // weapon_scout
+    SNIPER_WEIGHT, // weapon_scout
     0.0, // weapon_hegrenade
-    2.5, // weapon_xm1014
+    RIFLE_WEIGHT, // weapon_xm1014
     0.0, // weapon_c4
-    2.2, // weapon_mac10
-    2.7, // weapon_aug
+    RIFLE_WEIGHT, // weapon_mac10
+    RIFLE_WEIGHT, // weapon_aug
     0.0, // weapon_smokegrenade
-    1.0, // weapon_elite
-    1.0, // weapon_fiveseven
-    2.2, // weapon_ump45
-    2.7, // weapon_sg550
-    2.5, // weapon_galil
-    2.5, // weapon_famas
-    1.0, // weapon_usp
-    1.0, // weapon_glock18
-    3.5, // weapon_awp
-    2.20, // weapon_mp5navy
-    3.5, // weapon_m249
-    1.6, // weapon_m3
-    2.63, // weapon_m4a1
-    2.2, // weapon_tmp
-    3.2, // weapon_g3sg1
+    PISTOL_WEIGHT, // weapon_elite
+    PISTOL_WEIGHT, // weapon_fiveseven
+    RIFLE_WEIGHT, // weapon_ump45
+    RIFLE_WEIGHT, // weapon_sg550
+    RIFLE_WEIGHT, // weapon_galil
+    RIFLE_WEIGHT, // weapon_famas
+    PISTOL_WEIGHT, // weapon_usp
+    PISTOL_WEIGHT, // weapon_glock18
+    SNIPER_WEIGHT, // weapon_awp
+    RIFLE_WEIGHT, // weapon_mp5navy
+    BFF_WEIGHT, // weapon_m249
+    RIFLE_WEIGHT, // weapon_m3
+    RIFLE_WEIGHT, // weapon_m4a1
+    RIFLE_WEIGHT, // weapon_tmp
+    SNIPER_WEIGHT, // weapon_g3sg1
     0.0, // weapon_flashbang
-    1.3, // weapon_deagle
-    2.7, // weapon_sg552
-    2.70, // weapon_ak47
-    0.5, // weapon_knife
-    2.2, // weapon_p90
+    MAGNUM_WEIGHT, // weapon_deagle
+    RIFLE_WEIGHT, // weapon_sg552
+    RIFLE_WEIGHT, // weapon_ak47
+    MELEE_WEIGHT, // weapon_knife
+    RIFLE_WEIGHT, // weapon_p90
 };
 
 new const Float:g_fAmmoWeight[] = {
     0.0,
-    0.1083, // "338Magnum"
-    0.07, // "762Nato"
-    0.07, // "556NatoBox"
-    0.07, // "556Nato"
-    0.20, // "buckshot"
-    0.07, // "45ACP"
-    0.07, // "57mm"
-    0.07, // "50AE"
-    0.07, // "357SIG"
-    0.07, // "9mm"
-    0.8, // "Flashbang"
-    0.8, // "HEGrenade"
-    0.8, // "SmokeGrenade"
-    0.8 // "C4"
+    MAGNUM_AMMO_WEIGHT, // "338Magnum"
+    RIFLE_AMMO_WEIGHT, // "762Nato"
+    RIFLE_AMMO_WEIGHT, // "556NatoBox"
+    RIFLE_AMMO_WEIGHT, // "556Nato"
+    0SHOTGUN_AMMO_WEIGHT, // "buckshot"
+    PISTOL_AMMO_WEIGHT, // "45ACP"
+    PISTOL_AMMO_WEIGHT, // "57mm"
+    PISTOL_AMMO_WEIGHT, // "50AE"
+    PISTOL_AMMO_WEIGHT, // "357SIG"
+    PISTOL_AMMO_WEIGHT, // "9mm"
+    GRENADE_WEIGHT, // "Flashbang"
+    GRENADE_WEIGHT, // "HEGrenade"
+    GRENADE_WEIGHT, // "SmokeGrenade"
+    GRENADE_WEIGHT // "C4"
 };
 
 new Float:g_flPlayerBaseSpeed[MAX_PLAYERS + 1];
@@ -106,7 +106,7 @@ public OnPlayerPreThink_Post(pPlayer) {
     new iSpeedButtons = IN_DUCK | IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT;
 
     if (iButtons & IN_BACK || ((iButtons & IN_MOVELEFT || iButtons & IN_MOVERIGHT) && ~iButtons & IN_FORWARD)) {
-        g_flPlayerBaseSpeed[pPlayer] *= 0.5;
+        g_flPlayerBaseSpeed[pPlayer] *= 0.85;
     }
 
     if (iButtons & IN_DUCK && pev(pPlayer, pev_flags) & FL_DUCKING) {
