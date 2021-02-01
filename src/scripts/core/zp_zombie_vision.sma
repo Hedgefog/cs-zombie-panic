@@ -16,6 +16,7 @@
 #define VISION_SCREEN_FADE_COLOR 255, 195, 195
 #define VISION_EFFECT_TIME 0.5
 #define VISION_ALPHA 20
+#define MAX_BRIGHTNESS 150
 
 new bool:g_bPlayerVision[MAX_PLAYERS + 1];
 new bool:g_bPlayerExternalFade[MAX_PLAYERS + 1];
@@ -118,6 +119,8 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
         set_es(es, ES_RenderFx, kRenderFxGlowShell);
         set_es(es, ES_RenderAmt, 1);
 
+        static iColor[3];
+
         if (!ZP_Player_IsZombie(pEntity)) {
             static Float:flMaxHealth;
             pev(pEntity, pev_max_health, flMaxHealth);
@@ -125,14 +128,17 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
             static Float:flHealth;
             pev(pEntity, pev_health, flHealth);
 
-            new Float:flBrightness = (1.0 - (flHealth / flMaxHealth)) * 255.0;
-            static iColor[3] = {0, 0, 0};
-            iColor[0] = floatround(flBrightness);
+            iColor[0] = floatround(MAX_BRIGHTNESS * (1.0 - (flHealth / flMaxHealth)));
+            iColor[1] = 0;
+            iColor[2] = 0;
 
-            set_es(es, ES_RenderColor, iColor);
         } else {
-            set_es(es, ES_RenderColor, { 0, 255, 0});
+            iColor[0] = 0;
+            iColor[1] = MAX_BRIGHTNESS;
+            iColor[2] = 0;
         }
+
+        set_es(es, ES_RenderColor, iColor);
     }
 
     return FMRES_HANDLED;
