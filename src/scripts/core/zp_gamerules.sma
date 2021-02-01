@@ -9,6 +9,7 @@
 #include <api_rounds>
 
 #include <zombiepanic>
+#include <zombiepanic_utils>
 
 #define PLUGIN "[Zombie Panic] Gamerules"
 #define AUTHOR "Hedgehog Fog"
@@ -236,8 +237,7 @@ DistributeTeams() {
             continue;
         }
 
-        new iTeam = get_member(pPlayer, m_iTeam);
-        if (iTeam != ZP_ZOMBIE_TEAM && iTeam != ZP_HUMAN_TEAM) {
+        if (UTIL_IsPlayerSpectator(pPlayer)) {
             continue;
         }
 
@@ -253,8 +253,7 @@ ProcessZombiePlayers(iMaxZombies) {
             continue;
         }
 
-        new iTeam = get_member(pPlayer, m_iTeam);
-        if (iTeam != ZP_ZOMBIE_TEAM && iTeam != ZP_HUMAN_TEAM) {
+        if (UTIL_IsPlayerSpectator(pPlayer)) {
             continue;
         }
 
@@ -283,8 +282,7 @@ ChooseRandomZombie() {
             continue;
         }
 
-        new iTeam = get_member(pPlayer, m_iTeam);
-        if (iTeam != ZP_ZOMBIE_TEAM && iTeam != ZP_HUMAN_TEAM) {
+        if (UTIL_IsPlayerSpectator(pPlayer)) {
             continue;
         }
 
@@ -309,8 +307,7 @@ CalculatePlayerCount() {
             continue;
         }
 
-        new iTeam = get_member(pPlayer, m_iTeam);
-        if (iTeam != ZP_ZOMBIE_TEAM && iTeam != ZP_HUMAN_TEAM) {
+        if (UTIL_IsPlayerSpectator(pPlayer)) {
             continue;
         }
 
@@ -371,8 +368,7 @@ ShuffleTeams() {
             continue;
         }
 
-        new iTeam = get_member(pPlayer, m_iTeam);
-        if (iTeam != ZP_ZOMBIE_TEAM && iTeam != ZP_HUMAN_TEAM) {
+        if (UTIL_IsPlayerSpectator(pPlayer)) {
             continue;
         }
 

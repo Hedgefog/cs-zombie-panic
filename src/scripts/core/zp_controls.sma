@@ -37,6 +37,10 @@ public OnImpulse_100(pPlayer) {
 }
 
 public OnClCmd_NextAmmo(pPlayer) {
+    if (!is_user_alive(pPlayer)) {
+        return PLUGIN_HANDLED;
+    }
+
     if (ZP_Player_IsZombie(pPlayer)) {
         return PLUGIN_HANDLED;
     }
@@ -46,6 +50,10 @@ public OnClCmd_NextAmmo(pPlayer) {
 }
 
 public OnClCmd_DropAmmo(pPlayer) {
+    if (!is_user_alive(pPlayer)) {
+        return PLUGIN_HANDLED;
+    }
+
     if (ZP_Player_IsZombie(pPlayer)) {
         return PLUGIN_HANDLED;
     }
@@ -55,6 +63,10 @@ public OnClCmd_DropAmmo(pPlayer) {
 }
 
 public OnClCmd_Panic(pPlayer) {
+    if (!is_user_alive(pPlayer)) {
+        return PLUGIN_HANDLED;
+    }
+
     if (ZP_Player_IsZombie(pPlayer)) {
         return PLUGIN_HANDLED;
     }

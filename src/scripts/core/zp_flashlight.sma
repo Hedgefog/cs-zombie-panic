@@ -134,7 +134,6 @@ bool:SetPlayerFlashlight(pPlayer, bool:bValue) {
         }
     }
 
-
     g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_On] = bValue;
 
     remove_task(TASKID_FLASHLIGHT_HUD + pPlayer);

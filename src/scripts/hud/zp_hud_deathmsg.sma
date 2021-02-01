@@ -1,5 +1,6 @@
 #include <amxmodx>
 #include <fakemeta>
+#include <reapi>
 
 #include <zombiepanic>
 #include <zombiepanic_utils>
@@ -34,7 +35,7 @@ public OnMessage_DeathMsg(iMsgId, iDest, pPlayer) {
             continue;
         }
 
-        if (!ZP_Player_IsZombie(pPlayer)) {
+        if (!ZP_Player_IsZombie(pPlayer) && !UTIL_IsPlayerSpectator(pPlayer)) {
             continue;
         }
 

@@ -2,6 +2,7 @@
 #include <reapi>
 
 #include <zombiepanic>
+#include <zombiepanic_utils>
 
 #define PLUGIN "[Zombie Panic] StatusValue"
 #define AUTHOR "Hedgehog Fog"
@@ -26,6 +27,10 @@ public OnMessage(iMsgId, iDest, pPlayer) {
     }
 
     if (ZP_Player_IsZombie(pPlayer)) {
+        return PLUGIN_CONTINUE;
+    }
+
+    if (UTIL_IsPlayerSpectator(pPlayer)) {
         return PLUGIN_CONTINUE;
     }
 

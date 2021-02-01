@@ -138,3 +138,8 @@ stock UTIL_CalculateWeaponSpread(pWeapon, const Float:vecSpread[3], Float:flMove
     xs_vec_mul_scalar(vecOut, flAirFactor, vecOut);
   }
 }
+
+stock bool:UTIL_IsPlayerSpectator(pPlayer) {
+  new iTeam = get_member(pPlayer, m_iTeam);
+  return iTeam < 1 || iTeam > 2;
+}

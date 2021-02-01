@@ -54,7 +54,9 @@ public OnEvent() {
         }
 
         new iTeam = get_member(pPlayer, m_iTeam);
-        SendMessage(pPlayer, pTargetPlayer, ZP_Player_IsZombie(pPlayer) || is_user_bot(pPlayer) ? szTeam : g_rgszTeams[iTeam]);
+        new bool:bShowTeam = ZP_Player_IsZombie(pPlayer) || is_user_bot(pPlayer) || UTIL_IsPlayerSpectator(pPlayer)
+
+        SendMessage(pPlayer, pTargetPlayer, bShowTeam ? szTeam : g_rgszTeams[iTeam]);
     }
 }
 
