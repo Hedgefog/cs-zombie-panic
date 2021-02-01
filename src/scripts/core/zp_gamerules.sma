@@ -40,6 +40,7 @@ public plugin_init() {
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn", .Post = 0);
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
     RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
+    RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage", .Post = 0);
 
     register_forward(FM_ClientKill, "OnClientKill");
 
@@ -191,6 +192,10 @@ public OnPlayerKilled_Post(pPlayer) {
     CheckWinConditions();
 
     return HAM_HANDLED;
+}
+
+public OnPlayerTakeDamage(pPlayer) {
+    return Round_IsRoundEnd() ? HAM_SUPERCEDE : HAM_IGNORED;
 }
 
 public OnCheckWinConditions() {
