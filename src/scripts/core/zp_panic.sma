@@ -13,6 +13,8 @@
 #define PANIC_DURATION 5.0
 #define PANIC_DELAY 55.0
 
+new gmsgScreenShake;
+
 new bool:g_bPlayerPanic[MAX_PLAYERS + 1];
 new Float:g_flPlayerLastPanic[MAX_PLAYERS + 1];
 
@@ -21,6 +23,8 @@ new g_pFwResult;
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+
+    gmsgScreenShake = get_user_msgid("ScreenShake");
 
     RegisterHam(Ham_Touch, "weaponbox", "OnItemTouch", .Post = 0);
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
@@ -77,6 +81,12 @@ bool:Panic(pPlayer) {
     g_bPlayerPanic[pPlayer] = true;
     ZP_Player_DropBackpack(pPlayer);
     ZP_Player_UpdateSpeed(pPlayer);
+
+    emessage_begin(MSG_ONE, gmsgScreenShake, _, pPlayer);
+    ewrite_short(floatround(1.5 * (1<<12)));
+    ewrite_short(floatround(1.0 * (1<<12)));
+    ewrite_short(floatround(1.0 * (1<<12)));
+    emessage_end();
 
     set_task(PANIC_DURATION, "Task_EndPanic", pPlayer);
 
