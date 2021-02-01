@@ -14,5 +14,9 @@ public plugin_init() {
 }
 
 public OnMessage(iMsgId, iDest, pPlayer) {
+    if (is_user_bot(pPlayer)) {
+        return PLUGIN_CONTINUE;
+    }
+
     return ZP_Player_IsZombie(pPlayer) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
 }

@@ -34,17 +34,33 @@ public plugin_init() {
 }
 
 public OnMessage_Radar(iMsgId, iMsgDest, pPlayer) {
+    if (is_user_bot(pPlayer)) {
+        return PLUGIN_CONTINUE;
+    }
+
     return PLUGIN_HANDLED;
 }
 
 public OnMessage_ScoreAttrib(iMsgId, iMsgDest, pPlayer) {
-    if(get_msg_arg_int(1) == pPlayer) {
-            set_msg_arg_int(2, ARG_BYTE, get_msg_arg_int(2) | (g_bPlayerInScore[pPlayer] ? 0 : SCORE_STATUS_DEAD));
+    if (is_user_bot(pPlayer)) {
+        return PLUGIN_CONTINUE;
     }
+
+    if(get_msg_arg_int(1) == pPlayer) {
+        set_msg_arg_int(2, ARG_BYTE, get_msg_arg_int(2) | (g_bPlayerInScore[pPlayer] ? 0 : SCORE_STATUS_DEAD));
+    }
+
+    return PLUGIN_CONTINUE;
 }
 
 public OnMessage_HideWeapon(iMsgId, iMsgDest, pPlayer) {
+    if (is_user_bot(pPlayer)) {
+        return PLUGIN_CONTINUE;
+    }
+    
     g_iPlayerHideWeapon[pPlayer] = get_msg_arg_int(1);
+
+    return PLUGIN_CONTINUE;
 }
 
 public OnCmdStart(pPlayer, pCmd) {
@@ -53,7 +69,7 @@ public OnCmdStart(pPlayer, pCmd) {
     new iOldButtons = pev(pPlayer, pev_oldbuttons);
 
     if (iButtons & IN_SCORE == iOldButtons & IN_SCORE)    {
-            return;
+        return PLUGIN_CONTINUE;
     }
 
     g_bPlayerInScore[pPlayer] = !!(iButtons & IN_SCORE);
@@ -74,4 +90,6 @@ public OnCmdStart(pPlayer, pCmd) {
     emessage_begin(MSG_ONE, gmsgCrosshair, _, pPlayer);
     ewrite_byte(0);
     emessage_end();
+
+    return PLUGIN_CONTINUE;
 }

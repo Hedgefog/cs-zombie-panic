@@ -35,7 +35,7 @@ public OnMessage(iMsgId, iDest, pPlayer) {
     return pPlayer ? PLUGIN_CONTINUE : PLUGIN_HANDLED;
 }
 
-public OnEvent(pPlayer) {
+public OnEvent() {
     new pTargetPlayer = read_data(1);
 
     for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {

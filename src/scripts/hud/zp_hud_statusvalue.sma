@@ -21,6 +21,14 @@ public plugin_init() {
 }
 
 public OnMessage(iMsgId, iDest, pPlayer) {
+    if (is_user_bot(pPlayer)) {
+        return PLUGIN_CONTINUE;
+    }
+
+    if (ZP_Player_IsZombie(pPlayer)) {
+        return PLUGIN_CONTINUE;
+    }
+
     new StatusValueFlag:iFlag = StatusValueFlag:get_msg_arg_int(1);
     new iValue = get_msg_arg_int(2);
 
@@ -30,7 +38,7 @@ public OnMessage(iMsgId, iDest, pPlayer) {
 
     g_statusValue[iFlag] = iValue;
 
-    if (!ZP_Player_IsZombie(pPlayer) && g_statusValue[StatusValueFlag_IsTeammate] == 2) {
+    if (g_statusValue[StatusValueFlag_IsTeammate] == 2) {
         return PLUGIN_HANDLED;
     }
 

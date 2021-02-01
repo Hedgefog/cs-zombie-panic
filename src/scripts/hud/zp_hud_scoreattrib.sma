@@ -14,11 +14,20 @@ public plugin_init() {
 }
 
 public OnMessage(iMsgId, iDest, pPlayer) {
-    new iFlags = get_msg_arg_int(2);
-
-    if (pPlayer && !ZP_Player_IsZombie(pPlayer)) {
-        set_msg_arg_int(2, ARG_BYTE, iFlags & ~SCORE_STATUS_DEAD);
+    if (!pPlayer) {
+        return PLUGIN_CONTINUE;
     }
+
+    if (is_user_bot(pPlayer)) {
+        return PLUGIN_CONTINUE;
+    }
+
+    if (ZP_Player_IsZombie(pPlayer)) {
+        return PLUGIN_CONTINUE;
+    }
+
+    new iFlags = get_msg_arg_int(2);
+    set_msg_arg_int(2, ARG_BYTE, iFlags & ~SCORE_STATUS_DEAD);
 
     return PLUGIN_CONTINUE;
 }

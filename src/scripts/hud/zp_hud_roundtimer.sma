@@ -23,6 +23,10 @@ public plugin_init() {
 }
 
 public OnResetHUD(pPlayer) {
+    if (is_user_bot(pPlayer)) {
+        return PLUGIN_CONTINUE;
+    }
+
     if (!ZP_GameRules_GetObjectiveMode()) {
         return PLUGIN_CONTINUE;
     }
@@ -39,6 +43,10 @@ public OnResetHUD(pPlayer) {
 }
 
 public OnMessage_HideWeapon(iMsgId, iMsgDest, pPlayer) {
+    if (is_user_bot(pPlayer)) {
+        return PLUGIN_CONTINUE;
+    }
+
     if (!ZP_GameRules_GetObjectiveMode()) {
         return PLUGIN_CONTINUE;
     }

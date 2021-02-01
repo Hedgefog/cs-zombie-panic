@@ -29,15 +29,17 @@ public plugin_init() {
 
 public OnMessage_HideWeapon(iMsgId, iMsgDest, pPlayer) {
     if (is_user_bot(pPlayer)) {
-        return;
+        return PLUGIN_CONTINUE;
     }
 
     g_iPlayerHideWeapon[pPlayer] = get_msg_arg_int(1);
+
+    return PLUGIN_CONTINUE;
 }
 
 public OnEvent_CurWeapon(pPlayer) {
     if (is_user_bot(pPlayer)) {
-        return;
+        return PLUGIN_CONTINUE;
     }
 
     emessage_begin(MSG_ONE, gmsgHideWeapon, _, pPlayer);
@@ -57,4 +59,6 @@ public OnEvent_CurWeapon(pPlayer) {
     message_begin(MSG_ONE, gmsgSetFOV, _, pPlayer);
     write_byte(get_member(pPlayer, m_iFOV));
     message_end();
+
+    return PLUGIN_CONTINUE;
 }
