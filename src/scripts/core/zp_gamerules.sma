@@ -261,7 +261,7 @@ ProcessZombiePlayers(iMaxZombies) {
             continue;
         }
 
-        if (iZombieCount >= iMaxZombies) {
+        if (iMaxZombies && iZombieCount >= iMaxZombies) {
             break;
         }
 
