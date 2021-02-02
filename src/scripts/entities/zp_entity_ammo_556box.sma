@@ -23,7 +23,7 @@ public plugin_init() {
 
 public plugin_precache() {
     precache_model(AMMO_BOX_MODEL);
-    CE_Register(ENTITY_NAME, _, Float:{-8.0, -8.0, 0.0}, Float:{8.0, 8.0, 8.0});
+    CE_Register(ENTITY_NAME, _, Float:{-8.0, -8.0, 0.0}, Float:{8.0, 8.0, 8.0}, _, ZP_AMMO_RESPAWN_TIME);
     CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME, "OnSpawn");
 }
 
@@ -40,17 +40,7 @@ public OnSpawn(pEntity) {
     set_pev(pWeaponBox, pev_angles, vecAngles);
     engfunc(EngFunc_SetModel, pWeaponBox, AMMO_BOX_MODEL);
 
-    if (ZP_AMMO_RESPAWN_TIME > 0.0) {
-        SetThink(pEntity, "ThinkSpawn");
-        set_pev(pEntity, pev_nextthink, get_gametime() + ZP_AMMO_RESPAWN_TIME);
-    }
+    CE_Kill(pEntity);
 }
 
-public ThinkSpawn(pEntity) {
-    if (pev(pEntity, pev_nextthink) > get_gametime()) {
-        return;
-    }
-
-    dllfunc(DLLFunc_Spawn, pEntity);
-}
 
