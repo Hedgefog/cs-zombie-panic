@@ -160,12 +160,12 @@ Float:CalculatePlayerMaxSpeed(pPlayer) {
         g_flPlayerMaxSpeed[pPlayer]
     );
 
-    if (g_bPlayerStrafing[pPlayer]) {
-        flMaxSpeed *= 0.85;
+    if (g_bPlayerDucking[pPlayer]) {
+        flMaxSpeed *= 1.25;
     }
 
-    if (g_bPlayerDucking[pPlayer]) {
-        flMaxSpeed *= 1.125;
+    if (g_bPlayerStrafing[pPlayer]) {
+        flMaxSpeed *= 0.85;
     }
 
     if (ZP_Player_InPanic(pPlayer)) {
