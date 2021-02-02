@@ -3,6 +3,7 @@
 #include <amxmodx>
 #include <fakemeta>
 #include <hamsandwich>
+#include <reapi>
 
 #include <zombiepanic>
 #include <api_rounds>
@@ -14,7 +15,7 @@ new const g_rgszObjectiveEntities[][] = {
     "func_bomb_target",
     "func_escapezone",
     "func_hostage_rescue",
-    "func_vip_safetyzone",
+    // "func_vip_safetyzone", // trigger_endround alias
     "func_buyzone",
     "hostage_entity",
     "info_bomb_target",
@@ -45,16 +46,11 @@ new const g_rgszDelayEntities[][] = {
 
 new g_pCvarRoundTime;
 new g_pFwEntitySpawn;
-new Array:g_irgObjectiveEntities;
 
 public plugin_precache() {
-    g_irgObjectiveEntities = ArrayCreate();
-
     CreateHiddenBuyZone();
 
     g_pFwEntitySpawn = register_forward(FM_Spawn, "OnSpawn");
-
-    RegisterHam(Ham_Spawn, "game_score", "OnGameScoreSpawn", .Post = 1);
 
     g_pCvarRoundTime = get_cvar_pointer("mp_roundtime");
 }
@@ -63,12 +59,6 @@ public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
     unregister_forward(FM_Spawn, g_pFwEntitySpawn);
-
-    RemoveObjectiveEntities();
-}
-
-public plugin_end() {
-    ArrayDestroy(g_irgObjectiveEntities);
 }
 
 public OnGameScoreSpawn(pEntity) {
@@ -81,7 +71,7 @@ public OnSpawn(pEntity) {
     }
 
     if (IsObjectiveEntity(pEntity)) {
-        ArrayPushCell(g_irgObjectiveEntities, pEntity);
+        engfunc(EngFunc_RemoveEntity, pEntity);
     } else if (IsDelayEntity(pEntity)) {
         if (get_ent_data_float(pEntity, "CBaseToggle", "m_flWait") < 0.0) {
             set_ent_data_float(pEntity, "CBaseToggle", "m_flWait", get_pcvar_num(g_pCvarRoundTime) * 60.0 + 1.0);
@@ -176,15 +166,4 @@ CreateHiddenBuyZone() {
     new pEntity = engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, "func_buyzone"));
     dllfunc(DLLFunc_Spawn, pEntity);
     engfunc(EngFunc_SetSize, pEntity, {-8192.0, -8192.0, -8192.0}, {-8191.0, -8191.0, -8191.0});
-}
-
-RemoveObjectiveEntities() {
-    for (new i = ArraySize(g_irgObjectiveEntities) - 1; i >= 0; --i) {
-        new pEntity = ArrayGetCell(g_irgObjectiveEntities, i);
-        if (pev_valid(pEntity) && IsObjectiveEntity(pEntity)) {
-            engfunc(EngFunc_RemoveEntity, pEntity);
-        }
-
-        ArrayDeleteItem(g_irgObjectiveEntities, i);
-    }
 }
