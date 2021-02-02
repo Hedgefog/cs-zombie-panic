@@ -164,6 +164,10 @@ public OnItemPickup(pPlayer) {
         return PLUGIN_CONTINUE;
     }
 
+    if (ZP_Player_IsZombie(pPlayer)) {
+        return PLUGIN_CONTINUE;
+    }
+
     new Float:flMaxSpeed;
     pev(pPlayer, pev_maxspeed, flMaxSpeed);
 
