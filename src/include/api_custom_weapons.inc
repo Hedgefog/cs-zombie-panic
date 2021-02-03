@@ -46,6 +46,7 @@ native CW_Bind(CW:iHandler, CW_Binding:iBinding, const szFunctionName[]);
 native CW:CW_GetHandlerByEntity(iEntity);
 native CW:CW_GetHandler(const szName[]);
 
+native CW_Idle(pItem);
 native CW_Reload(pItem);
 native CW_PrimaryAttack(pItem);
 native CW_SecondaryAttack(pItem);

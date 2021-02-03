@@ -167,14 +167,16 @@ public @Weapon_Deploy(this) {
 }
 
 public @Weapon_Holster(this) {
+    CW_Idle(this); // force idle to handle throw
+
+    // set_member(this, m_flStartThrow, 0.0);
+    // set_member(this, m_flReleaseThrow, -1.0);
+    
     new pPlayer = CW_GetPlayer(this);
     if (get_member(pPlayer, m_rgAmmo, g_iAmmoId) <= 0) {
         SetThink(this, "RemovePlayerItem");
         set_pev(this, pev_nextthink, get_gametime() + 0.1);
     }
-
-    set_member(this, m_flStartThrow, 0.0);
-    set_member(this, m_flReleaseThrow, -1.0);
 }
 
 public RemovePlayerItem(this) {
