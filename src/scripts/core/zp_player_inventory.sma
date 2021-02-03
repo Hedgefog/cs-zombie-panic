@@ -85,7 +85,7 @@ public OnPlayerKilled(pPlayer) {
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
-    g_pPlayerSelectedAmmo[pPlayer] = -1;
+    g_pPlayerSelectedAmmo[pPlayer] = 0;
     SelectNextPlayerAmmo(pPlayer, false);
 }
 
@@ -276,22 +276,37 @@ PackPlayerAmmo(pPlayer, pWeaponBox) {
 }
 
 SelectNextPlayerAmmo(pPlayer, bool:bShowMessage = true) {
+    new iAmmoId;
     new iAmmoIndex = g_pPlayerSelectedAmmo[pPlayer];
+
     do {
         iAmmoIndex++;
 
         if (iAmmoIndex >= ZP_Ammo_GetCount()) {
             iAmmoIndex = 0;
         }
-    } while (ZP_Ammo_GetPackSize(iAmmoIndex) == -1 && iAmmoIndex != g_pPlayerSelectedAmmo[pPlayer]);
+
+        iAmmoId = ZP_Ammo_GetId(iAmmoIndex);
+
+        if (ZP_Ammo_GetPackSize(iAmmoIndex) != -1 && get_member(pPlayer, m_rgAmmo, iAmmoId) > 0) {
+            break;
+        }
+    } while (iAmmoIndex != g_pPlayerSelectedAmmo[pPlayer]);
+
+    new iAmmoAmount = get_member(pPlayer, m_rgAmmo, iAmmoId);
+    if (g_pPlayerSelectedAmmo[pPlayer] == iAmmoIndex && !iAmmoAmount) {
+        return;
+    }
 
     g_pPlayerSelectedAmmo[pPlayer] = iAmmoIndex;
 
-    static szAmmoName[32];
-    ZP_Ammo_GetName(g_pPlayerSelectedAmmo[pPlayer], szAmmoName, charsmax(szAmmoName));
-
     if (bShowMessage) {
-        client_print(pPlayer, print_chat, "Selected %s ammo", szAmmoName);
+        static szAmmoName[32];
+        ZP_Ammo_GetName(g_pPlayerSelectedAmmo[pPlayer], szAmmoName, charsmax(szAmmoName));
+
+        new iMaxAmmo = ZP_Ammo_GetMaxAmount(iAmmoIndex);
+
+        client_print(pPlayer, print_chat, "Selected %s ammo [%d/%d]", szAmmoName, iAmmoAmount, iMaxAmmo);
     }
 }
 
