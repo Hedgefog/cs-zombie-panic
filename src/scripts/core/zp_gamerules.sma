@@ -124,7 +124,7 @@ public OnMessage_ShowMenu(iMsgId, iDest, pPlayer) {
     get_msg_arg_string(4, szBuffer, charsmax(szBuffer));
 
     if (equali(szBuffer, "#Team_Select", 12)) {
-        set_task(0.1, "TaskJoin", pPlayer);
+        set_task(0.1, "Task_Join", pPlayer);
         return PLUGIN_HANDLED;
     }
 
@@ -140,7 +140,7 @@ public OnMessage_VGUIMenu(iMsgId, iDest, pPlayer) {
     new iMenuId = get_msg_arg_int(1);
 
     if (iMenuId == CHOOSE_TEAM_VGUI_MENU_ID) {
-        set_task(0.1, "TaskJoin", pPlayer);
+        set_task(0.1, "Task_Join", pPlayer);
         return PLUGIN_HANDLED;
     }
 
@@ -395,7 +395,7 @@ DispatchWin(iTeam) {
 
 /*--------------------------------[ Tasks ]--------------------------------*/
 
-public TaskJoin(pPlayer) {
+public Task_Join(pPlayer) {
     if (!is_user_connected(pPlayer) || is_user_hltv(pPlayer)) {
         return;
     }
