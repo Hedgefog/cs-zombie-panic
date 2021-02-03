@@ -39,6 +39,7 @@ public plugin_precache() {
     CW_Bind(g_iCwHandler, CWB_Idle, "@Weapon_Idle");
     CW_Bind(g_iCwHandler, CWB_PrimaryAttack, "@Weapon_PrimaryAttack");
     CW_Bind(g_iCwHandler, CWB_Deploy, "@Weapon_Deploy");
+    CW_Bind(g_iCwHandler, CWB_Holster, "@Weapon_Holster");
     CW_Bind(g_iCwHandler, CWB_GetMaxSpeed, "@Weapon_GetMaxSpeed");
     CW_Bind(g_iCwHandler, CWB_Spawn, "@Weapon_Spawn");
     CW_Bind(g_iCwHandler, CWB_WeaponBoxModelUpdate, "@Weapon_WeaponBoxSpawn");
@@ -61,11 +62,7 @@ public @Weapon_Idle(this) {
     new pPlayer = CW_GetPlayer(this);
 
     if (!get_member(this, m_flReleaseThrow) && get_member(this, m_flStartThrow)) {
-            set_member(this, m_flReleaseThrow, get_gametime());
-    }
-
-    if (get_member(this, m_Weapon_flTimeWeaponIdle) > 0.0) {
-        return;
+        set_member(this, m_flReleaseThrow, get_gametime());
     }
 
     if (get_member(this, m_flStartThrow)) {
@@ -167,6 +164,21 @@ public @Weapon_Idle(this) {
 public @Weapon_Deploy(this) {
     set_member(this, m_flReleaseThrow, -1.0);
     CW_DefaultDeploy(this, ZP_WEAPON_GRENADE_V_MODEL, ZP_WEAPON_GRENADE_P_MODEL, 7, "grenade");
+}
+
+public @Weapon_Holster(this) {
+    new pPlayer = CW_GetPlayer(this);
+    if (get_member(pPlayer, m_rgAmmo, g_iAmmoId) <= 0) {
+        SetThink(this, "RemovePlayerItem");
+        set_pev(this, pev_nextthink, get_gametime() + 0.1);
+    }
+
+    set_member(this, m_flStartThrow, 0.0);
+    set_member(this, m_flReleaseThrow, -1.0);
+}
+
+public RemovePlayerItem(this) {
+    CW_RemovePlayerItem(this);
 }
 
 public Float:@Weapon_GetMaxSpeed(this) {
