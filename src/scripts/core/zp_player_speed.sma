@@ -6,30 +6,13 @@
 #include <reapi>
 
 #include <zombiepanic>
+#include <zombiepanic_utils>
 #include <api_rounds>
 
 #define PLUGIN "[Zombie Panic] Player Speed"
 #define AUTHOR "Hedgehog Fog"
 
 #define SPEED_BUTTONS (IN_DUCK | IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT)
-
-new const Float:g_fAmmoWeight[] = {
-    0.0,
-    ZP_WEIGHT_MAGNUM_AMMO, // "338Magnum"
-    ZP_WEIGHT_RIFLE_AMMO, // "762Nato"
-    ZP_WEIGHT_RIFLE_AMMO, // "556NatoBox"
-    ZP_WEIGHT_RIFLE_AMMO, // "556Nato"
-    ZP_WEIGHT_SHOTGUN_AMMO, // "buckshot"
-    ZP_WEIGHT_PISTOL_AMMO, // "45ACP"
-    ZP_WEIGHT_PISTOL_AMMO, // "57mm"
-    ZP_WEIGHT_PISTOL_AMMO, // "50AE"
-    ZP_WEIGHT_PISTOL_AMMO, // "357SIG"
-    ZP_WEIGHT_PISTOL_AMMO, // "9mm"
-    ZP_WEIGHT_GRENADE, // "Flashbang"
-    ZP_WEIGHT_GRENADE, // "HEGrenade"
-    ZP_WEIGHT_GRENADE, // "SmokeGrenade"
-    ZP_WEIGHT_GRENADE // "C4"
-};
 
 new Float:g_flPlayerMaxSpeed[MAX_PLAYERS + 1];
 new bool:g_bPlayerDucking[MAX_PLAYERS + 1];
@@ -169,8 +152,11 @@ Float:CalculatePlayerWeaponsWeight(pPlayer) {
 
             new iAmmoId = get_member(pItem, m_Weapon_iPrimaryAmmoType);
             if (iAmmoId != -1) {
-                new iClip = get_member(pItem, m_Weapon_iClip);
-                flWeight += iClip * g_fAmmoWeight[iAmmoId];
+                new iAmmoHandler = ZP_Ammo_GetHandlerById(iAmmoId);
+                if (iAmmoHandler != -1) {
+                    new iClip = get_member(pItem, m_Weapon_iClip);
+                    flWeight += iClip * ZP_Ammo_GetWeight(iAmmoHandler);
+                }
             }
 
             pItem = get_member(pItem, m_pNext);
@@ -183,10 +169,13 @@ Float:CalculatePlayerWeaponsWeight(pPlayer) {
 Float:CalculatePlayerAmmoWeight(pPlayer) {
     new Float:flWeight = 0.0;
 
-    new iSize = sizeof(g_fAmmoWeight);
+    new iSize = sizeof(AMMO_LIST);
     for (new iAmmoId = 0; iAmmoId < iSize; ++iAmmoId) {
         new iBpAmmo = get_member(pPlayer, m_rgAmmo, iAmmoId);
-        flWeight += iBpAmmo * g_fAmmoWeight[iAmmoId];
+        new iAmmoHandler = ZP_Ammo_GetHandlerById(iAmmoId);
+        if (iAmmoHandler != -1) {
+            flWeight += iBpAmmo * ZP_Ammo_GetWeight(iAmmoHandler);
+        }
     }
 
     return flWeight;

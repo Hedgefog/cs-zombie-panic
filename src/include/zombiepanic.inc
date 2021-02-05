@@ -44,6 +44,7 @@ native ZP_Ammo_GetName(iHandler, szOut[], iLen);
 native ZP_Ammo_GetPackSize(iHandler);
 native ZP_Ammo_GetPackModel(iHandler, szOut[], iLen);
 native ZP_Ammo_GetMaxAmount(iHandler);
+native Float:ZP_Ammo_GetWeight(iHandler);
 native ZP_Ammo_GetCount();
 
 // Game Rules
