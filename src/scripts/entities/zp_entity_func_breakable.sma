@@ -84,7 +84,7 @@ public OnTakeDamage_Post(pEntity) {
 
     new iszSpawnObject = get_ent_data(pEntity, "CBreakable", "m_iszSpawnObject");
 
-    static szSpawnObject[32];
+    static szSpawnObject[64];
     engfunc(EngFunc_SzFromIndex, iszSpawnObject, szSpawnObject, charsmax(szSpawnObject));
 
     new CW:iCwHandler = CW_GetHandler(szSpawnObject);
