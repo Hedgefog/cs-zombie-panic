@@ -59,7 +59,7 @@ public @Weapon_PrimaryAttack(this) {
         set_member(pPlayer, m_szAnimExtention, "shieldgren");
     }
 
-    new pHit = CW_DefaultSwing(this, 25.0, 0.5, 36.0);
+    new pHit = CW_DefaultSwing(this, 35.0, 0.5, 36.0);
 
     if (pHit < 0) {
         switch (random(3)) {

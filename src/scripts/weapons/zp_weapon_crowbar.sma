@@ -66,7 +66,7 @@ public @Weapon_Idle(this) {
 
 public @Weapon_PrimaryAttack(this) {
     new pPlayer = CW_GetPlayer(this);
-    new pHit = CW_DefaultSwing(this, 25.0, 0.5, 36.0);
+    new pHit = CW_DefaultSwing(this, 35.0, 0.5, 36.0);
     CW_PlayAnimation(this, 4, 0.25);
 
     if (pHit < 0) {
