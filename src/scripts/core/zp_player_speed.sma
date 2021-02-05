@@ -119,7 +119,7 @@ Float:CalculatePlayerMaxSpeed(pPlayer) {
     }
 
     if (ZP_Player_InPanic(pPlayer)) {
-        flMaxSpeed *= 1.125;
+        flMaxSpeed *= ZP_PANIC_SPEED_MODIFIER;
     } else {
         flMaxSpeed -= CalculatePlayerInventoryWeight(pPlayer);
     }
