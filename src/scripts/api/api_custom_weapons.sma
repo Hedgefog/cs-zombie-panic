@@ -143,6 +143,9 @@ public plugin_natives() {
     register_native("CW_SpawnWeapon", "Native_SpawnWeapon");
     register_native("CW_SpawnWeaponBox", "Native_SpawnWeaponBox");
 
+    register_native("CW_Deploy", "Native_Deploy");
+    register_native("CW_Holster", "Native_Holster");
+    register_native("CW_ItemPostFrame", "Native_ItemPostFrame");
     register_native("CW_Idle", "Native_Idle");
     register_native("CW_Reload", "Native_Reload");
     register_native("CW_PrimaryAttack", "Native_PrimaryAttack");
@@ -367,6 +370,21 @@ public bool:Native_DefaultShotgunIdle(iPluginId, iArgc) {
     get_string(6, szPumpSound, charsmax(szPumpSound));
 
     return DefaultShotgunIdle(pItem, iAnim, iReloadEndAnim, flDuration, flReloadEndDuration, szPumpSound);
+}
+
+public Native_Deploy(iPluginId, iArgc) {
+    new pItem = get_param(1);
+    WeaponDeploy(pItem);
+}
+
+public Native_Holster(iPluginId, iArgc) {
+    new pItem = get_param(1);
+    WeaponHolster(pItem);
+}
+
+public Native_ItemPostFrame(iPluginId, iArgc) {
+    new pItem = get_param(1);
+    ItemPostFrame(pItem);
 }
 
 public Native_Idle(iPluginId, iArgc) {
