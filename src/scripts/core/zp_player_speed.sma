@@ -112,14 +112,14 @@ Float:CalculatePlayerMaxSpeed(pPlayer) {
         g_flPlayerMaxSpeed[pPlayer]
     );
 
-    if (g_bPlayerDucking[pPlayer]) {
-        flMaxSpeed *= 1.25;
-    }
-
     flMaxSpeed -= CalculatePlayerInventoryWeight(pPlayer);
 
     if (ZP_Player_InPanic(pPlayer)) {
         flMaxSpeed *= ZP_PANIC_SPEED_MODIFIER;
+    }
+
+    if (g_bPlayerDucking[pPlayer]) {
+        flMaxSpeed *= ZP_DUCK_SPEED_MODIFIER;
     }
 
     if (g_bPlayerMoveBack[pPlayer]) {
