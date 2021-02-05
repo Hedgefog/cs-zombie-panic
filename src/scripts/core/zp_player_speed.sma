@@ -16,6 +16,7 @@
 
 new Float:g_flPlayerMaxSpeed[MAX_PLAYERS + 1];
 new bool:g_bPlayerDucking[MAX_PLAYERS + 1];
+new bool:g_bPlayerMoveBack[MAX_PLAYERS + 1];
 new bool:g_bPlayerStrafing[MAX_PLAYERS + 1];
 
 public plugin_init() {
@@ -59,7 +60,8 @@ public OnCmdStart(pPlayer, pHandle) {
     new bool:bPrevDucking = g_bPlayerDucking[pPlayer];
 
     g_bPlayerDucking[pPlayer] = iButtons & IN_DUCK && iFlags & FL_DUCKING;
-    g_bPlayerStrafing[pPlayer] = iButtons & IN_BACK || ((iButtons & IN_MOVELEFT || iButtons & IN_MOVERIGHT) && ~iButtons & IN_FORWARD);
+    g_bPlayerMoveBack[pPlayer] = !!(iButtons & IN_BACK);
+    g_bPlayerStrafing[pPlayer] = !!((iButtons & IN_MOVELEFT || iButtons & IN_MOVERIGHT) && ~iButtons & IN_FORWARD);
 
     if ((iButtons & SPEED_BUTTONS) != (iOldButtons & SPEED_BUTTONS) || g_bPlayerDucking[pPlayer] != bPrevDucking) {
         UpdatePlayerSpeed(pPlayer);
@@ -114,14 +116,16 @@ Float:CalculatePlayerMaxSpeed(pPlayer) {
         flMaxSpeed *= 1.25;
     }
 
-    if (g_bPlayerStrafing[pPlayer]) {
-        flMaxSpeed *= 0.85;
+    if (g_bPlayerMoveBack[pPlayer]) {
+        flMaxSpeed *= ZP_BACKWARD_SPEED_MODIFIER;
+    } else if (g_bPlayerStrafing[pPlayer]) {
+        flMaxSpeed *= ZP_STRAFE_SPEED_MODIFIER;
     }
+
+    flMaxSpeed -= CalculatePlayerInventoryWeight(pPlayer);
 
     if (ZP_Player_InPanic(pPlayer)) {
         flMaxSpeed *= ZP_PANIC_SPEED_MODIFIER;
-    } else {
-        flMaxSpeed -= CalculatePlayerInventoryWeight(pPlayer);
     }
 
     return flMaxSpeed;
