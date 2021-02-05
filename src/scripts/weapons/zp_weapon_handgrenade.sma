@@ -43,6 +43,8 @@ public plugin_precache() {
     CW_Bind(g_iCwHandler, CWB_GetMaxSpeed, "@Weapon_GetMaxSpeed");
     CW_Bind(g_iCwHandler, CWB_Spawn, "@Weapon_Spawn");
     CW_Bind(g_iCwHandler, CWB_WeaponBoxModelUpdate, "@Weapon_WeaponBoxSpawn");
+
+    ZP_Weapons_Register(g_iCwHandler, 0.0);
 }
 
 public plugin_init() {

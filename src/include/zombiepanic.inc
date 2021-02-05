@@ -30,6 +30,11 @@ native ZP_Player_AddAmmo(pPlayer, const szAmmo[], iValue);
 native ZP_Player_NextAmmo(pPlayer);
 native ZP_Player_DropAmmo(pPlayer);
 
+// Weapons
+
+native ZP_Weapons_Register(CW:iCwHandler, Float:flWeight);
+native Float:ZP_Weapons_GetWeight(pEntity);
+
 // Ammo
 
 native ZP_Ammo_GetHandler(const szName[]);
@@ -39,6 +44,7 @@ native ZP_Ammo_GetName(iHandler, szOut[], iLen);
 native ZP_Ammo_GetPackSize(iHandler);
 native ZP_Ammo_GetPackModel(iHandler, szOut[], iLen);
 native ZP_Ammo_GetMaxAmount(iHandler);
+native Float:ZP_Ammo_GetWeight(iHandler);
 native ZP_Ammo_GetCount();
 
 // Game Rules

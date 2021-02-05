@@ -6,6 +6,7 @@
 #include <reapi>
 
 #include <zombiepanic>
+#include <zombiepanic_utils>
 #include <api_rounds>
 
 #define PLUGIN "[Zombie Panic] Player Speed"
@@ -13,59 +14,9 @@
 
 #define SPEED_BUTTONS (IN_DUCK | IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT)
 
-new const Float:g_pFweaponWeight[CSW_LAST_WEAPON + 1] = {
-    ZP_WEIGHT_PISTOL, // weapon_p228
-    0.0, // weapon_shield
-    ZP_WEIGHT_SNIPER, // weapon_scout
-    0.0, // weapon_hegrenade
-    ZP_WEIGHT_RIFLE, // weapon_xm1014
-    0.0, // weapon_c4
-    ZP_WEIGHT_RIFLE, // weapon_mac10
-    ZP_WEIGHT_RIFLE, // weapon_aug
-    0.0, // weapon_smokegrenade
-    ZP_WEIGHT_PISTOL, // weapon_elite
-    ZP_WEIGHT_PISTOL, // weapon_fiveseven
-    ZP_WEIGHT_RIFLE, // weapon_ump45
-    ZP_WEIGHT_RIFLE, // weapon_sg550
-    ZP_WEIGHT_RIFLE, // weapon_galil
-    ZP_WEIGHT_RIFLE, // weapon_famas
-    ZP_WEIGHT_PISTOL, // weapon_usp
-    ZP_WEIGHT_PISTOL, // weapon_glock18
-    ZP_WEIGHT_SNIPER, // weapon_awp
-    ZP_WEIGHT_RIFLE, // weapon_mp5navy
-    ZP_WEIGHT_BFF, // weapon_m249
-    ZP_WEIGHT_RIFLE, // weapon_m3
-    ZP_WEIGHT_RIFLE, // weapon_m4a1
-    ZP_WEIGHT_RIFLE, // weapon_tmp
-    ZP_WEIGHT_SNIPER, // weapon_g3sg1
-    0.0, // weapon_flashbang
-    ZP_WEIGHT_MAGNUM, // weapon_deagle
-    ZP_WEIGHT_RIFLE, // weapon_sg552
-    ZP_WEIGHT_RIFLE, // weapon_ak47
-    ZP_WEIGHT_MELEE, // weapon_knife
-    ZP_WEIGHT_RIFLE, // weapon_p90
-};
-
-new const Float:g_fAmmoWeight[] = {
-    0.0,
-    ZP_WEIGHT_MAGNUM_AMMO, // "338Magnum"
-    ZP_WEIGHT_RIFLE_AMMO, // "762Nato"
-    ZP_WEIGHT_RIFLE_AMMO, // "556NatoBox"
-    ZP_WEIGHT_RIFLE_AMMO, // "556Nato"
-    ZP_WEIGHT_SHOTGUN_AMMO, // "buckshot"
-    ZP_WEIGHT_PISTOL_AMMO, // "45ACP"
-    ZP_WEIGHT_PISTOL_AMMO, // "57mm"
-    ZP_WEIGHT_PISTOL_AMMO, // "50AE"
-    ZP_WEIGHT_PISTOL_AMMO, // "357SIG"
-    ZP_WEIGHT_PISTOL_AMMO, // "9mm"
-    ZP_WEIGHT_GRENADE, // "Flashbang"
-    ZP_WEIGHT_GRENADE, // "HEGrenade"
-    ZP_WEIGHT_GRENADE, // "SmokeGrenade"
-    ZP_WEIGHT_GRENADE // "C4"
-};
-
 new Float:g_flPlayerMaxSpeed[MAX_PLAYERS + 1];
 new bool:g_bPlayerDucking[MAX_PLAYERS + 1];
+new bool:g_bPlayerMoveBack[MAX_PLAYERS + 1];
 new bool:g_bPlayerStrafing[MAX_PLAYERS + 1];
 
 public plugin_init() {
@@ -109,7 +60,8 @@ public OnCmdStart(pPlayer, pHandle) {
     new bool:bPrevDucking = g_bPlayerDucking[pPlayer];
 
     g_bPlayerDucking[pPlayer] = iButtons & IN_DUCK && iFlags & FL_DUCKING;
-    g_bPlayerStrafing[pPlayer] = iButtons & IN_BACK || ((iButtons & IN_MOVELEFT || iButtons & IN_MOVERIGHT) && ~iButtons & IN_FORWARD);
+    g_bPlayerMoveBack[pPlayer] = !!(iButtons & IN_BACK);
+    g_bPlayerStrafing[pPlayer] = !!((iButtons & IN_MOVELEFT || iButtons & IN_MOVERIGHT) && ~iButtons & IN_FORWARD);
 
     if ((iButtons & SPEED_BUTTONS) != (iOldButtons & SPEED_BUTTONS) || g_bPlayerDucking[pPlayer] != bPrevDucking) {
         UpdatePlayerSpeed(pPlayer);
@@ -164,14 +116,16 @@ Float:CalculatePlayerMaxSpeed(pPlayer) {
         flMaxSpeed *= 1.25;
     }
 
-    if (g_bPlayerStrafing[pPlayer]) {
-        flMaxSpeed *= 0.85;
+    if (g_bPlayerMoveBack[pPlayer]) {
+        flMaxSpeed *= ZP_BACKWARD_SPEED_MODIFIER;
+    } else if (g_bPlayerStrafing[pPlayer]) {
+        flMaxSpeed *= ZP_STRAFE_SPEED_MODIFIER;
     }
 
+    flMaxSpeed -= CalculatePlayerInventoryWeight(pPlayer);
+
     if (ZP_Player_InPanic(pPlayer)) {
-        flMaxSpeed *= 1.125;
-    } else {
-        flMaxSpeed -= CalculatePlayerInventoryWeight(pPlayer);
+        flMaxSpeed *= ZP_PANIC_SPEED_MODIFIER;
     }
 
     return flMaxSpeed;
@@ -198,15 +152,15 @@ Float:CalculatePlayerWeaponsWeight(pPlayer) {
         new pItem = get_member(pPlayer, m_rgpPlayerItems, iSlot);
 
         while (pItem != -1) {
-            // if (pItem != pActiveItem) {
-            new iWeaponId = get_member(pItem, m_iId);
-            flWeight += g_pFweaponWeight[iWeaponId];
-            // }
+            flWeight += ZP_Weapons_GetWeight(pItem);
 
             new iAmmoId = get_member(pItem, m_Weapon_iPrimaryAmmoType);
             if (iAmmoId != -1) {
-                new iClip = get_member(pItem, m_Weapon_iClip);
-                flWeight += iClip * g_fAmmoWeight[iAmmoId];
+                new iAmmoHandler = ZP_Ammo_GetHandlerById(iAmmoId);
+                if (iAmmoHandler != -1) {
+                    new iClip = get_member(pItem, m_Weapon_iClip);
+                    flWeight += iClip * ZP_Ammo_GetWeight(iAmmoHandler);
+                }
             }
 
             pItem = get_member(pItem, m_pNext);
@@ -219,10 +173,13 @@ Float:CalculatePlayerWeaponsWeight(pPlayer) {
 Float:CalculatePlayerAmmoWeight(pPlayer) {
     new Float:flWeight = 0.0;
 
-    new iSize = sizeof(g_fAmmoWeight);
+    new iSize = sizeof(AMMO_LIST);
     for (new iAmmoId = 0; iAmmoId < iSize; ++iAmmoId) {
         new iBpAmmo = get_member(pPlayer, m_rgAmmo, iAmmoId);
-        flWeight += iBpAmmo * g_fAmmoWeight[iAmmoId];
+        new iAmmoHandler = ZP_Ammo_GetHandlerById(iAmmoId);
+        if (iAmmoHandler != -1) {
+            flWeight += iBpAmmo * ZP_Ammo_GetWeight(iAmmoHandler);
+        }
     }
 
     return flWeight;

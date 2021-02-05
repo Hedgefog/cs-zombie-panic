@@ -36,6 +36,8 @@ public plugin_precache() {
     CW_Bind(g_iCwHandler, CWB_Deploy, "@Weapon_Deploy");
     CW_Bind(g_iCwHandler, CWB_GetMaxSpeed, "@Weapon_GetMaxSpeed");
     CW_Bind(g_iCwHandler, CWB_CanDrop, "@Weapon_CanDrop");
+
+    ZP_Weapons_Register(g_iCwHandler, 0.0);
 }
 
 public plugin_init() {

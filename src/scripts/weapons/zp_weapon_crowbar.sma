@@ -42,6 +42,8 @@ public plugin_precache() {
     CW_Bind(g_iCwHandler, CWB_Spawn, "@Weapon_Spawn");
     CW_Bind(g_iCwHandler, CWB_WeaponBoxModelUpdate, "@Weapon_WeaponBoxSpawn");
     CW_Bind(g_iCwHandler, CWB_CanDrop, "@Weapon_CanDrop");
+
+    ZP_Weapons_Register(g_iCwHandler, ZP_WEIGHT_MELEE);
 }
 
 public plugin_init() {
