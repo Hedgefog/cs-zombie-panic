@@ -116,16 +116,16 @@ Float:CalculatePlayerMaxSpeed(pPlayer) {
         flMaxSpeed *= 1.25;
     }
 
-    if (g_bPlayerMoveBack[pPlayer]) {
-        flMaxSpeed *= ZP_BACKWARD_SPEED_MODIFIER;
-    } else if (g_bPlayerStrafing[pPlayer]) {
-        flMaxSpeed *= ZP_STRAFE_SPEED_MODIFIER;
-    }
-
     flMaxSpeed -= CalculatePlayerInventoryWeight(pPlayer);
 
     if (ZP_Player_InPanic(pPlayer)) {
         flMaxSpeed *= ZP_PANIC_SPEED_MODIFIER;
+    }
+
+    if (g_bPlayerMoveBack[pPlayer]) {
+        flMaxSpeed *= ZP_BACKWARD_SPEED_MODIFIER;
+    } else if (g_bPlayerStrafing[pPlayer]) {
+        flMaxSpeed *= ZP_STRAFE_SPEED_MODIFIER;
     }
 
     return flMaxSpeed;
