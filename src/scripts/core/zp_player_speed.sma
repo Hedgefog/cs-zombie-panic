@@ -13,39 +13,6 @@
 
 #define SPEED_BUTTONS (IN_DUCK | IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT)
 
-new const Float:g_pFweaponWeight[CSW_LAST_WEAPON + 1] = {
-    ZP_WEIGHT_PISTOL, // weapon_p228
-    0.0, // weapon_shield
-    ZP_WEIGHT_SNIPER, // weapon_scout
-    0.0, // weapon_hegrenade
-    ZP_WEIGHT_RIFLE, // weapon_xm1014
-    0.0, // weapon_c4
-    ZP_WEIGHT_RIFLE, // weapon_mac10
-    ZP_WEIGHT_RIFLE, // weapon_aug
-    0.0, // weapon_smokegrenade
-    ZP_WEIGHT_PISTOL, // weapon_elite
-    ZP_WEIGHT_PISTOL, // weapon_fiveseven
-    ZP_WEIGHT_RIFLE, // weapon_ump45
-    ZP_WEIGHT_RIFLE, // weapon_sg550
-    ZP_WEIGHT_RIFLE, // weapon_galil
-    ZP_WEIGHT_RIFLE, // weapon_famas
-    ZP_WEIGHT_PISTOL, // weapon_usp
-    ZP_WEIGHT_PISTOL, // weapon_glock18
-    ZP_WEIGHT_SNIPER, // weapon_awp
-    ZP_WEIGHT_RIFLE, // weapon_mp5navy
-    ZP_WEIGHT_BFF, // weapon_m249
-    ZP_WEIGHT_RIFLE, // weapon_m3
-    ZP_WEIGHT_RIFLE, // weapon_m4a1
-    ZP_WEIGHT_RIFLE, // weapon_tmp
-    ZP_WEIGHT_SNIPER, // weapon_g3sg1
-    0.0, // weapon_flashbang
-    ZP_WEIGHT_MAGNUM, // weapon_deagle
-    ZP_WEIGHT_RIFLE, // weapon_sg552
-    ZP_WEIGHT_RIFLE, // weapon_ak47
-    ZP_WEIGHT_MELEE, // weapon_knife
-    ZP_WEIGHT_RIFLE, // weapon_p90
-};
-
 new const Float:g_fAmmoWeight[] = {
     0.0,
     ZP_WEIGHT_MAGNUM_AMMO, // "338Magnum"
@@ -198,10 +165,7 @@ Float:CalculatePlayerWeaponsWeight(pPlayer) {
         new pItem = get_member(pPlayer, m_rgpPlayerItems, iSlot);
 
         while (pItem != -1) {
-            // if (pItem != pActiveItem) {
-            new iWeaponId = get_member(pItem, m_iId);
-            flWeight += g_pFweaponWeight[iWeaponId];
-            // }
+            flWeight += ZP_Weapons_GetWeight(pItem);
 
             new iAmmoId = get_member(pItem, m_Weapon_iPrimaryAmmoType);
             if (iAmmoId != -1) {
