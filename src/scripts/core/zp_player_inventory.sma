@@ -91,18 +91,21 @@ public OnPlayerSpawn_Post(pPlayer) {
 
 DropBackpack(pPlayer) {
     new pActiveItem = get_member(pPlayer, m_pActiveItem);
+    new iIgnoreAmmoId = -1;
     new iActiveSlot;
 
     if (pActiveItem != -1) {
         // remove active item from player's inventory
         TakePlayerItem(pPlayer, pActiveItem, iActiveSlot);
+        iIgnoreAmmoId = get_member(pActiveItem, m_Weapon_iPrimaryAmmoType);
     }
 
     // drop unactive items
     new pWeaponBox = DropPlayerWeaponBox(pPlayer);
     // new pItemsCount = PackPlayerItems(pPlayer, pWeaponBox);
     DropPlayerItems(pPlayer);
-    new iAmmoTypesCount = PackPlayerAmmo(pPlayer, pWeaponBox);
+
+    new iAmmoTypesCount = PackPlayerAmmo(pPlayer, pWeaponBox, iIgnoreAmmoId);
 
     if (iAmmoTypesCount) {
         engfunc(EngFunc_SetModel, pWeaponBox, ZP_WEAPONBOX_MODEL);
@@ -257,11 +260,15 @@ DropPlayerItem(pPlayer, pItem, iSlot) {
     return pWeaponBox;
 }
 
-PackPlayerAmmo(pPlayer, pWeaponBox) {
+PackPlayerAmmo(pPlayer, pWeaponBox, iIgnoreAmmoId = -1) {
     new iWeaponBoxAmmoIndex = 0;
 
     new iSize = sizeof(AMMO_LIST);
     for (new iAmmoId = 0; iAmmoId < iSize; ++iAmmoId) {
+        if (iAmmoId == iIgnoreAmmoId) {
+            continue;
+        }
+
         new iBpAmmo = get_member(pPlayer, m_rgAmmo, iAmmoId);
 
         if (iBpAmmo > 0) {
