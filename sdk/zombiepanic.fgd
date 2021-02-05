@@ -1,0 +1,290 @@
+@BaseClass = Global 
+[ 
+	globalname(string) : "Global Entity Name" 
+]
+
+@BaseClass = Angles
+[
+    angles(string) : "Pitch Yaw Roll (Y Z X)" : "0 0 0"
+]
+
+@BaseClass = Target
+[
+    target(target_destination) : "Target"
+]
+
+@BaseClass = Targetname
+[
+    targetname(target_source) : "Name"
+]
+
+@BaseClass = Team
+[
+    team(choices) : "Team" : 0 =
+    [
+        0: "None"
+        1: "Terrorists"
+        2: "Counter-Terrorists"
+    ]
+]
+
+@BaseClass base(Targetname, Global) = Breakable
+[
+	target(target_destination) : "Target on break"
+	health(integer) : "Strength" : 1
+	material(choices) :"Material type" : 0 =
+	[
+		0: "Glass"
+		1: "Wood"
+		2: "Metal"
+		3: "Flesh"
+		4: "Cinder Block"  
+		5: "Ceiling Tile"
+		6: "Computer"
+		7: "Unbreakable Glass"
+		8: "Rocks"
+	]
+	explosion(choices) : "Gibs Direction" : 0 =
+	[
+		0: "Random"
+		1: "Relative to Attack"
+	]
+	delay(string) : "Delay before fire" : "0"
+	gibmodel(studio) : "Gib Model" : ""
+	spawnobject(choices) : "Spawn On Break" : 0 =
+	[
+		0: "Nothing"
+		1: "Armor"
+		2: "Healthkit"
+		3: "Colt .45"
+		4: ".45 Clip"
+		5: "M-4 Rifle"
+		6: "M-4 Rifle Magazine"
+		7: "Shotgun"
+		8: "Shotgun Shells"
+		9: "357"
+		10: "357 clip"
+		11: "Hand grenade"
+		12: "Satchel Charge"
+	]
+	explodemagnitude(integer) : "Explode Magnitude (0=none)" : 0
+]
+
+@BaseClass base(Target, Targetname) = Trigger
+[
+	killtarget(target_destination) : "Kill target"
+	netname(target_destination) : "Target Path"
+	master(string) : "Master" 
+	sounds(choices) : "Sound style" : 0 =
+	[
+		0 : "No Sound"
+	]
+	delay(string) : "Delay before trigger" : "0"
+	message(string) : "Message (set sound too!)"
+	spawnflags(flags) = 
+	[
+		1: "Monsters" : 0
+		2: "No Clients" : 0
+		4: "Pushables": 0
+	]
+]
+
+@BaseClass = RenderFxChoices
+[
+	renderfx(choices) :"Render FX" : 0 =
+	[
+		0: "Normal"
+		1: "Slow Pulse"
+		2: "Fast Pulse"
+		3: "Slow Wide Pulse"
+		4: "Fast Wide Pulse"
+		9: "Slow Strobe"
+		10: "Fast Strobe"
+		11: "Faster Strobe"
+		12: "Slow Flicker"
+		13: "Fast Flicker"
+		5: "Slow Fade Away"
+		6: "Fast Fade Away"
+		7: "Slow Become Solid"
+		8: "Fast Become Solid"
+		14: "Constant Glow"
+		15: "Distort"
+		16: "Hologram (Distort + fade)"
+	]
+]
+
+@BaseClass base(RenderFxChoices) = RenderFields 
+[
+	rendermode(choices) : "Render Mode" : 0 =
+	[
+		0: "Normal"
+		1: "Color"
+		2: "Texture"
+		3: "Glow"
+		4: "Solid"
+		5: "Additive"
+	]
+	renderamt(integer) : "FX Amount (1 - 255)"
+	rendercolor(color255) : "FX Color (R G B)" : "0 0 0"
+]
+
+
+@SolidClass base(Breakable, RenderFields) = func_breakable : "Breakable Object" 
+[
+	spawnflags(flags) =
+	[
+		1 : "Only Trigger" : 0
+		2 : "Touch"	   : 0
+		4 : "Pressure"     : 0
+		16: "Explosion Only": 0
+		256: "Instant Crowbar" : 1
+	]
+	_minlight(string) : "Minimum light level"
+]
+
+@SolidClass base(Global, Targetname, Target, RenderFields, Angles) = func_button : "Button" 
+[
+	speed(integer) : "Speed" : 5
+	health(integer) : "Health (shootable if > 0)"
+	lip(integer) : "Lip"
+	master(string) : "Master" 
+	sounds(choices) : "Sounds" : 0 = 
+	[
+		0: "None"
+		1: "Big zap & Warmup"
+		2: "Access Denied"
+		3: "Access Granted"
+		4: "Quick Combolock"
+		5: "Power Deadbolt 1"
+		6: "Power Deadbolt 2"
+		7: "Plunger"
+		8: "Small zap"
+		9: "Keycard Sound"
+		10: "Buzz"
+		11: "Buzz Off"
+		14: "Lightswitch"
+	]
+	wait(integer) : "delay before reset (-1 stay)" : 3
+	delay(string) : "Delay before trigger" : "0"
+	spawnflags(flags) =
+	[
+		1: "Don't move" : 0
+		32: "Toggle" : 0
+		64: "Sparks" : 0
+		256:"Touch Activates": 0
+		512:"Human Only": 0
+	]
+	locked_sound(choices) : "Locked Sound" : 0 = 
+	[
+		0: "None"
+		2: "Access Denied"
+		8: "Small zap"
+		10: "Buzz"
+		11: "Buzz Off"
+		12: "Latch Locked"
+	]
+	unlocked_sound(choices) : "Unlocked Sound" : 0 = 
+	[
+		0: "None"
+		1: "Big zap & Warmup"
+		3: "Access Granted"
+		4: "Quick Combolock"
+		5: "Power Deadbolt 1"
+		6: "Power Deadbolt 2"
+		7: "Plunger"
+		8: "Small zap"
+		9: "Keycard Sound"
+		10: "Buzz"
+		13: "Latch Unlocked"
+		14: "Lightswitch"
+	]
+	locked_sentence(choices) : "Locked Sentence" : 0 = 
+	[
+		0: "None"
+		1: "Gen. Access Denied"
+		2: "Security Lockout"
+		3: "Blast Door"
+		4: "Fire Door"
+		5: "Chemical Door"
+		6: "Radiation Door"
+		7: "Gen. Containment"
+		8: "Maintenance Door"
+		9: "Broken Shut Door"
+	]
+	unlocked_sentence(choices) : "Unlocked Sentence" : 0 = 
+	[
+		0: "None"
+		1: "Gen. Access Granted"
+		2: "Security Disengaged"
+		3: "Blast Door"
+		4: "Fire Door"
+		5: "Chemical Door"
+		6: "Radiation Door"
+		7: "Gen. Containment"
+		8: "Maintenance area"
+	]
+	_minlight(string) : "Minimum light level"
+]
+
+@BaseClass base(Angles) size(-16 -16 -36, 16 16 36) color(0 255 0) = PlayerClass []
+@BaseClass size(-16 -16 0, 16 16 32) color(0 0 200) base(Targetname, Angles) = Weapon []
+
+@PointClass base(PlayerClass) = info_player_team1 : "Zombie Start" []
+@PointClass base(PlayerClass) = info_player_team2 : "Survivor Start" []
+
+@PointClass
+	base(Weapon)
+	Studio("models/zombiepanic/b1/items/w_9mmclip.mdl")
+= ammo_9mmclip : "9mm Pistol Ammo" []
+@PointClass
+	base(Weapon)
+	Studio("models/zombiepanic/b1/items/w_556ARclip.mdl")
+= ammo_556AR : "5.56mm Assault Rifle Ammo" []
+@PointClass
+	base(Weapon)
+	Studio("models/w_chainammo.mdl")
+= ammo_556box : "box of 200 5.56mm rounds" []
+@PointClass
+	base(Weapon)
+	Studio("models/zombiepanic/b1/items/w_shotbox.mdl")
+= ammo_buckshot : "Shotgun Ammo" []
+@PointClass
+	base(Weapon)
+	Studio("models/zombiepanic/b1/items/w_357ammobox.mdl")
+= ammo_357 : "357 Ammo" []
+
+@PointClass
+	base(Weapon)
+	Studio("models/w_crowbar.mdl")
+= weapon_crowbar : "Crowbar" []
+@PointClass
+	base(Weapon)
+	Studio("models/zombiepanic/b1/items/w_9mmhandgun.mdl")
+= weapon_9mmhandgun : "9mm Handgun" []
+@PointClass
+	base(Weapon)
+	Studio("models/zombiepanic/b1/items/w_357.mdl")
+= weapon_357 : "357 Handgun" []
+@PointClass
+	base(Weapon)
+	Studio("models/zombiepanic/b1/items/w_556ar.mdl")
+= weapon_556AR : "5.56mm Assault Rifle" []
+@PointClass
+	base(Weapon)
+	Studio("models/zombiepanic/b1/items/w_shotgun.mdl")
+= weapon_shotgun : "Shotgun" []
+@PointClass
+	base(Weapon)
+	Studio("models/zombiepanic/b1/items/w_satchel.mdl")
+= weapon_satchel : "Satchel Charge Ammo" []
+@PointClass
+	base(Weapon)
+	Studio("models/zombiepanic/b1/items/w_grenade.mdl")
+= weapon_handgrenade : "Handgrenade Ammo" []
+
+@SolidClass base(Trigger) = trigger_endround : "Trigger: End Round" [
+	spawnflags(flags) = 
+	[
+		1: "For all" : 0
+	]
+]
