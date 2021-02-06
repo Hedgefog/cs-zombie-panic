@@ -68,74 +68,7 @@ public @Weapon_Idle(this) {
     }
 
     if (get_member(this, m_flStartThrow)) {
-        static Float:vecThrowAngle[3];
-        pev(pPlayer, pev_v_angle, vecThrowAngle);
-
-        if (vecThrowAngle[0] < 0.0) {
-            vecThrowAngle[0] = -10.0 + vecThrowAngle[0] * ((90.0 - 10.0) / 90.0);
-        } else {
-            vecThrowAngle[0] = -10.0 + vecThrowAngle[0] * ((90.0 + 10.0) / 90.0);
-        }
-
-        new Float:flVel = (90.0 - vecThrowAngle[0]) * 4;
-        if (flVel > 500.0) {
-            flVel = 500.0;
-        }
-
-        engfunc(EngFunc_MakeVectors, vecThrowAngle); 
-
-        static Float:vecSrc[3];
-        ExecuteHam(Ham_Player_GetGunPosition, pPlayer, vecSrc);
-
-        static Float:vecThrow[3];
-        pev(pPlayer, pev_velocity, vecThrow);
-
-        static Float:vecForward[3];
-        get_global_vector(GL_v_forward, vecForward);
-
-        for (new i = 0; i < 3; ++i) {
-            vecSrc[i] += vecForward[i] * 16.0;
-            vecThrow[i] += vecForward[i] * flVel;
-        }
-
-        // alway explode 3 seconds after the pin was pulled
-        new Float:flTime = get_member(this, m_flStartThrow) - get_gametime() + 3.0;
-        if (flTime < 0.0) {
-            flTime = 0.0;
-        }
-
-        ShootTimed(pPlayer, vecSrc, vecThrow, flTime);
-
-        if ( flVel < 500 ) {
-        	CW_PlayAnimation(this, 3);
-        } else if ( flVel < 1000 ) {
-        	CW_PlayAnimation(this, 4);
-        } else {
-        	CW_PlayAnimation(this, 5);
-        }
-
-        // player "shoot" animation
-        rg_set_animation(pPlayer, PLAYER_ATTACK1);
-
-        set_member(this, m_flReleaseThrow, 0.0);
-        set_member(this, m_flStartThrow, 0.0);
-        set_member(this, m_Weapon_flNextPrimaryAttack, 0.5); // m_flNextPrimaryAttack = GetNextAttackDelay(0.5)
-        set_member(this, m_Weapon_flTimeWeaponIdle, 0.5);
-
-        set_member(pPlayer, m_rgAmmo, get_member(pPlayer, m_rgAmmo, g_iAmmoId) - 1, g_iAmmoId);
-
-        if (get_member(pPlayer, m_rgAmmo, g_iAmmoId)) {
-            // just threw last grenade
-            // set attack times in the future, and weapon idle in the future so we can see the whole throw
-            // animation, weapon idle will automatically retire the weapon for us.
-            // m_flTimeWeaponIdle = m_flNextSecondaryAttack = m_flNextPrimaryAttack = GetNextAttackDelay(0.5);// ensure that the animation can finish playing
-            set_member(this, m_Weapon_flTimeWeaponIdle, 0.5);
-            set_member(this, m_Weapon_flNextSecondaryAttack, 0.5);
-            set_member(this, m_Weapon_flNextPrimaryAttack, 0.5);
-        }
-
-        ZP_Player_UpdateSpeed(pPlayer);
-
+        ThrowGrenade(this);
         return;
     } else if (get_member(this, m_flReleaseThrow) > 0.0) {
         // we've finished the throw, restart.
@@ -169,7 +102,9 @@ public @Weapon_Deploy(this) {
 }
 
 public @Weapon_Holster(this) {
-    CW_Idle(this); // force idle to handle throw
+    if (get_member(this, m_flStartThrow)) {
+        ThrowGrenade(this);
+    }
 
     // set_member(this, m_flStartThrow, 0.0);
     // set_member(this, m_flReleaseThrow, -1.0);
@@ -196,6 +131,78 @@ public @Weapon_Spawn(this) {
 
 public @Weapon_WeaponBoxSpawn(this, pWeaponBox) {
     engfunc(EngFunc_SetModel, pWeaponBox, ZP_WEAPON_GRENADE_W_MODEL);
+}
+
+ThrowGrenade(this) {
+    new pPlayer = CW_GetPlayer(this);
+
+    static Float:vecThrowAngle[3];
+    pev(pPlayer, pev_v_angle, vecThrowAngle);
+
+    if (vecThrowAngle[0] < 0.0) {
+        vecThrowAngle[0] = -10.0 + vecThrowAngle[0] * ((90.0 - 10.0) / 90.0);
+    } else {
+        vecThrowAngle[0] = -10.0 + vecThrowAngle[0] * ((90.0 + 10.0) / 90.0);
+    }
+
+    new Float:flVel = (90.0 - vecThrowAngle[0]) * 4;
+    if (flVel > 500.0) {
+        flVel = 500.0;
+    }
+
+    engfunc(EngFunc_MakeVectors, vecThrowAngle); 
+
+    static Float:vecSrc[3];
+    ExecuteHam(Ham_Player_GetGunPosition, pPlayer, vecSrc);
+
+    static Float:vecThrow[3];
+    pev(pPlayer, pev_velocity, vecThrow);
+
+    static Float:vecForward[3];
+    get_global_vector(GL_v_forward, vecForward);
+
+    for (new i = 0; i < 3; ++i) {
+        vecSrc[i] += vecForward[i] * 16.0;
+        vecThrow[i] += vecForward[i] * flVel;
+    }
+
+    // alway explode 3 seconds after the pin was pulled
+    new Float:flTime = get_member(this, m_flStartThrow) - get_gametime() + 3.0;
+    if (flTime < 0.0) {
+        flTime = 0.0;
+    }
+
+    ShootTimed(pPlayer, vecSrc, vecThrow, flTime);
+
+    if ( flVel < 500 ) {
+        CW_PlayAnimation(this, 3);
+    } else if ( flVel < 1000 ) {
+        CW_PlayAnimation(this, 4);
+    } else {
+        CW_PlayAnimation(this, 5);
+    }
+
+    // player "shoot" animation
+    rg_set_animation(pPlayer, PLAYER_ATTACK1);
+
+    set_member(this, m_flReleaseThrow, 0.0);
+    set_member(this, m_flStartThrow, 0.0);
+    set_member(this, m_Weapon_flNextPrimaryAttack, 0.5); // m_flNextPrimaryAttack = GetNextAttackDelay(0.5)
+    set_member(this, m_Weapon_flTimeWeaponIdle, 0.5);
+
+    set_member(pPlayer, m_rgAmmo, get_member(pPlayer, m_rgAmmo, g_iAmmoId) - 1, g_iAmmoId);
+
+    if (get_member(pPlayer, m_rgAmmo, g_iAmmoId)) {
+        // just threw last grenade
+        // set attack times in the future, and weapon idle in the future so we can see the whole throw
+        // animation, weapon idle will automatically retire the weapon for us.
+        // m_flTimeWeaponIdle = m_flNextSecondaryAttack = m_flNextPrimaryAttack = GetNextAttackDelay(0.5);// ensure that the animation can finish playing
+        set_member(this, m_Weapon_flTimeWeaponIdle, 0.5);
+        set_member(this, m_Weapon_flNextSecondaryAttack, 0.5);
+        set_member(this, m_Weapon_flNextPrimaryAttack, 0.5);
+    }
+
+    ZP_Player_UpdateSpeed(pPlayer);
 }
 
 ShootTimed(pOwner, const Float:vecStart[3], const Float:vecVelocity[3], Float:flTime) {
