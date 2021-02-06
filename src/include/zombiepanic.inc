@@ -23,7 +23,8 @@ forward ZP_Fw_Player_AimItem(pPlayer, pItem);
 // Player inventory
 
 native ZP_Player_UpdateSpeed(pPlayer);
-native ZP_Player_DropBackpack(pPlayer);
+native ZP_Player_DropUnactiveWeapons(pPlayer);
+native ZP_Player_DropUnactiveAmmo(pPlayer);
 native ZP_Player_GetAmmo(pPlayer, const szAmmo[]);
 native ZP_Player_SetAmmo(pPlayer, const szAmmo[], iValue);
 native ZP_Player_AddAmmo(pPlayer, const szAmmo[], iValue);

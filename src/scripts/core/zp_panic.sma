@@ -79,8 +79,9 @@ bool:Panic(pPlayer) {
     }
 
     g_bPlayerPanic[pPlayer] = true;
-    ZP_Player_DropBackpack(pPlayer);
-    ZP_Player_UpdateSpeed(pPlayer);
+    ZP_Player_DropUnactiveWeapons(pPlayer);
+    ZP_Player_DropUnactiveAmmo(pPlayer);
+    // ZP_Player_UpdateSpeed(pPlayer);
 
     emessage_begin(MSG_ONE, gmsgScreenShake, _, pPlayer);
     ewrite_short(floatround(1.5 * (1<<12)));

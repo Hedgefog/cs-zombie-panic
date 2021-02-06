@@ -30,7 +30,8 @@ public plugin_init() {
 }
 
 public plugin_natives() {
-    register_native("ZP_Player_DropBackpack", "Native_DropBackpack");
+    register_native("ZP_Player_DropUnactiveWeapons", "Native_DropUnactiveWeapons");
+    register_native("ZP_Player_DropUnactiveAmmo", "Native_DropUnactiveAmmo");
     register_native("ZP_Player_GetAmmo", "Native_GetAmmo");
     register_native("ZP_Player_SetAmmo", "Native_SetAmmo");
     register_native("ZP_Player_AddAmmo", "Native_AddAmmo");
@@ -48,10 +49,15 @@ public Native_NextAmmo(iPluginId, iArgc) {
     SelectNextPlayerAmmo(pPlayer);
 }
 
-public Native_DropBackpack(iPluginId, iArgc) {
+public Native_DropUnactiveWeapons(iPluginid, iArgc) {
     new pPlayer = get_param(1);
 
-    DropBackpack(pPlayer);
+    DropPlayerUnactiveWeapons(pPlayer);
+}
+public Native_DropUnactiveAmmo(iPluginid, iArgc) {
+    new pPlayer = get_param(1);
+
+    DropPlayerUnactiveAmmo(pPlayer);
 }
 
 public Native_GetAmmo(iPluginId, iArgc) {
@@ -81,7 +87,8 @@ public Native_AddAmmo(iPluginId, iArgc) {
 }
 
 public OnPlayerKilled(pPlayer) {
-    DropBackpack(pPlayer);
+    DropPlayerUnactiveAmmo(pPlayer);
+    DropPlayerUnactiveWeapons(pPlayer);
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
@@ -89,22 +96,15 @@ public OnPlayerSpawn_Post(pPlayer) {
     SelectNextPlayerAmmo(pPlayer, false);
 }
 
-DropBackpack(pPlayer) {
+DropPlayerUnactiveAmmo(pPlayer) {
     new pActiveItem = get_member(pPlayer, m_pActiveItem);
     new iIgnoreAmmoId = -1;
-    new iActiveSlot;
 
     if (pActiveItem != -1) {
-        // remove active item from player's inventory
-        TakePlayerItem(pPlayer, pActiveItem, iActiveSlot);
         iIgnoreAmmoId = get_member(pActiveItem, m_Weapon_iPrimaryAmmoType);
     }
 
-    // drop unactive items
     new pWeaponBox = DropPlayerWeaponBox(pPlayer);
-    // new pItemsCount = PackPlayerItems(pPlayer, pWeaponBox);
-    DropPlayerItems(pPlayer);
-
     new iAmmoTypesCount = PackPlayerAmmo(pPlayer, pWeaponBox, iIgnoreAmmoId);
 
     if (iAmmoTypesCount) {
@@ -112,6 +112,20 @@ DropBackpack(pPlayer) {
     } else {
         engfunc(EngFunc_RemoveEntity, pWeaponBox);
     }
+
+    ZP_Player_UpdateSpeed(pPlayer);
+}
+
+DropPlayerUnactiveWeapons(pPlayer) {
+    new pActiveItem = get_member(pPlayer, m_pActiveItem);
+    new iActiveSlot;
+
+    if (pActiveItem != -1) {
+        // remove active item from player's inventory
+        TakePlayerItem(pPlayer, pActiveItem, iActiveSlot);
+    }
+
+    DropPlayerItems(pPlayer);
 
     if (pActiveItem != -1) {
         // return the active item to player's inventory for the default drop logic

@@ -13,10 +13,12 @@ public plugin_init() {
 
     register_clcmd("changeammotype", "OnClCmd_NextAmmo");
     register_clcmd("dropammo", "OnClCmd_DropAmmo");
+    register_clcmd("dua", "OnClCmd_DropUnactiveAmmo");
     register_clcmd("panic", "OnClCmd_Panic");
 
     register_clcmd("radio1", "OnClCmd_NextAmmo");
     register_clcmd("radio2", "OnClCmd_DropAmmo");
+    register_clcmd("radio3", "OnClCmd_DropUnactiveAmmo");
     register_clcmd("buyequip", "OnClCmd_Panic");
 
     register_impulse(100, "OnImpulse_100");
@@ -59,6 +61,19 @@ public OnClCmd_DropAmmo(pPlayer) {
     }
 
     ZP_Player_DropAmmo(pPlayer);
+    return PLUGIN_HANDLED;
+}
+
+public OnClCmd_DropUnactiveAmmo(pPlayer) {
+    if (!is_user_alive(pPlayer)) {
+        return PLUGIN_HANDLED;
+    }
+
+    if (ZP_Player_IsZombie(pPlayer)) {
+        return PLUGIN_HANDLED;
+    }
+
+    ZP_Player_DropUnactiveAmmo(pPlayer);
     return PLUGIN_HANDLED;
 }
 
