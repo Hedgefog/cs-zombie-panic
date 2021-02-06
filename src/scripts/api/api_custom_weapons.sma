@@ -113,6 +113,7 @@ public plugin_precache() {
     register_forward(FM_SetModel, "OnSetModel_Post", 1);
 
     RegisterHam(Ham_Spawn, "weaponbox", "OnWeaponboxSpawn_Post");
+    RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
     RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage", .Post = 0);
     RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage_Post", .Post = 1);
 
@@ -544,6 +545,19 @@ public OnWeaponboxSpawn_Post(this) {
     g_pNewWeaponboxEnt = this;
 }
 
+public OnPlayerPreThink_Post(pPlayer) {
+    new pActiveItem = get_member(pPlayer, m_pActiveItem);
+    if (pActiveItem == -1) {
+        SetWeaponPrediction(pPlayer, false);
+        return HAM_IGNORED;
+    }
+
+    new CW:iHandler = GetHandlerByEntity(pActiveItem);
+    SetWeaponPrediction(pPlayer, iHandler == CW_INVALID_HANDLER);
+
+    return HAM_HANDLED;
+}
+
 public OnPlayerTakeDamage(pPlayer, pInflictor, pAttacker) {
     g_pKillerItem = pInflictor;
 }
@@ -802,8 +816,11 @@ WeaponDeploy(this) {
         return;
     }
 
-    SetThink(this, "DisablePrediction");
-    set_pev(this, pev_nextthink, get_gametime() + 0.1);
+    new pPlayer = GetPlayer(this);
+    SetWeaponPrediction(pPlayer, false);
+
+    // SetThink(this, "DisablePrediction");
+    // set_pev(this, pev_nextthink, get_gametime() + 0.1);
 }
 
 bool:ShouldWeaponIdle(this) {

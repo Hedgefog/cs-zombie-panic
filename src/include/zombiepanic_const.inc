@@ -120,7 +120,7 @@ stock const ZP_WEAPON_SHOTGUN_V_MODEL[] = "models/zombiepanic/b1/items/v_shotgun
 stock const ZP_WEAPON_SHOTGUN_P_MODEL[] = "models/zombiepanic/b1/items/p_shotgun.mdl";
 stock const ZP_WEAPON_SHOTGUN_W_MODEL[] = "models/zombiepanic/b1/items/w_shotgun.mdl";
 
-stock const ZP_WEAPON_CROWBAR_V_MODEL[] = "models/zombiepanic/b2/items/v_crowbar.mdl";
+stock const ZP_WEAPON_CROWBAR_V_MODEL[] = "models/zombiepanic/b1/items/v_crowbar.mdl";
 stock const ZP_WEAPON_CROWBAR_P_MODEL[] = "models/zombiepanic/b1/items/p_crowbar.mdl";
 stock const ZP_WEAPON_CROWBAR_W_MODEL[] = "models/w_crowbar.mdl";
 
