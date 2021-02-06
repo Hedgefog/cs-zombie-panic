@@ -57,7 +57,7 @@ public Native_DropUnactiveWeapons(iPluginid, iArgc) {
 public Native_DropUnactiveAmmo(iPluginid, iArgc) {
     new pPlayer = get_param(1);
 
-    DropPlayerUnactiveAmmo(pPlayer);
+    DropPlayerAmmo(pPlayer, true);
 }
 
 public Native_GetAmmo(iPluginId, iArgc) {
@@ -87,8 +87,8 @@ public Native_AddAmmo(iPluginId, iArgc) {
 }
 
 public OnPlayerKilled(pPlayer) {
-    DropPlayerUnactiveAmmo(pPlayer);
     DropPlayerUnactiveWeapons(pPlayer);
+    DropPlayerAmmo(pPlayer);
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
@@ -96,16 +96,9 @@ public OnPlayerSpawn_Post(pPlayer) {
     SelectNextPlayerAmmo(pPlayer, false);
 }
 
-DropPlayerUnactiveAmmo(pPlayer) {
-    new pActiveItem = get_member(pPlayer, m_pActiveItem);
-    new iIgnoreAmmoId = -1;
-
-    if (pActiveItem != -1) {
-        iIgnoreAmmoId = get_member(pActiveItem, m_Weapon_iPrimaryAmmoType);
-    }
-
+DropPlayerAmmo(pPlayer, bool:bUnactiveOnly = false) {
     new pWeaponBox = DropPlayerWeaponBox(pPlayer);
-    new iAmmoTypesCount = PackPlayerAmmo(pPlayer, pWeaponBox, iIgnoreAmmoId);
+    new iAmmoTypesCount = PackPlayerAmmo(pPlayer, pWeaponBox, bUnactiveOnly);
 
     if (iAmmoTypesCount) {
         engfunc(EngFunc_SetModel, pWeaponBox, ZP_WEAPONBOX_MODEL);
@@ -274,13 +267,30 @@ DropPlayerItem(pPlayer, pItem, iSlot) {
     return pWeaponBox;
 }
 
-PackPlayerAmmo(pPlayer, pWeaponBox, iIgnoreAmmoId = -1) {
+PackPlayerAmmo(pPlayer, pWeaponBox, bool:bUnactiveOnly = false) {
     new iWeaponBoxAmmoIndex = 0;
 
     new iSize = sizeof(AMMO_LIST);
     for (new iAmmoId = 0; iAmmoId < iSize; ++iAmmoId) {
-        if (iAmmoId == iIgnoreAmmoId) {
-            continue;
+        if (bUnactiveOnly) {
+            new bool:bSkip = false;
+
+            for (new iSlot = 0; iSlot < 6; ++iSlot) {
+                new pItem = get_member(pPlayer, m_rgpPlayerItems, iSlot);
+
+                while (pItem != -1) {
+                    if (iAmmoId == get_member(pItem, m_Weapon_iPrimaryAmmoType)) {
+                        bSkip = true;
+                        break;
+                    }
+
+                    pItem = get_member(pItem, m_pNext);
+                }
+            }
+
+            if (bSkip) {
+                continue;
+            }
         }
 
         new iBpAmmo = get_member(pPlayer, m_rgAmmo, iAmmoId);
