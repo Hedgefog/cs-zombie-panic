@@ -21,7 +21,9 @@ new g_bPlayerPickup[MAX_PLAYERS + 1] = { false, ... };
 
 new g_pFwAimItem;
 new g_pFwResult;
+
 new g_pCvarUsePickup;
+new g_pCvarUsePickupHighlight;
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
@@ -36,6 +38,7 @@ public plugin_init() {
     register_forward(FM_AddToFullPack, "OnAddToFullPack_Post", 1);
 
     g_pCvarUsePickup = register_cvar("zp_use_pickup", "1");
+    g_pCvarUsePickupHighlight = register_cvar("zp_use_pickup_highlight", "1");
     g_pFwAimItem = CreateMultiForward("ZP_Fw_Player_AimItem", ET_IGNORE, FP_CELL, FP_CELL);
 }
 
@@ -49,6 +52,10 @@ public OnItemTouch(pEntity, pToucher) {
 
 public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     if (!get_pcvar_num(g_pCvarUsePickup)) {
+        return FMRES_IGNORED;
+    }
+
+    if (!get_pcvar_num(g_pCvarUsePickupHighlight)) {
         return FMRES_IGNORED;
     }
 
