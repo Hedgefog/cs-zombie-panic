@@ -72,10 +72,10 @@ public OnSpawn(pEntity) {
 
     if (IsObjectiveEntity(pEntity)) {
         engfunc(EngFunc_RemoveEntity, pEntity);
-    } else if (IsDelayEntity(pEntity)) {
-        if (get_ent_data_float(pEntity, "CBaseToggle", "m_flWait") < 0.0) {
-            set_ent_data_float(pEntity, "CBaseToggle", "m_flWait", get_pcvar_num(g_pCvarRoundTime) * 60.0 + 1.0);
-        }
+    // } else if (IsDelayEntity(pEntity)) {
+    //     if (get_ent_data_float(pEntity, "CBaseToggle", "m_flWait") < 0.0) {
+    //         set_ent_data_float(pEntity, "CBaseToggle", "m_flWait", get_pcvar_num(g_pCvarRoundTime) * 60.0 + 1.0);
+    //     }
     }
 
     return FMRES_IGNORED;
@@ -148,19 +148,19 @@ bool:IsObjectiveEntity(pEntity) {
     return false;
 }
 
-bool:IsDelayEntity(pEntity) {
-    new szClassname[32];
-    pev(pEntity, pev_classname, szClassname, charsmax(szClassname));
+// bool:IsDelayEntity(pEntity) {
+//     new szClassname[32];
+//     pev(pEntity, pev_classname, szClassname, charsmax(szClassname));
     
-    new iSize = sizeof(g_rgszDelayEntities);
-    for (new i = 0; i < iSize; ++i) {
-        if (equal(szClassname, g_rgszDelayEntities[i])) {
-            return true;
-        }
-    }
+//     new iSize = sizeof(g_rgszDelayEntities);
+//     for (new i = 0; i < iSize; ++i) {
+//         if (equal(szClassname, g_rgszDelayEntities[i])) {
+//             return true;
+//         }
+//     }
 
-    return false;
-}
+//     return false;
+// }
 
 CreateHiddenBuyZone() {
     new pEntity = engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, "func_buyzone"));
