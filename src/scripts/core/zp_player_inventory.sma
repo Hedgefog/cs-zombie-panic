@@ -100,11 +100,29 @@ DropPlayerAmmo(pPlayer, bool:bUnactiveOnly = false) {
     new pWeaponBox = DropPlayerWeaponBox(pPlayer);
     new iAmmoTypesCount = PackPlayerAmmo(pPlayer, pWeaponBox, bUnactiveOnly);
 
-    if (iAmmoTypesCount) {
-        engfunc(EngFunc_SetModel, pWeaponBox, ZP_WEAPONBOX_MODEL);
-    } else {
+    if (!iAmmoTypesCount) {
         engfunc(EngFunc_RemoveEntity, pWeaponBox);
+        return;
     }
+
+    engfunc(EngFunc_SetModel, pWeaponBox, ZP_WEAPONBOX_MODEL);
+
+    static Float:vecThrowAngle[3];
+    pev(pPlayer, pev_v_angle, vecThrowAngle);
+    engfunc(EngFunc_MakeVectors, vecThrowAngle); 
+
+    static Float:vecVelocity[3];
+    get_global_vector(GL_v_forward, vecVelocity);
+    xs_vec_mul_scalar(vecVelocity, -125.0, vecVelocity);
+    set_pev(pWeaponBox, pev_velocity, vecVelocity);
+
+    static Float:vecAngles[3];
+    vector_to_angle(vecVelocity, vecAngles);
+    vecAngles[0] = 0.0;
+    vecAngles[1] = vecThrowAngle[1] - 180.0;
+    vecAngles[2] = 0.0;
+
+    set_pev(pWeaponBox, pev_angles, vecAngles);
 
     ZP_Player_UpdateSpeed(pPlayer);
 }
