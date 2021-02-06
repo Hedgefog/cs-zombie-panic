@@ -229,8 +229,8 @@
 @BaseClass base(Angles) size(-16 -16 -36, 16 16 36) color(0 255 0) = PlayerClass []
 @BaseClass size(-16 -16 0, 16 16 32) color(0 0 200) base(Targetname, Angles) = Weapon []
 
-@PointClass base(PlayerClass) = info_player_team1 : "Zombie Start" []
-@PointClass base(PlayerClass) = info_player_team2 : "Survivor Start" []
+@PointClass base(PlayerClass) = info_player_team1 : "Survivor Start" []
+@PointClass base(PlayerClass) = info_player_team2 : "Zombie Start" []
 
 @PointClass
 	base(Weapon)
