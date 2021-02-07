@@ -25,26 +25,26 @@ new const g_rgszObjectiveEntities[][] = {
     "weapon_c4"
 };
 
-new const g_rgszDelayEntities[][] = {
-    "trigger_auto",
-    "trigger_changetarget",
-    "trigger_relay",
-    "button_target",
-    "func_door",
-    "func_door_rotating",
-    "func_button",
-    "func_rotating",
-    "func_rot_button",
-    "func_tracktrain",
-    "func_train",
-    "momentary_door",
-    "momentary_rot_button",
-    "trigger_multiple",
-    "trigger_once",
-    "trigger_push"
-};
+// new const g_rgszDelayEntities[][] = {
+//     "trigger_auto",
+//     "trigger_changetarget",
+//     "trigger_relay",
+//     "button_target",
+//     "func_door",
+//     "func_door_rotating",
+//     "func_button",
+//     "func_rotating",
+//     "func_rot_button",
+//     "func_tracktrain",
+//     "func_train",
+//     "momentary_door",
+//     "momentary_rot_button",
+//     "trigger_multiple",
+//     "trigger_once",
+//     "trigger_push"
+// };
 
-new g_pCvarRoundTime;
+// new g_pCvarRoundTime;
 new g_pFwEntitySpawn;
 
 public plugin_precache() {
@@ -52,7 +52,7 @@ public plugin_precache() {
 
     g_pFwEntitySpawn = register_forward(FM_Spawn, "OnSpawn");
 
-    g_pCvarRoundTime = get_cvar_pointer("mp_roundtime");
+    // g_pCvarRoundTime = get_cvar_pointer("mp_roundtime");
 }
 
 public plugin_init() {
