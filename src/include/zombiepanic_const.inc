@@ -1,5 +1,5 @@
 #define ZP_TITLE "Zombie Panic Beta"
-#define ZP_VERSION "0.9.6"
+#define ZP_VERSION "0.10.0"
 
 #define ZP_HUMAN_TEAM 2
 #define ZP_ZOMBIE_TEAM 1
