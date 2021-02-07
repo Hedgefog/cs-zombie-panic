@@ -64,28 +64,28 @@ public OnPlayerKilled_Post(pPlayer) {
         g_iLives++;
     }
 
-    if (!get_member_game(m_bFreezePeriod) && get_member(pPlayer, m_iTeam) != 3) {
+    if (get_member(pPlayer, m_iTeam) != 3) {
         SetupRespawnTask(pPlayer);
     }
 }
 
 SetupRespawnTask(pPlayer) {
-        remove_task(TASKID_PLAYER_RESPAWN + pPlayer);
-        set_task(get_pcvar_float(g_pCvarRespawnTime), "Task_RespawnPlayer", TASKID_PLAYER_RESPAWN + pPlayer);
+    remove_task(TASKID_PLAYER_RESPAWN + pPlayer);
+    set_task(get_pcvar_float(g_pCvarRespawnTime), "Task_RespawnPlayer", TASKID_PLAYER_RESPAWN + pPlayer);
 }
 
 RespawnPlayer(pPlayer) {
-    if (!g_iLives) {
+    if (!g_iLives || get_member_game(m_bFreezePeriod)) {
         SetupRespawnTask(pPlayer);
         return;
     }
 
     if (!is_user_connected(pPlayer)) {
-            return;
+        return;
     }
 
     if (is_user_alive(pPlayer)) {
-            return;
+        return;
     }
 
     if (ZP_Player_IsZombie(pPlayer)) {
