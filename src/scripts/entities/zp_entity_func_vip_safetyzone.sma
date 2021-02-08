@@ -1,13 +1,12 @@
-
 #pragma semicolon 1
 
 #include <amxmodx>
 #include <hamsandwich>
 #include <fakemeta>
-
-#include <api_custom_entities>
+#include <reapi>
 
 #include <zombiepanic>
+#include <api_custom_entities>
 
 #define PLUGIN "[Entity] func_vip_safetyzone"
 #define AUTHOR "Hedgehog Fog"
@@ -34,7 +33,7 @@ public OnSpawn_Post(pEntity) {
     new iEndroundTrigger = CE_Create("trigger_endround", vecOrigin, .temp = false);
     dllfunc(DLLFunc_Spawn, iEndroundTrigger);
     engfunc(EngFunc_SetModel, iEndroundTrigger, szModel);
-    set_pev(iEndroundTrigger, pev_spawnflags, (1<<0));
+    set_pev(iEndroundTrigger, pev_spawnflags, BIT(0));
 
     return HAM_HANDLED;
 }

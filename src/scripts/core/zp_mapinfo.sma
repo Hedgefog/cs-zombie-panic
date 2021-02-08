@@ -51,7 +51,7 @@ BuildMotd() {
     new iLine = 0;
     static szLine[128];
     while (read_file(szFile, iLine++, szLine, charsmax(szLine)) != 0) {
-            format(g_szMotdData, charsmax(g_szMotdData), "%s<br>%s", g_szMotdData, szLine);
+        format(g_szMotdData, charsmax(g_szMotdData), "%s<br>%s", g_szMotdData, szLine);
     }
 
     copy(g_szMotdTitle, charsmax(g_szMotdTitle), szMap);

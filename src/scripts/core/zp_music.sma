@@ -10,7 +10,7 @@
 
 #define TASKID_PLAY_NEXT_TRACK 100
 
-#define MUSIC_DELAY 3.0
+#define MUSIC_DELAY 5.0
 
 new bool:g_bPlayerMusic[MAX_PLAYERS + 1];
 

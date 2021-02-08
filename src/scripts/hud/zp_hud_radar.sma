@@ -1,8 +1,8 @@
 #include <amxmodx>
 #include <fakemeta>
 #include <hamsandwich>
-
 #include <reapi>
+
 #include <zombiepanic>
 
 #define PLUGIN "[Zombie Panic] Radar"

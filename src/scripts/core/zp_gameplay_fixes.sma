@@ -25,34 +25,12 @@ new const g_rgszObjectiveEntities[][] = {
     "weapon_c4"
 };
 
-// new const g_rgszDelayEntities[][] = {
-//     "trigger_auto",
-//     "trigger_changetarget",
-//     "trigger_relay",
-//     "button_target",
-//     "func_door",
-//     "func_door_rotating",
-//     "func_button",
-//     "func_rotating",
-//     "func_rot_button",
-//     "func_tracktrain",
-//     "func_train",
-//     "momentary_door",
-//     "momentary_rot_button",
-//     "trigger_multiple",
-//     "trigger_once",
-//     "trigger_push"
-// };
-
-// new g_pCvarRoundTime;
 new g_pFwEntitySpawn;
 
 public plugin_precache() {
     CreateHiddenBuyZone();
 
     g_pFwEntitySpawn = register_forward(FM_Spawn, "OnSpawn");
-
-    // g_pCvarRoundTime = get_cvar_pointer("mp_roundtime");
 }
 
 public plugin_init() {
@@ -72,10 +50,6 @@ public OnSpawn(pEntity) {
 
     if (IsObjectiveEntity(pEntity)) {
         engfunc(EngFunc_RemoveEntity, pEntity);
-    // } else if (IsDelayEntity(pEntity)) {
-    //     if (get_ent_data_float(pEntity, "CBaseToggle", "m_flWait") < 0.0) {
-    //         set_ent_data_float(pEntity, "CBaseToggle", "m_flWait", get_pcvar_num(g_pCvarRoundTime) * 60.0 + 1.0);
-    //     }
     }
 
     return FMRES_IGNORED;
@@ -147,20 +121,6 @@ bool:IsObjectiveEntity(pEntity) {
 
     return false;
 }
-
-// bool:IsDelayEntity(pEntity) {
-//     new szClassname[32];
-//     pev(pEntity, pev_classname, szClassname, charsmax(szClassname));
-    
-//     new iSize = sizeof(g_rgszDelayEntities);
-//     for (new i = 0; i < iSize; ++i) {
-//         if (equal(szClassname, g_rgszDelayEntities[i])) {
-//             return true;
-//         }
-//     }
-
-//     return false;
-// }
 
 CreateHiddenBuyZone() {
     new pEntity = engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, "func_buyzone"));

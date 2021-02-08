@@ -42,7 +42,7 @@ public plugin_destroy() {
 
 public OnSpawn(pEntity) {
     if (!pev_valid(pEntity)) {
-            return HAM_IGNORED;
+        return HAM_IGNORED;
     }
 
     new szTarget[32];

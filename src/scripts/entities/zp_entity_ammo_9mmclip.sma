@@ -1,4 +1,3 @@
-
 #pragma semicolon 1
 
 #include <amxmodx>
@@ -23,6 +22,7 @@ public plugin_init() {
 
 public plugin_precache() {
     precache_model(AMMO_BOX_MODEL);
+
     CE_Register(ENTITY_NAME, _, Float:{-8.0, -8.0, 0.0}, Float:{8.0, 8.0, 8.0}, _, ZP_AMMO_RESPAWN_TIME);
     CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME, "OnSpawn");
 }

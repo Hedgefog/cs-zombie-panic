@@ -1,16 +1,20 @@
 #include <amxmodx>
+#include <reapi>
 
 #include <zombiepanic>
 
 #define PLUGIN "[Zombie Panic] ScoreAttrib"
 #define AUTHOR "Hedgehog Fog"
 
-#define SCORE_STATUS_DEAD (1<<0)
+#define SCORE_STATUS_DEAD BIT(0)
+
+new gmsgScoreAttrib;
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    register_message(get_user_msgid("ScoreAttrib"), "OnMessage");
+    gmsgScoreAttrib = get_user_msgid("ScoreAttrib");
+    register_message(gmsgScoreAttrib, "OnMessage");
 }
 
 public OnMessage(iMsgId, iDest, pPlayer) {

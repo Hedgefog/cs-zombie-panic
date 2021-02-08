@@ -30,6 +30,8 @@ enum CharacterData {
     Character_ZombieDeathSounds
 }
 
+new gmsgClCorpse;
+
 new g_szCharacterDir[MAX_RESOURCE_PATH_LENGTH];
 
 new Array:g_rgCharactersData[CharacterData];
@@ -39,8 +41,6 @@ new g_iCharacterCount = 0;
 new g_iPlayerCharacter[MAX_PLAYERS + 1] = { -1, ... };
 
 new CW:g_iCwSwipeHandler;
-
-new gmsgClCorpse;
 
 public plugin_precache() {
     precache_model(DEFAULT_PLAYER_MODEL);

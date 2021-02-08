@@ -2,7 +2,6 @@
 #include <fakemeta>
 
 #include <zombiepanic>
-
 #include <screenfade_util>
 
 #define PLUGIN "[Zombie Panic] Win Message"

@@ -7,10 +7,13 @@
 #define PLUGIN "[Zombie Panic] Item Pickup HUD"
 #define AUTHOR "Hedgehog Fog"
 
+new gmsgWeapPickup;
+
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    register_message(get_user_msgid("WeapPickup"), "OnMessage");
+    gmsgWeapPickup = get_user_msgid("WeapPickup");
+    register_message(gmsgWeapPickup, "OnMessage");
 }
 
 public OnMessage(iMsgId, iDest, pPlayer) {

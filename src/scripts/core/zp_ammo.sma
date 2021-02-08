@@ -124,6 +124,11 @@ RegisterAmmo(const szName[], iAmmoId, iPackSize, const szModel[], iMaxAmount, Fl
         precache_model(szModel);
     }
 
+    if (TrieKeyExists(g_iAmmoMap, szName)) {
+        log_amx("Cannot register ^"%s^" ammo. Ammo ^"%s^" is already registered!", szName, szName);
+        return;
+    }
+
     ArrayPushCell(Array:g_rgAmmo[Ammo_Id], iAmmoId);
     ArrayPushString(Array:g_rgAmmo[Ammo_Name], szName);
     ArrayPushCell(Array:g_rgAmmo[Ammo_PackSize], iPackSize);

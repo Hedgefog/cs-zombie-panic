@@ -4,18 +4,18 @@
 #include <amxmodx>
 #include <hamsandwich>
 #include <fakemeta>
-
-#include <api_rounds>
-#include <api_custom_entities>
+#include <reapi>
 
 #include <zombiepanic>
+#include <api_rounds>
+#include <api_custom_entities>
 #include <zombiepanic_utils>
 
 #define PLUGIN "[Entity] trigger_endround"
 #define AUTHOR "Hedgehog Fog"
 
 #define ENTITY_NAME "trigger_endround"
-#define SF_FORALL (1<<0)
+#define SF_FORALL BIT(0)
 
 new g_ceHandler;
 new bool:g_bDispatched = false;

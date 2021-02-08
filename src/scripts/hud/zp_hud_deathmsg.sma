@@ -10,11 +10,11 @@
 
 new gmsgDeathMsg;
 
-public plugin_init()
-{
+public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
     
     gmsgDeathMsg = get_user_msgid("DeathMsg");
+
     register_message(gmsgDeathMsg, "OnMessage_DeathMsg");
 }
 

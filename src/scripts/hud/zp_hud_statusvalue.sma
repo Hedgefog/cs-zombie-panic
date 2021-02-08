@@ -13,12 +13,15 @@ enum StatusValueFlag {
     StatusValueFlag_Health
 }
 
+new gmsgStatusValue;
+
 new g_statusValue[StatusValueFlag];
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    register_message(get_user_msgid("StatusValue"), "OnMessage");
+    gmsgStatusValue = get_user_msgid("StatusValue");
+    register_message(gmsgStatusValue, "OnMessage");
 }
 
 public OnMessage(iMsgId, iDest, pPlayer) {

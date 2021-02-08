@@ -1,4 +1,3 @@
-
 #pragma semicolon 1
 
 #include <amxmodx>
@@ -19,6 +18,7 @@ new Trie:g_iSpawnObjectMap;
 
 public plugin_precache() {
     g_iSpawnObjectMap = TrieCreate();
+
     TrieSetCell(g_iSpawnObjectMap, "3", engfunc(EngFunc_AllocString, ZP_WEAPON_PISTOL));
     TrieSetCell(g_iSpawnObjectMap, "4", engfunc(EngFunc_AllocString, ZP_AMMO_PISTOL));
     TrieSetCell(g_iSpawnObjectMap, "5", engfunc(EngFunc_AllocString, ZP_WEAPON_RIFLE));
