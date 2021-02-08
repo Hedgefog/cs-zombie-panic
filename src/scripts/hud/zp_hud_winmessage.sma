@@ -34,6 +34,25 @@ public OnMessage_OnTextMsg(iMsgId, iDest, pPlayer) {
     return PLUGIN_HANDLED;
 }
 
+public OnMessage_SendAudio(iMsgId, iDest, pPlayer) {
+    static szMessage[32];
+    get_msg_arg_string(2, szMessage, charsmax(szMessage));
+
+    if (equal(szMessage[7], "terwin")) {
+        return PLUGIN_HANDLED;
+    }
+
+    if (equal(szMessage[7], "ctwin")) {
+        return PLUGIN_HANDLED;
+    }
+
+    if (equal(szMessage[7], "rounddraw")) {
+        return PLUGIN_HANDLED;
+    }
+
+    return PLUGIN_CONTINUE;
+}
+
 public Task_WinMessage() {
     switch (g_iWinnerTeam) {
         case ZP_ZOMBIE_TEAM: {
@@ -53,23 +72,4 @@ ShowWinMessage(const szMessage[], any:...) {
     show_dhudmessage(0, szBuffer);
 
     UTIL_ScreenFade(0, {0, 0, 0}, 1.0, ZP_NEW_ROUND_DELAY, 255, FFADE_OUT, .bExternal = true);
-}
-
-public OnMessage_SendAudio(iMsgId, iDest, pPlayer) {
-    static szMessage[32];
-    get_msg_arg_string(2, szMessage, charsmax(szMessage));
-
-    if (equal(szMessage[7], "terwin")) {
-        return PLUGIN_HANDLED;
-    }
-
-    if (equal(szMessage[7], "ctwin")) {
-        return PLUGIN_HANDLED;
-    }
-
-    if (equal(szMessage[7], "rounddraw")) {
-        return PLUGIN_HANDLED;
-    }
-
-    return PLUGIN_CONTINUE;
 }

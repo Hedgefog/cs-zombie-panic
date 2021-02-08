@@ -15,6 +15,7 @@ public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
     gmsgScoreInfo = get_user_msgid("ScoreInfo");
+
     register_event("ScoreInfo", "OnEvent", "a");
     register_message(gmsgScoreInfo, "OnMessage");
 

@@ -10,8 +10,6 @@
 #define PLUGIN "[Zombie Panic] TeamInfo"
 #define AUTHOR "Hedgehog Fog"
 
-#define FAKE_TEAM_NAME "CT"
-
 new gmsgTeamInfo;
 
 new g_rgszTeams[][] = {

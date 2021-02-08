@@ -8,14 +8,14 @@
 #define PLUGIN "[Zombie Panic] DeathMsg"
 #define AUTHOR "Hedgehog Fog"
 
-new g_iDeathMsgMessage;
+new gmsgDeathMsg;
 
 public plugin_init()
 {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
     
-    g_iDeathMsgMessage = get_user_msgid("DeathMsg");
-    register_message(g_iDeathMsgMessage, "OnMessage_DeathMsg");
+    gmsgDeathMsg = get_user_msgid("DeathMsg");
+    register_message(gmsgDeathMsg, "OnMessage_DeathMsg");
 }
 
 public OnMessage_DeathMsg(iMsgId, iDest, pPlayer) {
@@ -46,7 +46,7 @@ public OnMessage_DeathMsg(iMsgId, iDest, pPlayer) {
 }
 
 SendDeathMsg(pPlayer, iKiller, iVictim, iHeadshot, const szWeapon[]) {
-    emessage_begin(MSG_ONE, g_iDeathMsgMessage, _, pPlayer);
+    emessage_begin(MSG_ONE, gmsgDeathMsg, _, pPlayer);
     ewrite_byte(iKiller);
     ewrite_byte(iVictim);
     ewrite_byte(iHeadshot);
