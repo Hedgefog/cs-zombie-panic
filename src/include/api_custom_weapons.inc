@@ -1,3 +1,5 @@
+// This is a beta version, some functions may be unstable. Use at your own risk.
+
 #if defined _api_custom_weapons_included
   #endinput
 #endif
