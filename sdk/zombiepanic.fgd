@@ -234,11 +234,11 @@
 
 @PointClass
 	base(Weapon)
-	Studio("models/zombiepanic/b1/items/w_9mmclip.mdl")
+	Studio("models/zombiepanic/v100/items/w_9mmclip.mdl")
 = ammo_9mmclip : "9mm Pistol Ammo" []
 @PointClass
 	base(Weapon)
-	Studio("models/zombiepanic/b1/items/w_556ARclip.mdl")
+	Studio("models/zombiepanic/v100/items/w_556ARclip.mdl")
 = ammo_556AR : "5.56mm Assault Rifle Ammo" []
 @PointClass
 	base(Weapon)
@@ -246,11 +246,11 @@
 = ammo_556box : "box of 200 5.56mm rounds" []
 @PointClass
 	base(Weapon)
-	Studio("models/zombiepanic/b1/items/w_shotbox.mdl")
+	Studio("models/zombiepanic/v100/items/w_shotbox.mdl")
 = ammo_buckshot : "Shotgun Ammo" []
 @PointClass
 	base(Weapon)
-	Studio("models/zombiepanic/b1/items/w_357ammobox.mdl")
+	Studio("models/zombiepanic/v100/items/w_357ammobox.mdl")
 = ammo_357 : "357 Ammo" []
 
 @PointClass
@@ -259,27 +259,27 @@
 = weapon_crowbar : "Crowbar" []
 @PointClass
 	base(Weapon)
-	Studio("models/zombiepanic/b1/items/w_9mmhandgun.mdl")
+	Studio("models/zombiepanic/v100/items/w_9mmhandgun.mdl")
 = weapon_9mmhandgun : "9mm Handgun" []
 @PointClass
 	base(Weapon)
-	Studio("models/zombiepanic/b1/items/w_357.mdl")
+	Studio("models/zombiepanic/v100/items/w_357.mdl")
 = weapon_357 : "357 Handgun" []
 @PointClass
 	base(Weapon)
-	Studio("models/zombiepanic/b1/items/w_556ar.mdl")
+	Studio("models/zombiepanic/v100/items/w_556ar.mdl")
 = weapon_556AR : "5.56mm Assault Rifle" []
 @PointClass
 	base(Weapon)
-	Studio("models/zombiepanic/b1/items/w_shotgun.mdl")
+	Studio("models/zombiepanic/v100/items/w_shotgun.mdl")
 = weapon_shotgun : "Shotgun" []
 @PointClass
 	base(Weapon)
-	Studio("models/zombiepanic/b1/items/w_satchel.mdl")
+	Studio("models/zombiepanic/v100/items/w_satchel.mdl")
 = weapon_satchel : "Satchel Charge Ammo" []
 @PointClass
 	base(Weapon)
-	Studio("models/zombiepanic/b1/items/w_grenade.mdl")
+	Studio("models/zombiepanic/v100/items/w_grenade.mdl")
 = weapon_handgrenade : "Handgrenade Ammo" []
 
 @SolidClass base(Trigger) = trigger_endround : "Trigger: End Round" [

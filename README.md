@@ -1,12 +1,13 @@
 ### Zombie Panic Mod for Counter-Strike 1.6
-__Version:__ 0.10.0
+__Version:__ 1.0.0
 
 ### Download latest:
 - [Releases](./releases)
 
 ### Requirements
 - Amx Mod X 1.9.0+
-- ReAPI
+- RegameDLL + ReAPI
+- Metamod-R or Metamod-P (for windows)
 
 ### Deployment
 - Clone repository.

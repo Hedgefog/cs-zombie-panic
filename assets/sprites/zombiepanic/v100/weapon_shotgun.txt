@@ -1,0 +1,9 @@
+8
+weapon			320 zombiepanic/v100/320hud1	0	160	80	20
+weapon_s		320 zombiepanic/v100/320hud1	0	180	80	20
+ammo				320 zombiepanic/v100/320hud2	54	16	18	18
+weapon			640 zombiepanic/v100/640hud1	0	180	170	45
+weapon_s		640 zombiepanic/v100/640hud4	0	180	170	45
+ammo				640 zombiepanic/v100/640hud7	72	72	24	24
+crosshair		640 zombiepanic/v100/shotgun_xhair	0	0	64	64
+autoaim			640 zombiepanic/v100/shotgun_xhair	0	0	64	64
