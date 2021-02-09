@@ -34,6 +34,8 @@ public OnMessage_HideWeapon(iMsgId, iMsgDest, pPlayer) {
 
     g_iPlayerHideWeapon[pPlayer] = get_msg_arg_int(1);
 
+    set_task(0.1, "Task_UpdateCrosshair", pPlayer);
+
     return PLUGIN_CONTINUE;
 }
 
@@ -42,6 +44,13 @@ public OnEvent_CurWeapon(pPlayer) {
         return PLUGIN_CONTINUE;
     }
 
+    set_task(0.1, "Task_UpdateCrosshair", pPlayer);
+
+    return PLUGIN_CONTINUE;
+}
+
+UpdateCrosshair(pPlayer) {
+
     emessage_begin(MSG_ONE, gmsgHideWeapon, _, pPlayer);
     ewrite_byte(g_iPlayerHideWeapon[pPlayer] | HIDEHUD_CROSSHAIR | BIT(7));
     emessage_end();
@@ -49,16 +58,26 @@ public OnEvent_CurWeapon(pPlayer) {
     message_begin(MSG_ONE, gmsgSetFOV, _, pPlayer);
     write_byte(89);
     message_end();
+    
+    new pActiveItem = get_member(pPlayer, m_pActiveItem);
+    if (pActiveItem != -1) {
+        new iWeaponId = get_member(pActiveItem, m_iId);
+        new iClip = get_member(pActiveItem, m_Weapon_iClip);
 
-    message_begin(MSG_ONE, gmsgCurWeapon, _, pPlayer);
-    write_byte(read_data(1));
-    write_byte(read_data(2));
-    write_byte(read_data(3));
-    message_end();
+        message_begin(MSG_ONE, gmsgCurWeapon, _, pPlayer);
+        write_byte(1);
+        write_byte(iWeaponId);
+        write_byte(iClip);
+        message_end();
+    }
 
     message_begin(MSG_ONE, gmsgSetFOV, _, pPlayer);
     write_byte(get_member(pPlayer, m_iFOV));
     message_end();
+}
 
-    return PLUGIN_CONTINUE;
+public Task_UpdateCrosshair(iTaskId) {
+    new pPlayer = iTaskId;
+
+    UpdateCrosshair(pPlayer);
 }
