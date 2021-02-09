@@ -10,7 +10,7 @@
 #include <api_custom_weapons>
 
 #define PLUGIN "[API] Custom Weapons"
-#define VERSION "0.5.1"
+#define VERSION "0.5.2"
 #define AUTHOR "Hedgehog Fog"
 
 #define WALL_PUFF_SPRITE "sprites/wall_puff1.spr"
@@ -33,7 +33,8 @@ enum CW_Data {
     CW_Data_SlotId,
     CW_Data_Position,
     CW_Data_WeaponFlags,
-    CW_Data_Bindings
+    CW_Data_Bindings,
+    CW_Data_Flags
 }
 
 enum _:WeaponListMessage {
@@ -217,7 +218,9 @@ public CW:Native_Register(iPluginId, iArgc) {
     new szIcon[16];
     get_string(11, szIcon, charsmax(szIcon));
 
-    return RegisterWeapon(iPluginId, szName, iWeaponId, iClipSize, iPrimaryAmmoType, iPrimaryAmmoMaxAmount, iSecondaryAmmoType, iSecondaryAmmoMaxAmount, iSlotId, iPosition, iWeaponFlags, szIcon);
+    new CW_Flags:iFlags = CW_Flags:get_param(12);
+
+    return RegisterWeapon(iPluginId, szName, iWeaponId, iClipSize, iPrimaryAmmoType, iPrimaryAmmoMaxAmount, iSecondaryAmmoType, iSecondaryAmmoMaxAmount, iSlotId, iPosition, iWeaponFlags, szIcon, iFlags);
 }
 
 public Native_GiveWeapon(iPluginId, iArgc) {
@@ -523,8 +526,8 @@ public OnItemAddToPlayer_Post(this, pPlayer) {
         new iWeaponId = get_member(this, m_iId);
         ResetWeaponList(pPlayer, iWeaponId);
     } else {
-            set_member(this, m_Weapon_iPrimaryAmmoType, GetData(iHandler, CW_Data_PrimaryAmmoType));
-            UpdateWeaponList(pPlayer, iHandler);
+        set_member(this, m_Weapon_iPrimaryAmmoType, GetData(iHandler, CW_Data_PrimaryAmmoType));
+        UpdateWeaponList(pPlayer, iHandler);
     }
 
     return HAM_HANDLED;
@@ -709,7 +712,7 @@ ItemPostFrame(this) {
     new pPlayer = GetPlayer(this);
     new flInReload = get_member(this, m_Weapon_fInReload);
     new iMaxClip = GetData(iHandler, CW_Data_ClipSize);
-    new iFlags = GetData(iHandler, CW_Data_WeaponFlags);
+    new iWeaponFlags = GetData(iHandler, CW_Data_WeaponFlags);
     new Float:flNextAttack = get_member(pPlayer, m_flNextAttack);
     new button = pev(pPlayer, pev_button);
     new iPrimaryAmmoIndex = get_member(this, m_Weapon_iPrimaryAmmoType);
@@ -747,12 +750,12 @@ ItemPostFrame(this) {
         set_member(this, m_Weapon_fFireOnEmpty, 0);
 
         if (!IsUseable(this) && flNextPrimaryAttack < 0.0) {
-            // if (!(iFlags & ITEM_FLAG_NOAUTOSWITCHEMPTY) && g_pGameRules->GetNextBestWeapon(m_pPlayer, this)) {
+            // if (!(iWeaponFlags & ITEM_FLAG_NOAUTOSWITCHEMPTY) && g_pGameRules->GetNextBestWeapon(m_pPlayer, this)) {
             //     set_member(this, m_Weapon_flNextPrimaryAttack, 0.3);
             // 	return;
             // }
         } else {
-            if (!get_member(this, m_Weapon_iClip) && !(iFlags & ITEM_FLAG_NOAUTORELOAD) && flNextPrimaryAttack < 0.0) {
+            if (!get_member(this, m_Weapon_iClip) && !(iWeaponFlags & ITEM_FLAG_NOAUTORELOAD) && flNextPrimaryAttack < 0.0) {
                 Reload(this);
                 return;
             }
@@ -859,8 +862,14 @@ GetPlayer(this) {
 }
 
 FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:vecSpread[3], Float:flDistance, Float:flDamage, pAttacker, Float:vecOut[3]) {
+    new CW:iHandler = GetHandlerByEntity(this);
+    if (iHandler == CW_INVALID_HANDLER) {
+        return;
+    }
+
     new pPlayer = GetPlayer(this);
     new shared_rand = pPlayer > 0 ? get_member(pPlayer, random_seed) : 0;
+    new CW_Flags:iFlags = GetData(iHandler, CW_Data_Flags);
 
     new tr = create_tr2();
 
@@ -909,7 +918,6 @@ FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:
                 pHit = 0;
             }
 
-            
             rg_multidmg_clear();
             ExecuteHamB(Ham_TraceAttack, pHit, pAttacker, flDamage, vecDir, tr, DMG_BULLET | DMG_NEVERGIB);
             rg_multidmg_apply(this, pAttacker);
@@ -917,13 +925,18 @@ FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:
             // TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
             // DecalGunshot( &tr, iBulletType );
 
-            new iDecalIndex = random_num(get_decal_index("{shot1"), get_decal_index("{shot5") + 1);
             // new iDecalIndex = ExecuteHam(Ham_DamageDecal, pHit, DMG_BULLET);
             // DecalTrace2(tr, iDecalIndex);
 
             if (!ExecuteHam(Ham_IsPlayer, pHit)) {
-                BulletSmoke(tr);
-                MakeDecal(tr, pHit, iDecalIndex);
+                if (~iFlags & CWF_NoBulletSmoke) {
+                    BulletSmoke(tr);
+                }
+                
+                if (~iFlags & CWF_NoBulletDecal) {
+                    new iDecalIndex = random_num(get_decal_index("{shot1"), get_decal_index("{shot5") + 1);
+                    MakeDecal(tr, pHit, iDecalIndex);
+                }
             }
         }
 
@@ -1013,14 +1026,20 @@ GrenadeExplode(this, pTr, iDamageBits, Float:flRadius, Float:flMagnitude) {
 // ANCHOR: Weapon Callbacks
 
 public Smack(this) {
+    new CW:iHandler = GetHandlerByEntity(this);
+    new CW_Flags:iFlags = GetData(iHandler, CW_Data_Flags);
+
     new tr = pev(this, pev_iuser1);
     new pHit = get_tr2(tr, TR_pHit);
     if (pHit < 0) {
         pHit = 0;
     }
 
-    new iDecalIndex = random_num(get_decal_index("{shot1"), get_decal_index("{shot5") + 1);
-    MakeDecal(tr, pHit, iDecalIndex, false);
+    if (~iFlags & CWF_NoBulletDecal) {
+        new iDecalIndex = random_num(get_decal_index("{shot1"), get_decal_index("{shot5") + 1);
+        MakeDecal(tr, pHit, iDecalIndex, false);
+    }
+
     free_tr2(tr);
 
     SetThink(this, NULL_STRING);
@@ -1240,6 +1259,11 @@ bool:DefaultShotgunShot(this, Float:flDamage, Float:flRate, Float:flPumpDelay, F
 }
 
 DefaultSwing(this, Float:flDamage, Float:flRate, Float:flDistance) {
+    new CW:iHandler = GetHandlerByEntity(this);
+    if (iHandler == CW_INVALID_HANDLER) {
+        return -1;
+    }
+
     new pPlayer = GetPlayer(this);
 
     static Float:vecSrc[3];
@@ -1312,7 +1336,7 @@ DefaultSwing(this, Float:flDamage, Float:flRate, Float:flDistance) {
 
 // ANCHOR: Weapon Methods
 
-CW:RegisterWeapon(iPluginId, const szName[], iWeaponId, iClipSize, iPrimaryAmmoType, iPrimaryAmmoMaxAmount, iSecondaryAmmoType, iSecondaryAmmoMaxAmount, iSlotId, iPosition, iWeaponFlags, const szIcon[]) {
+CW:RegisterWeapon(iPluginId, const szName[], iWeaponId, iClipSize, iPrimaryAmmoType, iPrimaryAmmoMaxAmount, iSecondaryAmmoType, iSecondaryAmmoMaxAmount, iSlotId, iPosition, iWeaponFlags, const szIcon[], CW_Flags:iFlags) {
     new CW:iHandler = CreateWeaponData(szName);
     SetData(iHandler, CW_Data_PluginId, iPluginId);
     SetStringData(iHandler, CW_Data_Name, szName);
@@ -1326,6 +1350,7 @@ CW:RegisterWeapon(iPluginId, const szName[], iWeaponId, iClipSize, iPrimaryAmmoT
     SetData(iHandler, CW_Data_Position, iPosition);
     SetData(iHandler, CW_Data_WeaponFlags, iWeaponFlags);
     SetStringData(iHandler, CW_Data_Icon, szIcon);
+    SetData(iHandler, CW_Data_Flags, iFlags);
 
     if (!g_bPrecache && !g_bWeaponHooks[iWeaponId]) { // we are not able to get weapon name in precache state
         RegisterWeaponHooks(iWeaponId);
@@ -1394,6 +1419,8 @@ SpawnWeaponBox(CW:iHandler) {
 
     dllfunc(DLLFunc_Spawn, pWeaponBox);
 
+    // engfunc(EngFunc_SetSize, pWeaponBox, {-8.0, -8.0, 0.0}, {8.0, 8.0, 4.0});
+
     return pWeaponBox;
 }
 
@@ -1419,7 +1446,7 @@ UpdateWeaponList(pPlayer, CW:iHandler) {
     new iSecondaryAmmoMaxCount = GetData(iHandler, CW_Data_SecondaryAmmoMaxAmount);
     new iSlotId = GetData(iHandler, CW_Data_SlotId);
     new iPosition = GetData(iHandler, CW_Data_Position);
-    new iFlags = GetData(iHandler, CW_Data_WeaponFlags);
+    new iWeaponFlags = GetData(iHandler, CW_Data_WeaponFlags);
 
     emessage_begin(MSG_ONE, gmsgWeaponList, _, pPlayer);
     ewrite_string(szName);
@@ -1430,7 +1457,7 @@ UpdateWeaponList(pPlayer, CW:iHandler) {
     ewrite_byte(iSlotId);
     ewrite_byte(iPosition);
     ewrite_byte(iWeaponId);
-    ewrite_byte(iFlags);
+    ewrite_byte(iWeaponFlags);
     emessage_end();
 }
 
