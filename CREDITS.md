@@ -8,6 +8,7 @@
 - Pokemoshka
 - Moto Runner
 - MayroN
+- PentalginPlus
 
 # Promotion
 - wopox1337
