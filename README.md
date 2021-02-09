@@ -2,7 +2,7 @@
 __Version:__ 1.0.0
 
 ### Download latest:
-- [Releases](./releases)
+- [Releases](../../releases)
 
 ### Requirements
 - Amx Mod X 1.9.0+
