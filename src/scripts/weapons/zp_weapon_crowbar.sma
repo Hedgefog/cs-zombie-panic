@@ -33,7 +33,7 @@ public plugin_precache() {
         precache_sound(ZP_WEAPON_CROWBAR_HITBODY_SOUNDS[i]);
     }
 
-    g_iCwHandler = CW_Register(ZP_WEAPON_CROWBAR, CSW_KNIFE, WEAPON_NOCLIP, 0, -1, 0, -1, 2, 5);
+    g_iCwHandler = CW_Register(ZP_WEAPON_CROWBAR, CSW_KNIFE, WEAPON_NOCLIP, 0, -1, 0, -1, 2, 5, _, _, CWF_NoBulletSmoke);
     CW_Bind(g_iCwHandler, CWB_Idle, "@Weapon_Idle");
     CW_Bind(g_iCwHandler, CWB_PrimaryAttack, "@Weapon_PrimaryAttack");
     CW_Bind(g_iCwHandler, CWB_SecondaryAttack, "@Weapon_SecondaryAttack");
