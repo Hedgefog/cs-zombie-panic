@@ -29,7 +29,7 @@ public plugin_precache() {
         precache_sound(ZP_WEAPON_SWIPE_HIT_SOUNDS[i]);
     }
 
-    g_iCwHandler = CW_Register(ZP_WEAPON_SWIPE, CSW_KNIFE, WEAPON_NOCLIP, PRIMARY_AMMO_ID, -1, _, _, 2, 0);
+    g_iCwHandler = CW_Register(ZP_WEAPON_SWIPE, CSW_KNIFE, WEAPON_NOCLIP, PRIMARY_AMMO_ID, -1, _, _, 2, 0, _, _, CWF_NoBulletDecal);
     CW_Bind(g_iCwHandler, CWB_Idle, "@Weapon_Idle");
     CW_Bind(g_iCwHandler, CWB_PrimaryAttack, "@Weapon_PrimaryAttack");
     CW_Bind(g_iCwHandler, CWB_SecondaryAttack, "@Weapon_SecondaryAttack");
