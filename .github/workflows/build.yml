@@ -24,7 +24,7 @@
             mkdir downloads
             wget https://www.amxmodx.org/amxxdrop/1.9/amxmodx-1.9.0-git5271-base-linux.tar.gz -P ./downloads
             wget https://www.amxmodx.org/amxxdrop/1.9/amxmodx-1.9.0-git5271-cstrike-linux.tar.gz -P ./downloads
-            wget https://github.com/s1lentq/reapi/releases/download/5.19.0.210/reapi_5.19.0.205-dev.zip -P ./downloads
+            wget https://github.com/s1lentq/reapi/releases/download/5.19.0.211/reapi_5.19.0.211-dev.zip -P ./downloads
         - name: Setup Build Variables
           id: buildvars
           uses: actions/github-script@v3
@@ -48,7 +48,7 @@
             tar --strip-components=3 -zxf ./downloads/amxmodx-1.9.0-git5271-base-linux.tar.gz -C ./compiler addons/amxmodx/scripting
             tar --strip-components=3 -zxf ./downloads/amxmodx-1.9.0-git5271-cstrike-linux.tar.gz -C ./compiler addons/amxmodx/scripting
             mkdir -p ./thirdparty/reapi
-            unzip ./downloads/reapi_5.19.0.205-dev.zip -d ./thirdparty/reapi
+            unzip ./downloads/reapi_5.19.0.211-dev.zip -d ./thirdparty/reapi
         - name: Install Dependencies
           run: npm install
         - name: Build project
