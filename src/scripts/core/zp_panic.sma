@@ -2,6 +2,7 @@
 
 #include <amxmodx>
 #include <hamsandwich>
+#include <reapi>
 
 #include <zombiepanic>
 #include <zombiepanic_utils>
@@ -10,76 +11,94 @@
 #define AUTHOR "Hedgehog Fog"
 
 #define PANIC_DURATION 5.0
-#define PANIC_DELAY 60.0
+#define PANIC_DELAY 55.0
+
+new gmsgScreenShake;
 
 new bool:g_bPlayerPanic[MAX_PLAYERS + 1];
 new Float:g_flPlayerLastPanic[MAX_PLAYERS + 1];
 
-public plugin_precache() {
-  for (new i = 0; i < sizeof(ZP_PANIC_SOUNDS); ++i) {
-    precache_sound(ZP_PANIC_SOUNDS[i]);
-  }
-}
+new g_pFwPanic;
+new g_pFwResult;
 
 public plugin_init() {
-  register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+    register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-  RegisterHam(Ham_Touch, "weaponbox", "OnItemTouch", .Post = 0);
-  RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
+    gmsgScreenShake = get_user_msgid("ScreenShake");
+
+    RegisterHam(Ham_Touch, "weaponbox", "OnItemTouch", .Post = 0);
+    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
+
+    g_pFwPanic = CreateMultiForward("ZP_Fw_PlayerPanic", ET_IGNORE, FP_CELL);
 }
 
 public plugin_natives() {
-  register_native("ZP_Player_Panic", "Native_Panic");
-  register_native("ZP_Player_InPanic", "Native_InPanic");
+    register_native("ZP_Player_Panic", "Native_Panic");
+    register_native("ZP_Player_InPanic", "Native_InPanic");
 }
 
 public bool:Native_Panic(iPluginId, iArgc) {
-  new pPlayer = get_param(1);
+    new pPlayer = get_param(1);
 
-  return Panic(pPlayer);
+    return Panic(pPlayer);
 }
 
 public bool:Native_InPanic(iPluginId, iArgc) {
-  new pPlayer = get_param(1);
+    new pPlayer = get_param(1);
 
-  return g_bPlayerPanic[pPlayer];
+    return g_bPlayerPanic[pPlayer];
 }
 
 public OnItemTouch(pItem, pToucher) {
-  if (!UTIL_IsPlayer(pToucher)) {
-    return HAM_IGNORED;
-  }
+    if (!UTIL_IsPlayer(pToucher)) {
+        return HAM_IGNORED;
+    }
 
-  if (!g_bPlayerPanic[pToucher]) {
-    return HAM_IGNORED;
-  }
+    if (!g_bPlayerPanic[pToucher]) {
+        return HAM_IGNORED;
+    }
 
-  return HAM_SUPERCEDE;
+    return HAM_SUPERCEDE;
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
-  g_flPlayerLastPanic[pPlayer] = -PANIC_DELAY;
+    g_flPlayerLastPanic[pPlayer] = -PANIC_DELAY;
 }
 
 bool:Panic(pPlayer) {
-  if (get_gametime() - g_flPlayerLastPanic[pPlayer] < PANIC_DELAY) {
-    return false;
-  }
+    if (g_bPlayerPanic[pPlayer]) {
+        return false;
+    }
 
-  ZP_Player_DropBackpack(pPlayer);
-  emit_sound(pPlayer, CHAN_VOICE, ZP_PANIC_SOUNDS[random(sizeof(ZP_PANIC_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-  g_bPlayerPanic[pPlayer] = true;
+    if (get_member_game(m_bFreezePeriod)) {
+        return false;
+    }
+    
+    if (get_gametime() - g_flPlayerLastPanic[pPlayer] < PANIC_DELAY) {
+        return false;
+    }
 
-  set_task(PANIC_DURATION, "TaskEndPanic", pPlayer);
-  ZP_Player_UpdateSpeed(pPlayer);
+    g_bPlayerPanic[pPlayer] = true;
+    ZP_Player_DropUnactiveWeapons(pPlayer);
+    ZP_Player_DropUnactiveAmmo(pPlayer);
+    // ZP_Player_UpdateSpeed(pPlayer);
 
-  return true;
+    emessage_begin(MSG_ONE, gmsgScreenShake, _, pPlayer);
+    ewrite_short(floatround(1.5 * (1<<12)));
+    ewrite_short(floatround(1.0 * (1<<12)));
+    ewrite_short(floatround(1.0 * (1<<12)));
+    emessage_end();
+
+    set_task(PANIC_DURATION, "Task_EndPanic", pPlayer);
+
+    ExecuteForward(g_pFwPanic, g_pFwResult, pPlayer);
+
+    return true;
 }
 
-public TaskEndPanic(iTaskId) {
-  new pPlayer = iTaskId;
-
-  g_bPlayerPanic[pPlayer] = false;
-  g_flPlayerLastPanic[pPlayer] = get_gametime();
-  ZP_Player_UpdateSpeed(pPlayer);
+public Task_EndPanic(iTaskId) {
+    new pPlayer = iTaskId;
+    g_bPlayerPanic[pPlayer] = false;
+    g_flPlayerLastPanic[pPlayer] = get_gametime();
+    ZP_Player_UpdateSpeed(pPlayer);
 }

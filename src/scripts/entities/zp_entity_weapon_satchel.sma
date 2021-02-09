@@ -42,7 +42,7 @@ public OnSpawn(pEntity) {
     new Float:vecAngles[3];
     pev(pEntity, pev_angles, vecAngles);
 
-    new iWeaponBox = CW_SpawnWeaponBox(g_iCwHandler);
-    engfunc(EngFunc_SetOrigin, iWeaponBox, vecOrigin);
-    set_pev(iWeaponBox, pev_angles, vecAngles);
+    new pWeaponBox = CW_SpawnWeaponBox(g_iCwHandler);
+    engfunc(EngFunc_SetOrigin, pWeaponBox, vecOrigin);
+    set_pev(pWeaponBox, pev_angles, vecAngles);
 }

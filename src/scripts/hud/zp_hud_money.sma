@@ -4,12 +4,9 @@
 #include <engine>
 
 #include <zombiepanic>
-#include <zombiepanic_utils>
 
 #define PLUGIN "[Zombie Panic] Money HUD"
 #define AUTHOR "Hedgehog Fog"
-
-#define HIDEHUD_MONEY (1<<5)
 
 new gmsgHideWeapon;
 

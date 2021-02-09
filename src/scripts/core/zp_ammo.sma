@@ -13,7 +13,8 @@ enum AmmoData {
     Ammo_Id,
     Ammo_PackSize,
     Ammo_PackModel,
-    Ammo_MaxAmount
+    Ammo_MaxAmount,
+    Ammo_Weight
 }
 
 new Array:g_rgAmmo[AmmoData];
@@ -22,13 +23,14 @@ new g_rgAmmoMap[15] = { -1, ... };
 new g_iAmmoCount = 0;
 
 public plugin_precache() {
-    InitStorage();
-    RegisterAmmo(ZP_AMMO_PISTOL, 10, 7, ZP_AMMO_PISTOL_MODEL, 70);
-    RegisterAmmo(ZP_AMMO_RIFLE, 4, 30, ZP_AMMO_RIFLE_MODEL, 240);
-    RegisterAmmo(ZP_AMMO_SHOTGUN, 5, 6, ZP_AMMO_SHOTGUN_MODEL, 60);
-    RegisterAmmo(ZP_AMMO_MAGNUM, 1, 6, ZP_AMMO_MAGNUM_MODEL, 36);
-    RegisterAmmo(ZP_AMMO_SATCHEL, 14, -1, "", 3);
-    RegisterAmmo(ZP_AMMO_GRENADE, 12, -1, "", 3);
+    InitStorages();
+
+    RegisterAmmo(ZP_AMMO_PISTOL, 10, 7, ZP_AMMO_PISTOL_MODEL, 70, ZP_WEIGHT_PISTOL_AMMO);
+    RegisterAmmo(ZP_AMMO_RIFLE, 4, 30, ZP_AMMO_RIFLE_MODEL, 240, ZP_WEIGHT_RIFLE_AMMO);
+    RegisterAmmo(ZP_AMMO_SHOTGUN, 5, 6, ZP_AMMO_SHOTGUN_MODEL, 60, ZP_WEIGHT_SHOTGUN_AMMO);
+    RegisterAmmo(ZP_AMMO_MAGNUM, 1, 6, ZP_AMMO_MAGNUM_MODEL, 36, ZP_WEIGHT_MAGNUM_AMMO);
+    RegisterAmmo(ZP_AMMO_SATCHEL, 14, -1, NULL_STRING, 1, ZP_WEIGHT_SATCHEL);
+    RegisterAmmo(ZP_AMMO_GRENADE, 12, -1, NULL_STRING, 1, ZP_WEIGHT_GRENADE);
 }
 
 public plugin_init() {
@@ -44,18 +46,11 @@ public plugin_natives() {
     register_native("ZP_Ammo_GetPackModel", "Native_GetPackModel");
     register_native("ZP_Ammo_GetCount", "Native_GetCount");
     register_native("ZP_Ammo_GetMaxAmount", "Native_GetMaxAmount");
+    register_native("ZP_Ammo_GetWeight", "Native_GetWeight");
 }
 
 public plugin_end() {
-    for (new i = 0; i < _:AmmoData; ++i) {
-        new Array:irgData = Array:g_rgAmmo[AmmoData:i];
-
-        if (irgData != Invalid_Array) {
-            ArrayDestroy(irgData);
-        }
-    }
-
-    TrieDestroy(g_iAmmoMap);
+    DestroyStorages();
 }
 
 public Native_GetHandler(iPluginId, iArgc) {
@@ -118,18 +113,20 @@ public Native_GetMaxAmount(iPluginId, iArgc) {
     return ArrayGetCell(Array:g_rgAmmo[Ammo_MaxAmount], iHandler);
 }
 
-InitStorage() {
-    g_rgAmmo[Ammo_Name] = ArrayCreate(32, 1);
-    g_rgAmmo[Ammo_Id] = ArrayCreate(1, 1);
-    g_rgAmmo[Ammo_PackSize] = ArrayCreate(1, 1);
-    g_rgAmmo[Ammo_PackModel] = ArrayCreate(64, 1);
-    g_rgAmmo[Ammo_MaxAmount] = ArrayCreate(1, 1);
-    g_iAmmoMap = TrieCreate();
+public Float:Native_GetWeight(iPluginId, iArgc) {
+    new iHandler = get_param(1);
+
+    return ArrayGetCell(Array:g_rgAmmo[Ammo_Weight], iHandler);
 }
 
-RegisterAmmo(const szName[], iAmmoId, iPackSize, const szModel[], iMaxAmount) {
+RegisterAmmo(const szName[], iAmmoId, iPackSize, const szModel[], iMaxAmount, Float:flWeight) {
     if (szModel[0] != '^0') {
         precache_model(szModel);
+    }
+
+    if (TrieKeyExists(g_iAmmoMap, szName)) {
+        log_amx("Cannot register ^"%s^" ammo. Ammo ^"%s^" is already registered!", szName, szName);
+        return;
     }
 
     ArrayPushCell(Array:g_rgAmmo[Ammo_Id], iAmmoId);
@@ -137,6 +134,7 @@ RegisterAmmo(const szName[], iAmmoId, iPackSize, const szModel[], iMaxAmount) {
     ArrayPushCell(Array:g_rgAmmo[Ammo_PackSize], iPackSize);
     ArrayPushString(Array:g_rgAmmo[Ammo_PackModel], szModel);
     ArrayPushCell(Array:g_rgAmmo[Ammo_MaxAmount], iMaxAmount);
+    ArrayPushCell(Array:g_rgAmmo[Ammo_Weight], flWeight);
     TrieSetCell(g_iAmmoMap, szName, g_iAmmoCount);
 
     g_rgAmmoMap[iAmmoId] = g_iAmmoCount;
@@ -145,4 +143,26 @@ RegisterAmmo(const szName[], iAmmoId, iPackSize, const szModel[], iMaxAmount) {
 
 GetHandlerById(iAmmoId) {
     return g_rgAmmoMap[iAmmoId];
+}
+
+InitStorages() {
+    g_rgAmmo[Ammo_Name] = ArrayCreate(32, 1);
+    g_rgAmmo[Ammo_Id] = ArrayCreate(1, 1);
+    g_rgAmmo[Ammo_PackSize] = ArrayCreate(1, 1);
+    g_rgAmmo[Ammo_PackModel] = ArrayCreate(64, 1);
+    g_rgAmmo[Ammo_MaxAmount] = ArrayCreate(1, 1);
+    g_rgAmmo[Ammo_Weight] = ArrayCreate(1, 1);
+    g_iAmmoMap = TrieCreate();
+}
+
+DestroyStorages() {
+    for (new i = 0; i < _:AmmoData; ++i) {
+        new Array:irgData = Array:g_rgAmmo[AmmoData:i];
+
+        if (irgData != Invalid_Array) {
+            ArrayDestroy(irgData);
+        }
+    }
+
+    TrieDestroy(g_iAmmoMap);
 }

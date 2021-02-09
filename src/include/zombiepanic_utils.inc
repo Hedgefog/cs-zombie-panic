@@ -4,6 +4,34 @@
 // #define ITEM_FLAG_LIMITINWORLD      8
 // #define ITEM_FLAG_EXHAUSTIBLE       16 // A player can totally exhaust their ammo supply and lose this weapon
 
+stock const AMMO_LIST[15][] = {
+    "",
+    "338Magnum", 
+    "762Nato",
+    "556NatoBox", 
+    "556Nato",
+    "buckshot", 
+    "45ACP", 
+    "57mm", 
+    "50AE", 
+    "357SIG",
+    "9mm", 
+    "Flashbang",
+    "HEGrenade", 
+    "SmokeGrenade", 
+    "C4"
+};
+
+stock const ITEMS_LIST[][] = {
+    "armoury_entity",
+    "item_battery",
+    "item_healthkit",
+    "armoury_entity",
+    "weaponbox",
+    "weapon_shield",
+    "grenade"
+};
+
 stock bool:UTIL_IsPlayer(pEntity) {
     static c_iMaxPlayers;
     if (!c_iMaxPlayers) {
@@ -36,40 +64,23 @@ stock UTIL_Message_Dlight(
 
 stock UTIL_CreateAmmoBox(iAmmoId, iAmount) {
     static iszWeaponbox = 0;
-    static const szAmmoList[15][] = {
-        "",
-        "338Magnum", 
-        "762Nato",
-        "556NatoBox", 
-        "556Nato",
-        "buckshot", 
-        "45ACP", 
-        "57mm", 
-        "50AE", 
-        "357SIG",
-        "9mm", 
-        "Flashbang",
-        "HEGrenade", 
-        "SmokeGrenade", 
-        "C4"
-    };
 
     if (!iszWeaponbox) {
         iszWeaponbox = engfunc(EngFunc_AllocString, "weaponbox");
     }
 
 
-    new iWeaponBox = engfunc(EngFunc_CreateNamedEntity, iszWeaponbox);
-    dllfunc(DLLFunc_Spawn, iWeaponBox);
+    new pWeaponBox = engfunc(EngFunc_CreateNamedEntity, iszWeaponbox);
+    dllfunc(DLLFunc_Spawn, pWeaponBox);
 
-    set_member(iWeaponBox, m_WeaponBox_rgiszAmmo, szAmmoList[iAmmoId], 0);
-    set_member(iWeaponBox, m_WeaponBox_rgAmmo, iAmount, 0);
-    set_member(iWeaponBox, m_WeaponBox_cAmmoTypes, 1);
+    set_member(pWeaponBox, m_WeaponBox_rgiszAmmo, AMMO_LIST[iAmmoId], 0);
+    set_member(pWeaponBox, m_WeaponBox_rgAmmo, iAmount, 0);
+    set_member(pWeaponBox, m_WeaponBox_cAmmoTypes, 1);
 
-    return iWeaponBox;
+    return pWeaponBox;
 }
 
-stock UTIL_BeamPoints(const Float:vecStart[3], const Float:vecEnd[3], const color[3]) {
+stock UTIL_BeamPoints(const Float:vecStart[3], const Float:vecEnd[3], const color[3], iLifetime = 30) {
     message_begin(MSG_BROADCAST ,SVC_TEMPENTITY);
     write_byte(TE_BEAMPOINTS);
     write_coord(floatround(vecStart[0]));	// start position
@@ -81,7 +92,7 @@ stock UTIL_BeamPoints(const Float:vecStart[3], const Float:vecEnd[3], const colo
     write_short(engfunc(EngFunc_ModelIndex, "sprites/laserbeam.spr"));	// sprite index
     write_byte(0);	// starting frame
     write_byte(10);	// frame rate in 0.1's
-    write_byte(30);	// life in 0.1's
+    write_byte(iLifetime);	// life in 0.1's
     write_byte(2);	// line width in 0.1's
     write_byte(1);	// noise amplitude in 0.01's
     write_byte(color[0]);	// Red
@@ -90,4 +101,45 @@ stock UTIL_BeamPoints(const Float:vecStart[3], const Float:vecEnd[3], const colo
     write_byte(127);	// brightness
     write_byte(10);	// scroll speed in 0.1's
     message_end();
+}
+
+stock bool:UTIL_IsMasterTriggered(const szMaster[], pActivator) {
+    new pMaster = engfunc(EngFunc_FindEntityByString, 0, "targetname", szMaster);
+
+    if (pMaster && (ExecuteHam(Ham_ObjectCaps, pMaster) & FCAP_MASTER)) {
+        return !!ExecuteHamB(Ham_IsTriggered, pMaster, pActivator);
+    }
+
+    return true;
+}
+
+stock UTIL_CalculateWeaponSpread(pWeapon, const Float:vecSpread[3], Float:flMovementFactor, Float:flFirstShotModifier, Float:flDuckFactor, Float:flAirFactor, Float:vecOut[3]) {
+  new pPlayer = get_member(pWeapon, m_pPlayer);
+  new iShotsFired = get_member(pWeapon, m_Weapon_iShotsFired);
+  new iPlayerFlags = pev(pPlayer, pev_flags);
+
+  xs_vec_copy(vecSpread, vecOut);
+  
+  static Float:vecVelocity[3];
+  pev(pPlayer, pev_velocity, vecVelocity);
+  if (xs_vec_len(vecVelocity) > 0) {
+    if (iShotsFired == 0) {
+      flMovementFactor *= flFirstShotModifier;
+    }
+
+    xs_vec_mul_scalar(vecOut, flMovementFactor, vecOut);
+  }
+
+  if (iPlayerFlags & FL_DUCKING) {
+    xs_vec_mul_scalar(vecOut, flDuckFactor, vecOut);
+  }
+
+  if (~iPlayerFlags & FL_ONGROUND) {
+    xs_vec_mul_scalar(vecOut, flAirFactor, vecOut);
+  }
+}
+
+stock bool:UTIL_IsPlayerSpectator(pPlayer) {
+  new iTeam = get_member(pPlayer, m_iTeam);
+  return iTeam < 1 || iTeam > 2;
 }

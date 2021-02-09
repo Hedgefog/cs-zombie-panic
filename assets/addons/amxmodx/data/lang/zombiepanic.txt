@@ -1,0 +1,39 @@
+[en]
+ZP_HINT_TITLE = Hint
+ZP_HINT_PANIC = Panic may help you escape from the zombies^nPress <O> to Panic
+ZP_HINT_DROP_AMMO = You can drop your ammo pressing <X>^nPress <Z> to select ammo type
+ZP_HINT_PICKUP = Press <E> to pickup items on dinstance
+ZP_WARN_TITLE = Warning
+ZP_WARN_SPEED = A large amount of ammo and weapons slows you down^nDon't forget to get rid of unnecessary ammo
+ZP_OBJECTIVE_TITLE = Survival
+ZP_OBJECTIVE_HUMAN = Survive to the end of the round or kill all zombies
+ZP_OBJECTIVE_ZOMBIE = Kill all survivors
+ZPO_OBJECTIVE_TITLE = Objective
+ZPO_OBJECTIVE_HUMAN = Follow the marks to complete objectives
+ZPO_OBJECTIVE_ZOMBIE = Don't let survivors complete the objectives
+ZP_RESPAWN_TITLE = Respawn
+ZP_RESPAWN_ZOMBIE = You will be respawned soon...^nWatch the lives in the lower right corner
+ZP_RESPAWN_HUMAN = You will be respawned as zombie soon...
+ZP_RESPAWN_NOLIVES = No more lives^nWait for more lives to appear
+ZP_ITEM_PICKUP_TITLE = <E>
+ZP_ITEM_PICKUP = Pickup item
+
+[ru]
+ZP_HINT_TITLE = Совет
+ZP_HINT_PANIC = Паника может помочь вам убежать от зомби^nНажмите <O> для активации
+ZP_HINT_DROP_AMMO = Вы можете выбросить патроны нажав <X>^nНажмите <Z> для выбора типа патронов
+ZP_HINT_PICKUP = Нажмите <е> для того, чтоб подобрать предметы на расстоянии
+ZP_WARN_TITLE = Внимание
+ZP_WARN_SPEED = Не забывайте избавляться от ненужных патронов, чтоб поддерживать скорость
+ZP_OBJECTIVE_TITLE = Выживание
+ZP_OBJECTIVE_HUMAN = Продержитесь до конца раунда или убейте всех зомби
+ZP_OBJECTIVE_ZOMBIE = Убейте всех выживших
+ZPO_OBJECTIVE_TITLE = Цель
+ZPO_OBJECTIVE_HUMAN = Следуйте к отметкам для выполнения целей
+ZPO_OBJECTIVE_ZOMBIE = Не дайте выжившим выполнить цель
+ZP_RESPAWN_TITLE = Возрождение
+ZP_RESPAWN_ZOMBIE = Вскоре, Вы возродитесь^nследите за жизнями в правой нижней части экрана
+ZP_RESPAWN_HUMAN = Вскоре, Вы воздродитесь за зомби...
+ZP_RESPAWN_NOLIVES = Жизней больше нет^nОжидайте, пока появится больше жизней
+ZP_ITEM_PICKUP_TITLE = <E>
+ZP_ITEM_PICKUP = Подобрать предмет

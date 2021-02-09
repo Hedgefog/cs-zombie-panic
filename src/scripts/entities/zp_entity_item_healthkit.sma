@@ -1,4 +1,3 @@
-
 #pragma semicolon 1
 
 #include <amxmodx>
@@ -48,20 +47,24 @@ public OnTouch(pEntity, pToucher) {
         return HAM_SUPERCEDE;
     }
 
-    new Float:flMaxHealth;
-    pev(pToucher, pev_max_health, flMaxHealth);
-    
-    new Float:flHealth;
-    pev(pToucher, pev_health, flHealth);
+    if (GetHamReturnStatus() < HAM_SUPERCEDE) {
+        if (!get_member_game(m_bFreezePeriod)) {
+            new Float:flMaxHealth;
+            pev(pToucher, pev_max_health, flMaxHealth);
+            
+            new Float:flHealth;
+            pev(pToucher, pev_health, flHealth);
 
-    if (flHealth < flMaxHealth) {
-        flHealth = floatmin(flMaxHealth, flHealth + 25.0);
-        set_pev(pToucher, pev_health, flHealth);
+            if (flHealth < flMaxHealth) {
+                flHealth = floatmin(flMaxHealth, flHealth + 25.0);
+                set_pev(pToucher, pev_health, flHealth);
 
-        set_pev(pEntity, pev_effects, pev(pEntity, pev_effects) | EF_NODRAW);
-        set_pev(pEntity, pev_solid, SOLID_NOT);
+                set_pev(pEntity, pev_effects, pev(pEntity, pev_effects) | EF_NODRAW);
+                set_pev(pEntity, pev_solid, SOLID_NOT);
 
-        emit_sound(pToucher, CHAN_ITEM, "items/smallmedkit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+                emit_sound(pToucher, CHAN_ITEM, "items/smallmedkit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+            }
+        }
     }
 
     return HAM_SUPERCEDE;
