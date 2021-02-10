@@ -26,7 +26,7 @@ public plugin_precache() {
     precache_sound(ZP_WEAPON_PISTOL_RELOAD_START_SOUND);
     precache_sound(ZP_WEAPON_PISTOL_RELOAD_END_SOUND);
 
-    g_iCwHandler = CW_Register(ZP_WEAPON_PISTOL, CSW_FIVESEVEN, 7, ZP_Ammo_GetId(ZP_Ammo_GetHandler(ZP_AMMO_PISTOL)), 120, _, _, 1, 1, _, "fiveseven", CWF_NoBulletSmoke);
+    g_iCwHandler = CW_Register(ZP_WEAPON_PISTOL, CSW_FIVESEVEN, 7, ZP_Ammo_GetId(ZP_Ammo_GetHandler(ZP_AMMO_PISTOL)), 120, _, _, 1, 6, _, "fiveseven", CWF_NoBulletSmoke);
     CW_Bind(g_iCwHandler, CWB_Idle, "@Weapon_Idle");
     CW_Bind(g_iCwHandler, CWB_PrimaryAttack, "@Weapon_PrimaryAttack");
     CW_Bind(g_iCwHandler, CWB_Reload, "@Weapon_Reload");

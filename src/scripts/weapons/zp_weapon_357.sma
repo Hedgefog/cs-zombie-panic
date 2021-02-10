@@ -26,7 +26,7 @@ public plugin_precache() {
         precache_sound(ZP_WEAPON_MAGNUM_SHOT_SOUNDS[i]);
     }
 
-    g_iCwHandler = CW_Register(ZP_WEAPON_MAGNUM, CSW_DEAGLE, 6, ZP_Ammo_GetId(ZP_Ammo_GetHandler(ZP_AMMO_MAGNUM)), 24, _, _, 1, 6, _, "fiveseven", CWF_NoBulletSmoke);
+    g_iCwHandler = CW_Register(ZP_WEAPON_MAGNUM, CSW_DEAGLE, 6, ZP_Ammo_GetId(ZP_Ammo_GetHandler(ZP_AMMO_MAGNUM)), 24, _, _, 1, 1, _, "fiveseven", CWF_NoBulletSmoke);
     CW_Bind(g_iCwHandler, CWB_Idle, "@Weapon_Idle");
     CW_Bind(g_iCwHandler, CWB_PrimaryAttack, "@Weapon_PrimaryAttack");
     CW_Bind(g_iCwHandler, CWB_Reload, "@Weapon_Reload");
