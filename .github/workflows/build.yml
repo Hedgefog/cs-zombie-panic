@@ -95,16 +95,16 @@
             asset_path: ./dist/bundles/full/zombiepanic-${{ steps.buildvars.outputs.tagversion }}-resources.zip
             asset_name: zombiepanic-${{ steps.buildvars.outputs.tagversion }}-resources.zip
             asset_content_type: application/zip
-        # - name: Upload Release SDK
-        #   id: upload-release-sdk
-        #   uses: actions/upload-release-asset@v1
-        #   env:
-        #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        #   with:
-        #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-        #     asset_path: ./dist/bundles/sdk/zombiepanic-${{ steps.buildvars.outputs.tagversion }}-sdk.zip
-        #     asset_name: zombiepanic-${{ steps.buildvars.outputs.tagversion }}-sdk.zip
-        #     asset_content_type: application/zip
+        - name: Upload Release SDK
+          id: upload-release-sdk
+          uses: actions/upload-release-asset@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            asset_path: ./dist/bundles/sdk/zombiepanic-${{ steps.buildvars.outputs.tagversion }}-sdk.zip
+            asset_name: zombiepanic-${{ steps.buildvars.outputs.tagversion }}-sdk.zip
+            asset_content_type: application/zip
         - name: Cleanup
           run: |
             rm -rf ./compiler
