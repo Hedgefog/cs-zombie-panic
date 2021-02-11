@@ -921,10 +921,7 @@ FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:
                 pHit = 0;
             }
 
-            static Float:vecShotEnd[3];
-            get_tr2(tr, TR_flFraction, vecShotEnd);
-
-            new Float:flCurrentDistance = xs_vec_distance(vecSrc, vecShotEnd);
+            new Float:flCurrentDistance = flDistance * flFraction;
             new Float:flCurrentDamage = flDamage * floatpower(flRangeModifier, flCurrentDistance / 500.0);
 
             rg_multidmg_clear();
