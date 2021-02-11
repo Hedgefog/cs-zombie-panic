@@ -50,7 +50,7 @@ public @Weapon_PrimaryAttack(this) {
     static Float:vecSpread[3];
     UTIL_CalculateWeaponSpread(this, Float:VECTOR_CONE_10DEGREES, 1.1125, 1.0, 0.95, 2.0, vecSpread);
 
-    if (CW_DefaultShotgunShot(this, 6.0, 1.0, 0.5, vecSpread, 25)) {
+    if (CW_DefaultShotgunShot(this, 6.0, 1.0, 1.0, 0.5, vecSpread, 25)) {
         CW_PlayAnimation(this, 1, 1.5);
         new pPlayer = CW_GetPlayer(this);
         emit_sound(pPlayer, CHAN_WEAPON, ZP_WEAPON_SHOTGUN_SHOT_SOUND, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
