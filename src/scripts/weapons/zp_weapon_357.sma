@@ -101,6 +101,10 @@ public @Weapon_WeaponBoxSpawn(this, pWeaponBox) {
 public Task_EjectBrass(iTaskId) {
     new pItem = iTaskId - TASKID_EJECT_BRASS;
 
+    if (!pev_valid(pItem)) {
+        return;
+    }
+
     new pPlayer = CW_GetPlayer(pItem);
     new iClip = get_member(pItem, m_Weapon_iClip);
     new iModelIndex = engfunc(EngFunc_ModelIndex, "models/shell.mdl");
