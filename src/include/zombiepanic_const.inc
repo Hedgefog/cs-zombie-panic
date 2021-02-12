@@ -231,3 +231,12 @@ stock const ZP_WEAPON_PISTOL_RELOAD_START_SOUND[] = "items/9mmclip1.wav";
 stock const ZP_WEAPON_PISTOL_RELOAD_END_SOUND[] = "items/9mmclip2.wav";
 
 stock const ZP_OBJECTIVE_MARK_SPRITE[] = "sprites/zombiepanic/v100/objective_mark.spr";
+
+stock const ZP_JOLT_SOUNDS[][] = {
+  "zombiepanic/v110/player/jolt01.wav",
+  "zombiepanic/v110/player/jolt02.wav",
+  "zombiepanic/v110/player/jolt03.wav",
+  "zombiepanic/v110/player/jolt04.wav"
+};
+
+stock const ZP_TRANSFORMATION_SOUND[] = "zombiepanic/v110/player/transformation.wav";
