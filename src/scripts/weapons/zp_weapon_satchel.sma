@@ -372,6 +372,10 @@ public OnPlayerKilled_Post(pPlayer) {
 
 
 public OnPlayerPreThink_Post(pPlayer) {
+    if (!is_user_alive(pPlayer)) {
+        return HAM_IGNORED;
+    }
+
     g_pPlayerPickupCharge[pPlayer] = -1;
     
     if (~pev(pPlayer, pev_button) & IN_USE || pev(pPlayer, pev_oldbuttons) & IN_USE) {
