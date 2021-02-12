@@ -61,7 +61,7 @@ public plugin_init() {
 
 public plugin_natives() {
     register_native("ZP_Player_SetInfected", "Native_SetInfected");
-    register_native("ZP_Player_IsPlayerInfected", "Native_IsPlayerInfected");
+    register_native("ZP_Player_IsInfected", "Native_IsPlayerInfected");
 }
 
 public Native_SetInfected(iPluginId, iArgc) {
