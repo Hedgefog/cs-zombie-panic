@@ -421,8 +421,6 @@ public OnPlayerPreThink_Post(pPlayer) {
 }
 
 public OnPlayerPostThink_Post(pPlayer) {
-    client_print(pPlayer, print_center, "Charges: %d", g_iPlayerChargeCount[pPlayer]);
-
     if (g_pPlayerPickupCharge[pPlayer] != -1) {
         if (ZP_Player_AddAmmo(pPlayer, ZP_AMMO_SATCHEL, 1)) {
             Deactivate(g_pPlayerPickupCharge[pPlayer]);
