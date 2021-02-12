@@ -10,7 +10,7 @@
 #include <api_custom_weapons>
 
 #define PLUGIN "[API] Custom Weapons"
-#define VERSION "0.5.2"
+#define VERSION "0.6.0"
 #define AUTHOR "Hedgehog Fog"
 
 #define WALL_PUFF_SPRITE "sprites/wall_puff1.spr"
@@ -277,13 +277,14 @@ public Native_FireBulletsPlayer(iPluginId, iArgc) {
 
     new Float:flDistance = get_param_f(6);
     new Float:flDamage = get_param_f(7);
-    new pevAttacker = get_param(8);
+    new Float:flRangeModifier = get_param_f(8);
+    new pevAttacker = get_param(9);
 
     static Float:vecOut[3];
 
-    FireBulletsPlayer(pWeapon, iShots, vecSrc, vecDirShooting, vecSpread, flDistance, flDamage, pevAttacker, vecOut);
+    FireBulletsPlayer(pWeapon, iShots, vecSrc, vecDirShooting, vecSpread, flDistance, flDamage, flRangeModifier, pevAttacker, vecOut);
 
-    set_array_f(9, vecOut, sizeof(vecOut));
+    set_array_f(10, vecOut, sizeof(vecOut));
 }
 
 public bool:Native_EjectWeaponBrass(iPluginId, iArgc) {
@@ -297,22 +298,8 @@ public bool:Native_EjectWeaponBrass(iPluginId, iArgc) {
 public bool:Native_DefaultShot(iPluginId, iArgc) {
     new pItem = get_param(1);
     new Float:flDamage = get_param_f(2);
-    new Float:flRate = get_param_f(3);
-
-    static Float:vecSpread[3];
-    get_array_f(4, vecSpread, sizeof(vecSpread));
-
-    new iShots = get_param(5);
-    new Float:flDistance = get_param_f(6);
-
-    return DefaultShot(pItem, flDamage, flRate, vecSpread, iShots, flDistance);
-}
-
-public bool:Native_DefaultShotgunShot(iPluginId, iArgc) {
-    new pItem = get_param(1);
-    new Float:flDamage = get_param_f(2);
-    new Float:flRate = get_param_f(3);
-    new Float:flPumpDelay = get_param_f(4);
+    new Float:flRangeModifier = get_param_f(3);
+    new Float:flRate = get_param_f(4);
 
     static Float:vecSpread[3];
     get_array_f(5, vecSpread, sizeof(vecSpread));
@@ -320,7 +307,23 @@ public bool:Native_DefaultShotgunShot(iPluginId, iArgc) {
     new iShots = get_param(6);
     new Float:flDistance = get_param_f(7);
 
-    return DefaultShotgunShot(pItem, flDamage, flRate, flPumpDelay, vecSpread, iShots, flDistance);
+    return DefaultShot(pItem, flDamage, flRangeModifier, flRate, vecSpread, iShots, flDistance);
+}
+
+public bool:Native_DefaultShotgunShot(iPluginId, iArgc) {
+    new pItem = get_param(1);
+    new Float:flDamage = get_param_f(2);
+    new Float:flRangeModifier = get_param_f(3);
+    new Float:flRate = get_param_f(4);
+    new Float:flPumpDelay = get_param_f(5);
+
+    static Float:vecSpread[3];
+    get_array_f(6, vecSpread, sizeof(vecSpread));
+
+    new iShots = get_param(7);
+    new Float:flDistance = get_param_f(8);
+
+    return DefaultShotgunShot(pItem, flDamage, flRangeModifier, flRate, flPumpDelay, vecSpread, iShots, flDistance);
 }
 
 public Native_DefaultSwing(iPluginId, iArgc) {
@@ -861,7 +864,7 @@ GetPlayer(this) {
     return get_member(this, m_pPlayer);
 }
 
-FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:vecSpread[3], Float:flDistance, Float:flDamage, pAttacker, Float:vecOut[3]) {
+FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:vecSpread[3], Float:flDistance, Float:flDamage, Float:flRangeModifier, pAttacker, Float:vecOut[3]) {
     new CW:iHandler = GetHandlerByEntity(this);
     if (iHandler == CW_INVALID_HANDLER) {
         return;
@@ -918,8 +921,11 @@ FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:
                 pHit = 0;
             }
 
+            new Float:flCurrentDistance = flDistance * flFraction;
+            new Float:flCurrentDamage = flDamage * floatpower(flRangeModifier, flCurrentDistance / 500.0);
+
             rg_multidmg_clear();
-            ExecuteHamB(Ham_TraceAttack, pHit, pAttacker, flDamage, vecDir, tr, DMG_BULLET | DMG_NEVERGIB);
+            ExecuteHamB(Ham_TraceAttack, pHit, pAttacker, flCurrentDamage, vecDir, tr, DMG_BULLET | DMG_NEVERGIB);
             rg_multidmg_apply(this, pAttacker);
         
             // TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
@@ -1199,7 +1205,7 @@ bool:DefaultDeploy(this, const szViewModel[], const szWeaponModel[], iAnim, cons
     return true;
 }
 
-bool:DefaultShot(this, Float:flDamage, Float:flRate, Float:flSpread[3], iShots, Float:flDistance) {
+bool:DefaultShot(this, Float:flDamage, Float:flRangeModifier, Float:flRate, Float:flSpread[3], iShots, Float:flDistance) {
     new iClip = get_member(this, m_Weapon_iClip);
     if (iClip <= 0) {
         return false;
@@ -1214,7 +1220,7 @@ bool:DefaultShot(this, Float:flDamage, Float:flRate, Float:flSpread[3], iShots, 
     ExecuteHam(Ham_Player_GetGunPosition, pPlayer, vecSrc);
 
     static Float:vecOut[3];
-    FireBulletsPlayer(this, iShots, vecSrc, vecDirShooting, flSpread, flDistance, flDamage, pPlayer, vecOut);
+    FireBulletsPlayer(this, iShots, vecSrc, vecDirShooting, flSpread, flDistance, flDamage, flRangeModifier, pPlayer, vecOut);
 
     set_member(this, m_Weapon_iClip, --iClip);
 
@@ -1229,7 +1235,7 @@ bool:DefaultShot(this, Float:flDamage, Float:flRate, Float:flSpread[3], iShots, 
     return true;
 }
 
-bool:DefaultShotgunShot(this, Float:flDamage, Float:flRate, Float:flPumpDelay, Float:flSpread[3], iShots, Float:flDistance) {
+bool:DefaultShotgunShot(this, Float:flDamage, Float:flRangeModifier, Float:flRate, Float:flPumpDelay, Float:flSpread[3], iShots, Float:flDistance) {
     new iClip = get_member(this, m_Weapon_iClip);
     if (iClip <= 0) {
         Reload(this);
@@ -1245,7 +1251,7 @@ bool:DefaultShotgunShot(this, Float:flDamage, Float:flRate, Float:flPumpDelay, F
 
     // m_pPlayer->pev->effects = (int)(m_pPlayer->pev->effects) | EF_MUZZLEFLASH;
 
-    if (!DefaultShot(this, flDamage, flRate, flSpread, iShots, flDistance)) {
+    if (!DefaultShot(this, flDamage, flRangeModifier, flRate, flSpread, iShots, flDistance)) {
         return false;
     }
 
@@ -2190,7 +2196,7 @@ bool:EjectWeaponBrass(this, iModelIndex, iSoundType) {
     pev(pPlayer, pev_origin, vecOrigin);
 
     for (new i = 0; i < 3; ++i) {
-        vecOrigin[i] = vecOrigin[i] + vecViewOfs[i] + (vecUp[i]    * -9.0) + (vecForward[i] * 16.0);
+        vecOrigin[i] = vecOrigin[i] + vecViewOfs[i] + (vecUp[i] * -9.0) + (vecForward[i] * 16.0);
     }
 
     static Float:vecVelocity[3];

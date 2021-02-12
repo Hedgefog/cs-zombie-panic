@@ -59,14 +59,20 @@ public @Weapon_Idle(this) {
 
 public @Weapon_PrimaryAttack(this) {
     static Float:vecSpread[3];
-    UTIL_CalculateWeaponSpread(this, Float:VECTOR_CONE_6DEGREES, 3.0, 0.5, 0.95, 3.5, vecSpread);
+    UTIL_CalculateWeaponSpread(this, Float:VECTOR_CONE_5DEGREES, 1.1125, 0.5, 0.95, 3.5, vecSpread);
 
-    if (CW_DefaultShot(this, 26.0, 0.095, Float:vecSpread)) {
+    if (CW_DefaultShot(this, 26.0, 0.85, 0.095, Float:vecSpread)) {
         CW_PlayAnimation(this, 5 + random(3), 0.7);
         new pPlayer = CW_GetPlayer(this);
         emit_sound(pPlayer, CHAN_WEAPON, ZP_WEAPON_RIFLE_SHOT_SOUNDS[random(sizeof(ZP_WEAPON_RIFLE_SHOT_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
-        set_pev(pPlayer, pev_punchangle, Float:{-2.0, 0.0, 0.0});
+        static Float:vecPunchAngle[3];
+        pev(pPlayer, pev_punchangle, vecPunchAngle);
+        xs_vec_add(vecPunchAngle, Float:{-1.75, 0.0, 0.0}, vecPunchAngle);
+
+        if (xs_vec_len(vecPunchAngle) > 0.0) {
+            set_pev(pPlayer, pev_punchangle, vecPunchAngle);
+        }
 
         CW_EjectWeaponBrass(this, engfunc(EngFunc_ModelIndex, "models/shell.mdl"), 1);
     }

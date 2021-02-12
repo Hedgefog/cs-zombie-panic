@@ -66,13 +66,20 @@ public @Weapon_PrimaryAttack(this) {
     }
 
     static Float:vecSpread[3];
-    UTIL_CalculateWeaponSpread(this, Float:VECTOR_CONE_1DEGREES, 5.0, 1.0, 0.95, 7.5, vecSpread);
+    UTIL_CalculateWeaponSpread(this, Float:VECTOR_CONE_1DEGREES, 2.5, 1.0, 0.95, 7.5, vecSpread);
 
-    if (CW_DefaultShot(this, 70.0, 0.5, vecSpread)) {
+    if (CW_DefaultShot(this, 80.0, 0.9, 0.5, vecSpread)) {
         CW_PlayAnimation(this, 2, 1.03);
         new pPlayer = CW_GetPlayer(this);
         emit_sound(pPlayer, CHAN_WEAPON, ZP_WEAPON_MAGNUM_SHOT_SOUNDS[random(sizeof(ZP_WEAPON_MAGNUM_SHOT_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-        set_pev(pPlayer, pev_punchangle, Float:{-10.0, 0.0, 0.0});
+
+        static Float:vecPunchAngle[3];
+        pev(pPlayer, pev_punchangle, vecPunchAngle);
+        xs_vec_add(vecPunchAngle, Float:{-8.0, 0.0, 0.0}, vecPunchAngle);
+
+        if (xs_vec_len(vecPunchAngle) > 0.0) {
+            set_pev(pPlayer, pev_punchangle, vecPunchAngle);
+        }
     }
 }
 
