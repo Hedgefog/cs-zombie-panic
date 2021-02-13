@@ -251,6 +251,10 @@ public ZP_Fw_Player_AimItem(pPlayer) {
 }
 
 public ZP_Fw_PlayerInfected(pPlayer, pInfector) {
+    if (!pInfector) {
+        return;
+    }
+
     SetMessageTitle("%L", pInfector, "ZP_WARN_INFECTION_TITLE");
     SetMessageText("%L ^"%n^"", pInfector, "ZP_WARN_INFECTOR", pPlayer);
 
