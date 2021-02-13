@@ -27,7 +27,6 @@ new gmsgScreenShake;
 new g_pPlayerInfector[MAX_PLAYERS + 1];
 new Float:g_flPlayerTransformationTime[MAX_PLAYERS + 1];
 new InfectionState:g_iPlayerInfectionState[MAX_PLAYERS + 1];
-new bool:g_bPlayerResetTeam[MAX_PLAYERS + 1];
 new g_iPlayerRoomType[MAX_PLAYERS + 1] = { -1, ... };
 
 new g_pCvarInfectionChance;
@@ -51,8 +50,8 @@ public plugin_init() {
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
     RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
     RegisterHam(Ham_TraceAttack, "player", "OnPlayerTraceAttack", .Post = 0);
-    RegisterHam(Ham_TraceAttack, "player", "OnPlayerTraceAttack_Post", .Post = 1);
-    RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage_Post", .Post = 1);
+    RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage", .Post = 0);
+    RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage_Post", .Post = 0);
 
     g_pCvarInfectionChance = register_cvar("zp_infection_chance", "10");
 
@@ -138,7 +137,7 @@ public OnPlayerPreThink_Post(pPlayer) {
 }
 
 public OnPlayerTraceAttack(pPlayer, pAttacker, Float:flDamage, Float:vecDir[3], pTr, iDamageBits) {
-    if (IsPlayerInfected(pPlayer)) {
+    if (!IsPlayerInfected(pPlayer)) {
         return HAM_IGNORED;
     }
 
@@ -156,23 +155,45 @@ public OnPlayerTraceAttack(pPlayer, pAttacker, Float:flDamage, Float:vecDir[3], 
     }
 
     new iAttackerTeam = get_member(pAttacker, m_iTeam);
-    if (iTeam == iAttackerTeam) {
-        g_bPlayerResetTeam[pPlayer] = true;
-        set_member(pPlayer, m_iTeam, ZP_ZOMBIE_TEAM);
-    }
-
-    return HAM_HANDLED;
-}
-
-public OnPlayerTraceAttack_Post(pPlayer, pAttacker, Float:flDamage, Float:vecDir[3], pTr, iDamageBits) {
-    if (!g_bPlayerResetTeam[pPlayer]) {
+    if (iTeam != iAttackerTeam) {
         return HAM_IGNORED;
     }
 
-    g_bPlayerResetTeam[pPlayer] = false;
+    set_member(pPlayer, m_iTeam, ZP_ZOMBIE_TEAM);
+    ExecuteHam(Ham_TraceAttack, pPlayer, pAttacker, flDamage, vecDir, pTr, iDamageBits);
     set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
 
-    return HAM_HANDLED;
+    return HAM_SUPERCEDE;
+}
+
+public OnPlayerTakeDamage(pPlayer, pInflictor, pAttacker, Float:flDamage, iDamageBits) {
+    if (!IsPlayerInfected(pPlayer)) {
+        return HAM_IGNORED;
+    }
+
+    if (!UTIL_IsPlayer(pAttacker)) {
+        return HAM_IGNORED;
+    }
+
+    if (g_iPlayerInfectionState[pPlayer] < InfectionState_PartialZombie) {
+        return HAM_IGNORED;
+    }
+
+    new iTeam = get_member(pPlayer, m_iTeam);
+    if (iTeam != ZP_HUMAN_TEAM) {
+        return HAM_IGNORED;
+    }
+
+    new iAttackerTeam = get_member(pAttacker, m_iTeam);
+    if (iTeam != iAttackerTeam) {
+        return HAM_IGNORED;
+    }
+
+    set_member(pPlayer, m_iTeam, ZP_ZOMBIE_TEAM);
+    ExecuteHam(Ham_TakeDamage, pPlayer, pInflictor, pAttacker, flDamage, iDamageBits);
+    set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
+
+    return HAM_SUPERCEDE;
 }
 
 public OnPlayerTakeDamage_Post(pPlayer, pInflictor, pAttacker) {
@@ -207,7 +228,6 @@ bool:SetInfected(pPlayer, bool:bValue, pInfector = 0) {
     if (bValue) {
         g_flPlayerTransformationTime[pPlayer] = get_gametime() + TRANSFORMATION_DELAY;
         g_pPlayerInfector[pPlayer] = pInfector;
-        g_bPlayerResetTeam[pPlayer] = false;
 
         ExecuteForward(g_pFwInfected, g_iFwResult, pPlayer, pInfector);
     } else {
