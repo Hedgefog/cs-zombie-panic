@@ -103,6 +103,8 @@ new g_pKillerItem = -1;
 new gmsgWeaponList;
 new bool:g_bPrecache;
 
+new Array:g_irgDecals;
+
 public plugin_precache() {
     g_bPrecache = true;
     
@@ -112,6 +114,7 @@ public plugin_precache() {
     register_forward(FM_UpdateClientData, "OnUpdateClientData_Post", 1);
     register_forward(FM_PrecacheEvent, "OnPrecacheEvent_Post", 1);
     register_forward(FM_SetModel, "OnSetModel_Post", 1);
+    register_forward(FM_DecalIndex, "OnDecalIndex_Post", 1);
 
     RegisterHam(Ham_Spawn, "weaponbox", "OnWeaponboxSpawn_Post");
     RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
@@ -643,6 +646,14 @@ public OnSetModel_Post(this, const szModel[]) {
     return FMRES_HANDLED;
 }
 
+public OnDecalIndex_Post() {
+    if (!g_bPrecache) {
+        return;
+    }
+
+    ArrayPushCell(g_irgDecals, get_orig_retval());
+}
+
 public OnWeaponClCmd(pPlayer) {
     static szName[64];
     read_argv(0, szName, charsmax(szName));
@@ -940,8 +951,10 @@ FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:
                 }
                 
                 if (~iFlags & CWF_NoBulletDecal) {
-                    new iDecalIndex = random_num(get_decal_index("{shot1"), get_decal_index("{shot5") + 1);
-                    MakeDecal(tr, pHit, iDecalIndex);
+                    new iDecalIndex = GetDecalIndex(pHit);
+                    if (iDecalIndex >= 0) {
+                        MakeDecal(tr, pHit, iDecalIndex);
+                    }
                 }
             }
         }
@@ -1042,8 +1055,10 @@ public Smack(this) {
     }
 
     if (~iFlags & CWF_NoBulletDecal) {
-        new iDecalIndex = random_num(get_decal_index("{shot1"), get_decal_index("{shot5") + 1);
-        MakeDecal(tr, pHit, iDecalIndex, false);
+        new iDecalIndex = GetDecalIndex(pHit);
+        if (iDecalIndex >= 0) {
+            MakeDecal(tr, pHit, iDecalIndex, false);
+        }
     }
 
     free_tr2(tr);
@@ -1716,6 +1731,23 @@ MakeAimDir(pPlayer, Float:flDistance, Float:vecOut[3]) {
     xs_vec_mul_scalar(vecOut, flDistance, vecOut);
 }
 
+GetDecalIndex(pEntity) {
+    new iDecalIndex = ExecuteHamB(Ham_DamageDecal, pEntity, 0);
+    if (iDecalIndex < 0) {
+        return -1;
+    }
+
+    iDecalIndex = ArrayGetCell(g_irgDecals, iDecalIndex);
+
+    if (iDecalIndex == engfunc(EngFunc_DecalIndex, "{break1")
+        || iDecalIndex == engfunc(EngFunc_DecalIndex, "{break2")
+        || iDecalIndex == engfunc(EngFunc_DecalIndex, "{break3")) {
+        return engfunc(EngFunc_DecalIndex, "{bproof1");
+    }
+
+    return iDecalIndex;
+}
+
 // ANCHOR: Storages
 
 AllocateStrings() {
@@ -1741,6 +1773,8 @@ InitStorages() {
     }
 
     g_rgWeaponsMap = TrieCreate();
+
+    g_irgDecals = ArrayCreate();
 }
 
 DestroyStorages() {
@@ -1753,6 +1787,8 @@ DestroyStorages() {
     }
 
     TrieDestroy(g_rgWeaponsMap);
+
+    ArrayDestroy(g_irgDecals);
 }
 
 // ANCHOR: Weapon Data
