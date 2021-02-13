@@ -47,6 +47,11 @@ enum MessageType {
 #define MESSAGE_PICKUP_FADEIN_TIME 0.5
 #define MESSAGE_PICKUP_FADEOUT_TIME 1.0
 
+#define MESSAGE_INFECTION_POS -1.0, 0.30
+#define MESSAGE_INFECTION_HOLD_TIME 5.0
+#define MESSAGE_INFECTION_FADEIN_TIME 1.0
+#define MESSAGE_INFECTION_FADEOUT_TIME 1.0
+
 #define HINTS_KEY "zp_hints"
 
 enum Message {
@@ -243,6 +248,20 @@ public ZP_Fw_Player_AimItem(pPlayer) {
     );
 
     g_flPlayerLastPickupHint[pPlayer] = get_gametime();
+}
+
+public ZP_Fw_PlayerInfected(pPlayer, pInfector) {
+    SetMessageTitle("%L", pInfector, "ZP_WARN_INFECTION_TITLE");
+    SetMessageText("%L ^"%n^"", pInfector, "ZP_WARN_INFECTOR", pPlayer);
+
+    ShowMessage(
+        pInfector,
+        MessageType_Warn,
+        MESSAGE_INFECTION_POS,
+        MESSAGE_INFECTION_HOLD_TIME,
+        MESSAGE_INFECTION_FADEIN_TIME,
+        MESSAGE_INFECTION_FADEOUT_TIME
+    );
 }
 
 SetMessageTitle(const szTitle[], any:...) {

@@ -17,6 +17,8 @@ ZP_RESPAWN_HUMAN = You will be respawned as zombie soon...
 ZP_RESPAWN_NOLIVES = No more lives^nWait for more lives to appear
 ZP_ITEM_PICKUP_TITLE = <E>
 ZP_ITEM_PICKUP = Pickup item
+ZP_WARN_INFECTION_TITLE = Infection
+ZP_WARN_INFECTOR = You've infected player
 
 [ru]
 ZP_HINT_TITLE = Совет
@@ -37,3 +39,5 @@ ZP_RESPAWN_HUMAN = Вскоре, Вы воздродитесь за зомби..
 ZP_RESPAWN_NOLIVES = Жизней больше нет^nОжидайте, пока появится больше жизней
 ZP_ITEM_PICKUP_TITLE = <E>
 ZP_ITEM_PICKUP = Подобрать предмет
+ZP_WARN_INFECTION_TITLE = Заражение
+ZP_WARN_INFECTOR = Вы инфицировали игрока
