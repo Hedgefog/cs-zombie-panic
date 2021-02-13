@@ -1320,7 +1320,6 @@ DefaultSwing(this, Float:flDamage, Float:flRate, Float:flDistance) {
         pHit = 0;
     }
 
-    rg_multidmg_clear();
 
     // if (get_member(this, m_Weapon_flNextPrimaryAttack) + 1.0 < 0.0) {
     // first swing does full damage
@@ -1328,10 +1327,11 @@ DefaultSwing(this, Float:flDamage, Float:flRate, Float:flDistance) {
     xs_vec_sub(vecSrc, vecEnd, vecDir);
     xs_vec_normalize(vecDir, vecDir);
 
+    rg_multidmg_clear();
     ExecuteHamB(Ham_TraceAttack, pHit, pPlayer, flDamage, vecDir, tr, DMG_CLUB); 
+    rg_multidmg_apply(pPlayer, pPlayer);
     // }
 
-    rg_multidmg_apply(this, pPlayer);
 
     set_pev(this, pev_iuser1, tr);
     SetThink(this, "Smack");
