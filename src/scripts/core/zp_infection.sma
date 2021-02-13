@@ -48,6 +48,7 @@ public plugin_init() {
     gmsgScreenShake = get_user_msgid("ScreenShake");
 
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
     RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
     RegisterHam(Ham_TraceAttack, "player", "OnPlayerTraceAttack", .Post = 0);
     RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage", .Post = 0);
@@ -84,6 +85,10 @@ public Native_IsPlayerTransforming(iPluginId, iArgc) {
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
+    SetInfected(pPlayer, false);
+}
+
+public OnPlayerKilled_Post(pPlayer) {
     SetInfected(pPlayer, false);
 }
 
