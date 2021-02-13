@@ -103,25 +103,7 @@ public OnPlayerPreThink_Post(pPlayer) {
 
     new Float:flTimeLeft = g_flPlayerTransformationTime[pPlayer] - get_gametime();
     if (flTimeLeft <= 0.0) {
-        static vecOrigin[3];
-        pev(pPlayer, pev_origin, vecOrigin);
-
-        static vecAngles[3];
-        pev(pPlayer, pev_angles, vecAngles);
-
-        static vecViewAngles[3];
-        pev(pPlayer, pev_v_angle, vecViewAngles);
-
-        new iFlags = pev(pPlayer, pev_flags);
-
-        ExecuteHamB(Ham_Killed, pPlayer, g_pPlayerInfector[pPlayer], 0);
-        set_member(pPlayer, m_iTeam, ZP_ZOMBIE_TEAM);
-        ExecuteHamB(Ham_CS_RoundRespawn, pPlayer);
-
-        set_pev(pPlayer, pev_origin, vecOrigin);
-        set_pev(pPlayer, pev_angles, vecAngles);
-        set_pev(pPlayer, pev_v_angle, vecViewAngles);
-        set_pev(pPlayer, pev_flags, iFlags);
+        TransformPlayer(pPlayer);
     } else if (flTimeLeft <= TRANSFORMATION_DURATION) {
         if (g_iPlayerInfectionState[pPlayer] != InfectionState_Transformation) {
             SendScreenShake(pPlayer);
@@ -243,7 +225,33 @@ bool:SetInfected(pPlayer, bool:bValue, pInfector = 0) {
 }
 
 bool:IsPlayerInfected(pPlayer) {
+    if (ZP_Player_IsZombie(pPlayer)) {
+        return false;
+    }
+
     return g_iPlayerInfectionState[pPlayer] > InfectionState_None;
+}
+
+TransformPlayer(pPlayer) {
+    static vecOrigin[3];
+    pev(pPlayer, pev_origin, vecOrigin);
+
+    static vecAngles[3];
+    pev(pPlayer, pev_angles, vecAngles);
+
+    static vecViewAngles[3];
+    pev(pPlayer, pev_v_angle, vecViewAngles);
+
+    new iFlags = pev(pPlayer, pev_flags);
+
+    ExecuteHamB(Ham_Killed, pPlayer, g_pPlayerInfector[pPlayer], 0);
+    set_member(pPlayer, m_iTeam, ZP_ZOMBIE_TEAM);
+    ExecuteHamB(Ham_CS_RoundRespawn, pPlayer);
+
+    set_pev(pPlayer, pev_origin, vecOrigin);
+    set_pev(pPlayer, pev_angles, vecAngles);
+    set_pev(pPlayer, pev_v_angle, vecViewAngles);
+    set_pev(pPlayer, pev_flags, iFlags);
 }
 
 ResetRoomType(pPlayer) {
