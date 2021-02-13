@@ -54,7 +54,7 @@ public plugin_init() {
     RegisterHam(Ham_TraceAttack, "player", "OnPlayerTraceAttack_Post", .Post = 1);
     RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage_Post", .Post = 1);
 
-    g_pCvarInfectionChance = register_cvar("zp_infection_chance", "5");
+    g_pCvarInfectionChance = register_cvar("zp_infection_chance", "10");
 
     g_pFwInfected = CreateMultiForward("ZP_Fw_PlayerInfected", ET_IGNORE, FP_CELL, FP_CELL);
 }
