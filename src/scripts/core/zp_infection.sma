@@ -182,16 +182,17 @@ public OnPlayerTakeDamage_Post(pPlayer, pInflictor, pAttacker) {
     }
 
     if (random(100) < get_pcvar_num(g_pCvarInfectionChance)) {
-        SetInfected(pPlayer, true, pAttacker);
-        client_print(pAttacker, print_chat, "You've infected %n.", pPlayer);
+        if (SetInfected(pPlayer, true, pAttacker)) {
+            client_print(pAttacker, print_chat, "You've infected %n.", pPlayer);
+        }
     }
 
     return HAM_HANDLED;
 }
 
-SetInfected(pPlayer, bool:bValue, pInfector = 0) {
+bool:SetInfected(pPlayer, bool:bValue, pInfector = 0) {
     if (bValue == IsPlayerInfected(pPlayer)) {
-        return;
+        return false;
     }
 
     g_iPlayerInfectionState[pPlayer] = bValue ? InfectionState_Infected : InfectionState_None;
@@ -205,6 +206,8 @@ SetInfected(pPlayer, bool:bValue, pInfector = 0) {
     } else {
         ResetRoomType(pPlayer);
     }
+
+    return true;
 }
 
 bool:IsPlayerInfected(pPlayer) {
