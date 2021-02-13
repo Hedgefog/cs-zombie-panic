@@ -1,3 +1,21 @@
+/*
+    1.1.0
+        Additions and improvements:
+            Added infection (10% chance by default)
+            Satchel charges are now can be picked up
+            Improved spread and recoil system
+            Added damage range modifier
+            Reduced zombie damage to 25
+
+        Cvars:
+            Added zp_infection_chance cvar
+            Added zp_healthkit_cure_chance cvar
+
+        Fixes:
+            Fixed decals
+            Fixed client crashes when using melee weapons
+*/
+
 #if defined _zombiepanic_included
   #endinput
 #endif
