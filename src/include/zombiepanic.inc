@@ -15,6 +15,7 @@ native bool:ZP_Player_InPanic(pPlayer);
 native bool:ZP_Player_ToggleFlashlight(pPlayer);
 native bool:ZP_Player_ToggleZombieVision(pPlayer);
 native bool:ZP_Player_IsInfected(pPlayer);
+native bool:ZP_Player_IsTransforming(pPlayer);
 native ZP_Player_SetInfected(pPlayer, bool:bValue);
 
 forward ZP_Fw_PlayerJoined(pPlayer);
