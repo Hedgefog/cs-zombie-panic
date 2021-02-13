@@ -23,6 +23,8 @@ forward ZP_Fw_PlayerPanic(pPlayer);
 forward ZP_Fw_PlayerZombieVision(pPlayer, bool:bValue);
 forward ZP_Fw_Player_AimItem(pPlayer, pItem);
 forward ZP_Fw_PlayerInfected(pPlayer, pInfector);
+forward ZP_Fw_PlayerTransformationDeath(pPlayer);
+forward ZP_Fw_PlayerTransformed(pPlayer);
 
 // Player inventory
 
