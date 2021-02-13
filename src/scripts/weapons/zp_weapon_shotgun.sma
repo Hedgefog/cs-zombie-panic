@@ -29,7 +29,7 @@ public plugin_precache() {
     precache_sound(ZP_WEAPON_SHOTGUN_SHOT_SOUND);
     precache_sound(ZP_WEAPON_SHOTGUN_PUMP_SOUND);
 
-    g_iCwHandler = CW_Register(ZP_WEAPON_SHOTGUN, CSW_M3, 6, ZP_Ammo_GetId(ZP_Ammo_GetHandler(ZP_AMMO_SHOTGUN)), 24, _, _, 0, 3, _, "m3", CWF_NoBulletSmoke);
+    g_iCwHandler = CW_Register(ZP_WEAPON_SHOTGUN, CSW_M3, 6, ZP_Ammo_GetId(ZP_Ammo_GetHandler(ZP_AMMO_SHOTGUN)), 24, _, _, 0, 5, _, "m3", CWF_NoBulletSmoke);
     CW_Bind(g_iCwHandler, CWB_Idle, "@Weapon_Idle");
     CW_Bind(g_iCwHandler, CWB_PrimaryAttack, "@Weapon_PrimaryAttack");
     CW_Bind(g_iCwHandler, CWB_Reload, "@Weapon_Reload");
@@ -48,9 +48,9 @@ public plugin_init() {
 
 public @Weapon_PrimaryAttack(this) {
     static Float:vecSpread[3];
-    UTIL_CalculateWeaponSpread(this, Float:VECTOR_CONE_15DEGREES, 1.5, 1.0, 0.95, 2.0, vecSpread);
+    UTIL_CalculateWeaponSpread(this, Float:VECTOR_CONE_10DEGREES, 1.1125, 1.0, 0.95, 2.0, vecSpread);
 
-    if (CW_DefaultShotgunShot(this, 7.0, 1.0, 0.5, vecSpread, 25)) {
+    if (CW_DefaultShotgunShot(this, 6.0, 0.8, 1.0, 0.5, vecSpread, 25)) {
         CW_PlayAnimation(this, 1, 1.5);
         new pPlayer = CW_GetPlayer(this);
         emit_sound(pPlayer, CHAN_WEAPON, ZP_WEAPON_SHOTGUN_SHOT_SOUND, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);

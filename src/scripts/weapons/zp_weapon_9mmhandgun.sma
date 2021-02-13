@@ -26,7 +26,7 @@ public plugin_precache() {
     precache_sound(ZP_WEAPON_PISTOL_RELOAD_START_SOUND);
     precache_sound(ZP_WEAPON_PISTOL_RELOAD_END_SOUND);
 
-    g_iCwHandler = CW_Register(ZP_WEAPON_PISTOL, CSW_FIVESEVEN, 7, ZP_Ammo_GetId(ZP_Ammo_GetHandler(ZP_AMMO_PISTOL)), 120, _, _, 1, 1, _, "fiveseven", CWF_NoBulletSmoke);
+    g_iCwHandler = CW_Register(ZP_WEAPON_PISTOL, CSW_FIVESEVEN, 7, ZP_Ammo_GetId(ZP_Ammo_GetHandler(ZP_AMMO_PISTOL)), 120, _, _, 1, 6, _, "fiveseven", CWF_NoBulletSmoke);
     CW_Bind(g_iCwHandler, CWB_Idle, "@Weapon_Idle");
     CW_Bind(g_iCwHandler, CWB_PrimaryAttack, "@Weapon_PrimaryAttack");
     CW_Bind(g_iCwHandler, CWB_Reload, "@Weapon_Reload");
@@ -63,13 +63,21 @@ public @Weapon_PrimaryAttack(this) {
     }
 
     static Float:vecSpread[3];
-    UTIL_CalculateWeaponSpread(this, Float:VECTOR_CONE_10DEGREES, 3.0, 0.5, 0.95, 3.5, vecSpread);
+    UTIL_CalculateWeaponSpread(this, Float:VECTOR_CONE_3DEGREES, 3.0, 0.1, 0.95, 3.5, vecSpread);
 
-    if (CW_DefaultShot(this, 30.0, 0.125, vecSpread)) {
+    if (CW_DefaultShot(this, 30.0, 0.75, 0.125, vecSpread)) {
         CW_PlayAnimation(this, 3, 0.71);
         new pPlayer = CW_GetPlayer(this);
         emit_sound(pPlayer, CHAN_WEAPON, ZP_WEAPON_PISTOL_SHOT_SOUND, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-        set_pev(pPlayer, pev_punchangle, Float:{-3.5, 0.0, 0.0});
+
+        static Float:vecPunchAngle[3];
+        pev(pPlayer, pev_punchangle, vecPunchAngle);
+        xs_vec_add(vecPunchAngle, Float:{-2.5, 0.0, 0.0}, vecPunchAngle);
+
+        if (xs_vec_len(vecPunchAngle) > 0.0) {
+            set_pev(pPlayer, pev_punchangle, vecPunchAngle);
+        }
+
         CW_EjectWeaponBrass(this, engfunc(EngFunc_ModelIndex, "models/shell.mdl"), 1);
     }
 }

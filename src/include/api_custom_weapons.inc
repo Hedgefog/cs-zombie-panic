@@ -63,16 +63,16 @@ native CW_PrimaryAttack(pItem);
 native CW_SecondaryAttack(pItem);
 
 native CW_PlayAnimation(pItem, iSequence, Float:flDuration = 0.0);
-native CW_FireBulletsPlayer(pPlayer, iShots, const Float:vecSrc[3], const Float:vecDirShooting[3], const Float:vecSpread[3], Float:flDistance, Float:flDamage, pevAttacker = 0, Float:vOut[3]);
+native CW_FireBulletsPlayer(pPlayer, iShots, const Float:vecSrc[3], const Float:vecDirShooting[3], const Float:vecSpread[3], Float:flDistance, Float:flDamage, Float:flRangeModifier = 1.0, pevAttacker = 0, Float:vOut[3]);
 native CW_GrenadeDetonate(pGrenade, Float:flRadius = 0.0, Float:flMagnitude = 0.0);
 native CW_GrenadeSmoke(pGrenade);
 native CW_EjectWeaponBrass(pItem, iModelIndex, iSoundType);
 
 native bool:CW_DefaultDeploy(pWeapon, const szViewModel[], const szWeaponModel[], iAnim, const szAnimExt[] = "");
-native bool:CW_DefaultShot(pItem, Float:flDamage, Float:flRate, Float:flSpread[3] = VECTOR_CONE_6DEGREES, iShots = 1, Float:flDistance = 8192.0);
+native bool:CW_DefaultShot(pItem, Float:flDamage, Float:flRangeModifier, Float:flRate, Float:flSpread[3] = VECTOR_CONE_6DEGREES, iShots = 1, Float:flDistance = 8192.0);
 native CW_DefaultReload(pItem, iAnim, Float:fDuration);
 native bool:CW_DefaultShotgunIdle(pItem, iAnim, iReloadEndAnim, Float:fDuration = 0.25, Float:fReloadEndDuration = 1.0, const szPumpSound[] = "");
-native bool:CW_DefaultShotgunShot(pItem, Float:flDamage, Float:flRate, Float:flPumpDelay, Float:flSpread[3] = VECTOR_CONE_DM_SHOTGUN, iShots = 16, Float:flDistance = 2048.0);
+native bool:CW_DefaultShotgunShot(pItem, Float:flDamage, Float:flRangeModifier, Float:flRate, Float:flPumpDelay, Float:flSpread[3] = VECTOR_CONE_DM_SHOTGUN, iShots = 16, Float:flDistance = 2048.0);
 native CW_DefaultShotgunReload(pItem, iStartAnim, iEndAnim, Float:fDelay, Float:fDuration);
 native CW_DefaultSwing(pItem, Float:flDamage, Float:flRate, Float:flDistance);
 

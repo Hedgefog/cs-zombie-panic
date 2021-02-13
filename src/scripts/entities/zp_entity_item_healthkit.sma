@@ -17,10 +17,14 @@
 
 new g_iModel;
 
+new g_pCvarCureChance;
+
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
     RegisterHam(Ham_Touch, ENTITY_NAME, "OnTouch", .Post = 0);
+
+    g_pCvarCureChance = register_cvar("zp_healthkit_cure_chance", "25");
 }
 
 public plugin_precache() {
@@ -61,6 +65,12 @@ public OnTouch(pEntity, pToucher) {
 
                 set_pev(pEntity, pev_effects, pev(pEntity, pev_effects) | EF_NODRAW);
                 set_pev(pEntity, pev_solid, SOLID_NOT);
+
+                if (ZP_Player_IsInfected(pToucher) && !ZP_Player_IsTransforming(pToucher)) {
+                    if (random(100) < get_pcvar_num(g_pCvarCureChance)) {
+                        ZP_Player_SetInfected(pToucher, false);
+                    }
+                }
 
                 emit_sound(pToucher, CHAN_ITEM, "items/smallmedkit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
             }

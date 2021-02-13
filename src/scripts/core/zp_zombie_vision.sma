@@ -122,16 +122,21 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
         static iColor[3];
 
         if (!ZP_Player_IsZombie(pEntity)) {
-            static Float:flMaxHealth;
-            pev(pEntity, pev_max_health, flMaxHealth);
+            if (ZP_Player_IsInfected(pEntity)) {
+                iColor[0] = 255;
+                iColor[1] = 120;
+                iColor[2] = 0;
+            } else {
+                static Float:flMaxHealth;
+                pev(pEntity, pev_max_health, flMaxHealth);
 
-            static Float:flHealth;
-            pev(pEntity, pev_health, flHealth);
+                static Float:flHealth;
+                pev(pEntity, pev_health, flHealth);
 
-            iColor[0] = floatround(MAX_BRIGHTNESS * (1.0 - (flHealth / flMaxHealth)));
-            iColor[1] = 0;
-            iColor[2] = 0;
-
+                iColor[0] = floatround(MAX_BRIGHTNESS * (1.0 - (flHealth / flMaxHealth)));
+                iColor[1] = 0;
+                iColor[2] = 0;
+            }
         } else {
             iColor[0] = 0;
             iColor[1] = MAX_BRIGHTNESS;

@@ -1,12 +1,14 @@
 #pragma semicolon 1
 
 #include <amxmodx>
+#include <engine>
 #include <hamsandwich>
 #include <fakemeta>
 #include <xs>
 #include <reapi>
 
 #include <zombiepanic>
+#include <zombiepanic_utils>
 #include <api_rounds>
 #include <api_custom_weapons>
 
@@ -19,8 +21,12 @@ new const g_rgszBounceSounds[][] = {
     "weapons/g_bounce3.wav"
 };
 
+new gmsgAmmoPickup;
+
 new bool:g_bPlayerChargeReady[MAX_PLAYERS + 1];
 new bool:g_bPlayerRedeploy[MAX_PLAYERS + 1];
+new g_pPlayerPickupCharge[MAX_PLAYERS + 1] = { -1, ... };
+new g_iPlayerChargeCount[MAX_PLAYERS + 1] = { 0, ... };
 new g_iAmmoId;
 
 new CW:g_iCwHandler;
@@ -57,7 +63,11 @@ public plugin_precache() {
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
+    gmsgAmmoPickup = get_user_msgid("AmmoPickup");
+
     RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
+    RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
+    RegisterHam(Ham_Player_PostThink, "player", "OnPlayerPostThink_Post", .Post = 1);
 }
 
 public @Weapon_PrimaryAttack(this) {
@@ -175,7 +185,8 @@ Throw(this) {
     set_pev(pSatchelCharge, pev_velocity, vecVelocity);
     set_pev(pSatchelCharge, pev_avelocity, Float:{0.0, 100.0, 0.0});
     set_pev(pSatchelCharge, pev_owner, pPlayer);
-    set_pev(pSatchelCharge, pev_team, pPlayer);
+    set_pev(pSatchelCharge, pev_team, get_member(pPlayer, m_iTeam));
+    g_iPlayerChargeCount[pPlayer]++;
 
     set_member(pPlayer, m_rgAmmo, iAmmoAmount - 1, g_iAmmoId);
     rg_set_animation(pPlayer, PLAYER_ATTACK1);
@@ -235,6 +246,11 @@ SpawnSatchelCharge() {
 Deactivate(this) {
     set_pev(this, pev_solid, SOLID_NOT);
     set_pev(this, pev_flags, pev(this, pev_flags) | FL_KILLME);
+
+    new pOwner = pev(this, pev_owner);
+    if (UTIL_IsPlayer(pOwner)) {
+        g_iPlayerChargeCount[pOwner]--;
+    }
 }
 
 DeactivateSatchels(pOwner) {
@@ -325,12 +341,18 @@ public GrenadeDetonateUse(const pEntity) {
 }
 
 public GrenadeDetonate(this) {
+    new pOwner = pev(this, pev_owner);
+
     new Float:flDamage;
     pev(this, pev_dmg, flDamage);
 
     CW_GrenadeDetonate(this, flDamage * 0.75, flDamage * 0.125);
     SetThink(this, "GrenadeSmoke");
     set_pev(this, pev_nextthink, get_gametime() + 0.1);
+
+    if (UTIL_IsPlayer(pOwner)) {
+        g_iPlayerChargeCount[pOwner]--;
+    }
 }
 
 public GrenadeSmoke(this) {
@@ -346,4 +368,88 @@ public Round_Fw_NewRound() {
 
 public OnPlayerKilled_Post(pPlayer) {
     DeactivateSatchels(pPlayer);
+}
+
+
+public OnPlayerPreThink_Post(pPlayer) {
+    if (!is_user_alive(pPlayer)) {
+        return HAM_IGNORED;
+    }
+
+    g_pPlayerPickupCharge[pPlayer] = -1;
+    
+    if (~pev(pPlayer, pev_button) & IN_USE || pev(pPlayer, pev_oldbuttons) & IN_USE) {
+        return HAM_IGNORED;
+    }
+    if (ZP_Player_IsZombie(pPlayer)) {
+        return HAM_IGNORED;
+    }
+
+    static Float:vecSrc[3];
+    ExecuteHam(Ham_Player_GetGunPosition, pPlayer, vecSrc);
+
+    static Float:vecEnd[3];
+    pev(pPlayer, pev_v_angle, vecEnd);
+    engfunc(EngFunc_MakeVectors, vecEnd);
+    get_global_vector(GL_v_forward, vecEnd);
+
+    for (new i = 0; i < 3; ++i) {
+        vecEnd[i] = vecSrc[i] + (vecEnd[i] * 64.0);
+    }
+
+    new pTr = create_tr2();
+    engfunc(EngFunc_TraceLine, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, pPlayer, pTr);
+    get_tr2(pTr, TR_vecEndPos, vecEnd);
+    free_tr2(pTr);
+
+    new pEntity;
+    while ((pEntity = engfunc(EngFunc_FindEntityByString, pEntity, "classname", "zp_satchel_charge")) != 0) {
+        if (~pev(pEntity, pev_flags) & FL_ONGROUND) {
+            continue;
+        }
+        
+        if (pev(pEntity, pev_owner) != pPlayer) {
+            continue;
+        }
+
+        static Float:vecOrigin[3];
+        pev(pEntity, pev_origin, vecOrigin);
+
+        if (xs_vec_distance(vecOrigin, vecEnd) < 16.0) {
+            g_pPlayerPickupCharge[pPlayer] = pEntity;
+            break;
+        }
+    }
+
+    return HAM_HANDLED;
+}
+
+public OnPlayerPostThink_Post(pPlayer) {
+    if (g_pPlayerPickupCharge[pPlayer] != -1) {
+        if (ZP_Player_AddAmmo(pPlayer, ZP_AMMO_SATCHEL, 1)) {
+            Deactivate(g_pPlayerPickupCharge[pPlayer]);
+
+            if (!g_iPlayerChargeCount[pPlayer]) {
+                new pActiveItem = get_member(pPlayer, m_pActiveItem);
+
+                if (pActiveItem != 1 && CW_GetHandlerByEntity(pActiveItem) == g_iCwHandler) {
+                    g_bPlayerRedeploy[pPlayer] = true;
+                    set_member(pActiveItem, m_Weapon_flTimeWeaponIdle, 0.0);
+                }
+
+                g_bPlayerChargeReady[pPlayer] = false;
+            }
+
+            emessage_begin(MSG_ONE, gmsgAmmoPickup, _, pPlayer);
+            ewrite_byte(ZP_Ammo_GetId(ZP_Ammo_GetHandler(ZP_AMMO_SATCHEL)));
+            ewrite_byte(1);
+            emessage_end();
+
+            emit_sound(pPlayer, CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+        }
+
+        g_pPlayerPickupCharge[pPlayer] = -1;
+    }
+
+    return HAM_HANDLED;
 }

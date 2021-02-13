@@ -17,6 +17,8 @@ enum MessageType {
     MessageType_Warn
 }
 
+#define TASKID_RESPAWN_MESSAGE 100
+
 #define HUD_CHAR_WIDTH 0.02083  // 16.0 / 768.0
 #define DHUD_CHAR_WIDTH 0.03125  // 24.0 / 768.0
 
@@ -44,6 +46,11 @@ enum MessageType {
 #define MESSAGE_PICKUP_HOLD_TIME 0.75
 #define MESSAGE_PICKUP_FADEIN_TIME 0.5
 #define MESSAGE_PICKUP_FADEOUT_TIME 1.0
+
+#define MESSAGE_INFECTION_POS -1.0, 0.30
+#define MESSAGE_INFECTION_HOLD_TIME 1.0
+#define MESSAGE_INFECTION_FADEIN_TIME 1.0
+#define MESSAGE_INFECTION_FADEOUT_TIME 1.0
 
 #define HINTS_KEY "zp_hints"
 
@@ -160,26 +167,7 @@ public OnPlayerKilled_Post(pPlayer) {
         return HAM_IGNORED;
     }
 
-    SetMessageTitle("%L", pPlayer, "ZP_RESPAWN_TITLE");
-
-    if (ZP_Player_IsZombie(pPlayer)) {
-        if (ZP_GameRules_GetZombieLives() > 0) {
-            SetMessageText("%L", pPlayer, "ZP_RESPAWN_ZOMBIE");
-        } else {
-            SetMessageText("%L", pPlayer, "ZP_RESPAWN_NOLIVES");
-        }
-    } else {
-        SetMessageText("%L", pPlayer, "ZP_RESPAWN_HUMAN");
-    }
-
-    ShowMessage(
-        pPlayer,
-        MessageType_Info,
-        MESSAGE_RESPAWN_POS,
-        MESSAGE_RESPAWNHOLD_TIME,
-        MESSAGE_RESPAWNFADEIN_TIME,
-        MESSAGE_RESPAWNFADEOUT_TIME
-    );
+    set_task(1.0, "Task_RespawnMessage", TASKID_RESPAWN_MESSAGE + pPlayer);
 
     return HAM_IGNORED;
 }
@@ -262,6 +250,24 @@ public ZP_Fw_Player_AimItem(pPlayer) {
     g_flPlayerLastPickupHint[pPlayer] = get_gametime();
 }
 
+public ZP_Fw_PlayerInfected(pPlayer, pInfector) {
+    if (!pInfector) {
+        return;
+    }
+
+    SetMessageTitle("%L", pInfector, "ZP_WARN_INFECTION_TITLE");
+    SetMessageText("%L ^"%n^"", pInfector, "ZP_WARN_INFECTOR", pPlayer);
+
+    ShowMessage(
+        pInfector,
+        MessageType_Warn,
+        MESSAGE_INFECTION_POS,
+        MESSAGE_INFECTION_HOLD_TIME,
+        MESSAGE_INFECTION_FADEIN_TIME,
+        MESSAGE_INFECTION_FADEOUT_TIME
+    );
+}
+
 SetMessageTitle(const szTitle[], any:...) {
     static szBuffer[64];
     vformat(szBuffer, charsmax(szBuffer), szTitle, 2);
@@ -322,6 +328,35 @@ IsPlayerHintsEnabled(pPlayer) {
     get_user_info(pPlayer, HINTS_KEY, szValue, charsmax(szValue));
 
     return szValue[0] != '0';
+}
+
+public Task_RespawnMessage(iTaskId) {
+    new pPlayer = iTaskId - TASKID_RESPAWN_MESSAGE;
+
+    if (is_user_alive(pPlayer)) {
+        return;
+    }
+
+    SetMessageTitle("%L", pPlayer, "ZP_RESPAWN_TITLE");
+
+    if (ZP_Player_IsZombie(pPlayer)) {
+        if (ZP_GameRules_GetZombieLives() > 0) {
+            SetMessageText("%L", pPlayer, "ZP_RESPAWN_ZOMBIE");
+        } else {
+            SetMessageText("%L", pPlayer, "ZP_RESPAWN_NOLIVES");
+        }
+    } else {
+        SetMessageText("%L", pPlayer, "ZP_RESPAWN_HUMAN");
+    }
+
+    ShowMessage(
+        pPlayer,
+        MessageType_Info,
+        MESSAGE_RESPAWN_POS,
+        MESSAGE_RESPAWNHOLD_TIME,
+        MESSAGE_RESPAWNFADEIN_TIME,
+        MESSAGE_RESPAWNFADEOUT_TIME
+    );
 }
 
 stock UTIL_CalculateHUDLines(const szText[]) {

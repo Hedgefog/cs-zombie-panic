@@ -14,11 +14,17 @@ native bool:ZP_Player_Panic(pPlayer);
 native bool:ZP_Player_InPanic(pPlayer);
 native bool:ZP_Player_ToggleFlashlight(pPlayer);
 native bool:ZP_Player_ToggleZombieVision(pPlayer);
+native bool:ZP_Player_IsInfected(pPlayer);
+native bool:ZP_Player_IsTransforming(pPlayer);
+native ZP_Player_SetInfected(pPlayer, bool:bValue);
 
 forward ZP_Fw_PlayerJoined(pPlayer);
 forward ZP_Fw_PlayerPanic(pPlayer);
 forward ZP_Fw_PlayerZombieVision(pPlayer, bool:bValue);
 forward ZP_Fw_Player_AimItem(pPlayer, pItem);
+forward ZP_Fw_PlayerInfected(pPlayer, pInfector);
+forward ZP_Fw_PlayerTransformationDeath(pPlayer);
+forward ZP_Fw_PlayerTransformed(pPlayer);
 
 // Player inventory
 

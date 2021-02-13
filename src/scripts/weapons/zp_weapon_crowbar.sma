@@ -33,7 +33,7 @@ public plugin_precache() {
         precache_sound(ZP_WEAPON_CROWBAR_HITBODY_SOUNDS[i]);
     }
 
-    g_iCwHandler = CW_Register(ZP_WEAPON_CROWBAR, CSW_KNIFE, WEAPON_NOCLIP, 0, -1, 0, -1, 2, 5, _, _, CWF_NoBulletSmoke);
+    g_iCwHandler = CW_Register(ZP_WEAPON_CROWBAR, CSW_KNIFE, WEAPON_NOCLIP, _, _, _, _, 2, 1, _, _, CWF_NoBulletSmoke);
     CW_Bind(g_iCwHandler, CWB_Idle, "@Weapon_Idle");
     CW_Bind(g_iCwHandler, CWB_PrimaryAttack, "@Weapon_PrimaryAttack");
     CW_Bind(g_iCwHandler, CWB_SecondaryAttack, "@Weapon_SecondaryAttack");
@@ -66,7 +66,7 @@ public @Weapon_Idle(this) {
 
 public @Weapon_PrimaryAttack(this) {
     new pPlayer = CW_GetPlayer(this);
-    new pHit = CW_DefaultSwing(this, 35.0, 0.5, 36.0);
+    new pHit = CW_DefaultSwing(this, 35.0, 0.5, 38.0);
     CW_PlayAnimation(this, 4, 0.25);
 
     if (pHit < 0) {

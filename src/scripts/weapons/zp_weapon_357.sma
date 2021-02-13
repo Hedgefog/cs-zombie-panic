@@ -12,6 +12,10 @@
 #define PLUGIN "[Zombie Panic] Weapon 357 Magnum"
 #define AUTHOR "Hedgehog Fog"
 
+#define TASKID_EJECT_BRASS 100
+
+#define CLIP_SIZE 6
+
 new CW:g_iCwHandler;
 
 public plugin_precache() {
@@ -26,7 +30,7 @@ public plugin_precache() {
         precache_sound(ZP_WEAPON_MAGNUM_SHOT_SOUNDS[i]);
     }
 
-    g_iCwHandler = CW_Register(ZP_WEAPON_MAGNUM, CSW_DEAGLE, 6, ZP_Ammo_GetId(ZP_Ammo_GetHandler(ZP_AMMO_MAGNUM)), 24, _, _, 1, 6, _, "fiveseven", CWF_NoBulletSmoke);
+    g_iCwHandler = CW_Register(ZP_WEAPON_MAGNUM, CSW_DEAGLE, CLIP_SIZE, ZP_Ammo_GetId(ZP_Ammo_GetHandler(ZP_AMMO_MAGNUM)), 24, _, _, 1, 1, _, "fiveseven", CWF_NoBulletSmoke);
     CW_Bind(g_iCwHandler, CWB_Idle, "@Weapon_Idle");
     CW_Bind(g_iCwHandler, CWB_PrimaryAttack, "@Weapon_PrimaryAttack");
     CW_Bind(g_iCwHandler, CWB_Reload, "@Weapon_Reload");
@@ -62,20 +66,27 @@ public @Weapon_PrimaryAttack(this) {
     }
 
     static Float:vecSpread[3];
-    UTIL_CalculateWeaponSpread(this, Float:VECTOR_CONE_1DEGREES, 5.0, 1.0, 0.95, 7.5, vecSpread);
+    UTIL_CalculateWeaponSpread(this, Float:VECTOR_CONE_1DEGREES, 2.5, 1.0, 0.95, 7.5, vecSpread);
 
-    if (CW_DefaultShot(this, 70.0, 0.5, vecSpread)) {
+    if (CW_DefaultShot(this, 80.0, 0.9, 0.5, vecSpread)) {
         CW_PlayAnimation(this, 2, 1.03);
         new pPlayer = CW_GetPlayer(this);
         emit_sound(pPlayer, CHAN_WEAPON, ZP_WEAPON_MAGNUM_SHOT_SOUNDS[random(sizeof(ZP_WEAPON_MAGNUM_SHOT_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-        set_pev(pPlayer, pev_punchangle, Float:{-10.0, 0.0, 0.0});
 
-        CW_EjectWeaponBrass(this, engfunc(EngFunc_ModelIndex, "models/shell.mdl"), 1);
+        static Float:vecPunchAngle[3];
+        pev(pPlayer, pev_punchangle, vecPunchAngle);
+        xs_vec_add(vecPunchAngle, Float:{-8.0, 0.0, 0.0}, vecPunchAngle);
+
+        if (xs_vec_len(vecPunchAngle) > 0.0) {
+            set_pev(pPlayer, pev_punchangle, vecPunchAngle);
+        }
     }
 }
 
 public @Weapon_Reload(this) {
-    CW_DefaultReload(this, 3, 2.5);
+    if (CW_DefaultReload(this, 3, 2.5)) {
+        set_task(0.75, "Task_EjectBrass", TASKID_EJECT_BRASS + this);
+    }
 }
 
 public @Weapon_Deploy(this) {
@@ -92,4 +103,35 @@ public @Weapon_Spawn(this) {
 
 public @Weapon_WeaponBoxSpawn(this, pWeaponBox) {
     engfunc(EngFunc_SetModel, pWeaponBox, ZP_WEAPON_MAGNUM_W_MODEL);
+}
+
+public Task_EjectBrass(iTaskId) {
+    new pItem = iTaskId - TASKID_EJECT_BRASS;
+
+    if (!pev_valid(pItem)) {
+        return;
+    }
+
+    new pPlayer = CW_GetPlayer(pItem);
+    new iClip = get_member(pItem, m_Weapon_iClip);
+    new iModelIndex = engfunc(EngFunc_ModelIndex, "models/shell.mdl");
+
+    static Float:vecOrigin[3];
+    pev(pPlayer, pev_origin, vecOrigin);
+
+    for (new i = 0; i < CLIP_SIZE - iClip; ++i) {
+        engfunc(EngFunc_MessageBegin, MSG_PVS, SVC_TEMPENTITY, vecOrigin, 0);
+        write_byte(TE_MODEL);
+        engfunc(EngFunc_WriteCoord, vecOrigin[0]);
+        engfunc(EngFunc_WriteCoord, vecOrigin[1]);
+        engfunc(EngFunc_WriteCoord, vecOrigin[2]);
+        engfunc(EngFunc_WriteCoord, random_float(8.0, 32.0));
+        engfunc(EngFunc_WriteCoord, random_float(8.0, 32.0));
+        engfunc(EngFunc_WriteCoord, 0.0);
+        write_angle(0);
+        write_short(iModelIndex);
+        write_byte(1);
+        write_byte(25);
+        message_end();
+    }
 }

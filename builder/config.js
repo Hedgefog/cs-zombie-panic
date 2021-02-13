@@ -12,9 +12,9 @@ module.exports = {
     project: {
         includeDir: path.resolve('./src/include'),
     },
-    // sdk: {
-    //     dir: path.resolve('./sdk')
-    // },
+    sdk: {
+        dir: path.resolve('./sdk')
+    },
     thirdparty: {
         dir: path.resolve('./thirdparty')
     },
