@@ -12,7 +12,7 @@
 #define PLUGIN "[Zombie Panic] Infection"
 #define AUTHOR "Hedgehog Fog"
 
-#define TRANSFORMATION_DELAY 60.0
+#define TRANSFORMATION_DELAY 15.0
 #define TRANSFORMATION_DURATION 7.0
 #define INFECTION_ICON "dmg_bio"
 
@@ -69,6 +69,12 @@ public plugin_init() {
     g_pFwInfected = CreateMultiForward("ZP_Fw_PlayerInfected", ET_IGNORE, FP_CELL, FP_CELL);
     g_pFwTransformationDeath = CreateMultiForward("ZP_Fw_PlayerTransformationDeath", ET_IGNORE, FP_CELL);
     g_pFwTransformed = CreateMultiForward("ZP_Fw_PlayerTransformed", ET_IGNORE, FP_CELL);
+
+    register_clcmd("infectme", "infectme");
+}
+
+public infectme(pPlayer) {
+    SetInfected(pPlayer, true);
 }
 
 public plugin_natives() {
@@ -125,6 +131,7 @@ public OnPlayerPreThink_Post(pPlayer) {
             }
 
             EndPlayerTransformation(pPlayer);
+            SendBlinkEffect(pPlayer);
         }
     } else if (flTimeLeft <= TRANSFORMATION_DURATION) {
         if (!is_user_alive(pPlayer)) {
