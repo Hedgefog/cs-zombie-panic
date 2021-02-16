@@ -5,6 +5,7 @@
 #include <hamsandwich>
 #include <fakemeta>
 #include <reapi>
+#include <xs>
 
 #include <api_custom_weapons>
 
@@ -48,6 +49,8 @@ public plugin_precache() {
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+
+    RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage_Post", .Post = 1);
 }
 
 public @Weapon_Idle(this) {
@@ -66,7 +69,7 @@ public @Weapon_Idle(this) {
 
 public @Weapon_PrimaryAttack(this) {
     new pPlayer = CW_GetPlayer(this);
-    new pHit = CW_DefaultSwing(this, 35.0, 0.5, 38.0);
+    new pHit = CW_DefaultSwing(this, 25.0, 0.5, 38.0);
     CW_PlayAnimation(this, 4, 0.25);
 
     if (pHit < 0) {
@@ -119,4 +122,19 @@ public @Weapon_WeaponBoxSpawn(this, pWeaponBox) {
 
 public @Weapon_CanDrop(this) {
     return PLUGIN_HANDLED;
+}
+
+public OnPlayerTakeDamage_Post(this, pInflictor, pAttacker) {
+    if (!UTIL_IsPlayer(pAttacker)) {
+        return HAM_IGNORED;
+    }
+
+    new pAttackerActiveItem = get_member(pAttacker, m_pActiveItem);
+    if (CW_GetHandlerByEntity(pAttackerActiveItem) != g_iCwHandler) {
+        return HAM_IGNORED;
+    }
+
+    UTIL_PlayerKnockback(this, pAttacker, 250.0);
+
+    return HAM_HANDLED;
 }
