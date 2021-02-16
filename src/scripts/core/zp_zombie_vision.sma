@@ -154,17 +154,17 @@ public OnMessage_ScreenFade(iMsgId, iMsgDest, pPlayer) {
         return PLUGIN_CONTINUE;
     }
 
-    new Float:flHoldTime = float(get_msg_arg_int(2)) / (1<<12);
-    if (flHoldTime > 0.0) {
+    new Float:flDuration = (float(get_msg_arg_int(1)) / (1<<12)) + (float(get_msg_arg_int(2)) / (1<<12));
+    if (flDuration > 0.0) {
         if (pPlayer > 0) {
-            HandleExternalFade(pPlayer, flHoldTime);
+            HandleExternalFade(pPlayer, flDuration);
         } else {
             for (new pTargetPlayer = 1; pTargetPlayer <= MaxClients; ++pTargetPlayer) {
                 if (!is_user_connected(pTargetPlayer)) {
                     continue;
                 }
 
-                HandleExternalFade(pTargetPlayer, flHoldTime);
+                HandleExternalFade(pTargetPlayer, flDuration);
             }
         }
     }
