@@ -568,7 +568,7 @@ public OnPlayerPreThink_Post(pPlayer) {
 }
 
 public OnPlayerTakeDamage(pPlayer, pInflictor, pAttacker) {
-    if (pInflictor == pAttacker) {
+    if (pAttacker && ExecuteHam(Ham_IsPlayer, pAttacker) && pInflictor == pAttacker) {
         g_pKillerItem = get_member(pAttacker, m_pActiveItem);
     } else {
         g_pKillerItem = pInflictor;
@@ -598,15 +598,21 @@ public OnMessage_DeathMsg(iMsgId, iDest, pPlayer) {
     }
 
     new CW:iHandler = GetHandlerByEntity(g_pKillerItem);
+    log_amx("iHandler %d", iHandler);
     if (iHandler == CW_INVALID_HANDLER) {
         return PLUGIN_CONTINUE;
     }
 
     static szIcon[64];
     GetStringData(iHandler, CW_Data_Icon, szIcon, charsmax(szIcon));
+
+    log_amx("CW_Data_Icon %s", szIcon);
+
     if (szIcon[0] == '^0') {
         GetStringData(iHandler, CW_Data_Name, szIcon, charsmax(szIcon));
     }
+
+    log_amx("szIcon %s", szIcon);
 
     set_msg_arg_string(4, szIcon);
 
@@ -1362,6 +1368,7 @@ DefaultSwing(this, Float:flDamage, Float:flRate, Float:flDistance) {
 // ANCHOR: Weapon Methods
 
 CW:RegisterWeapon(iPluginId, const szName[], iWeaponId, iClipSize, iPrimaryAmmoType, iPrimaryAmmoMaxAmount, iSecondaryAmmoType, iSecondaryAmmoMaxAmount, iSlotId, iPosition, iWeaponFlags, const szIcon[], CW_Flags:iFlags) {
+    log_amx("szIcon %s", szIcon);
     new CW:iHandler = CreateWeaponData(szName);
     SetData(iHandler, CW_Data_PluginId, iPluginId);
     SetStringData(iHandler, CW_Data_Name, szName);
