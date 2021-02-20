@@ -129,6 +129,10 @@ public OnPlayerTakeDamage_Post(this, pInflictor, pAttacker) {
         return HAM_IGNORED;
     }
 
+    if (!rg_is_player_can_takedamage(this, pAttacker)) {
+        return HAM_IGNORED;
+    }
+
     new pAttackerActiveItem = get_member(pAttacker, m_pActiveItem);
     if (CW_GetHandlerByEntity(pAttackerActiveItem) != g_iCwHandler) {
         return HAM_IGNORED;
