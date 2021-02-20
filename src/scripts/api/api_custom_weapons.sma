@@ -568,7 +568,11 @@ public OnPlayerPreThink_Post(pPlayer) {
 }
 
 public OnPlayerTakeDamage(pPlayer, pInflictor, pAttacker) {
-    g_pKillerItem = pInflictor;
+    if (pInflictor == pAttacker) {
+        g_pKillerItem = get_member(pAttacker, m_pActiveItem);
+    } else {
+        g_pKillerItem = pInflictor;
+    }
 }
 
 public OnPlayerTakeDamage_Post() {
