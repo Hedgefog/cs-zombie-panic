@@ -133,8 +133,12 @@ public OnPlayerTakeDamage_Post(this, pInflictor, pAttacker) {
         return HAM_IGNORED;
     }
 
-    new pAttackerActiveItem = get_member(pAttacker, m_pActiveItem);
-    if (CW_GetHandlerByEntity(pAttackerActiveItem) != g_iCwHandler) {
+    new pItem = pInflictor == pAttacker ? get_member(pAttacker, m_pActiveItem) : pInflictor;
+    if (pItem <= 0) {
+        return HAM_IGNORED;
+    }
+
+    if (CW_GetHandlerByEntity(pItem) != g_iCwHandler) {
         return HAM_IGNORED;
     }
 
