@@ -12,7 +12,7 @@
 #define PLUGIN "[Zombie Panic] Infection"
 #define AUTHOR "Hedgehog Fog"
 
-#define TRANSFORMATION_DELAY 15.0
+#define TRANSFORMATION_DELAY 60.0
 #define TRANSFORMATION_DURATION 7.0
 #define INFECTION_ICON "dmg_bio"
 
