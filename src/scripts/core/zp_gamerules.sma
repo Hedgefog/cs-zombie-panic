@@ -26,6 +26,7 @@ enum TeamPreference {
 }
 
 new g_pCvarLives;
+new g_pCvarLivesPerPlayer;
 
 new g_pFwPlayerJoined;
 new g_pFwResult;
@@ -54,7 +55,8 @@ public plugin_init() {
     register_clcmd("joinclass", "OnPlayerChangeTeam");
     register_clcmd("drop", "OnClCmd_Drop");
 
-    g_pCvarLives = register_cvar("zp_zombie_lives", "20");
+    g_pCvarLives = register_cvar("zp_zombie_lives", "-1");
+    g_pCvarLivesPerPlayer = register_cvar("zp_zombie_lives_per_player", "2");
 
     g_pFwPlayerJoined = CreateMultiForward("ZP_Fw_PlayerJoined", ET_IGNORE, FP_CELL);
 
@@ -104,9 +106,34 @@ public Round_Fw_NewRound() {
 }
 
 public Round_Fw_RoundStart() {
-    ZP_GameRules_SetZombieLives(ZP_GameRules_GetObjectiveMode() ? 255 : get_pcvar_num(g_pCvarLives));
     DistributeTeams();
+
+    if (ZP_GameRules_GetObjectiveMode()) {
+        ZP_GameRules_SetZombieLives(255);
+    } else {
+        new iLives = get_pcvar_num(g_pCvarLives);
+        if (iLives == -1) {
+            iLives = CalculatePlayerCount(ZP_HUMAN_TEAM) * get_pcvar_num(g_pCvarLivesPerPlayer);
+        }
+
+        ZP_GameRules_SetZombieLives(iLives);
+    }
+
+
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
+        if (!is_user_connected(pPlayer)) {
+            continue;
+        }
+
+        if (UTIL_IsPlayerSpectator(pPlayer)) {
+            continue;
+        }
+
+        ExecuteHamB(Ham_CS_RoundRespawn, pPlayer);
+    }
+
     CheckWinConditions();
+    
     log_amx("New round started");
 }
 
@@ -237,18 +264,7 @@ DistributeTeams() {
             log_amx("Not enough players to start");
         }
     }
-    
-    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
-        if (!is_user_connected(pPlayer)) {
-            continue;
-        }
 
-        if (UTIL_IsPlayerSpectator(pPlayer)) {
-            continue;
-        }
-
-        ExecuteHamB(Ham_CS_RoundRespawn, pPlayer);
-    }
 }
 
 ProcessZombiePlayers(iMaxZombies) {
@@ -305,7 +321,7 @@ ChooseRandomZombie() {
     log_amx("Player ^"%n^" was randomly moved to the zombie team", pPlayer);
 }
 
-CalculatePlayerCount() {
+CalculatePlayerCount(iTeam = -1) {
     new pPlayerCount = 0;
 
     for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
@@ -314,6 +330,10 @@ CalculatePlayerCount() {
         }
 
         if (UTIL_IsPlayerSpectator(pPlayer)) {
+            continue;
+        }
+
+        if (iTeam != -1 && iTeam != get_member(pPlayer, m_iTeam)) {
             continue;
         }
 
