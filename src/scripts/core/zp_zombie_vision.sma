@@ -12,6 +12,7 @@
 #define AUTHOR "Hedgehog Fog"
 
 #define TASKID_FIX_FADE 100
+#define TASKID_ACTIVATE_VISION 200
 
 #define VISION_SCREEN_FADE_COLOR 255, 195, 195
 #define VISION_EFFECT_TIME 0.5
@@ -77,7 +78,7 @@ public OnPlayerSpawn(pPlayer) {
     }
 
     if (get_pcvar_num(g_pCvarAuto) > 0) {
-        SetZombieVision(pPlayer, true);
+        set_task(0.1, "Task_ActivateVision", TASKID_ACTIVATE_VISION + pPlayer);
     }
 
     return HAM_HANDLED;
@@ -85,6 +86,7 @@ public OnPlayerSpawn(pPlayer) {
 
 public OnPlayerKilled(pPlayer) {
     SetZombieVision(pPlayer, false);
+    remove_task(TASKID_ACTIVATE_VISION + pPlayer);
 
     if (!ZP_Player_IsZombie(pPlayer)) {
         return HAM_IGNORED;
@@ -221,4 +223,10 @@ public Task_FixVisionScreenFade(iTaskId) {
     }
 
     g_bPlayerExternalFade[pPlayer] = false;
+}
+
+public Task_ActivateVision(iTaskId) {
+    new pPlayer = iTaskId - TASKID_ACTIVATE_VISION;
+
+    SetZombieVision(pPlayer, true);
 }
