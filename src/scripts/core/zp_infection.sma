@@ -69,12 +69,6 @@ public plugin_init() {
     g_pFwInfected = CreateMultiForward("ZP_Fw_PlayerInfected", ET_IGNORE, FP_CELL, FP_CELL);
     g_pFwTransformationDeath = CreateMultiForward("ZP_Fw_PlayerTransformationDeath", ET_IGNORE, FP_CELL);
     g_pFwTransformed = CreateMultiForward("ZP_Fw_PlayerTransformed", ET_IGNORE, FP_CELL);
-
-    register_clcmd("infectme", "infectme");
-}
-
-public infectme(pPlayer) {
-    SetInfected(pPlayer, true);
 }
 
 public plugin_natives() {
