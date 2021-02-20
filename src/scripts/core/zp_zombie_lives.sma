@@ -80,6 +80,10 @@ RespawnPlayer(pPlayer) {
         return;
     }
 
+    if (Round_IsRoundEnd()) {
+        return;
+    }
+
     if (!is_user_connected(pPlayer)) {
         return;
     }
