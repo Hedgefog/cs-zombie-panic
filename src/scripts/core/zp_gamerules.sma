@@ -17,6 +17,7 @@
 #define CHOOSE_TEAM_VGUI_MENU_ID 2
 #define CHOOSE_TEAM1_CLASS_VGUI_MENU_ID 26
 #define CHOOSE_TEAM2_CLASS_VGUI_MENU_ID 27
+#define PLAYERS_PER_ZOMBIE 6
 
 enum TeamPreference {
     TeamPreference_Human,
@@ -223,10 +224,15 @@ DistributeTeams() {
         log_amx("Respawned %d zombies", iZombieCount);
     }
 
-    if (!iZombieCount) {
+    new iRequiredZombieCount = floatround(float(pPlayerCount) / PLAYERS_PER_ZOMBIE, floatround_ceil);
+    if (iZombieCount < iRequiredZombieCount) {
         if (pPlayerCount > 1) {
             log_amx("No one has chosen play zombie, a random player will be moved to the zombie team...");
-            ChooseRandomZombie();
+            
+            new iCount = iRequiredZombieCount - iZombieCount;
+            for (new i = 0; i < iCount; ++i) {
+                ChooseRandomZombie();
+            }
         } else {
             log_amx("Not enough players to start");
         }
