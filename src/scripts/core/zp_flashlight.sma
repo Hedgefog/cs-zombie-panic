@@ -15,12 +15,12 @@
 
 #define TASKID_FLASHLIGHT_HUD 100
 
-#define FLASHLIGHT_CHARGE_MAX 100.0
-#define FLASHLIGHT_CHARGE_DEF FLASHLIGHT_CHARGE_MAX
+#define FLASHLIGHT_MAX_BRIGHTNESS 160.0
 #define FLASHLIGHT_RATE 0.025
-#define FLASHLIGHT_MAX_DISTANCE 1024.0
+#define FLASHLIGHT_MAX_DISTANCE 768.0
 #define FLASHLIGHT_MAX_CHARGE 100.0
 #define FLASHLIGHT_MIN_CHARGE 0.0
+#define FLASHLIGHT_DEF_CHARGE FLASHLIGHT_MAX_CHARGE
 #define FLASHLIGHT_MIN_CHARGE_TO_ACTIVATE 10.0
 
 enum PlayerFlashlight {
@@ -74,7 +74,7 @@ public OnPlayerSpawn_Post(pPlayer) {
     }
 
     SetPlayerFlashlight(pPlayer, false);
-    g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_Charge] = FLASHLIGHT_CHARGE_DEF;
+    g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_Charge] = FLASHLIGHT_DEF_CHARGE;
     set_pev(pPlayer, pev_framerate, 1.0);
     
     return HAM_HANDLED;
@@ -223,17 +223,20 @@ CreatePlayerFlashlightLight(pPlayer) {
     new Float:flDistance = get_distance_f(vecStart, vecEnd);
     if (flDistance <= FLASHLIGHT_MAX_DISTANCE) {
         // TODO: Remove this hardcoded shit
-        new Float:flRadius = 4.0 + (flDistance / 64.0);
-        new Float:flBrightness = floatmax(255.0 - flDistance / 4.0, 0.0);
+        new Float:flDistanceRatio = (flDistance / FLASHLIGHT_MAX_DISTANCE);
+        new Float:flBrightness = FLASHLIGHT_MAX_BRIGHTNESS * (1.0 - flDistanceRatio);
+        if (flBrightness > 1.0) {
+            new iColor[3];
+            for (new i = 0; i < 3; ++i) {
+                iColor[i] = floatround(flBrightness);
+            }
 
-        new iColor[3];
-        for (new i = 0; i < 3; ++i) {
-            iColor[i] = floatround(flBrightness);
+            new Float:flRadius = 4.0 + (16.0 * flDistanceRatio);
+            new iLifeTime = max(1, floatround(FLASHLIGHT_RATE * 10));
+            new iDecayRate = 10 / iLifeTime;
+
+            UTIL_Message_Dlight(vecEnd, floatround(flRadius), iColor, iLifeTime, iDecayRate);
         }
-
-        new iLifeTime = max(1, floatround(FLASHLIGHT_RATE * 10));
-        new iDecayRate = 10 / iLifeTime;
-        UTIL_Message_Dlight(vecEnd, floatround(flRadius), iColor, iLifeTime, iDecayRate);
     }
 }
 
