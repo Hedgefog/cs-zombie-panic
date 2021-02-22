@@ -598,7 +598,6 @@ public OnMessage_DeathMsg(iMsgId, iDest, pPlayer) {
     }
 
     new CW:iHandler = GetHandlerByEntity(g_pKillerItem);
-    log_amx("iHandler %d", iHandler);
     if (iHandler == CW_INVALID_HANDLER) {
         return PLUGIN_CONTINUE;
     }
@@ -606,13 +605,10 @@ public OnMessage_DeathMsg(iMsgId, iDest, pPlayer) {
     static szIcon[64];
     GetStringData(iHandler, CW_Data_Icon, szIcon, charsmax(szIcon));
 
-    log_amx("CW_Data_Icon %s", szIcon);
-
     if (szIcon[0] == '^0') {
         GetStringData(iHandler, CW_Data_Name, szIcon, charsmax(szIcon));
     }
 
-    log_amx("szIcon %s", szIcon);
 
     set_msg_arg_string(4, szIcon);
 
