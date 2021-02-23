@@ -9,6 +9,7 @@
             Added blink effect at the end of the transformation
             Magnum no longer eject brass when shooting
             Added chooseteam command for spectators
+            Added unselectable characters support
 
         Cvars:
             Added zp_zombie_lives_per_player cvar
@@ -55,6 +56,7 @@ native bool:ZP_Player_ToggleZombieVision(pPlayer);
 native bool:ZP_Player_IsInfected(pPlayer);
 native bool:ZP_Player_IsTransforming(pPlayer);
 native ZP_Player_SetInfected(pPlayer, bool:bValue);
+native bool:ZP_Player_SetCharacter(pPlayer, const szCharacter[]);
 
 forward ZP_Fw_PlayerJoined(pPlayer);
 forward ZP_Fw_PlayerPanic(pPlayer);

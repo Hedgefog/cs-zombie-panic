@@ -27,7 +27,8 @@ enum CharacterData {
     Character_HumanDeathSounds,
     Character_PanicSounds,
     Character_ZombieAmbientSounds,
-    Character_ZombieDeathSounds
+    Character_ZombieDeathSounds,
+    Character_IsSelectable
 }
 
 new gmsgClCorpse;
@@ -36,6 +37,7 @@ new g_szCharacterDir[MAX_RESOURCE_PATH_LENGTH];
 
 new Array:g_rgCharactersData[CharacterData];
 new Trie:g_iCharactersMap;
+new Array:g_iSelectableCharacters;
 new g_iCharacterCount = 0;
 
 new g_iPlayerCharacter[MAX_PLAYERS + 1] = { -1, ... };
@@ -68,8 +70,23 @@ public plugin_init() {
     g_iCwSwipeHandler = CW_GetHandler(ZP_WEAPON_SWIPE);
 }
 
+public plugin_natives() {
+    register_native("ZP_Player_SetCharacter", "Native_SetCharacter");
+}
+
 public plugin_end() {
     DestroyCharactersStore();
+}
+
+/*--------------------------------[ Natives ]--------------------------------*/
+
+public bool:Native_SetCharacter(iPluginId, iArgc) {
+    new pPlayer = get_param(1);
+
+    new szCharacter[32];
+    get_string(2, szCharacter, charsmax(szCharacter));
+
+    return SetCharacter(pPlayer, szCharacter);
 }
 
 /*--------------------------------[ Forwards ]--------------------------------*/
@@ -148,6 +165,17 @@ public Task_Ambient(iTaskId) {
 
 /*--------------------------------[ Methods ]--------------------------------*/
 
+bool:SetCharacter(pPlayer, const szCharacter[]) {
+    new iCharacter;
+    if (!TrieGetCell(g_iCharactersMap, szCharacter, iCharacter)) {
+        return false;
+    }
+
+    g_iPlayerCharacter[pPlayer] = iCharacter;
+
+    return true;
+}
+
 UpdatePlayerModel(pPlayer) {
     new iCharacter = g_iPlayerCharacter[pPlayer];
 
@@ -174,12 +202,13 @@ UpdatePlayerCharacter(pPlayer, bool:bOverride = false) {
     get_user_info(pPlayer, CHARACTER_KEY, szCharacter, charsmax(szCharacter));
 
     new iCharacter;
-    if (!TrieGetCell(g_iCharactersMap, szCharacter, iCharacter)) {
+    if (!TrieGetCell(g_iCharactersMap, szCharacter, iCharacter)
+        || !ArrayGetCell(Array:g_rgCharactersData[Character_IsSelectable], iCharacter)) {
         if (!bOverride) {
             return;
         }
 
-        iCharacter = random(g_iCharacterCount);
+        iCharacter = ArrayGetCell(g_iSelectableCharacters, random(ArraySize(g_iSelectableCharacters)));
     }
 
     g_iPlayerCharacter[pPlayer] = iCharacter;
@@ -218,6 +247,8 @@ CreateCharacter() {
     CrateCharacterSoundsData(iCharacter, Character_PanicSounds);
     CrateCharacterSoundsData(iCharacter, Character_ZombieAmbientSounds);
     CrateCharacterSoundsData(iCharacter, Character_ZombieDeathSounds);
+
+    ArraySetCell(Array:g_rgCharactersData[Character_IsSelectable], iCharacter, true);
 
     g_iCharacterCount++;
 
@@ -289,6 +320,14 @@ LoadCharacter(const szName[]) {
     LoadCharacterSoundsData(iCharacter, iSoundsDoc, "zombie.ambient", Character_ZombieAmbientSounds);
     LoadCharacterSoundsData(iCharacter, iSoundsDoc, "zombie.death", Character_ZombieDeathSounds);
 
+    if (json_object_has_value(iDoc, "selectable")) {
+        ArraySetCell(Array:g_rgCharactersData[Character_IsSelectable], iCharacter, json_object_get_bool(iDoc, "selectable"));
+    }
+
+    if (ArrayGetCell(Array:g_rgCharactersData[Character_IsSelectable], iCharacter)) {
+        ArrayPushCell(g_iSelectableCharacters, iCharacter);
+    }
+
     return iCharacter;
 }
 
@@ -315,6 +354,7 @@ LoadCharacterSoundsData(iCharacter, JSON:iSoundDoc, const szKey[], CharacterData
 
 InitializeCharactersStore() {
     g_iCharactersMap = TrieCreate();
+    g_iSelectableCharacters = ArrayCreate(_, RESERVED_CHARACTER_COUNT);
 
     g_rgCharactersData[Character_HumanModel] = ArrayCreate(MAX_RESOURCE_PATH_LENGTH, RESERVED_CHARACTER_COUNT);
     g_rgCharactersData[Character_ZombieModel] = ArrayCreate(MAX_RESOURCE_PATH_LENGTH, RESERVED_CHARACTER_COUNT);
@@ -323,6 +363,7 @@ InitializeCharactersStore() {
     g_rgCharactersData[Character_PanicSounds] = ArrayCreate(_, RESERVED_CHARACTER_COUNT);
     g_rgCharactersData[Character_ZombieAmbientSounds] = ArrayCreate(_, RESERVED_CHARACTER_COUNT);
     g_rgCharactersData[Character_ZombieDeathSounds] = ArrayCreate(_, RESERVED_CHARACTER_COUNT);
+    g_rgCharactersData[Character_IsSelectable] = ArrayCreate(_, RESERVED_CHARACTER_COUNT);
 }
 
 DestroyCharactersStore() {
@@ -331,6 +372,7 @@ DestroyCharactersStore() {
     }
 
     TrieDestroy(g_iCharactersMap);
+    ArrayDestroy(g_iSelectableCharacters);
 
     ArrayDestroy(Array:g_rgCharactersData[Character_HumanModel]);
     ArrayDestroy(Array:g_rgCharactersData[Character_ZombieModel]);
