@@ -24,7 +24,7 @@ new bool:g_bPlayerExternalFade[MAX_PLAYERS + 1];
 new bool:g_bIgnoreFadeMessage;
 
 new g_pFwZombieVision;
-new g_pFwResult;
+new g_iFwResult;
 
 new g_pCvarAuto;
 
@@ -197,7 +197,7 @@ SetZombieVision(pPlayer, bool:bValue) {
     VisionFadeEffect(pPlayer, bValue);
     g_bPlayerVision[pPlayer] = bValue;
 
-    ExecuteForward(g_pFwZombieVision, g_pFwResult, pPlayer, bValue);
+    ExecuteForward(g_pFwZombieVision, g_iFwResult, pPlayer, bValue);
 }
 
 VisionFadeEffect(pPlayer, bool:bValue) {

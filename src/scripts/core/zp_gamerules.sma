@@ -29,7 +29,7 @@ new g_pCvarLives;
 new g_pCvarLivesPerPlayer;
 
 new g_pFwPlayerJoined;
-new g_pFwResult;
+new g_iFwResult;
 
 new g_iTeamMenu;
 new bool:g_bObjectiveMode = false;
@@ -439,7 +439,7 @@ public Task_Join(pPlayer) {
     set_member(pPlayer, m_iTeam, 2);
     set_member(pPlayer, m_iJoiningState, 5);
 
-    ExecuteForward(g_pFwPlayerJoined, g_pFwResult, pPlayer);
+    ExecuteForward(g_pFwPlayerJoined, g_iFwResult, pPlayer);
 }
 
 /*--------------------------------[ Team Menu ]--------------------------------*/
