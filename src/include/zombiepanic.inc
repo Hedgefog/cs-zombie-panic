@@ -1,4 +1,23 @@
 /*
+    1.2.0
+        Additions and improvements:
+            Reduced crowbar damage to 25
+            Added crowbar knockback
+            Zombie lives are now related to the number of survivors
+            Zombies number are now related to the number of survivors
+            Zombies no longer respawn after round ends
+            Added blink effect at the end of the transformation
+            Magnum no longer eject brass when shooting
+
+        Cvars:
+            Added zp_zombie_lives_per_player cvar
+
+        Fixes:
+            Fixed client crashes related to weapon icon names
+            Fixed crosshair flickering
+            Fixed zombie vision external fade handling
+            Fixed zombie vision fade effect when respawning
+
     1.1.0
         Additions and improvements:
             Added infection (10% chance by default)
