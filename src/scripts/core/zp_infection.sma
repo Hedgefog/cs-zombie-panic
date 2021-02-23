@@ -80,8 +80,9 @@ public plugin_natives() {
 public Native_SetInfected(iPluginId, iArgc) {
     new pPlayer = get_param(1);
     new bool:bValue = bool:get_param(2);
+    new pInfector = get_param(3);
 
-    SetInfected(pPlayer, bValue);
+    SetInfected(pPlayer, bValue, pInfector);
 }
 
 public Native_IsPlayerInfected(iPluginId, iArgc) {
