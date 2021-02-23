@@ -35,7 +35,7 @@ public plugin_precache() {
     }
 
     g_iAmmoId = ZP_Ammo_GetId(ZP_Ammo_GetHandler("grenade"));
-    g_iCwHandler = CW_Register(ZP_WEAPON_GRENADE, CSW_HEGRENADE, WEAPON_NOCLIP, g_iAmmoId, -1, 0, -1, 3, 6);
+    g_iCwHandler = CW_Register(ZP_WEAPON_GRENADE, CSW_HEGRENADE, WEAPON_NOCLIP, g_iAmmoId, -1, 0, -1, 3, 6, _, "handgrenade");
     CW_Bind(g_iCwHandler, CWB_Idle, "@Weapon_Idle");
     CW_Bind(g_iCwHandler, CWB_PrimaryAttack, "@Weapon_PrimaryAttack");
     CW_Bind(g_iCwHandler, CWB_Deploy, "@Weapon_Deploy");

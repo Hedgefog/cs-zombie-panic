@@ -12,7 +12,6 @@
 #define PLUGIN "[Zombie Panic] Weapon Crowbar"
 #define AUTHOR "Hedgehog Fog"
 
-#define SWIPE_MODEL "swipe.mdl"
 #define PRIMARY_AMMO_ID 13
 
 new CW:g_iCwHandler;
@@ -29,7 +28,7 @@ public plugin_precache() {
         precache_sound(ZP_WEAPON_SWIPE_HIT_SOUNDS[i]);
     }
 
-    g_iCwHandler = CW_Register(ZP_WEAPON_SWIPE, CSW_KNIFE, WEAPON_NOCLIP, PRIMARY_AMMO_ID, -1, _, _, 2, 1, _, _, CWF_NoBulletDecal);
+    g_iCwHandler = CW_Register(ZP_WEAPON_SWIPE, CSW_KNIFE, WEAPON_NOCLIP, PRIMARY_AMMO_ID, _, _, _, 2, 1, _, "swipe", CWF_NoBulletDecal);
     CW_Bind(g_iCwHandler, CWB_Idle, "@Weapon_Idle");
     CW_Bind(g_iCwHandler, CWB_PrimaryAttack, "@Weapon_PrimaryAttack");
     CW_Bind(g_iCwHandler, CWB_SecondaryAttack, "@Weapon_SecondaryAttack");
