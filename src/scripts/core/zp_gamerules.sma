@@ -239,7 +239,7 @@ DistributeTeams() {
     new iRequiredZombieCount = floatround(float(pPlayerCount) / PLAYERS_PER_ZOMBIE, floatround_ceil);
     if (iZombieCount < iRequiredZombieCount) {
         if (pPlayerCount > 1) {
-            log_amx("No one has chosen play zombie, a random player will be moved to the zombie team...");
+            log_amx("Not enough zombies, a random players will be moved to the zombie team...");
             
             new iCount = iRequiredZombieCount - iZombieCount;
             for (new i = 0; i < iCount; ++i) {
