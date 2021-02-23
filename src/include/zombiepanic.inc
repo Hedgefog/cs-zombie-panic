@@ -8,6 +8,7 @@
             Zombies no longer respawn after round ends
             Added blink effect at the end of the transformation
             Magnum no longer eject brass when shooting
+            Added chooseteam command for spectators
 
         Cvars:
             Added zp_zombie_lives_per_player cvar

@@ -91,15 +91,7 @@ public client_disconnected(pPlayer) {
 }
 
 public Round_Fw_NewRound() {
-    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
-        if (!is_user_connected(pPlayer) || is_user_hltv(pPlayer)) {
-            continue;
-        }
-
-        g_iPlayerTeamPreference[pPlayer] = get_member(pPlayer, m_iTeam) == 3 ? TeamPreference_Spectator : TeamPreference_Human;
-        OpenTeamMenu(pPlayer);
-    }
-
+    ResetPlayerTeamPreferences();
     ShuffleTeams();
 
     return PLUGIN_CONTINUE;
@@ -169,6 +161,10 @@ public OnMessage_VGUIMenu(iMsgId, iDest, pPlayer) {
 
 
 public OnPlayerChangeTeam(pPlayer, iKey) {
+    if (get_member(pPlayer, m_iTeam) == 3) {
+        OpenTeamMenu(pPlayer);
+    }
+
     return PLUGIN_HANDLED;
 }
 
@@ -189,9 +185,14 @@ public OnPlayerSpawn(pPlayer) {
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
+    if (!is_user_alive(pPlayer)) {
+        return HAM_IGNORED;
+    }
+
     if (!Round_IsRoundStarted()) {
         set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
         set_pev(pPlayer, pev_takedamage, DAMAGE_NO);
+        OpenTeamMenu(pPlayer);
         ZP_ShowMapInfo(pPlayer);
         // ZP_Player_UpdateSpeed(pPlayer);
     } else {
@@ -399,6 +400,16 @@ ShuffleTeams() {
     ArrayDestroy(irgPlayers);
 }
 
+ResetPlayerTeamPreferences() {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
+        if (!is_user_connected(pPlayer) || is_user_hltv(pPlayer)) {
+            continue;
+        }
+
+        g_iPlayerTeamPreference[pPlayer] = get_member(pPlayer, m_iTeam) == 3 ? TeamPreference_Spectator : TeamPreference_Human;
+    }
+}
+
 RespawnPlayers() {
     for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         if (!is_user_connected(pPlayer)) {
@@ -454,9 +465,17 @@ public TeamMenuHandler(pPlayer, iMenu, iItem) {
     switch (iItem) {
         case 0: {
             g_iPlayerTeamPreference[pPlayer] = TeamPreference_Human;
+
+            if (get_member(pPlayer, m_iTeam) == 3) {
+                set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
+            }
         }
         case 1: {
             g_iPlayerTeamPreference[pPlayer] = TeamPreference_Zombie;
+
+            if (get_member(pPlayer, m_iTeam) == 3) {
+                set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
+            }
         }
         case 5: {
             g_iPlayerTeamPreference[pPlayer] = TeamPreference_Spectator;
