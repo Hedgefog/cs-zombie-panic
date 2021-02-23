@@ -14,10 +14,15 @@
 
 #define PLAYER_IDLE_ANIMEXT "c4"
 
+new g_pFwPlayerEquiped;
+new g_iFwResult;
+
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
     RegisterHookChain(RG_CBasePlayer_OnSpawnEquip, "OnPlayerSpawnEquip");
+
+    g_pFwPlayerEquiped = CreateMultiForward("ZP_Fw_PlayerEquiped", ET_IGNORE, FP_CELL);
 }
 
 public OnPlayerSpawnEquip(pPlayer) {
@@ -41,6 +46,8 @@ public OnPlayerSpawnEquip(pPlayer) {
             CW_GiveWeapon(pPlayer, ZP_WEAPON_PISTOL);
         }
     }
+
+    ExecuteForward(g_pFwPlayerEquiped, g_iFwResult, pPlayer);
 
     return HC_SUPERCEDE;
 }
