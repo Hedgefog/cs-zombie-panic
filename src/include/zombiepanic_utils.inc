@@ -144,7 +144,7 @@ stock bool:UTIL_IsPlayerSpectator(pPlayer) {
   return iTeam < 1 || iTeam > 2;
 }
 
-stock UTIL_PlayerKnockback(pVictim, pAttacker, Float:flForce = 250.0) {
+stock UTIL_PlayerKnockback(pVictim, pAttacker, Float:flForce) {
     static Float:vecOrigin[3];
     pev(pVictim, pev_origin, vecOrigin);
 
@@ -154,17 +154,13 @@ stock UTIL_PlayerKnockback(pVictim, pAttacker, Float:flForce = 250.0) {
     static Float:vecDir[3];
     xs_vec_sub(vecOrigin, vecAttackerOrigin, vecDir);
 
-    static Float:vecKnockback[3];
-
     new Float:flLen = xs_vec_len_2d(vecDir);
-    for (new i = 0; i < 2; ++i) {
-        vecKnockback[i] = (vecDir[i] / flLen) * flForce;
-    }
-
-    vecKnockback[2] = 0.0;
 
     static Float:vecVelocity[3];
     pev(pVictim, pev_velocity, vecVelocity);
-    xs_vec_add(vecVelocity, vecKnockback, vecVelocity);
+    for (new i = 0; i < 2; ++i) {
+        vecVelocity[i] = (vecDir[i] / flLen) * flForce;
+    }
+
     set_pev(pVictim, pev_velocity, vecVelocity);
 }
