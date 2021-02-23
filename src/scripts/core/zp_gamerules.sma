@@ -55,7 +55,7 @@ public plugin_init() {
     register_clcmd("joinclass", "OnPlayerChangeTeam");
     register_clcmd("drop", "OnClCmd_Drop");
 
-    g_pCvarLives = register_cvar("zp_zombie_lives", "-1");
+    g_pCvarLives = register_cvar("zp_zombie_lives", "0");
     g_pCvarLivesPerPlayer = register_cvar("zp_zombie_lives_per_player", "2");
 
     g_pFwPlayerJoined = CreateMultiForward("ZP_Fw_PlayerJoined", ET_IGNORE, FP_CELL);
@@ -108,30 +108,14 @@ public Round_Fw_NewRound() {
 public Round_Fw_RoundStart() {
     DistributeTeams();
 
-    if (ZP_GameRules_GetObjectiveMode()) {
-        ZP_GameRules_SetZombieLives(255);
-    } else {
-        new iLives = get_pcvar_num(g_pCvarLives);
-        if (iLives == -1) {
-            iLives = CalculatePlayerCount(ZP_HUMAN_TEAM) * get_pcvar_num(g_pCvarLivesPerPlayer);
-        }
+    new iHumanCount = CalculatePlayerCount(ZP_HUMAN_TEAM);
+    new iLives = ZP_GameRules_GetObjectiveMode()
+        ? 255
+        : get_pcvar_num(g_pCvarLives) + (iHumanCount * get_pcvar_num(g_pCvarLivesPerPlayer));
 
-        ZP_GameRules_SetZombieLives(iLives);
-    }
+    ZP_GameRules_SetZombieLives(iLives);
 
-
-    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
-        if (!is_user_connected(pPlayer)) {
-            continue;
-        }
-
-        if (UTIL_IsPlayerSpectator(pPlayer)) {
-            continue;
-        }
-
-        ExecuteHamB(Ham_CS_RoundRespawn, pPlayer);
-    }
-
+    RespawnPlayers();
     CheckWinConditions();
     
     log_amx("New round started");
@@ -413,6 +397,20 @@ ShuffleTeams() {
     }
 
     ArrayDestroy(irgPlayers);
+}
+
+RespawnPlayers() {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
+        if (!is_user_connected(pPlayer)) {
+            continue;
+        }
+
+        if (UTIL_IsPlayerSpectator(pPlayer)) {
+            continue;
+        }
+
+        ExecuteHamB(Ham_CS_RoundRespawn, pPlayer);
+    }
 }
 
 DispatchWin(iTeam) {
