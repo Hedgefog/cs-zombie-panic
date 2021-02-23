@@ -5,10 +5,10 @@
             Added crowbar knockback
             Zombie lives are now related to the number of survivors
             Zombies number are now related to the number of survivors
-            Zombies no longer respawn after round ends
-            Added blink effect at the end of the transformation
-            Magnum no longer eject brass when shooting
             Added chooseteam command for spectators
+            Zombies no longer respawn after round ends
+            Magnum no longer eject brass when shooting
+            Added blink effect at the end of the transformation
             Added unselectable characters support
 
         Cvars:
