@@ -142,7 +142,7 @@ public OnPlayerTakeDamage_Post(this, pInflictor, pAttacker) {
         return HAM_IGNORED;
     }
 
-    UTIL_PlayerKnockback(this, pAttacker, 200.0);
+    UTIL_PlayerKnockback(this, pAttacker, 150.0);
 
     return HAM_HANDLED;
 }
