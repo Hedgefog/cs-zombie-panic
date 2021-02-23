@@ -17,6 +17,7 @@
 #define CHOOSE_TEAM_VGUI_MENU_ID 2
 #define CHOOSE_TEAM1_CLASS_VGUI_MENU_ID 26
 #define CHOOSE_TEAM2_CLASS_VGUI_MENU_ID 27
+#define PLAYERS_PER_ZOMBIE 6
 
 enum TeamPreference {
     TeamPreference_Human,
@@ -25,9 +26,10 @@ enum TeamPreference {
 }
 
 new g_pCvarLives;
+new g_pCvarLivesPerPlayer;
 
 new g_pFwPlayerJoined;
-new g_pFwResult;
+new g_iFwResult;
 
 new g_iTeamMenu;
 new bool:g_bObjectiveMode = false;
@@ -53,7 +55,8 @@ public plugin_init() {
     register_clcmd("joinclass", "OnPlayerChangeTeam");
     register_clcmd("drop", "OnClCmd_Drop");
 
-    g_pCvarLives = register_cvar("zp_zombie_lives", "20");
+    g_pCvarLives = register_cvar("zp_zombie_lives", "0");
+    g_pCvarLivesPerPlayer = register_cvar("zp_zombie_lives_per_player", "2");
 
     g_pFwPlayerJoined = CreateMultiForward("ZP_Fw_PlayerJoined", ET_IGNORE, FP_CELL);
 
@@ -88,24 +91,25 @@ public client_disconnected(pPlayer) {
 }
 
 public Round_Fw_NewRound() {
-    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
-        if (!is_user_connected(pPlayer) || is_user_hltv(pPlayer)) {
-            continue;
-        }
-
-        g_iPlayerTeamPreference[pPlayer] = get_member(pPlayer, m_iTeam) == 3 ? TeamPreference_Spectator : TeamPreference_Human;
-        OpenTeamMenu(pPlayer);
-    }
-
+    ResetPlayerTeamPreferences();
     ShuffleTeams();
 
     return PLUGIN_CONTINUE;
 }
 
 public Round_Fw_RoundStart() {
-    ZP_GameRules_SetZombieLives(ZP_GameRules_GetObjectiveMode() ? 255 : get_pcvar_num(g_pCvarLives));
     DistributeTeams();
+
+    new iHumanCount = CalculatePlayerCount(ZP_HUMAN_TEAM);
+    new iLives = ZP_GameRules_GetObjectiveMode()
+        ? 255
+        : get_pcvar_num(g_pCvarLives) + (iHumanCount * get_pcvar_num(g_pCvarLivesPerPlayer));
+
+    ZP_GameRules_SetZombieLives(iLives);
+
+    RespawnPlayers();
     CheckWinConditions();
+    
     log_amx("New round started");
 }
 
@@ -157,6 +161,10 @@ public OnMessage_VGUIMenu(iMsgId, iDest, pPlayer) {
 
 
 public OnPlayerChangeTeam(pPlayer, iKey) {
+    if (get_member(pPlayer, m_iTeam) == 3) {
+        OpenTeamMenu(pPlayer);
+    }
+
     return PLUGIN_HANDLED;
 }
 
@@ -177,9 +185,14 @@ public OnPlayerSpawn(pPlayer) {
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
+    if (!is_user_alive(pPlayer)) {
+        return HAM_IGNORED;
+    }
+
     if (!Round_IsRoundStarted()) {
         set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
         set_pev(pPlayer, pev_takedamage, DAMAGE_NO);
+        OpenTeamMenu(pPlayer);
         ZP_ShowMapInfo(pPlayer);
         // ZP_Player_UpdateSpeed(pPlayer);
     } else {
@@ -223,26 +236,20 @@ DistributeTeams() {
         log_amx("Respawned %d zombies", iZombieCount);
     }
 
-    if (!iZombieCount) {
+    new iRequiredZombieCount = floatround(float(pPlayerCount) / PLAYERS_PER_ZOMBIE, floatround_ceil);
+    if (iZombieCount < iRequiredZombieCount) {
         if (pPlayerCount > 1) {
-            log_amx("No one has chosen play zombie, a random player will be moved to the zombie team...");
-            ChooseRandomZombie();
+            log_amx("Not enough zombies, a random players will be moved to the zombie team...");
+            
+            new iCount = iRequiredZombieCount - iZombieCount;
+            for (new i = 0; i < iCount; ++i) {
+                ChooseRandomZombie();
+            }
         } else {
             log_amx("Not enough players to start");
         }
     }
-    
-    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
-        if (!is_user_connected(pPlayer)) {
-            continue;
-        }
 
-        if (UTIL_IsPlayerSpectator(pPlayer)) {
-            continue;
-        }
-
-        ExecuteHamB(Ham_CS_RoundRespawn, pPlayer);
-    }
 }
 
 ProcessZombiePlayers(iMaxZombies) {
@@ -299,7 +306,7 @@ ChooseRandomZombie() {
     log_amx("Player ^"%n^" was randomly moved to the zombie team", pPlayer);
 }
 
-CalculatePlayerCount() {
+CalculatePlayerCount(iTeam = -1) {
     new pPlayerCount = 0;
 
     for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
@@ -308,6 +315,10 @@ CalculatePlayerCount() {
         }
 
         if (UTIL_IsPlayerSpectator(pPlayer)) {
+            continue;
+        }
+
+        if (iTeam != -1 && iTeam != get_member(pPlayer, m_iTeam)) {
             continue;
         }
 
@@ -389,6 +400,30 @@ ShuffleTeams() {
     ArrayDestroy(irgPlayers);
 }
 
+ResetPlayerTeamPreferences() {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
+        if (!is_user_connected(pPlayer) || is_user_hltv(pPlayer)) {
+            continue;
+        }
+
+        g_iPlayerTeamPreference[pPlayer] = get_member(pPlayer, m_iTeam) == 3 ? TeamPreference_Spectator : TeamPreference_Human;
+    }
+}
+
+RespawnPlayers() {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
+        if (!is_user_connected(pPlayer)) {
+            continue;
+        }
+
+        if (UTIL_IsPlayerSpectator(pPlayer)) {
+            continue;
+        }
+
+        ExecuteHamB(Ham_CS_RoundRespawn, pPlayer);
+    }
+}
+
 DispatchWin(iTeam) {
     Round_DispatchWin(iTeam, ZP_NEW_ROUND_DELAY);
 }
@@ -404,7 +439,7 @@ public Task_Join(pPlayer) {
     set_member(pPlayer, m_iTeam, 2);
     set_member(pPlayer, m_iJoiningState, 5);
 
-    ExecuteForward(g_pFwPlayerJoined, g_pFwResult, pPlayer);
+    ExecuteForward(g_pFwPlayerJoined, g_iFwResult, pPlayer);
 }
 
 /*--------------------------------[ Team Menu ]--------------------------------*/
@@ -430,9 +465,17 @@ public TeamMenuHandler(pPlayer, iMenu, iItem) {
     switch (iItem) {
         case 0: {
             g_iPlayerTeamPreference[pPlayer] = TeamPreference_Human;
+
+            if (get_member(pPlayer, m_iTeam) == 3) {
+                set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
+            }
         }
         case 1: {
             g_iPlayerTeamPreference[pPlayer] = TeamPreference_Zombie;
+
+            if (get_member(pPlayer, m_iTeam) == 3) {
+                set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
+            }
         }
         case 5: {
             g_iPlayerTeamPreference[pPlayer] = TeamPreference_Spectator;

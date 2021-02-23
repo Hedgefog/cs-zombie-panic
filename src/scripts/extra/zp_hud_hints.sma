@@ -364,7 +364,7 @@ stock UTIL_CalculateHUDLines(const szText[]) {
     new iLineLength = 0;
 
     for (new i = 0; i < 256; ++i) {
-        if (szText[i] == 0) {
+        if (szText[i] == '^0') {
             break;
         }
 

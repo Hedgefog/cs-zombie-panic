@@ -46,7 +46,7 @@ public plugin_precache() {
 
     g_iAmmoId = ZP_Ammo_GetId(ZP_Ammo_GetHandler("satchel"));
 
-    g_iCwHandler = CW_Register(ZP_WEAPON_SATCHEL, CSW_C4, WEAPON_NOCLIP, g_iAmmoId, -1, 0, -1, 4, 5);
+    g_iCwHandler = CW_Register(ZP_WEAPON_SATCHEL, CSW_C4, WEAPON_NOCLIP, g_iAmmoId, -1, 0, -1, 4, 5, _, "satchel");
     CW_Bind(g_iCwHandler, CWB_Idle, "@Weapon_Idle");
     CW_Bind(g_iCwHandler, CWB_PrimaryAttack, "@Weapon_PrimaryAttack");
     CW_Bind(g_iCwHandler, CWB_SecondaryAttack, "@Weapon_SecondaryAttack");

@@ -19,7 +19,7 @@ new bool:g_bPlayerPanic[MAX_PLAYERS + 1];
 new Float:g_flPlayerLastPanic[MAX_PLAYERS + 1];
 
 new g_pFwPanic;
-new g_pFwResult;
+new g_iFwResult;
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
@@ -91,7 +91,7 @@ bool:Panic(pPlayer) {
 
     set_task(PANIC_DURATION, "Task_EndPanic", pPlayer);
 
-    ExecuteForward(g_pFwPanic, g_pFwResult, pPlayer);
+    ExecuteForward(g_pFwPanic, g_iFwResult, pPlayer);
 
     return true;
 }

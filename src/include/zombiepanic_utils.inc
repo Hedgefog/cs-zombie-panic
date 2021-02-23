@@ -143,3 +143,24 @@ stock bool:UTIL_IsPlayerSpectator(pPlayer) {
   new iTeam = get_member(pPlayer, m_iTeam);
   return iTeam < 1 || iTeam > 2;
 }
+
+stock UTIL_PlayerKnockback(pVictim, pAttacker, Float:flForce) {
+    static Float:vecOrigin[3];
+    pev(pVictim, pev_origin, vecOrigin);
+
+    static Float:vecAttackerOrigin[3];
+    pev(pAttacker, pev_origin, vecAttackerOrigin);
+
+    static Float:vecDir[3];
+    xs_vec_sub(vecOrigin, vecAttackerOrigin, vecDir);
+
+    new Float:flLen = xs_vec_len_2d(vecDir);
+
+    static Float:vecVelocity[3];
+    pev(pVictim, pev_velocity, vecVelocity);
+    for (new i = 0; i < 2; ++i) {
+        vecVelocity[i] = (vecDir[i] / flLen) * flForce;
+    }
+
+    set_pev(pVictim, pev_velocity, vecVelocity);
+}

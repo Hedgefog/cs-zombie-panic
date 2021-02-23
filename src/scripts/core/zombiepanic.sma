@@ -10,7 +10,7 @@
 #define AUTHOR "Hedgehog Fog"
 
 new g_pFwConfigLoaded;
-new g_pFwResult;
+new g_iFwResult;
 
 new g_pCvarVersion;
 
@@ -50,7 +50,7 @@ public plugin_cfg() {
     server_cmd("exec %s/zombiepanic.cfg", szConfigDir);
     server_exec();
     
-    ExecuteForward(g_pFwConfigLoaded, g_pFwResult);
+    ExecuteForward(g_pFwConfigLoaded, g_iFwResult);
 }
 
 public OnVersionCvarChange() {

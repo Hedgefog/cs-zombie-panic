@@ -38,6 +38,8 @@ public plugin_precache() {
     CW_Bind(g_iCwHandler, CWB_GetMaxSpeed, "@Weapon_GetMaxSpeed");
     CW_Bind(g_iCwHandler, CWB_Spawn, "@Weapon_Spawn");
     CW_Bind(g_iCwHandler, CWB_WeaponBoxModelUpdate, "@Weapon_WeaponBoxSpawn");
+    CW_Bind(g_iCwHandler, CWB_Holster, "@Weapon_Holster");
+    CW_Bind(g_iCwHandler, CWB_Pump, "@Weapon_Pump");
 
     ZP_Weapons_Register(g_iCwHandler, ZP_WEIGHT_MAGNUM);
 }
@@ -85,7 +87,7 @@ public @Weapon_PrimaryAttack(this) {
 
 public @Weapon_Reload(this) {
     if (CW_DefaultReload(this, 3, 2.5)) {
-        set_task(0.75, "Task_EjectBrass", TASKID_EJECT_BRASS + this);
+        set_member(this, m_Weapon_flNextReload, get_gametime() + 0.75);
     }
 }
 
@@ -105,15 +107,13 @@ public @Weapon_WeaponBoxSpawn(this, pWeaponBox) {
     engfunc(EngFunc_SetModel, pWeaponBox, ZP_WEAPON_MAGNUM_W_MODEL);
 }
 
-public Task_EjectBrass(iTaskId) {
-    new pItem = iTaskId - TASKID_EJECT_BRASS;
+public @Weapon_Holster(this) {
+    CW_PlayAnimation(this, 4, 16.0 / 30.0);
+}
 
-    if (!pev_valid(pItem)) {
-        return;
-    }
-
-    new pPlayer = CW_GetPlayer(pItem);
-    new iClip = get_member(pItem, m_Weapon_iClip);
+public @Weapon_Pump(this) {
+    new pPlayer = CW_GetPlayer(this);
+    new iClip = get_member(this, m_Weapon_iClip);
     new iModelIndex = engfunc(EngFunc_ModelIndex, "models/shell.mdl");
 
     static Float:vecOrigin[3];

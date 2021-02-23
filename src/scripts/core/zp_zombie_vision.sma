@@ -12,6 +12,7 @@
 #define AUTHOR "Hedgehog Fog"
 
 #define TASKID_FIX_FADE 100
+#define TASKID_ACTIVATE_VISION 200
 
 #define VISION_SCREEN_FADE_COLOR 255, 195, 195
 #define VISION_EFFECT_TIME 0.5
@@ -23,7 +24,7 @@ new bool:g_bPlayerExternalFade[MAX_PLAYERS + 1];
 new bool:g_bIgnoreFadeMessage;
 
 new g_pFwZombieVision;
-new g_pFwResult;
+new g_iFwResult;
 
 new g_pCvarAuto;
 
@@ -77,7 +78,7 @@ public OnPlayerSpawn(pPlayer) {
     }
 
     if (get_pcvar_num(g_pCvarAuto) > 0) {
-        SetZombieVision(pPlayer, true);
+        set_task(0.1, "Task_ActivateVision", TASKID_ACTIVATE_VISION + pPlayer);
     }
 
     return HAM_HANDLED;
@@ -85,6 +86,7 @@ public OnPlayerSpawn(pPlayer) {
 
 public OnPlayerKilled(pPlayer) {
     SetZombieVision(pPlayer, false);
+    remove_task(TASKID_ACTIVATE_VISION + pPlayer);
 
     if (!ZP_Player_IsZombie(pPlayer)) {
         return HAM_IGNORED;
@@ -154,17 +156,17 @@ public OnMessage_ScreenFade(iMsgId, iMsgDest, pPlayer) {
         return PLUGIN_CONTINUE;
     }
 
-    new Float:flHoldTime = float(get_msg_arg_int(2)) / (1<<12);
-    if (flHoldTime > 0.0) {
+    new Float:flDuration = (float(get_msg_arg_int(1)) / (1<<12)) + (float(get_msg_arg_int(2)) / (1<<12));
+    if (flDuration > 0.0) {
         if (pPlayer > 0) {
-            HandleExternalFade(pPlayer, flHoldTime);
+            HandleExternalFade(pPlayer, flDuration);
         } else {
             for (new pTargetPlayer = 1; pTargetPlayer <= MaxClients; ++pTargetPlayer) {
                 if (!is_user_connected(pTargetPlayer)) {
                     continue;
                 }
 
-                HandleExternalFade(pTargetPlayer, flHoldTime);
+                HandleExternalFade(pTargetPlayer, flDuration);
             }
         }
     }
@@ -195,7 +197,7 @@ SetZombieVision(pPlayer, bool:bValue) {
     VisionFadeEffect(pPlayer, bValue);
     g_bPlayerVision[pPlayer] = bValue;
 
-    ExecuteForward(g_pFwZombieVision, g_pFwResult, pPlayer, bValue);
+    ExecuteForward(g_pFwZombieVision, g_iFwResult, pPlayer, bValue);
 }
 
 VisionFadeEffect(pPlayer, bool:bValue) {
@@ -221,4 +223,10 @@ public Task_FixVisionScreenFade(iTaskId) {
     }
 
     g_bPlayerExternalFade[pPlayer] = false;
+}
+
+public Task_ActivateVision(iTaskId) {
+    new pPlayer = iTaskId - TASKID_ACTIVATE_VISION;
+
+    SetZombieVision(pPlayer, true);
 }

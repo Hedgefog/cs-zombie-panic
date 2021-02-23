@@ -5,6 +5,7 @@
 #include <hamsandwich>
 #include <fakemeta>
 #include <reapi>
+#include <xs>
 
 #include <api_custom_weapons>
 
@@ -33,7 +34,7 @@ public plugin_precache() {
         precache_sound(ZP_WEAPON_CROWBAR_HITBODY_SOUNDS[i]);
     }
 
-    g_iCwHandler = CW_Register(ZP_WEAPON_CROWBAR, CSW_KNIFE, WEAPON_NOCLIP, _, _, _, _, 2, 1, _, _, CWF_NoBulletSmoke);
+    g_iCwHandler = CW_Register(ZP_WEAPON_CROWBAR, CSW_KNIFE, WEAPON_NOCLIP, _, _, _, _, 2, 1, _, "crowbar",  CWF_NoBulletSmoke);
     CW_Bind(g_iCwHandler, CWB_Idle, "@Weapon_Idle");
     CW_Bind(g_iCwHandler, CWB_PrimaryAttack, "@Weapon_PrimaryAttack");
     CW_Bind(g_iCwHandler, CWB_SecondaryAttack, "@Weapon_SecondaryAttack");
@@ -48,6 +49,8 @@ public plugin_precache() {
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+
+    RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage_Post", .Post = 1);
 }
 
 public @Weapon_Idle(this) {
@@ -66,7 +69,7 @@ public @Weapon_Idle(this) {
 
 public @Weapon_PrimaryAttack(this) {
     new pPlayer = CW_GetPlayer(this);
-    new pHit = CW_DefaultSwing(this, 35.0, 0.5, 38.0);
+    new pHit = CW_DefaultSwing(this, 25.0, 0.5, 38.0);
     CW_PlayAnimation(this, 4, 0.25);
 
     if (pHit < 0) {
@@ -119,4 +122,27 @@ public @Weapon_WeaponBoxSpawn(this, pWeaponBox) {
 
 public @Weapon_CanDrop(this) {
     return PLUGIN_HANDLED;
+}
+
+public OnPlayerTakeDamage_Post(this, pInflictor, pAttacker) {
+    if (!UTIL_IsPlayer(pAttacker)) {
+        return HAM_IGNORED;
+    }
+
+    if (!rg_is_player_can_takedamage(this, pAttacker)) {
+        return HAM_IGNORED;
+    }
+
+    new pItem = pInflictor == pAttacker ? get_member(pAttacker, m_pActiveItem) : pInflictor;
+    if (pItem <= 0) {
+        return HAM_IGNORED;
+    }
+
+    if (CW_GetHandlerByEntity(pItem) != g_iCwHandler) {
+        return HAM_IGNORED;
+    }
+
+    UTIL_PlayerKnockback(this, pAttacker, 150.0);
+
+    return HAM_HANDLED;
 }

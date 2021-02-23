@@ -1,4 +1,25 @@
 /*
+    1.2.0
+        Additions and improvements:
+            Reduced crowbar damage to 25
+            Added crowbar knockback
+            Zombie lives are now related to the number of survivors
+            Zombies number are now related to the number of survivors
+            Added chooseteam command for spectators
+            Zombies no longer respawn after round ends
+            Magnum no longer eject brass when shooting
+            Added blink effect at the end of the transformation
+            Added unselectable characters support
+
+        Cvars:
+            Added zp_zombie_lives_per_player cvar
+
+        Fixes:
+            Fixed client crashes related to weapon icon names
+            Fixed crosshair flickering
+            Fixed zombie vision external fade handling
+            Fixed zombie vision fade effect when respawning
+
     1.1.0
         Additions and improvements:
             Added infection (10% chance by default)
@@ -34,7 +55,9 @@ native bool:ZP_Player_ToggleFlashlight(pPlayer);
 native bool:ZP_Player_ToggleZombieVision(pPlayer);
 native bool:ZP_Player_IsInfected(pPlayer);
 native bool:ZP_Player_IsTransforming(pPlayer);
-native ZP_Player_SetInfected(pPlayer, bool:bValue);
+native bool:ZP_Player_IsPartialZombie(pPlayer);
+native ZP_Player_SetInfected(pPlayer, bool:bValue, pInfector = 0);
+native bool:ZP_Player_SetCharacter(pPlayer, const szCharacter[]);
 
 forward ZP_Fw_PlayerJoined(pPlayer);
 forward ZP_Fw_PlayerPanic(pPlayer);
@@ -43,6 +66,7 @@ forward ZP_Fw_Player_AimItem(pPlayer, pItem);
 forward ZP_Fw_PlayerInfected(pPlayer, pInfector);
 forward ZP_Fw_PlayerTransformationDeath(pPlayer);
 forward ZP_Fw_PlayerTransformed(pPlayer);
+forward ZP_Fw_PlayerEquiped(pPlayer);
 
 // Player inventory
 

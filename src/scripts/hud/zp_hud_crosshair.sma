@@ -23,7 +23,8 @@ public plugin_init() {
     gmsgCurWeapon = get_user_msgid("CurWeapon");
 
     register_message(gmsgHideWeapon, "OnMessage_HideWeapon");
-    
+
+    register_event("HideWeapon", "OnEvent_HideWeapon", "be", "1=1");
     register_event("CurWeapon", "OnEvent_CurWeapon", "be", "1=1");
 }
 
@@ -34,7 +35,15 @@ public OnMessage_HideWeapon(iMsgId, iMsgDest, pPlayer) {
 
     g_iPlayerHideWeapon[pPlayer] = get_msg_arg_int(1);
 
-    set_task(0.1, "Task_UpdateCrosshair", pPlayer);
+    return PLUGIN_CONTINUE;
+}
+
+public OnEvent_HideWeapon(pPlayer) {
+    if (is_user_bot(pPlayer)) {
+        return PLUGIN_CONTINUE;
+    }
+
+    UpdateCrosshair(pPlayer);
 
     return PLUGIN_CONTINUE;
 }
@@ -44,15 +53,14 @@ public OnEvent_CurWeapon(pPlayer) {
         return PLUGIN_CONTINUE;
     }
 
-    set_task(0.1, "Task_UpdateCrosshair", pPlayer);
+    UpdateCrosshair(pPlayer);
 
     return PLUGIN_CONTINUE;
 }
 
 UpdateCrosshair(pPlayer) {
-
     emessage_begin(MSG_ONE, gmsgHideWeapon, _, pPlayer);
-    ewrite_byte(g_iPlayerHideWeapon[pPlayer] | HIDEHUD_CROSSHAIR | BIT(7));
+    ewrite_byte(g_iPlayerHideWeapon[pPlayer] | HIDEHUD_CROSSHAIR | HIDEHUD_OBSERVER_CROSSHAIR);
     emessage_end();
 
     message_begin(MSG_ONE, gmsgSetFOV, _, pPlayer);
@@ -74,10 +82,4 @@ UpdateCrosshair(pPlayer) {
     message_begin(MSG_ONE, gmsgSetFOV, _, pPlayer);
     write_byte(get_member(pPlayer, m_iFOV));
     message_end();
-}
-
-public Task_UpdateCrosshair(iTaskId) {
-    new pPlayer = iTaskId;
-
-    UpdateCrosshair(pPlayer);
 }

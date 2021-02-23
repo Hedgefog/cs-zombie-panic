@@ -35,6 +35,7 @@ public plugin_precache() {
     CW_Bind(g_iCwHandler, CWB_GetMaxSpeed, "@Weapon_GetMaxSpeed");
     CW_Bind(g_iCwHandler, CWB_Spawn, "@Weapon_Spawn");
     CW_Bind(g_iCwHandler, CWB_WeaponBoxModelUpdate, "@Weapon_WeaponBoxSpawn");
+    CW_Bind(g_iCwHandler, CWB_Holster, "@Weapon_Holster");
 
     ZP_Weapons_Register(g_iCwHandler, ZP_WEIGHT_PISTOL);
 }
@@ -108,4 +109,8 @@ public @Weapon_Spawn(this) {
 
 public @Weapon_WeaponBoxSpawn(this, pWeaponBox) {
     engfunc(EngFunc_SetModel, pWeaponBox, ZP_WEAPON_PISTOL_W_MODEL);
+}
+
+public @Weapon_Holster(this) {
+    CW_PlayAnimation(this, 8, 16.0 / 20.0);
 }

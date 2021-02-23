@@ -20,7 +20,7 @@ new g_pPlayerAimItem[MAX_PLAYERS + 1] = { -1, ... };
 new g_bPlayerPickup[MAX_PLAYERS + 1] = { false, ... };
 
 new g_pFwAimItem;
-new g_pFwResult;
+new g_iFwResult;
 
 new g_pCvarUsePickup;
 new g_pCvarUsePickupHighlight;
@@ -133,7 +133,7 @@ public OnPlayerPreThink_Post(pPlayer) {
             g_pPlayerAimItem[pPlayer] = pEntity;
 
             if (pEntity != pPrevAimItem) {
-                ExecuteForward(g_pFwAimItem, g_pFwResult, pPlayer, pEntity);
+                ExecuteForward(g_pFwAimItem, g_iFwResult, pPlayer, pEntity);
             }
 
             break;

@@ -568,7 +568,11 @@ public OnPlayerPreThink_Post(pPlayer) {
 }
 
 public OnPlayerTakeDamage(pPlayer, pInflictor, pAttacker) {
-    g_pKillerItem = pInflictor;
+    if (pAttacker && ExecuteHam(Ham_IsPlayer, pAttacker) && pInflictor == pAttacker) {
+        g_pKillerItem = get_member(pAttacker, m_pActiveItem);
+    } else {
+        g_pKillerItem = pInflictor;
+    }
 }
 
 public OnPlayerTakeDamage_Post() {
@@ -600,9 +604,11 @@ public OnMessage_DeathMsg(iMsgId, iDest, pPlayer) {
 
     static szIcon[64];
     GetStringData(iHandler, CW_Data_Icon, szIcon, charsmax(szIcon));
+
     if (szIcon[0] == '^0') {
         GetStringData(iHandler, CW_Data_Name, szIcon, charsmax(szIcon));
     }
+
 
     set_msg_arg_string(4, szIcon);
 
@@ -736,14 +742,14 @@ ItemPostFrame(this) {
     new iPrimaryAmmoAmount = get_member(pPlayer, m_rgAmmo, iPrimaryAmmoIndex);
     new iSecondaryAmmoAmount = get_member(pPlayer, m_rgAmmo, iSecondaryAmmoIndex);
 
-    if (flInReload && flNextAttack <= 0.0) {
-        CompleteReload(this);
-    }
-
     new Float:flReloadEndTime = get_member(this, m_Weapon_flNextReload);
     if (flReloadEndTime && flReloadEndTime < get_gametime()) {
         set_member(this, m_Weapon_flNextReload, 0.0);
         ExecuteBindedFunction(CWB_Pump, this);
+    }
+
+    if (flInReload && flNextAttack <= 0.0) {
+        CompleteReload(this);
     }
 
     if ((button & IN_ATTACK2) && flNextSecondaryAttack <= 0) {
@@ -822,6 +828,7 @@ WeaponHolster(this) {
     SetWeaponPrediction(pPlayer, true);
     set_member(this, m_Weapon_fInReload, 0);
     set_member(this, m_Weapon_fInSpecialReload, 0);
+    set_member(this, m_Weapon_flNextReload, 0.0);
 
     if (ExecuteBindedFunction(CWB_Holster, this) > PLUGIN_CONTINUE) {
         return;
