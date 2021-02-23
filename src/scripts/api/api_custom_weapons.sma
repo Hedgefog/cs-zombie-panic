@@ -1365,7 +1365,6 @@ DefaultSwing(this, Float:flDamage, Float:flRate, Float:flDistance) {
 // ANCHOR: Weapon Methods
 
 CW:RegisterWeapon(iPluginId, const szName[], iWeaponId, iClipSize, iPrimaryAmmoType, iPrimaryAmmoMaxAmount, iSecondaryAmmoType, iSecondaryAmmoMaxAmount, iSlotId, iPosition, iWeaponFlags, const szIcon[], CW_Flags:iFlags) {
-    log_amx("szIcon %s", szIcon);
     new CW:iHandler = CreateWeaponData(szName);
     SetData(iHandler, CW_Data_PluginId, iPluginId);
     SetStringData(iHandler, CW_Data_Name, szName);
