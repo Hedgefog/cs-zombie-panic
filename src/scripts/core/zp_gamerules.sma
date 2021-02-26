@@ -343,6 +343,11 @@ CheckWinConditions(pIgnorePlayer = 0) {
             continue;
         }
 
+        new iTeam = get_member(pPlayer, m_iTeam);
+        if (iTeam != ZP_HUMAN_TEAM && iTeam != ZP_ZOMBIE_TEAM) {
+            continue;
+        }
+
         if (ZP_Player_IsZombie(pPlayer)) {
             iZombieCount++;
 
