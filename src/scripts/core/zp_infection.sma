@@ -63,6 +63,7 @@ public plugin_init() {
     RegisterHam(Ham_TraceAttack, "player", "OnPlayerTraceAttack", .Post = 0);
     RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage", .Post = 0);
     RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage_Post", .Post = 0);
+    RegisterHam(Ham_BloodColor, "player", "OnPlayerBloodColor", .Post = 0);
 
     g_pCvarInfectionChance = register_cvar("zp_infection_chance", "10");
 
@@ -243,6 +244,15 @@ public OnPlayerTakeDamage_Post(pPlayer, pInflictor, pAttacker) {
     }
 
     return HAM_HANDLED;
+}
+
+public OnPlayerBloodColor(pPlayer) {
+    if (g_iPlayerInfectionState[pPlayer] < InfectionState_PartialZombie) {
+        return HAM_IGNORED;
+    }
+
+    SetHamReturnInteger(-1);
+    return HAM_SUPERCEDE;
 }
 
 bool:SetInfected(pPlayer, bool:bValue, pInfector = 0) {
