@@ -68,39 +68,15 @@ public @Weapon_Idle(this) {
 }
 
 public @Weapon_PrimaryAttack(this) {
-    new pPlayer = CW_GetPlayer(this);
-    new pHit = CW_DefaultSwing(this, 25.0, 0.5, 38.0);
-    CW_PlayAnimation(this, 4, 0.25);
-
-    if (pHit < 0) {
-        switch (random(3)) {
-            case 0: CW_PlayAnimation(this, 4, 11.0 / 22.0);
-            case 1: CW_PlayAnimation(this, 5, 14.0 / 22.0);
-            case 2: CW_PlayAnimation(this, 7, 19.0 / 24.0);
-        }
-
-        emit_sound(pPlayer, CHAN_ITEM, ZP_WEAPON_CROWBAR_MISS_SOUND, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-    } else {
-        switch (random(3)) {
-            case 0: CW_PlayAnimation(this, 3, 11.0 / 22.0);
-            case 1: CW_PlayAnimation(this, 6, 14.0 / 22.0);
-            case 2: CW_PlayAnimation(this, 8, 19.0 / 24.0);
-        }
-
-        if (UTIL_IsPlayer(pHit)) {
-            emit_sound(pPlayer, CHAN_ITEM, ZP_WEAPON_CROWBAR_HITBODY_SOUNDS[random(sizeof(ZP_WEAPON_CROWBAR_HITBODY_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-        } else {
-            emit_sound(pPlayer, CHAN_ITEM, ZP_WEAPON_CROWBAR_HIT_SOUNDS[random(sizeof(ZP_WEAPON_CROWBAR_HIT_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-        }
-    }
-
+    Swing(this);
     set_member(this, m_Weapon_flNextSecondaryAttack, 0.5);
 }
 
 public @Weapon_SecondaryAttack(this) {
     new pPlayer = CW_GetPlayer(this);
     if (is_user_bot(pPlayer)) {
-        CW_PrimaryAttack(this);
+        Swing(this);
+        set_member(this, m_Weapon_flNextSecondaryAttack, 0.5);
     }
 }
 
@@ -145,4 +121,33 @@ public OnPlayerTakeDamage_Post(this, pInflictor, pAttacker) {
     UTIL_PlayerKnockback(this, pAttacker, 150.0);
 
     return HAM_HANDLED;
+}
+
+
+Swing(this) {
+    new pPlayer = CW_GetPlayer(this);
+    new pHit = CW_DefaultSwing(this, 25.0, 0.5, 38.0);
+    CW_PlayAnimation(this, 4, 0.25);
+
+    if (pHit < 0) {
+        switch (random(3)) {
+            case 0: CW_PlayAnimation(this, 4, 11.0 / 22.0);
+            case 1: CW_PlayAnimation(this, 5, 14.0 / 22.0);
+            case 2: CW_PlayAnimation(this, 7, 19.0 / 24.0);
+        }
+
+        emit_sound(pPlayer, CHAN_ITEM, ZP_WEAPON_CROWBAR_MISS_SOUND, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    } else {
+        switch (random(3)) {
+            case 0: CW_PlayAnimation(this, 3, 11.0 / 22.0);
+            case 1: CW_PlayAnimation(this, 6, 14.0 / 22.0);
+            case 2: CW_PlayAnimation(this, 8, 19.0 / 24.0);
+        }
+
+        if (UTIL_IsPlayer(pHit)) {
+            emit_sound(pPlayer, CHAN_ITEM, ZP_WEAPON_CROWBAR_HITBODY_SOUNDS[random(sizeof(ZP_WEAPON_CROWBAR_HITBODY_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+        } else {
+            emit_sound(pPlayer, CHAN_ITEM, ZP_WEAPON_CROWBAR_HIT_SOUNDS[random(sizeof(ZP_WEAPON_CROWBAR_HIT_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+        }
+    }
 }
