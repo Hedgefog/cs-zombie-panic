@@ -90,6 +90,10 @@ public OnPlayerPreThink_Post(pPlayer) {
 
     new pPrevAimItem = g_pPlayerAimItem[pPlayer];
     g_pPlayerAimItem[pPlayer] = -1;
+
+    if (!is_user_alive(pPlayer)) {
+        return HAM_IGNORED;
+    }
     
     if (ZP_Player_IsZombie(pPlayer)) {
         return HAM_IGNORED;
