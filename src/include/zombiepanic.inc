@@ -1,4 +1,17 @@
 /*
+    1.2.1
+        Additions and improvements:
+            Removed default pain sound
+            Infected players no longer bleed
+            Increased fade in time for win message
+
+        Cvars:
+            zombiepanic_version cvar is now visible for monitoring
+
+        Fixes:
+            Fixed win conditions for spectators
+            Fixed death sound for infected players
+
     1.2.0
         Additions and improvements:
             Reduced crowbar damage to 25
