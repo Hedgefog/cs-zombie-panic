@@ -116,7 +116,7 @@ public OnPlayerSpawn_Post(pPlayer) {
 }
 
 public OnPlayerKilled_Post(pPlayer) {
-    PlayVoiceFromCharacterData(pPlayer, ZP_Player_IsZombie(pPlayer) ? Character_ZombieDeathSounds : Character_HumanDeathSounds);
+    PlayVoiceFromCharacterData(pPlayer, ZP_Player_IsZombie(pPlayer) && !ZP_Player_IsInfected(pPlayer) ? Character_ZombieDeathSounds : Character_HumanDeathSounds);
     return HAM_HANDLED;
 }
 

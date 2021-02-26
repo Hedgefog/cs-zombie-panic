@@ -275,9 +275,9 @@ bool:SetInfected(pPlayer, bool:bValue, pInfector = 0) {
 }
 
 bool:IsPlayerInfected(pPlayer) {
-    if (ZP_Player_IsZombie(pPlayer)) {
-        return false;
-    }
+    // if (ZP_Player_IsZombie(pPlayer)) {
+    //     return false;
+    // }
 
     return g_iPlayerInfectionState[pPlayer] > InfectionState_None;
 }
