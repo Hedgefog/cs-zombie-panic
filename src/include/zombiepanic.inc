@@ -4,6 +4,7 @@
             Removed default pain sound
             Infected players no longer bleed
             Increased fade in time for win message
+            Increased objective mark max velocity
 
         Cvars:
             zombiepanic_version cvar is now visible for monitoring
