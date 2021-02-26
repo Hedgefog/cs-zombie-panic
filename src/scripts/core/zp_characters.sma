@@ -61,6 +61,7 @@ public plugin_init() {
 
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
     RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
+    RegisterHam(Ham_PainSound, "player", "OnPlayerPainSound_Post", .Post = 1);
     RegisterHam(Ham_Item_Deploy, "weapon_knife", "OnKnifeDeploy_Post", .Post = 1);
 
     register_forward(FM_SetClientKeyValue, "OnSetClientKeyValue");
@@ -118,6 +119,10 @@ public OnPlayerSpawn_Post(pPlayer) {
 public OnPlayerKilled_Post(pPlayer) {
     PlayVoiceFromCharacterData(pPlayer, ZP_Player_IsZombie(pPlayer) && !ZP_Player_IsInfected(pPlayer) ? Character_ZombieDeathSounds : Character_HumanDeathSounds);
     return HAM_HANDLED;
+}
+
+public OnPlayerPainSound_Post(pPlayer) {
+    emit_sound(pPlayer, CHAN_VOICE, "common/null.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 }
 
 public OnKnifeDeploy_Post(pKnife) {
