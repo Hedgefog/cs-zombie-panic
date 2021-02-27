@@ -4,6 +4,7 @@
 #include <fakemeta>
 #include <hamsandwich>
 #include <reapi>
+#include <xs>
 
 #include <api_custom_entities>
 
@@ -31,14 +32,18 @@ public plugin_precache() {
 }
 
 public OnSpawn(pEntity) {
-    new iAmmoHandler = ZP_Ammo_GetHandler(ZP_AMMO_TYPE);
-    new iAmount = ZP_Ammo_GetPackSize(iAmmoHandler) * 5;
+    if (UTIL_CanItemRespawn(pEntity)) {
+        new iAmmoHandler = ZP_Ammo_GetHandler(ZP_AMMO_TYPE);
+        new iAmount = ZP_Ammo_GetPackSize(iAmmoHandler) * 5;
 
-    new pWeaponBox = UTIL_CreateZpAmmoBox(iAmmoHandler, iAmount);
-    engfunc(EngFunc_SetModel, pWeaponBox, AMMO_BOX_MODEL);
-    UTIL_InitWithSpawner(pWeaponBox, pEntity);
+        new pWeaponBox = UTIL_CreateZpAmmoBox(iAmmoHandler, iAmount);
+        engfunc(EngFunc_SetModel, pWeaponBox, AMMO_BOX_MODEL);
+        UTIL_InitWithSpawner(pWeaponBox, pEntity);
 
-    set_pev(pWeaponBox, pev_owner, pEntity);
+        set_pev(pWeaponBox, pev_owner, pEntity);
+    } else {
+        CE_Kill(pEntity);
+    }
 }
 
 public OnWeaponBoxTouch_Post(pEntity) {

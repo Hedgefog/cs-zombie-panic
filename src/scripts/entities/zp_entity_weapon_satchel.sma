@@ -4,6 +4,8 @@
 #include <amxmodx>
 #include <fakemeta>
 #include <hamsandwich>
+#include <reapi>
+#include <xs>
 
 #include <api_custom_weapons>
 #include <api_custom_entities>
@@ -35,8 +37,12 @@ public plugin_precache() {
 }
 
 public OnSpawn(pEntity) {
-    new pWeaponBox = CW_SpawnWeaponBox(g_iCwHandler);
-    UTIL_InitWithSpawner(pWeaponBox, pEntity);
+    if (UTIL_CanItemRespawn(pEntity)) {
+        new pWeaponBox = CW_SpawnWeaponBox(g_iCwHandler);
+        UTIL_InitWithSpawner(pWeaponBox, pEntity);
+    } else {
+        CE_Kill(pEntity);
+    }
 }
 
 public OnWeaponBoxTouch_Post(pEntity) {

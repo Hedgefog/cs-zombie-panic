@@ -199,3 +199,32 @@ stock UTIL_SetupSpawnerRespawn(pEntity) {
         CE_Kill(pOwner);
     }
 }
+
+stock UTIL_CanItemRespawn(pSpawner) {
+    new Float:vecOrigin[3];
+    pev(pSpawner, pev_origin, vecOrigin);
+
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
+        if (!is_user_connected(pPlayer)) {
+            continue;
+        }
+
+        if (!is_user_alive(pPlayer)) {
+            continue;
+        }
+
+        new iTeam = get_member(pPlayer, m_iTeam);
+        if (iTeam != ZP_HUMAN_TEAM) {
+            continue;
+        }
+
+        static Float:vecPlayerOrigin[3];
+        pev(pPlayer, pev_origin, vecPlayerOrigin);
+
+        if (xs_vec_distance(vecOrigin, vecPlayerOrigin) <= 512.0) {
+            return false;
+        }
+    }
+
+    return true;
+}
