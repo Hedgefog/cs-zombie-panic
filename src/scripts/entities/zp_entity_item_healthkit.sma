@@ -39,6 +39,8 @@ public OnSpawn_Post(pEntity) {
     set_pev(pEntity, pev_solid, SOLID_TRIGGER);
     set_pev(pEntity, pev_effects, pev(pEntity, pev_effects) & ~EF_NODRAW);
 
+    SetThink(pEntity, "");
+
     return HAM_HANDLED;
 }
 
@@ -73,11 +75,19 @@ public OnTouch(pEntity, pToucher) {
                 }
 
                 emit_sound(pToucher, CHAN_ITEM, "items/smallmedkit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+                SetThink(pEntity, "RespawnThink");
+                set_pev(pEntity, pev_nextthink, get_gametime() + ZP_ITEMS_RESPAWN_TIME);
             }
         }
     }
 
     return HAM_SUPERCEDE;
+}
+
+public RespawnThink(pEntity) {
+    dllfunc(DLLFunc_Spawn, pEntity);
+    SetThink(pEntity, "");
 }
 
 public Round_Fw_NewRound() {

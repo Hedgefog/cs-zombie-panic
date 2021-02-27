@@ -80,6 +80,22 @@ stock UTIL_CreateAmmoBox(iAmmoId, iAmount) {
     return pWeaponBox;
 }
 
+stock UTIL_CreateZpAmmoBox(iAmmoHandler, iAmount = 0) {
+    static szModel[64];
+    ZP_Ammo_GetPackModel(iAmmoHandler, szModel, charsmax(szModel));
+
+    if (!iAmount) {
+        iAmount = ZP_Ammo_GetPackSize(iAmmoHandler);
+    }
+
+    new iAmmoId = ZP_Ammo_GetId(iAmmoHandler);
+
+    new pWeaponBox = UTIL_CreateAmmoBox(iAmmoId, iAmount);
+    engfunc(EngFunc_SetModel, pWeaponBox, szModel);
+
+    return pWeaponBox;
+}
+
 stock UTIL_BeamPoints(const Float:vecStart[3], const Float:vecEnd[3], const color[3], iLifetime = 30) {
     message_begin(MSG_BROADCAST ,SVC_TEMPENTITY);
     write_byte(TE_BEAMPOINTS);
@@ -114,34 +130,34 @@ stock bool:UTIL_IsMasterTriggered(const szMaster[], pActivator) {
 }
 
 stock UTIL_CalculateWeaponSpread(pWeapon, const Float:vecSpread[3], Float:flMovementFactor, Float:flFirstShotModifier, Float:flDuckFactor, Float:flAirFactor, Float:vecOut[3]) {
-  new pPlayer = get_member(pWeapon, m_pPlayer);
-  new iShotsFired = get_member(pWeapon, m_Weapon_iShotsFired);
-  new iPlayerFlags = pev(pPlayer, pev_flags);
+    new pPlayer = get_member(pWeapon, m_pPlayer);
+    new iShotsFired = get_member(pWeapon, m_Weapon_iShotsFired);
+    new iPlayerFlags = pev(pPlayer, pev_flags);
 
-  xs_vec_copy(vecSpread, vecOut);
-  
-  static Float:vecVelocity[3];
-  pev(pPlayer, pev_velocity, vecVelocity);
-  if (xs_vec_len(vecVelocity) > 0) {
-    if (iShotsFired == 0) {
-      flMovementFactor *= flFirstShotModifier;
+    xs_vec_copy(vecSpread, vecOut);
+    
+    static Float:vecVelocity[3];
+    pev(pPlayer, pev_velocity, vecVelocity);
+    if (xs_vec_len(vecVelocity) > 0) {
+        if (iShotsFired == 0) {
+        flMovementFactor *= flFirstShotModifier;
+        }
+
+        xs_vec_mul_scalar(vecOut, flMovementFactor, vecOut);
     }
 
-    xs_vec_mul_scalar(vecOut, flMovementFactor, vecOut);
-  }
+    if (iPlayerFlags & FL_DUCKING) {
+        xs_vec_mul_scalar(vecOut, flDuckFactor, vecOut);
+    }
 
-  if (iPlayerFlags & FL_DUCKING) {
-    xs_vec_mul_scalar(vecOut, flDuckFactor, vecOut);
-  }
-
-  if (~iPlayerFlags & FL_ONGROUND) {
-    xs_vec_mul_scalar(vecOut, flAirFactor, vecOut);
-  }
+    if (~iPlayerFlags & FL_ONGROUND) {
+        xs_vec_mul_scalar(vecOut, flAirFactor, vecOut);
+    }
 }
 
 stock bool:UTIL_IsPlayerSpectator(pPlayer) {
-  new iTeam = get_member(pPlayer, m_iTeam);
-  return iTeam < 1 || iTeam > 2;
+    new iTeam = get_member(pPlayer, m_iTeam);
+    return iTeam < 1 || iTeam > 2;
 }
 
 stock UTIL_PlayerKnockback(pVictim, pAttacker, Float:flForce) {
@@ -163,4 +179,23 @@ stock UTIL_PlayerKnockback(pVictim, pAttacker, Float:flForce) {
     }
 
     set_pev(pVictim, pev_velocity, vecVelocity);
+}
+
+stock UTIL_InitWithSpawner(pEntity, pSpawner) {
+    new Float:vecOrigin[3];
+    pev(pSpawner, pev_origin, vecOrigin);
+
+    new Float:vecAngles[3];
+    pev(pSpawner, pev_angles, vecAngles);
+
+    engfunc(EngFunc_SetOrigin, pEntity, vecOrigin);
+    set_pev(pEntity, pev_angles, vecAngles);
+    set_pev(pEntity, pev_owner, pSpawner);
+}
+
+stock UTIL_SetupSpawnerRespawn(pEntity) {
+    new pOwner = pev(pEntity, pev_owner);
+    if (pev_valid(pOwner) && CE_GetHandlerByEntity(pOwner) != -1) {
+        CE_Kill(pOwner);
+    }
 }
