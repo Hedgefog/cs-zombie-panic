@@ -70,6 +70,10 @@ public OnPlayerKilled_Post(pPlayer) {
 }
 
 SetupRespawnTask(pPlayer) {
+    if (ZP_GameRules_IsCompetitive() && !ZP_Player_IsZombie(pPlayer)) {
+        return;
+    }
+
     remove_task(TASKID_PLAYER_RESPAWN + pPlayer);
     set_task(get_pcvar_float(g_pCvarRespawnTime), "Task_RespawnPlayer", TASKID_PLAYER_RESPAWN + pPlayer);
 }

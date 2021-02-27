@@ -257,6 +257,10 @@ public OnPlayerBloodColor(pPlayer) {
 
 bool:SetInfected(pPlayer, bool:bValue, pInfector = 0) {
     if (bValue) {
+        if (ZP_GameRules_IsCompetitive()) {
+            return false;
+        }
+
         if (IsPlayerInfected(pPlayer)) {
             return false;
         }

@@ -28,6 +28,7 @@ enum TeamPreference {
 
 new g_pCvarLives;
 new g_pCvarLivesPerPlayer;
+new g_pCvarCompetitive;
 
 new g_pFwPlayerJoined;
 new g_iFwResult;
@@ -58,6 +59,7 @@ public plugin_init() {
 
     g_pCvarLives = register_cvar("zp_zombie_lives", "0");
     g_pCvarLivesPerPlayer = register_cvar("zp_zombie_lives_per_player", "2");
+    g_pCvarCompetitive = register_cvar("zp_competitive", "0");
 
     g_pFwPlayerJoined = CreateMultiForward("ZP_Fw_PlayerJoined", ET_IGNORE, FP_CELL);
 
@@ -69,6 +71,7 @@ public plugin_natives() {
     register_native("ZP_GameRules_GetObjectiveMode", "Native_GetObjectiveMode");
     register_native("ZP_GameRules_SetObjectiveMode", "Native_SetObjectiveMode");
     register_native("ZP_GameRules_CanItemRespawn", "Native_CanItemRespawn");
+    register_native("ZP_GameRules_IsCompetitive", "Native_IsCompetitive");
 }
 
 /*--------------------------------[ Natives ]--------------------------------*/
@@ -86,6 +89,9 @@ public bool:Native_GetObjectiveMode(iPluginId, iArgc) {
     return g_bObjectiveMode;
 }
 
+public bool:Native_IsCompetitive(iPluginId, iArgc) {
+    return !!get_pcvar_num(g_pCvarCompetitive);
+}
 
 public bool:Native_CanItemRespawn(iPluginId, iArgc) {
     new pItem = get_param(1);
@@ -271,7 +277,8 @@ DistributeTeams() {
         log_amx("Respawned %d zombies", iZombieCount);
     }
 
-    new iRequiredZombieCount = floatround(float(pPlayerCount) / PLAYERS_PER_ZOMBIE, floatround_ceil);
+    new iPlayersPerZombie = get_pcvar_num(g_pCvarCompetitive) ? 2 : PLAYERS_PER_ZOMBIE;
+    new iRequiredZombieCount = floatround(float(pPlayerCount) / iPlayersPerZombie, floatround_ceil);
     if (iZombieCount < iRequiredZombieCount) {
         if (pPlayerCount > 1) {
             log_amx("Not enough zombies, a random players will be moved to the zombie team...");

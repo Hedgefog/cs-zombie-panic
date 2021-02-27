@@ -56,7 +56,11 @@ Update(pPlayer, pTargetPlayer) {
     new iScore = get_user_frags(pTargetPlayer);
     new iDeaths = ZP_Player_IsZombie(pPlayer) || pTargetPlayer == pPlayer ? get_member(pTargetPlayer, m_iDeaths) : 0;
     new iClassId = 0;
-    new bool:bShowTeam = ZP_Player_IsZombie(pPlayer) || is_user_bot(pPlayer) || UTIL_IsPlayerSpectator(pPlayer);
+    new bool:bShowTeam = ZP_Player_IsZombie(pPlayer)
+        || ZP_GameRules_IsCompetitive()
+        || is_user_bot(pPlayer)
+        || UTIL_IsPlayerSpectator(pPlayer);
+
     new iTeam = bShowTeam ? get_member(pTargetPlayer, m_iTeam) : get_member(pPlayer, m_iTeam);
 
     SendMessage(pPlayer, pTargetPlayer, iScore, iDeaths, iClassId, iTeam);

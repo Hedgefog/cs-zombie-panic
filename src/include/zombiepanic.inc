@@ -8,9 +8,11 @@
             Weapons and items are now respawnable
             Reduced pickups respawn time
             Pickups will no longer respawn when players are nearby
+            Added competitive mode
 
         Cvars:
             zombiepanic_version cvar is now visible for monitoring
+            Added zp_competitive cvar
 
         Fixes:
             Fixed win conditions for spectators
@@ -123,6 +125,7 @@ native ZP_GameRules_SetZombieLives(iLives);
 native ZP_GameRules_RespawnAsZombie(pPlayer);
 native ZP_GameRules_DispatchWin(iTeam);
 native ZP_GameRules_CanItemRespawn(pItem);
+native ZP_GameRules_IsCompetitive();
 
 // Map Info
 

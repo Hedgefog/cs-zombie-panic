@@ -48,7 +48,7 @@ public OnMessage(iMsgId, iDest, pPlayer) {
 
     g_statusValue[iFlag] = iValue;
 
-    if (g_statusValue[StatusValueFlag_IsTeammate] == 2) {
+    if (!ZP_GameRules_IsCompetitive() && g_statusValue[StatusValueFlag_IsTeammate] == 2) {
         return PLUGIN_HANDLED;
     }
 
