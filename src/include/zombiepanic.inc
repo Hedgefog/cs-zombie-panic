@@ -9,6 +9,7 @@
             Reduced pickups respawn time
             Pickups will no longer respawn when players are nearby
             Added competitive mode
+            Reduced 556ar spread
 
         Cvars:
             zombiepanic_version cvar is now visible for monitoring

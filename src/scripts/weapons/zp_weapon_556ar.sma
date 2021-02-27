@@ -60,7 +60,7 @@ public @Weapon_Idle(this) {
 
 public @Weapon_PrimaryAttack(this) {
     static Float:vecSpread[3];
-    UTIL_CalculateWeaponSpread(this, Float:VECTOR_CONE_5DEGREES, 1.1125, 0.5, 0.95, 3.5, vecSpread);
+    UTIL_CalculateWeaponSpread(this, Float:VECTOR_CONE_3DEGREES, 1.1125, 0.5, 0.95, 3.5, vecSpread);
 
     if (CW_DefaultShot(this, 26.0, 0.85, 0.095, Float:vecSpread)) {
         CW_PlayAnimation(this, 5 + random(3), 0.7);
