@@ -4,8 +4,6 @@
 #include <amxmodx>
 #include <fakemeta>
 #include <hamsandwich>
-#include <reapi>
-#include <xs>
 
 #include <api_custom_entities>
 #include <api_custom_weapons>
@@ -37,7 +35,7 @@ public plugin_precache() {
 }
 
 public OnSpawn(pEntity) {
-    if (UTIL_CanItemRespawn(pEntity)) {
+    if (ZP_GameRules_CanItemRespawn(pEntity)) {
         new pWeaponBox = CW_SpawnWeaponBox(g_iCwHandler);
         UTIL_InitWithSpawner(pWeaponBox, pEntity);
     } else {

@@ -122,6 +122,7 @@ native ZP_GameRules_GetZombieLives();
 native ZP_GameRules_SetZombieLives(iLives);
 native ZP_GameRules_RespawnAsZombie(pPlayer);
 native ZP_GameRules_DispatchWin(iTeam);
+native ZP_GameRules_CanItemRespawn(pItem);
 
 // Map Info
 

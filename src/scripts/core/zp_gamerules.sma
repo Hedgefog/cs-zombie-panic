@@ -5,6 +5,7 @@
 #include <hamsandwich>
 #include <fun>
 #include <reapi>
+#include <xs>
 
 #include <api_rounds>
 
@@ -67,6 +68,7 @@ public plugin_natives() {
     register_native("ZP_GameRules_DispatchWin", "Native_DispatchWin");
     register_native("ZP_GameRules_GetObjectiveMode", "Native_GetObjectiveMode");
     register_native("ZP_GameRules_SetObjectiveMode", "Native_SetObjectiveMode");
+    register_native("ZP_GameRules_CanItemRespawn", "Native_CanItemRespawn");
 }
 
 /*--------------------------------[ Natives ]--------------------------------*/
@@ -82,6 +84,39 @@ public Native_SetObjectiveMode(iPluginId, iArgc) {
 
 public bool:Native_GetObjectiveMode(iPluginId, iArgc) {
     return g_bObjectiveMode;
+}
+
+
+public bool:Native_CanItemRespawn(iPluginId, iArgc) {
+    new pItem = get_param(1);
+
+    if (get_gametime() - Float:get_member_game(m_fRoundStartTime) <= 1.0) {
+        return true;
+    }
+
+    new Float:vecOrigin[3];
+    pev(pItem, pev_origin, vecOrigin);
+
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
+        if (!is_user_connected(pPlayer)) {
+            continue;
+        }
+
+        if (!is_user_alive(pPlayer)) {
+            continue;
+        }
+
+        new Float:flMinRange = ZP_Player_IsZombie(pPlayer) ? 256.0 :  512.0;
+
+        static Float:vecPlayerOrigin[3];
+        pev(pPlayer, pev_origin, vecPlayerOrigin);
+
+        if (xs_vec_distance(vecOrigin, vecPlayerOrigin) <= flMinRange) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 /*--------------------------------[ Forwards ]--------------------------------*/

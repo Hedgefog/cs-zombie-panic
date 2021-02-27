@@ -42,7 +42,7 @@ public OnSpawn_Post(pEntity) {
 
     SetThink(pEntity, "");
 
-    if (!UTIL_CanItemRespawn(pEntity)) {
+    if (!ZP_GameRules_CanItemRespawn(pEntity)) {
         Kill(pEntity);
     }
 

@@ -202,32 +202,3 @@ stock UTIL_SetupSpawnerRespawn(pEntity) {
     }
 }
 
-stock UTIL_CanItemRespawn(pSpawner) {
-    if (get_gametime() - Float:get_member_game(m_fRoundStartTime) <= 1.0) {
-        return true;
-    }
-
-    new Float:vecOrigin[3];
-    pev(pSpawner, pev_origin, vecOrigin);
-
-    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
-        if (!is_user_connected(pPlayer)) {
-            continue;
-        }
-
-        if (!is_user_alive(pPlayer)) {
-            continue;
-        }
-
-        new Float:flMinRange = ZP_Player_IsZombie(pPlayer) ? 256.0 :  512.0;
-
-        static Float:vecPlayerOrigin[3];
-        pev(pPlayer, pev_origin, vecPlayerOrigin);
-
-        if (xs_vec_distance(vecOrigin, vecPlayerOrigin) <= flMinRange) {
-            return false;
-        }
-    }
-
-    return true;
-}
