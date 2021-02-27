@@ -184,12 +184,12 @@ stock UTIL_PlayerKnockback(pVictim, pAttacker, Float:flForce) {
 stock UTIL_InitWithSpawner(pEntity, pSpawner) {
     new Float:vecOrigin[3];
     pev(pSpawner, pev_origin, vecOrigin);
+    engfunc(EngFunc_SetOrigin, pEntity, vecOrigin);
 
     new Float:vecAngles[3];
     pev(pSpawner, pev_angles, vecAngles);
-
-    engfunc(EngFunc_SetOrigin, pEntity, vecOrigin);
     set_pev(pEntity, pev_angles, vecAngles);
+
     set_pev(pEntity, pev_owner, pSpawner);
 }
 
