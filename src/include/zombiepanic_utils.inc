@@ -219,15 +219,12 @@ stock UTIL_CanItemRespawn(pSpawner) {
             continue;
         }
 
-        new iTeam = get_member(pPlayer, m_iTeam);
-        if (iTeam != ZP_HUMAN_TEAM) {
-            continue;
-        }
+        new Float:flMinRange = ZP_Player_IsZombie(pPlayer) ? 256.0 :  512.0;
 
         static Float:vecPlayerOrigin[3];
         pev(pPlayer, pev_origin, vecPlayerOrigin);
 
-        if (xs_vec_distance(vecOrigin, vecPlayerOrigin) <= 512.0) {
+        if (xs_vec_distance(vecOrigin, vecPlayerOrigin) <= flMinRange) {
             return false;
         }
     }

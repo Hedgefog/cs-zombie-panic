@@ -7,7 +7,7 @@
             Increased objective mark max velocity
             Weapons and items are now respawnable
             Reduced pickups respawn time
-            Pickups will no longer respawn when survivors are nearby
+            Pickups will no longer respawn when players are nearby
 
         Cvars:
             zombiepanic_version cvar is now visible for monitoring
