@@ -5,6 +5,8 @@
             Infected players no longer bleed
             Increased fade in time for win message
             Increased objective mark max velocity
+            Weapons and items are now respawnable
+            Reduced pickups respawn time
 
         Cvars:
             zombiepanic_version cvar is now visible for monitoring
