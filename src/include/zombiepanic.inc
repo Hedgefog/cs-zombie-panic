@@ -1,5 +1,5 @@
 /*
-    1.2.1
+    1.3.0
         Additions and improvements:
             Removed default pain sound
             Infected players no longer bleed
