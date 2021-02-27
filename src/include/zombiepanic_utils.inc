@@ -201,6 +201,10 @@ stock UTIL_SetupSpawnerRespawn(pEntity) {
 }
 
 stock UTIL_CanItemRespawn(pSpawner) {
+    if (get_gametime() - Float:get_member_game(m_fRoundStartTime) <= 1.0) {
+        return true;
+    }
+
     new Float:vecOrigin[3];
     pev(pSpawner, pev_origin, vecOrigin);
 
