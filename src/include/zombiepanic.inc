@@ -18,6 +18,7 @@
             Fixed win conditions for spectators
             Fixed death sound for infected players
             Fixed melee secondary attack for bots
+            Fixed first shot spread calculation
 
     1.2.0
         Additions and improvements:
