@@ -191,6 +191,8 @@ stock UTIL_InitWithSpawner(pEntity, pSpawner) {
     set_pev(pEntity, pev_angles, vecAngles);
 
     set_pev(pEntity, pev_owner, pSpawner);
+
+    engfunc(EngFunc_DropToFloor, pEntity);
 }
 
 stock UTIL_SetupSpawnerRespawn(pEntity) {
