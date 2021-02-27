@@ -15,7 +15,7 @@ new g_iFwResult;
 new g_pCvarVersion;
 
 public plugin_precache() {
-    g_pCvarVersion = register_cvar("zombiepanic_version", ZP_VERSION, FCVAR_SERVER | FCVAR_EXTDLL | FCVAR_SPONLY);
+    g_pCvarVersion = register_cvar("zombiepanic_version", ZP_VERSION, FCVAR_SERVER);
     hook_cvar_change(g_pCvarVersion, "OnVersionCvarChange");
 
     for (new i = 0; i < sizeof(ZP_HUD_SPRITES); ++i) {
