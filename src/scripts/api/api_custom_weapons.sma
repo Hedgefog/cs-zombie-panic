@@ -88,6 +88,9 @@ new const g_rgszWeaponNames[CSW_LAST_WEAPON + 1][] = {
     "weapon_p90"
 };
 
+new gmsgWeaponList;
+new gmsgDeathMsg;
+
 new g_iszWeaponNames[CSW_LAST_WEAPON + 1];
 new bool:g_bWeaponHooks[CSW_LAST_WEAPON + 1];
 new g_weaponListDefaults[CSW_LAST_WEAPON + 1][WeaponListMessage];
@@ -100,7 +103,6 @@ new g_iszWeaponBox;
 new g_pNewWeaponboxEnt = -1;
 new g_pKillerItem = -1;
 
-new gmsgWeaponList;
 new bool:g_bPrecache;
 
 new Array:g_irgDecals;
@@ -121,8 +123,6 @@ public plugin_precache() {
     RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage", .Post = 0);
     RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage_Post", .Post = 1);
 
-    register_message(get_user_msgid("DeathMsg"), "OnMessage_DeathMsg");
-
     precache_model(WALL_PUFF_SPRITE);
 }
 
@@ -132,8 +132,10 @@ public plugin_init() {
     register_plugin(PLUGIN, VERSION, AUTHOR);
 
     gmsgWeaponList = get_user_msgid("WeaponList");
+    gmsgDeathMsg = get_user_msgid("DeathMsg");
 
     register_message(gmsgWeaponList, "OnMessage_WeaponList");
+    register_message(gmsgDeathMsg, "OnMessage_DeathMsg");
 
     InitWeaponHooks();
 }
