@@ -304,6 +304,7 @@ TransformPlayer(pPlayer) {
 
     ExecuteForward(g_pFwTransformationDeath, g_iFwResult, pPlayer);
     ExecuteHamB(Ham_Killed, pPlayer, g_pPlayerInfector[pPlayer], 0);
+    emit_sound(pPlayer, CHAN_VOICE, "common/null.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 }
 
 EndPlayerTransformation(pPlayer) {
