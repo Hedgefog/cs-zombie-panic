@@ -21,6 +21,7 @@
             Fixed melee secondary attack for bots
             Fixed first shot spread calculation
             Fixed death sound on transformation
+            Fixed death message icons
 
     1.2.0
         Additions and improvements:
