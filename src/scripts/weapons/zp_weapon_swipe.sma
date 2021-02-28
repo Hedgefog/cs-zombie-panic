@@ -50,41 +50,15 @@ public plugin_init() {
 }
 
 public @Weapon_PrimaryAttack(this) {
-    new pPlayer = CW_GetPlayer(this);
-
-    if (random(2) == 0) {
-        set_member(pPlayer, m_szAnimExtention, "grenade");
-    } else {
-        set_member(pPlayer, m_szAnimExtention, "shieldgren");
-    }
-
-    new pHit = CW_DefaultSwing(this, 25.0, 0.5, 36.0);
-
-    if (pHit < 0) {
-        switch (random(3)) {
-            case 0: CW_PlayAnimation(this, 4, 11.0 / 22.0);
-            case 1: CW_PlayAnimation(this, 5, 14.0 / 22.0);
-            case 2: CW_PlayAnimation(this, 7, 19.0 / 24.0);
-        }
-
-        emit_sound(pPlayer, CHAN_ITEM, ZP_WEAPON_SWIPE_MISS_SOUNDS[random(sizeof(ZP_WEAPON_SWIPE_MISS_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-    } else {
-        switch (random(3)) {
-            case 0: CW_PlayAnimation(this, 3, 11.0 / 22.0);
-            case 1: CW_PlayAnimation(this, 6, 14.0 / 22.0);
-            case 2: CW_PlayAnimation(this, 8, 19.0 / 24.0);
-        }
-
-        emit_sound(pPlayer, CHAN_ITEM, ZP_WEAPON_SWIPE_HIT_SOUNDS[random(sizeof(ZP_WEAPON_SWIPE_HIT_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-    }
-
+    Swing(this);
     set_member(this, m_Weapon_flNextSecondaryAttack, 0.5);
 }
 
 public @Weapon_SecondaryAttack(this) {
     new pPlayer = CW_GetPlayer(this);
     if (is_user_bot(pPlayer)) {
-        CW_PrimaryAttack(this);
+        Swing(this);
+        set_member(this, m_Weapon_flNextSecondaryAttack, 0.5);
     }
 }
 
@@ -141,6 +115,36 @@ public OnPlayerTraceAttack(this, pAttacker, Float:flDamage, Float:vecDir[3], pTr
     set_tr2(pTr, TR_iHitgroup, get_tr2(pTr, TR_iHitgroup) & ~HIT_HEAD);
 
     return HAM_HANDLED;
+}
+
+Swing(this) {
+    new pPlayer = CW_GetPlayer(this);
+
+    if (random(2) == 0) {
+        set_member(pPlayer, m_szAnimExtention, "grenade");
+    } else {
+        set_member(pPlayer, m_szAnimExtention, "shieldgren");
+    }
+
+    new pHit = CW_DefaultSwing(this, 25.0, 0.5, 36.0);
+
+    if (pHit < 0) {
+        switch (random(3)) {
+            case 0: CW_PlayAnimation(this, 4, 11.0 / 22.0);
+            case 1: CW_PlayAnimation(this, 5, 14.0 / 22.0);
+            case 2: CW_PlayAnimation(this, 7, 19.0 / 24.0);
+        }
+
+        emit_sound(pPlayer, CHAN_ITEM, ZP_WEAPON_SWIPE_MISS_SOUNDS[random(sizeof(ZP_WEAPON_SWIPE_MISS_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    } else {
+        switch (random(3)) {
+            case 0: CW_PlayAnimation(this, 3, 11.0 / 22.0);
+            case 1: CW_PlayAnimation(this, 6, 14.0 / 22.0);
+            case 2: CW_PlayAnimation(this, 8, 19.0 / 24.0);
+        }
+
+        emit_sound(pPlayer, CHAN_ITEM, ZP_WEAPON_SWIPE_HIT_SOUNDS[random(sizeof(ZP_WEAPON_SWIPE_HIT_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    }
 }
 
 UpdateZombieLives() {

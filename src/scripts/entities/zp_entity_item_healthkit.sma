@@ -4,6 +4,7 @@
 #include <hamsandwich>
 #include <fakemeta>
 #include <reapi>
+#include <xs>
 
 #include <api_rounds>
 
@@ -39,6 +40,12 @@ public OnSpawn_Post(pEntity) {
     set_pev(pEntity, pev_solid, SOLID_TRIGGER);
     set_pev(pEntity, pev_effects, pev(pEntity, pev_effects) & ~EF_NODRAW);
 
+    SetThink(pEntity, "");
+
+    if (!ZP_GameRules_CanItemRespawn(pEntity)) {
+        Kill(pEntity);
+    }
+
     return HAM_HANDLED;
 }
 
@@ -63,9 +70,6 @@ public OnTouch(pEntity, pToucher) {
                 flHealth = floatmin(flMaxHealth, flHealth + 25.0);
                 set_pev(pToucher, pev_health, flHealth);
 
-                set_pev(pEntity, pev_effects, pev(pEntity, pev_effects) | EF_NODRAW);
-                set_pev(pEntity, pev_solid, SOLID_NOT);
-
                 if (ZP_Player_IsInfected(pToucher) && !ZP_Player_IsTransforming(pToucher)) {
                     if (random(100) < get_pcvar_num(g_pCvarCureChance)) {
                         ZP_Player_SetInfected(pToucher, false);
@@ -73,6 +77,7 @@ public OnTouch(pEntity, pToucher) {
                 }
 
                 emit_sound(pToucher, CHAN_ITEM, "items/smallmedkit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+                Kill(pEntity);
             }
         }
     }
@@ -80,9 +85,21 @@ public OnTouch(pEntity, pToucher) {
     return HAM_SUPERCEDE;
 }
 
+public RespawnThink(pEntity) {
+    dllfunc(DLLFunc_Spawn, pEntity);
+    SetThink(pEntity, "");
+}
+
 public Round_Fw_NewRound() {
     new pEntity;
     while ((pEntity = engfunc(EngFunc_FindEntityByString, pEntity, "classname", ENTITY_NAME)) != 0) {
         ExecuteHamB(Ham_Spawn, pEntity);
     }
+}
+
+Kill(pEntity) {
+    set_pev(pEntity, pev_effects, pev(pEntity, pev_effects) | EF_NODRAW);
+    set_pev(pEntity, pev_solid, SOLID_NOT);
+    SetThink(pEntity, "RespawnThink");
+    set_pev(pEntity, pev_nextthink, get_gametime() + ZP_ITEMS_RESPAWN_TIME);
 }

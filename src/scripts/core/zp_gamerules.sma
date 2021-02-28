@@ -5,6 +5,7 @@
 #include <hamsandwich>
 #include <fun>
 #include <reapi>
+#include <xs>
 
 #include <api_rounds>
 
@@ -27,6 +28,7 @@ enum TeamPreference {
 
 new g_pCvarLives;
 new g_pCvarLivesPerPlayer;
+new g_pCvarCompetitive;
 
 new g_pFwPlayerJoined;
 new g_iFwResult;
@@ -57,6 +59,7 @@ public plugin_init() {
 
     g_pCvarLives = register_cvar("zp_zombie_lives", "0");
     g_pCvarLivesPerPlayer = register_cvar("zp_zombie_lives_per_player", "2");
+    g_pCvarCompetitive = register_cvar("zp_competitive", "0");
 
     g_pFwPlayerJoined = CreateMultiForward("ZP_Fw_PlayerJoined", ET_IGNORE, FP_CELL);
 
@@ -67,6 +70,8 @@ public plugin_natives() {
     register_native("ZP_GameRules_DispatchWin", "Native_DispatchWin");
     register_native("ZP_GameRules_GetObjectiveMode", "Native_GetObjectiveMode");
     register_native("ZP_GameRules_SetObjectiveMode", "Native_SetObjectiveMode");
+    register_native("ZP_GameRules_CanItemRespawn", "Native_CanItemRespawn");
+    register_native("ZP_GameRules_IsCompetitive", "Native_IsCompetitive");
 }
 
 /*--------------------------------[ Natives ]--------------------------------*/
@@ -82,6 +87,42 @@ public Native_SetObjectiveMode(iPluginId, iArgc) {
 
 public bool:Native_GetObjectiveMode(iPluginId, iArgc) {
     return g_bObjectiveMode;
+}
+
+public bool:Native_IsCompetitive(iPluginId, iArgc) {
+    return !!get_pcvar_num(g_pCvarCompetitive);
+}
+
+public bool:Native_CanItemRespawn(iPluginId, iArgc) {
+    new pItem = get_param(1);
+
+    if (get_gametime() - Float:get_member_game(m_fRoundStartTime) <= 1.0) {
+        return true;
+    }
+
+    new Float:vecOrigin[3];
+    pev(pItem, pev_origin, vecOrigin);
+
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
+        if (!is_user_connected(pPlayer)) {
+            continue;
+        }
+
+        if (!is_user_alive(pPlayer)) {
+            continue;
+        }
+
+        new Float:flMinRange = ZP_Player_IsZombie(pPlayer) ? 256.0 :  512.0;
+
+        static Float:vecPlayerOrigin[3];
+        pev(pPlayer, pev_origin, vecPlayerOrigin);
+
+        if (xs_vec_distance(vecOrigin, vecPlayerOrigin) <= flMinRange) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 /*--------------------------------[ Forwards ]--------------------------------*/
@@ -236,7 +277,8 @@ DistributeTeams() {
         log_amx("Respawned %d zombies", iZombieCount);
     }
 
-    new iRequiredZombieCount = floatround(float(pPlayerCount) / PLAYERS_PER_ZOMBIE, floatround_ceil);
+    new iPlayersPerZombie = get_pcvar_num(g_pCvarCompetitive) ? 2 : PLAYERS_PER_ZOMBIE;
+    new iRequiredZombieCount = floatround(float(pPlayerCount) / iPlayersPerZombie, floatround_ceil);
     if (iZombieCount < iRequiredZombieCount) {
         if (pPlayerCount > 1) {
             log_amx("Not enough zombies, a random players will be moved to the zombie team...");
@@ -340,6 +382,11 @@ CheckWinConditions(pIgnorePlayer = 0) {
         }
 
         if (!is_user_connected(pPlayer)) {
+            continue;
+        }
+
+        new iTeam = get_member(pPlayer, m_iTeam);
+        if (iTeam != ZP_HUMAN_TEAM && iTeam != ZP_ZOMBIE_TEAM) {
             continue;
         }
 

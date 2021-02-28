@@ -2,11 +2,13 @@
 
 #include <amxmodx>
 #include <fakemeta>
+#include <hamsandwich>
 
 #include <api_custom_weapons>
 #include <api_custom_entities>
 
 #include <zombiepanic>
+#include <zombiepanic_utils>
 
 #define PLUGIN "[Entity] weapon_shotgun"
 #define AUTHOR "Hedgehog Fog"
@@ -17,6 +19,8 @@ new CW:g_iCwHandler;
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+
+    RegisterHam(Ham_Touch, "weaponbox", "OnWeaponBoxTouch_Post", .Post = 1);
 }
 
 public plugin_precache() {
@@ -25,23 +29,21 @@ public plugin_precache() {
         return;
     }
 
-    CE_Register(
-        .szName = ENTITY_NAME,
-        .vMins = Float:{-8.0, -8.0, 0.0},
-        .vMaxs = Float:{8.0, 8.0, 8.0}
-    );
-
+    CE_Register(ENTITY_NAME, _, Float:{-8.0, -8.0, 0.0}, Float:{8.0, 8.0, 8.0}, _, ZP_WEAPONS_RESPAWN_TIME);
     CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME, "OnSpawn");
 }
 
 public OnSpawn(pEntity) {
-    new Float:vecOrigin[3];
-    pev(pEntity, pev_origin, vecOrigin);
+    if (ZP_GameRules_CanItemRespawn(pEntity)) {
+        new pWeaponBox = CW_SpawnWeaponBox(g_iCwHandler);
+        UTIL_InitWithSpawner(pWeaponBox, pEntity);
+    } else {
+        CE_Kill(pEntity);
+    }
+}
 
-    new Float:vecAngles[3];
-    pev(pEntity, pev_angles, vecAngles);
-
-    new pWeaponBox = CW_SpawnWeaponBox(g_iCwHandler);
-    engfunc(EngFunc_SetOrigin, pWeaponBox, vecOrigin);
-    set_pev(pWeaponBox, pev_angles, vecAngles);
+public OnWeaponBoxTouch_Post(pEntity) {
+    if (pev(pEntity, pev_flags) & FL_KILLME) {
+        UTIL_SetupSpawnerRespawn(pEntity);
+    }
 }

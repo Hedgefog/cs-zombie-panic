@@ -1,3 +1,5 @@
+#pragma semicolon 1
+
 #include <amxmodx>
 #include <fakemeta>
 #include <reapi>
@@ -35,7 +37,7 @@ public OnMessage_DeathMsg(iMsgId, iDest, pPlayer) {
             continue;
         }
 
-        if (!ZP_Player_IsZombie(pPlayer) && !UTIL_IsPlayerSpectator(pPlayer)) {
+        if (!ZP_GameRules_IsCompetitive() && !ZP_Player_IsZombie(pPlayer) && !UTIL_IsPlayerSpectator(pPlayer)) {
             continue;
         }
 

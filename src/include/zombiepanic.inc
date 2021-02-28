@@ -1,4 +1,28 @@
 /*
+    1.3.0
+        Additions and improvements:
+            Removed default pain sound
+            Infected players no longer bleed
+            Increased fade in time for win message
+            Increased objective mark max velocity
+            Weapons and items are now respawnable
+            Reduced pickups respawn time
+            Pickups will no longer respawn when players are nearby
+            Added competitive mode
+            Reduced 556ar spread
+
+        Cvars:
+            zombiepanic_version cvar is now visible for monitoring
+            Added zp_competitive cvar
+
+        Fixes:
+            Fixed win conditions for spectators
+            Fixed death sound for infected players
+            Fixed melee secondary attack for bots
+            Fixed first shot spread calculation
+            Fixed death sound on transformation
+            Fixed death message icons
+
     1.2.0
         Additions and improvements:
             Reduced crowbar damage to 25
@@ -104,6 +128,8 @@ native ZP_GameRules_GetZombieLives();
 native ZP_GameRules_SetZombieLives(iLives);
 native ZP_GameRules_RespawnAsZombie(pPlayer);
 native ZP_GameRules_DispatchWin(iTeam);
+native ZP_GameRules_CanItemRespawn(pItem);
+native ZP_GameRules_IsCompetitive();
 
 // Map Info
 

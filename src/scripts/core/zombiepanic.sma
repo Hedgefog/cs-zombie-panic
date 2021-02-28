@@ -15,9 +15,6 @@ new g_iFwResult;
 new g_pCvarVersion;
 
 public plugin_precache() {
-    g_pCvarVersion = register_cvar("zombiepanic_version", ZP_VERSION);
-    hook_cvar_change(g_pCvarVersion, "OnVersionCvarChange");
-
     for (new i = 0; i < sizeof(ZP_HUD_SPRITES); ++i) {
         precache_generic(ZP_HUD_SPRITES[i]);
     }
@@ -25,6 +22,9 @@ public plugin_precache() {
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+
+    g_pCvarVersion = register_cvar("zombiepanic_version", ZP_VERSION, FCVAR_SERVER);
+    hook_cvar_change(g_pCvarVersion, "OnVersionCvarChange");
 
     register_forward(FM_GetGameDescription, "OnGetGameDescription");
     

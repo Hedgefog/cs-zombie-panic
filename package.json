@@ -1,6 +1,6 @@
 {
   "name": "zombiepanic",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Zombie Panic Mod",
   "scripts": {
     "gulp": "gulp",

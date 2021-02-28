@@ -1,5 +1,5 @@
 #define ZP_TITLE "Zombie Panic"
-#define ZP_VERSION "1.2.0"
+#define ZP_VERSION "1.3.0"
 
 #define ZP_HUMAN_TEAM 2
 #define ZP_ZOMBIE_TEAM 1
@@ -11,7 +11,9 @@
 #define ZP_HUMAN_HEALTH 100.0
 #define ZP_ZOMBIE_HEALTH 200.0
 #define ZP_NEW_ROUND_DELAY 5.0
-#define ZP_AMMO_RESPAWN_TIME 150.0
+#define ZP_AMMO_RESPAWN_TIME 40.0
+#define ZP_WEAPONS_RESPAWN_TIME 60.0
+#define ZP_ITEMS_RESPAWN_TIME 60.0
 #define ZP_BUTTON_FLAG_HUMAN_ONLY BIT(9)
 
 #define ZP_MODE 1 // 1 - classic, 2 - zps
