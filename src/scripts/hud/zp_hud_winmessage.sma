@@ -60,7 +60,7 @@ public Task_WinMessage() {
             ShowWinMessage("%s have conquered...", ZP_ZOMBIE_TEAM_NAME);
         }
         case ZP_HUMAN_TEAM: {
-            ShowWinMessage("%s win!", ZP_HUMAN_TEAM_NAME);
+            ShowWinMessage("%s have survived...", ZP_HUMAN_TEAM_NAME);
         }
     }
 }
