@@ -28,7 +28,8 @@ enum CharacterData {
     Character_PanicSounds,
     Character_ZombieAmbientSounds,
     Character_ZombieDeathSounds,
-    Character_IsSelectable
+    Character_IsSelectable,
+    Character_BodyIndex
 }
 
 new gmsgClCorpse;
@@ -208,9 +209,11 @@ UpdatePlayerModel(pPlayer) {
     }
 
     new iModelIndex = engfunc(EngFunc_ModelIndex, szPlayerModel);
+    new iBody = ArrayGetCell(Array:g_rgCharactersData[Character_BodyIndex], iCharacter);
 
     set_user_info(pPlayer, "model", NULL_STRING);
     set_pev(pPlayer, pev_modelindex, iModelIndex);
+    set_pev(pPlayer, pev_body, iBody);
     set_member(pPlayer, m_modelIndexPlayer, iModelIndex);
 }
 
@@ -270,6 +273,7 @@ CreateCharacter() {
     CrateCharacterSoundsData(iCharacter, Character_ZombieDeathSounds);
 
     ArraySetCell(Array:g_rgCharactersData[Character_IsSelectable], iCharacter, true);
+    ArraySetCell(Array:g_rgCharactersData[Character_BodyIndex], iCharacter, 0);
 
     g_iCharacterCount++;
 
@@ -345,6 +349,10 @@ LoadCharacter(const szName[]) {
         ArraySetCell(Array:g_rgCharactersData[Character_IsSelectable], iCharacter, json_object_get_bool(iDoc, "selectable"));
     }
 
+    if (json_object_has_value(iDoc, "bodyindex")) {
+        ArraySetCell(Array:g_rgCharactersData[Character_BodyIndex], iCharacter, json_object_get_number(iDoc, "bodyindex"));
+    }
+
     if (ArrayGetCell(Array:g_rgCharactersData[Character_IsSelectable], iCharacter)) {
         ArrayPushCell(g_iSelectableCharacters, iCharacter);
     }
@@ -385,6 +393,7 @@ InitializeCharactersStore() {
     g_rgCharactersData[Character_ZombieAmbientSounds] = ArrayCreate(_, RESERVED_CHARACTER_COUNT);
     g_rgCharactersData[Character_ZombieDeathSounds] = ArrayCreate(_, RESERVED_CHARACTER_COUNT);
     g_rgCharactersData[Character_IsSelectable] = ArrayCreate(_, RESERVED_CHARACTER_COUNT);
+    g_rgCharactersData[Character_BodyIndex] = ArrayCreate(_, RESERVED_CHARACTER_COUNT);
 }
 
 DestroyCharactersStore() {
