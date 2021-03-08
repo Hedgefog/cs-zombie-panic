@@ -96,6 +96,12 @@ public client_connect(pPlayer) {
     UpdatePlayerCharacter(pPlayer, true);
 }
 
+public client_putinserver(pPlayer) {
+    if (!is_user_bot(pPlayer)) {
+        set_task(5.0, "Task_DisableMinModels", pPlayer);
+    }
+}
+
 public ZP_Fw_PlayerPanic(pPlayer) {
     PlayVoiceFromCharacterData(pPlayer, Character_PanicSounds);
 }
@@ -166,6 +172,16 @@ public Task_Ambient(iTaskId) {
 
     PlayAmbient(pPlayer);
     set_task(random_float(10.0, 30.0), "Task_Ambient", TASKID_AMBIENT + pPlayer);
+}
+
+public Task_DisableMinModels(iTaskId) {
+    new pPlayer = iTaskId;
+
+    if (!is_user_connected(pPlayer)) {
+        return;
+    }
+
+    client_cmd(pPlayer, "cl_minmodels %d", 0);
 }
 
 /*--------------------------------[ Methods ]--------------------------------*/
