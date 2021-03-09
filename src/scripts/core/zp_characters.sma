@@ -45,6 +45,10 @@ new g_iPlayerCharacter[MAX_PLAYERS + 1] = { -1, ... };
 
 new CW:g_iCwSwipeHandler;
 
+new g_pFwPlayerCharacterUpdated;
+new g_pFwPlayerModelUpdated;
+new g_iFwResult;
+
 public plugin_precache() {
     precache_model(DEFAULT_PLAYER_MODEL);
 
@@ -70,6 +74,9 @@ public plugin_init() {
     register_message(gmsgClCorpse, "OnMessage_ClCorpse");
 
     g_iCwSwipeHandler = CW_GetHandler(ZP_WEAPON_SWIPE);
+
+    g_pFwPlayerCharacterUpdated = CreateMultiForward("ZP_Fw_PlayerCharacterUpdated", ET_IGNORE, FP_CELL);
+    g_pFwPlayerModelUpdated = CreateMultiForward("ZP_Fw_PlayerModelUpdated", ET_IGNORE, FP_CELL);
 }
 
 public plugin_natives() {
@@ -215,6 +222,8 @@ UpdatePlayerModel(pPlayer) {
     set_pev(pPlayer, pev_modelindex, iModelIndex);
     set_pev(pPlayer, pev_body, iBody);
     set_member(pPlayer, m_modelIndexPlayer, iModelIndex);
+
+    ExecuteForward(g_pFwPlayerModelUpdated, g_iFwResult, pPlayer);
 }
 
 UpdatePlayerCharacter(pPlayer, bool:bOverride = false) {
@@ -236,6 +245,7 @@ UpdatePlayerCharacter(pPlayer, bool:bOverride = false) {
     }
 
     g_iPlayerCharacter[pPlayer] = iCharacter;
+    ExecuteForward(g_pFwPlayerCharacterUpdated, g_iFwResult, pPlayer);
 }
 
 PlayAmbient(pPlayer) {

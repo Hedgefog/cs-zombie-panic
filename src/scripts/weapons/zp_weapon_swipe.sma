@@ -45,7 +45,6 @@ public plugin_init() {
     gmsgAmmoX = get_user_msgid("AmmoX");
 
     RegisterHam(Ham_TraceAttack, "player", "OnPlayerTraceAttack", .Post = 0);
-    RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
 }
 
@@ -91,13 +90,7 @@ public @Weapon_CanDrop(this) {
     return PLUGIN_HANDLED;
 }
 
-public OnPlayerKilled_Post() {
-    UpdateZombieLives();
-    return HAM_HANDLED;
-}
-
 public OnPlayerSpawn_Post(pPlayer) {
-    UpdateZombieLives();
     UpdatePlayerZombieLives(pPlayer);
     return HAM_HANDLED;
 }
@@ -115,6 +108,24 @@ public OnPlayerTraceAttack(this, pAttacker, Float:flDamage, Float:vecDir[3], pTr
     set_tr2(pTr, TR_iHitgroup, get_tr2(pTr, TR_iHitgroup) & ~HIT_HEAD);
 
     return HAM_HANDLED;
+}
+
+public ZP_Fw_ZombieLivesChanged() {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
+        if (!is_user_connected(pPlayer)) {
+            continue;
+        }
+
+        if (!is_user_alive(pPlayer)) {
+            continue;
+        }
+
+        if (!ZP_Player_IsZombie(pPlayer)) {
+            continue;
+        }
+
+        UpdatePlayerZombieLives(pPlayer);
+    }
 }
 
 Swing(this) {
@@ -144,24 +155,6 @@ Swing(this) {
         }
 
         emit_sound(pPlayer, CHAN_ITEM, ZP_WEAPON_SWIPE_HIT_SOUNDS[random(sizeof(ZP_WEAPON_SWIPE_HIT_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-    }
-}
-
-UpdateZombieLives() {
-    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
-        if (!is_user_connected(pPlayer)) {
-            continue;
-        }
-
-        if (!is_user_alive(pPlayer)) {
-            continue;
-        }
-
-        if (!ZP_Player_IsZombie(pPlayer)) {
-            continue;
-        }
-
-        UpdatePlayerZombieLives(pPlayer);
     }
 }
 

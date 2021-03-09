@@ -91,6 +91,9 @@ forward ZP_Fw_PlayerInfected(pPlayer, pInfector);
 forward ZP_Fw_PlayerTransformationDeath(pPlayer);
 forward ZP_Fw_PlayerTransformed(pPlayer);
 forward ZP_Fw_PlayerEquiped(pPlayer);
+forward ZP_Fw_PlayerSpeedUpdated(pPlayer);
+forward ZP_Fw_PlayerCharacterUpdated(pPlayer);
+forward ZP_Fw_PlayerModelUpdated(pPlayer);
 
 // Player inventory
 
@@ -134,6 +137,7 @@ native ZP_GameRules_IsCompetitive();
 forward ZP_Fw_NewRound();
 forward ZP_Fw_RoundStarted();
 forward ZP_Fw_RoundEnd(iWinnerTeam);
+forward ZP_Fw_ZombieLivesChanged(iLives);
 
 // Map Info
 
