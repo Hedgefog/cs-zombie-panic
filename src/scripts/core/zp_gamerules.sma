@@ -31,6 +31,9 @@ new g_pCvarLivesPerPlayer;
 new g_pCvarCompetitive;
 
 new g_pFwPlayerJoined;
+new g_pFwNewRound;
+new g_pFwRoundStarted;
+new g_pFwRoundEnd;
 new g_iFwResult;
 
 new g_iTeamMenu;
@@ -62,6 +65,9 @@ public plugin_init() {
     g_pCvarCompetitive = register_cvar("zp_competitive", "0");
 
     g_pFwPlayerJoined = CreateMultiForward("ZP_Fw_PlayerJoined", ET_IGNORE, FP_CELL);
+    g_pFwNewRound = CreateMultiForward("ZP_Fw_NewRound", ET_IGNORE);
+    g_pFwRoundStarted = CreateMultiForward("ZP_Fw_RoundStarted", ET_IGNORE);
+    g_pFwRoundEnd = CreateMultiForward("ZP_Fw_RoundEnd", ET_IGNORE, FP_CELL);
 
     g_iTeamMenu = CreateTeamMenu();
 }
@@ -135,6 +141,8 @@ public Round_Fw_NewRound() {
     ResetPlayerTeamPreferences();
     ShuffleTeams();
 
+    ExecuteForward(g_pFwNewRound, g_iFwResult);
+
     return PLUGIN_CONTINUE;
 }
 
@@ -152,12 +160,13 @@ public Round_Fw_RoundStart() {
     CheckWinConditions();
     
     log_amx("New round started");
+
+    ExecuteForward(g_pFwRoundStarted, g_iFwResult);
 }
 
 public Round_Fw_RoundExpired() {
     if (!g_bObjectiveMode) {
         DispatchWin(ZP_HUMAN_TEAM);
-
         log_amx("Round expired, survivors win!");
     }
 }
@@ -473,6 +482,7 @@ RespawnPlayers() {
 
 DispatchWin(iTeam) {
     Round_DispatchWin(iTeam, ZP_NEW_ROUND_DELAY);
+    ExecuteForward(g_pFwRoundEnd, g_iFwResult, iTeam);
 }
 
 /*--------------------------------[ Tasks ]--------------------------------*/
@@ -483,7 +493,7 @@ public Task_Join(pPlayer) {
     }
 
     set_member(pPlayer, m_bTeamChanged, get_member(pPlayer, m_bTeamChanged) & ~BIT(8));
-    set_member(pPlayer, m_iTeam, 2);
+    set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
     set_member(pPlayer, m_iJoiningState, 5);
 
     ExecuteForward(g_pFwPlayerJoined, g_iFwResult, pPlayer);

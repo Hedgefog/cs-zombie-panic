@@ -131,6 +131,10 @@ native ZP_GameRules_DispatchWin(iTeam);
 native ZP_GameRules_CanItemRespawn(pItem);
 native ZP_GameRules_IsCompetitive();
 
+forward ZP_Fw_NewRound();
+forward ZP_Fw_RoundStarted();
+forward ZP_Fw_RoundEnd(iWinnerTeam);
+
 // Map Info
 
 native ZP_ShowMapInfo(pPlayer);
