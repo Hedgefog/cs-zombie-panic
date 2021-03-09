@@ -222,7 +222,7 @@ public OnItemPickup(pPlayer) {
     return PLUGIN_CONTINUE;
 }
 
-public ZP_Fw_Player_AimItem(pPlayer) {
+public ZP_Fw_PlayerAimItem(pPlayer) {
     if (!get_pcvar_num(g_pCvarEnabled)) {
         return;
     }

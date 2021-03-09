@@ -39,7 +39,7 @@ public plugin_init() {
 
     g_pCvarUsePickup = register_cvar("zp_use_pickup", "1");
     g_pCvarUsePickupHighlight = register_cvar("zp_use_pickup_highlight", "1");
-    g_pFwAimItem = CreateMultiForward("ZP_Fw_Player_AimItem", ET_IGNORE, FP_CELL, FP_CELL);
+    g_pFwAimItem = CreateMultiForward("ZP_Fw_PlayerAimItem", ET_IGNORE, FP_CELL, FP_CELL);
 }
 
 public OnItemTouch(pEntity, pToucher) {
