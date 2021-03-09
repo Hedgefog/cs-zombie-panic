@@ -9,8 +9,6 @@
 #define PLUGIN "[Zombie Panic] Win Message"
 #define AUTHOR "Hedgehog Fog"
 
-new g_iWinnerTeam = 0;
-
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
@@ -22,17 +20,15 @@ public OnMessage_OnTextMsg(iMsgId, iDest, pPlayer) {
     static szMessage[32];
     get_msg_arg_string(2, szMessage, charsmax(szMessage));
 
-    if (equal(szMessage, ZP_ZOMBIE_WIN_MESSAGE)) {
-        g_iWinnerTeam = ZP_ZOMBIE_TEAM;
-    } else if (equal(szMessage, ZP_HUMAN_WIN_MESSAGE)) {
-        g_iWinnerTeam = ZP_HUMAN_TEAM;
-    } else {
-        return PLUGIN_CONTINUE;
+    if (equal(szMessage, "#Terrorists_Win")) {
+        return PLUGIN_HANDLED;
     }
 
-    set_task(0.1, "Task_WinMessage");
+    if (equal(szMessage, "#CTs_Win")) {
+        return PLUGIN_HANDLED;
+    }
 
-    return PLUGIN_HANDLED;
+    return PLUGIN_CONTINUE;
 }
 
 public OnMessage_SendAudio(iMsgId, iDest, pPlayer) {
@@ -54,8 +50,8 @@ public OnMessage_SendAudio(iMsgId, iDest, pPlayer) {
     return PLUGIN_CONTINUE;
 }
 
-public Task_WinMessage() {
-    switch (g_iWinnerTeam) {
+public ZP_Fw_RoundEnd(iWinnerTeam) {
+    switch (iWinnerTeam) {
         case ZP_ZOMBIE_TEAM: {
             ShowWinMessage("%s have conquered...", ZP_ZOMBIE_TEAM_NAME);
         }

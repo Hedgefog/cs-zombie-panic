@@ -3,8 +3,6 @@
 
 #define ZP_HUMAN_TEAM 2
 #define ZP_ZOMBIE_TEAM 1
-#define ZP_ZOMBIE_WIN_MESSAGE "#Terrorists_Win"
-#define ZP_HUMAN_WIN_MESSAGE "#CTs_Win"
 #define ZP_ZOMBIE_TEAM_NAME "Zombies"
 #define ZP_HUMAN_TEAM_NAME "Humans"
 
