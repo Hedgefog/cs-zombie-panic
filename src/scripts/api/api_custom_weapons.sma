@@ -10,7 +10,7 @@
 #include <api_custom_weapons>
 
 #define PLUGIN "[API] Custom Weapons"
-#define VERSION "0.6.0"
+#define VERSION "0.6.1"
 #define AUTHOR "Hedgehog Fog"
 
 #define WALL_PUFF_SPRITE "sprites/wall_puff1.spr"
@@ -488,7 +488,7 @@ public OnUpdateClientData_Post(pPlayer, iSendWeapons, pCdHandle) {
 
     new CW:iHandler = GetHandlerByEntity(pItem);
     if (iHandler == CW_INVALID_HANDLER) {
-        return HAM_IGNORED;
+        return FMRES_IGNORED;
     }
 
     set_cd(pCdHandle, CD_flNextAttack, get_gametime() + 0.001); // block default animation
@@ -877,7 +877,36 @@ PlayWeaponAnim(this, iSequence, Float:flDuration) {
 }
 
 SendWeaponAnim(this, iAnim) {
-    ExecuteHamB(Ham_CS_Weapon_SendWeaponAnim, this, iAnim, 0);
+    new pPlayer = GetPlayer(this);
+
+    SendPlayerWeaponAnim(pPlayer, this, iAnim);
+
+    for (new pSpectator = 1; pSpectator <= MaxClients; pSpectator++) {
+        if (!is_user_connected(pSpectator)) {
+            continue;
+        }
+
+        if (pev(pSpectator, pev_iuser1) != OBS_IN_EYE) {
+            continue;
+        }
+
+        if (pev(pSpectator, pev_iuser2) != pPlayer) {
+            continue;
+        }
+
+        SendPlayerWeaponAnim(pSpectator, this, iAnim);
+	}
+}
+
+SendPlayerWeaponAnim(pPlayer, pWeapon, iAnim) {
+    new iBody = pev(pWeapon, pev_body);
+
+    set_pev(pPlayer, pev_weaponanim, iAnim);
+
+    message_begin(MSG_ONE, SVC_WEAPONANIM, _, pPlayer);
+    write_byte(iAnim);
+    write_byte(iBody);
+    message_end();
 }
 
 GetPlayer(this) {
