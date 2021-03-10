@@ -2,6 +2,7 @@
 
 #include <amxmodx>
 #include <engine>
+#include <fakemeta>
 #include <reapi>
 
 #include <zombiepanic>
@@ -24,8 +25,8 @@ public plugin_init() {
 
     register_message(gmsgHideWeapon, "OnMessage_HideWeapon");
 
-    register_event("HideWeapon", "OnEvent_HideWeapon", "be", "1=1");
-    register_event("CurWeapon", "OnEvent_CurWeapon", "be", "1=1");
+    register_event("HideWeapon", "OnEvent_HideWeapon", "b", "1=1");
+    register_event("CurWeapon", "OnEvent_CurWeapon", "b", "1=1");
 }
 
 public OnMessage_HideWeapon(iMsgId, iMsgDest, pPlayer) {
@@ -67,16 +68,19 @@ UpdateCrosshair(pPlayer) {
     write_byte(89);
     message_end();
     
-    new pActiveItem = get_member(pPlayer, m_pActiveItem);
-    if (pActiveItem != -1) {
-        new iWeaponId = get_member(pActiveItem, m_iId);
-        new iClip = get_member(pActiveItem, m_Weapon_iClip);
+    if (is_user_alive(pPlayer)) {
+        new pActiveItem = get_member(pPlayer, m_pActiveItem);
 
-        message_begin(MSG_ONE, gmsgCurWeapon, _, pPlayer);
-        write_byte(1);
-        write_byte(iWeaponId);
-        write_byte(iClip);
-        message_end();
+        if (pActiveItem != -1) {
+            new iWeaponId = get_member(pActiveItem, m_iId);
+            new iClip = is_user_alive(pPlayer) ? get_member(pActiveItem, m_Weapon_iClip) : 0;
+
+            message_begin(MSG_ONE, gmsgCurWeapon, _, pPlayer);
+            write_byte(1);
+            write_byte(iWeaponId);
+            write_byte(iClip);
+            message_end();
+        }
     }
 
     message_begin(MSG_ONE, gmsgSetFOV, _, pPlayer);
