@@ -68,5 +68,5 @@ ShowWinMessage(const szMessage[], any:...) {
     set_dhudmessage(255, 255, 255, -1.0, -1.0);
     show_dhudmessage(0, szBuffer);
 
-    UTIL_ScreenFade(0, {0, 0, 0}, 2.0, ZP_NEW_ROUND_DELAY, 255, FFADE_OUT, .bExternal = true);
+    UTIL_ScreenFade(0, {0, 0, 0}, ZP_NEW_ROUND_DELAY - 1.0, 1.0, 255, FFADE_OUT, .bExternal = true);
 }
