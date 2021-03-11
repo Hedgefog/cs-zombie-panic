@@ -555,7 +555,7 @@ public TeamMenuHandler(pPlayer, iMenu, iItem) {
             set_member(pPlayer, m_iTeam, 3);
 
             if (is_user_alive(pPlayer)) {
-                ExecuteHam(Ham_Killed, pPlayer, pPlayer, 0);
+                ExecuteHamB(Ham_Killed, pPlayer, pPlayer, 0);
             }
         }
     }
