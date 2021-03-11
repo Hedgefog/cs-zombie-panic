@@ -105,6 +105,8 @@ native ZP_Player_SetAmmo(pPlayer, const szAmmo[], iValue);
 native ZP_Player_AddAmmo(pPlayer, const szAmmo[], iValue);
 native ZP_Player_NextAmmo(pPlayer);
 native ZP_Player_DropAmmo(pPlayer);
+native ZP_Player_GetSelectedAmmo(pPlayer);
+native ZP_Player_SetSelectedAmmo(pPlayer, const szAmmo[]);
 
 // Weapons
 

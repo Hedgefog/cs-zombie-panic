@@ -37,6 +37,8 @@ public plugin_natives() {
     register_native("ZP_Player_AddAmmo", "Native_AddAmmo");
     register_native("ZP_Player_DropAmmo", "Native_DropAmmo");
     register_native("ZP_Player_NextAmmo", "Native_NextAmmo");
+    register_native("ZP_Player_GetSelectedAmmo", "Native_GetSelectedAmmo");
+    register_native("ZP_Player_SetSelectedAmmo", "Native_SetSelectedAmmo");
 }
 
 public Native_DropAmmo(iPluginId, iArgc) {
@@ -84,6 +86,26 @@ public Native_AddAmmo(iPluginId, iArgc) {
     new iValue = get_param(3);
 
     return AddAmmo(pPlayer, szAmmo, iValue);
+}
+
+public Native_GetSelectedAmmo(iPluginId, iArgc) {
+    new pPlayer = get_param(1);
+
+    return g_pPlayerSelectedAmmo[pPlayer];
+}
+
+public Native_SetSelectedAmmo(iPluginId, iArgc) {
+    new pPlayer = get_param(1);
+    
+    static szAmmo[16];
+    get_string(2, szAmmo, charsmax(szAmmo));
+
+    new iAmmoHandler = ZP_Ammo_GetHandler(szAmmo);
+    if (iAmmoHandler == -1) {
+        return;
+    }
+
+    g_pPlayerSelectedAmmo[pPlayer] = iAmmoHandler;
 }
 
 public OnPlayerKilled(pPlayer) {
