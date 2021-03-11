@@ -118,6 +118,10 @@ public bool:Native_CanItemRespawn(iPluginId, iArgc) {
             continue;
         }
 
+        if (is_user_bot(pPlayer)) {
+            continue;
+        }
+
         new Float:flMinRange = ZP_Player_IsZombie(pPlayer) ? 256.0 :  512.0;
 
         static Float:vecPlayerOrigin[3];
