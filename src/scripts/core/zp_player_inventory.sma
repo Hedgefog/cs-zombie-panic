@@ -294,9 +294,9 @@ DropPlayerItem(pPlayer, pItem, iSlot) {
     set_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, pItem, iSlot);
 
     static Float:vecVelocity[3];
-    vecVelocity[0] = random_float(-350.0, 350.0);
-    vecVelocity[1] = random_float(-350.0, 350.0);
-    vecVelocity[2] = random_float(0.0, 350.0);
+    vecVelocity[0] = random_float(-250.0, 250.0);
+    vecVelocity[1] = random_float(-250.0, 250.0);
+    vecVelocity[2] = random_float(0.0, 250.0);
 
     set_pev(pWeaponBox, pev_velocity, vecVelocity);
 
