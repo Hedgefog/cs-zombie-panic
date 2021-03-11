@@ -68,7 +68,7 @@ public OnPlayerPreThink_Post(pPlayer) {
         return HAM_IGNORED;
     }
 
-    if (get_gametime() < g_flPlayerNextThink[pPlayer]) {
+    if (g_flPlayerNextThink[pPlayer] > get_gametime()) {
         return HAM_IGNORED;
     }
 
@@ -205,6 +205,10 @@ bool:CanPickupWeaponBox(pBot, pWeaponBox, bool:bTouched) {
             continue;
         }
 
+        if (get_member(pBot, m_rgpPlayerItems, iSlot) != -1) {
+            return false;
+        }
+
         new CW:iCwHandler = CW_GetHandlerByEntity(pItem);
         if (iCwHandler == g_iCwGrenadeHandler) {
             return false;
@@ -222,10 +226,6 @@ bool:CanPickupWeaponBox(pBot, pWeaponBox, bool:bTouched) {
             return false;
         }
 
-        if (get_member(pBot, m_rgpPlayerItems, iSlot) != -1) {
-            return false;
-        }
-
         bContainsWeapon = true;
     }
 
@@ -238,6 +238,11 @@ bool:CanPickupWeaponBox(pBot, pWeaponBox, bool:bTouched) {
             }
 
             new iAmmoId = UTIL_GetAmmoId(szAmmoName);
+
+            if (ZP_Ammo_GetHandlerById(iAmmoId) == ZP_Ammo_GetHandler(ZP_AMMO_PISTOL)) {
+                return true;
+            }
+
             if (FindWeaponByAmmoId(pBot, iAmmoId)) {
                 return true;
             }
