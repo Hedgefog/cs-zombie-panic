@@ -109,6 +109,8 @@ public bool:Native_CanItemRespawn(iPluginId, iArgc) {
     new Float:vecOrigin[3];
     pev(pItem, pev_origin, vecOrigin);
 
+    new pTr = create_tr2();
+
     for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         if (!is_user_connected(pPlayer)) {
             continue;
@@ -127,10 +129,20 @@ public bool:Native_CanItemRespawn(iPluginId, iArgc) {
         static Float:vecPlayerOrigin[3];
         pev(pPlayer, pev_origin, vecPlayerOrigin);
 
+        engfunc(EngFunc_TraceLine, vecOrigin, vecPlayerOrigin, IGNORE_MONSTERS | IGNORE_GLASS, pPlayer, pTr);
+        static Float:flFraction;
+        get_tr2(pTr, TR_flFraction, flFraction);
+
+        if (flFraction < 1.0) {
+            flMinRange /= 2;
+        }
+
         if (xs_vec_distance(vecOrigin, vecPlayerOrigin) <= flMinRange) {
             return false;
         }
     }
+
+    free_tr2(pTr);
 
     return true;
 }
