@@ -535,27 +535,32 @@ OpenTeamMenu(pPlayer) {
 }
 
 public TeamMenuHandler(pPlayer, iMenu, iItem) {
+    new bool:bIsSpectator = get_member(pPlayer, m_iTeam) == 3;
+
     switch (iItem) {
         case 0: {
             g_iPlayerTeamPreference[pPlayer] = TeamPreference_Human;
 
-            if (get_member(pPlayer, m_iTeam) == 3) {
+            if (bIsSpectator) {
                 set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
             }
         }
         case 1: {
             g_iPlayerTeamPreference[pPlayer] = TeamPreference_Zombie;
 
-            if (get_member(pPlayer, m_iTeam) == 3) {
+            if (bIsSpectator) {
                 set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
             }
         }
         case 5: {
             g_iPlayerTeamPreference[pPlayer] = TeamPreference_Spectator;
-            set_member(pPlayer, m_iTeam, 3);
 
-            if (is_user_alive(pPlayer)) {
-                ExecuteHamB(Ham_Killed, pPlayer, pPlayer, 0);
+            if (!bIsSpectator) {
+                set_member(pPlayer, m_iTeam, 3);
+
+                if (is_user_alive(pPlayer)) {
+                    ExecuteHamB(Ham_Killed, pPlayer, pPlayer, 0);
+                }
             }
         }
     }
@@ -563,13 +568,13 @@ public TeamMenuHandler(pPlayer, iMenu, iItem) {
     if (Round_IsRoundStarted()) {
         switch (iItem) {
             case 0: {
-                if (get_member(pPlayer, m_iTeam) == 3) {
+                if (bIsSpectator) {
                     ZP_GameRules_RespawnAsZombie(pPlayer);
                 }
             }
             case 1: {
                 if (!ZP_Player_IsZombie(pPlayer)) {
-                    if (get_member(pPlayer, m_iTeam) == 3) {
+                    if (bIsSpectator) {
                         ZP_GameRules_RespawnAsZombie(pPlayer);
                     } else {
                         ExecuteHamB(Ham_Killed, pPlayer, pPlayer, 0);
