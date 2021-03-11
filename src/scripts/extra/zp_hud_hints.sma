@@ -338,14 +338,15 @@ public Task_RespawnMessage(iTaskId) {
     }
 
     SetMessageTitle("%L", pPlayer, "ZP_RESPAWN_TITLE");
+    new iTeam = get_member(pPlayer, m_iTeam);
 
-    if (ZP_Player_IsZombie(pPlayer)) {
+    if (iTeam == ZP_ZOMBIE_TEAM) {
         if (ZP_GameRules_GetZombieLives() > 0) {
             SetMessageText("%L", pPlayer, "ZP_RESPAWN_ZOMBIE");
         } else {
             SetMessageText("%L", pPlayer, "ZP_RESPAWN_NOLIVES");
         }
-    } else {
+    } else if (get_member(pPlayer, m_iTeam) == ZP_HUMAN_TEAM) {
         SetMessageText("%L", pPlayer, "ZP_RESPAWN_HUMAN");
     }
 
