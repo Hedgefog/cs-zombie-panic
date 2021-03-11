@@ -129,7 +129,7 @@ bool:PickupWeaponBoxAmmo(pPlayer, pWeaponBox) {
             continue;
         }
 
-        new iAmmoId = GetAmmoId(szAmmoName);
+        new iAmmoId = UTIL_GetAmmoId(szAmmoName);
         new iAmmoHandler = ZP_Ammo_GetHandlerById(iAmmoId);
         if (iAmmoHandler == -1) {
             continue;
@@ -200,17 +200,6 @@ FindPlayerItemById(pPlayer, iId) {
             }
 
             pItem = get_member(pItem, m_pNext);
-        }
-    }
-
-    return -1;
-}
-
-GetAmmoId(const szAmmoName[]) {
-    new iSize = sizeof(AMMO_LIST);
-    for (new iAmmoId = 0; iAmmoId < iSize; ++iAmmoId) {
-        if (equal(AMMO_LIST[iAmmoId], szAmmoName)) {
-            return iAmmoId;
         }
     }
 

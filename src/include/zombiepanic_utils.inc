@@ -206,3 +206,13 @@ stock UTIL_SetupSpawnerRespawn(pEntity) {
     }
 }
 
+stock UTIL_GetAmmoId(const szAmmoName[]) {
+    new iSize = sizeof(AMMO_LIST);
+    for (new iAmmoId = 0; iAmmoId < iSize; ++iAmmoId) {
+        if (equal(AMMO_LIST[iAmmoId], szAmmoName)) {
+            return iAmmoId;
+        }
+    }
+
+    return -1;
+}
