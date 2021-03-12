@@ -14,6 +14,8 @@
 #define PLUGIN "[Zombie Panic] Bot Fixes"
 #define AUTHOR "1.0.0"
 
+#define USE_BUTTON_RANGE 64.0
+#define MELEE_ATTACK_BREAKABLE_RANGE 56.0
 #define MELEE_ATTACK_RANGE 128.0
 #define TEAMMATE_SEARCH_RANGE 128.0
 #define PANIC_RANGE 256.0
@@ -81,17 +83,20 @@ public OnPlayerPreThink_Post(pPlayer) {
 
     new CW:iCwHandler = CW_GetHandlerByEntity(pActiveItem);
     if (iCwHandler == g_iCwSwipeHandler || iCwHandler == g_iCwCrowbarHandler) {
-        if (ShouldAttackWithMelee(pPlayer)) {
-            new pActiveItem = get_member(pPlayer, m_pActiveItem);
-            CW_PrimaryAttack(pActiveItem);
+        if (LookupEnemyToStub(pPlayer)) {
+            g_flPlayerNextThink[pPlayer] = get_gametime() + 0.5;
+            return HAM_HANDLED;
+        }
+        
+        if (LookupBreakable(pPlayer)) {
+            g_flPlayerNextThink[pPlayer] = get_gametime() + 1.0;
             return HAM_HANDLED;
         }
     }
 
     if (!ZP_Player_IsZombie(pPlayer)) {
-        if (ShouldPanic(pPlayer)) {
-            ZP_Player_Panic(pPlayer);
-            g_flPlayerNextThink[pPlayer] = get_gametime() + 5.0;
+        if (LookupObjectiveButton(pPlayer)) {
+            g_flPlayerNextThink[pPlayer] = get_gametime() + 1.5;
             return HAM_HANDLED;
         }
 
@@ -101,20 +106,20 @@ public OnPlayerPreThink_Post(pPlayer) {
             return HAM_HANDLED;
         }
 
-        if (PickupNearbyItems(pPlayer)) {
+        if (LookupNearbyItems(pPlayer)) {
             g_flPlayerNextThink[pPlayer] = get_gametime() + 1.0;
             return HAM_HANDLED;
         }
 
-        new pTeammate = FindPlayerNearby(pPlayer, TEAMMATE_SEARCH_RANGE, ZP_HUMAN_TEAM);
-        if (pTeammate != -1) {
-            new iAmmoId = FindAmmoForTeammate(pPlayer, pTeammate);
-            if (iAmmoId != -1) {
-                DropAmmoToTeammate(pPlayer, pTeammate, iAmmoId);
-                g_flPlayerNextThink[pPlayer] = get_gametime() + 2.0;
-                return HAM_HANDLED;
-            }
+        if (LookupTeamateToSupport(pPlayer)) {
+            g_flPlayerNextThink[pPlayer] = get_gametime() + 2.0;
+            return HAM_HANDLED;
+        }
 
+        if (ShouldPanic(pPlayer)) {
+            ZP_Player_Panic(pPlayer);
+            g_flPlayerNextThink[pPlayer] = get_gametime() + 5.0;
+            return HAM_HANDLED;
         }
     }
 
@@ -134,15 +139,65 @@ DropAmmoToTeammate(pBot, pTeammate, iAmmoIndex) {
     static szAmmo[16];
     ZP_Ammo_GetName(iAmmoIndex, szAmmo, charsmax(szAmmo));
 
-    static Float:vecTarget[3];
-    pev(pTeammate, pev_origin, vecTarget);
-    TurnTo(pBot, vecTarget);
+    TurnToEntity(pBot, pTeammate);
 
     ZP_Player_SetSelectedAmmo(pBot, szAmmo);
     ZP_Player_DropAmmo(pBot);
 }
 
-bool:PickupNearbyItems(pBot) {
+bool:LookupObjectiveButton(pBot) {
+    new pObjectiveButton = FindObjectiveButtonNearby(pBot, USE_BUTTON_RANGE);
+    if (pObjectiveButton == -1) {
+        return false;
+    }
+
+    TurnToEntity(pBot, pObjectiveButton);
+    ExecuteHamB(Ham_Use, pObjectiveButton, pBot, pBot, USE_ON, 0.0);
+
+    return true;
+}
+
+bool:LookupEnemyToStub(pBot) {
+    if (!ShouldAttackWithMelee(pBot)) {
+        return false;
+    }
+
+    new pActiveItem = get_member(pBot, m_pActiveItem);
+    CW_PrimaryAttack(pActiveItem);
+
+    return true;
+}
+
+bool:LookupBreakable(pBot) {
+    new pBreakable = FindBreakableNearby(pBot, MELEE_ATTACK_BREAKABLE_RANGE);
+    if (pBreakable == -1) {
+        return false;
+    }
+
+    TurnToEntity(pBot, pBreakable);
+
+    new pActiveItem = get_member(pBot, m_pActiveItem);
+    CW_PrimaryAttack(pActiveItem);
+
+    return true;
+}
+
+bool:LookupTeamateToSupport(pBot) {
+    new pTeammate = FindPlayerNearby(pBot, TEAMMATE_SEARCH_RANGE, ZP_HUMAN_TEAM);
+    if (pTeammate == -1) {
+        return false;
+    }
+
+    new iAmmoId = FindAmmoForTeammate(pBot, pTeammate);
+    if (iAmmoId != -1) {
+        DropAmmoToTeammate(pBot, pTeammate, iAmmoId);
+        return true;
+    }
+
+    return false;
+}
+
+bool:LookupNearbyItems(pBot) {
     static Float:vecOrigin[3];
     pev(pBot, pev_origin, vecOrigin);
 
@@ -172,28 +227,17 @@ bool:PickupNearbyItems(pBot) {
 }
 
 PickupWeaponBox(pBot, pWeaponBox) {
-    static Float:vecTarget[3];
-    pev(pWeaponBox, pev_origin, vecTarget);
-    TurnTo(pBot, vecTarget);
-
+    TurnToEntity(pBot, pWeaponBox);
     ExecuteHamB(Ham_Touch, pWeaponBox, pBot);
 }
 
 bool:CanPickupWeaponBox(pBot, pWeaponBox, bool:bTouched) {
+    if (~pev(pWeaponBox, pev_flags) & FL_ONGROUND) {
+        return false;
+    }
+
     if (!bTouched) {
-        static Float:vecOrigin[3];
-        pev(pBot, pev_origin, vecOrigin);
-
-        static Float:vecTarget[3];
-        pev(pWeaponBox, pev_origin, vecTarget);
-
-        new pTr = create_tr2();
-        engfunc(EngFunc_TraceLine, vecOrigin, vecTarget, DONT_IGNORE_MONSTERS, pBot, pTr);
-        static Float:flFraction;
-        get_tr2(pTr, TR_flFraction, flFraction);
-        free_tr2(pTr);
-
-        if (flFraction < 1.0) {
+        if (!IsEntityReachable(pBot, pWeaponBox)) {
             return false;
         }
     }
@@ -210,6 +254,7 @@ bool:CanPickupWeaponBox(pBot, pWeaponBox, bool:bTouched) {
         }
 
         new CW:iCwHandler = CW_GetHandlerByEntity(pItem);
+
         if (iCwHandler == g_iCwGrenadeHandler) {
             return false;
         }
@@ -243,7 +288,7 @@ bool:CanPickupWeaponBox(pBot, pWeaponBox, bool:bTouched) {
                 return true;
             }
 
-            if (FindWeaponByAmmoId(pBot, iAmmoId)) {
+            if (FindWeaponByAmmoId(pBot, iAmmoId) != -1) {
                 return true;
             }
         }
@@ -263,6 +308,10 @@ bool:ShouldAttackWithMelee(pBot) {
     static Float:vecTarget[3];
     pev(pEnemy, pev_origin, vecTarget);
     if (!is_in_viewcone(pBot, vecTarget)) {
+        return false;
+    }
+
+    if (!IsEntityReachable(pBot, pEnemy)) {
         return false;
     }
 
@@ -337,6 +386,109 @@ FindAmmoForTeammate(pBot, pTeammate) {
     return iAmmoIndex;
 }
 
+FindBreakableNearby(pBot, Float:flRange) {
+    static Float:vecOrigin[3];
+    pev(pBot, pev_origin, vecOrigin);
+
+    static Float:vecViewOfs[3];
+    pev(pBot, pev_view_ofs, vecViewOfs);
+    vecOrigin[2] += vecViewOfs[2];
+
+    new Float:flMinDistance;
+    new pBreakable = -1;
+
+    new pEntity;
+    new iPrevEntity;
+    while ((pEntity = engfunc(EngFunc_FindEntityInSphere, pEntity, vecOrigin, flRange)) != 0) {
+        if (iPrevEntity >= pEntity) {
+            break;
+        }
+
+        if (!pev_valid(pEntity)) {
+            continue;
+        }
+
+        static szClassname[16];
+        pev(pEntity, pev_classname, szClassname, charsmax(szClassname));
+
+        if (!equal(szClassname, "func_breakable")) {
+            continue;
+        }
+
+        if (pev(pEntity, pev_solid) == SOLID_NOT) {
+            continue;
+        }
+
+        static Float:flHealth;
+        pev(pEntity, pev_health, flHealth);
+
+        if (flHealth > 20.0) {
+            continue;
+        }
+
+        static Float:vecTarget[3];
+        ExecuteHamB(Ham_BodyTarget, pEntity, 0, vecTarget);
+
+        new Float:flDistance = get_distance_f(vecOrigin, vecTarget);
+        if (pBreakable == -1 || flDistance < flMinDistance) {
+            flMinDistance = flDistance;
+            pBreakable = pEntity;
+        }
+    }
+
+    return pBreakable;
+}
+
+FindObjectiveButtonNearby(pBot, Float:flRange) {
+    static Float:vecOrigin[3];
+    pev(pBot, pev_origin, vecOrigin);
+
+    static Float:vecViewOfs[3];
+    pev(pBot, pev_view_ofs, vecViewOfs);
+    vecOrigin[2] += vecViewOfs[2];
+
+    new Float:flMinDistance;
+    new pBreakable = -1;
+
+    new pEntity;
+    new iPrevEntity;
+    while ((pEntity = engfunc(EngFunc_FindEntityInSphere, pEntity, vecOrigin, flRange)) != 0) {
+        if (iPrevEntity >= pEntity) {
+            break;
+        }
+
+        if (!pev_valid(pEntity)) {
+            continue;
+        }
+
+        static szClassname[16];
+        pev(pEntity, pev_classname, szClassname, charsmax(szClassname));
+
+        if (!equal(szClassname, "func_button")) {
+            continue;
+        }
+
+        if (!UTIL_IsUsableButton(pEntity, pBot)) {
+            continue;
+        }
+
+        if (~pev(pEntity, pev_spawnflags) & ZP_BUTTON_FLAG_HUMAN_ONLY) {
+            continue;
+        }
+
+        static Float:vecTarget[3];
+        ExecuteHamB(Ham_BodyTarget, pEntity, 0, vecTarget);
+
+        new Float:flDistance = get_distance_f(vecOrigin, vecTarget);
+        if (pBreakable == -1 || flDistance < flMinDistance) {
+            flMinDistance = flDistance;
+            pBreakable = pEntity;
+        }
+    }
+
+    return pBreakable;
+}
+
 FindPlayerNearby(pBot, Float:flRange, iTeam = -1) {
     static Float:vecOrigin[3];
     pev(pBot, pev_origin, vecOrigin);
@@ -385,7 +537,20 @@ FindWeaponByAmmoId(pBot, iAmmoId) {
     return -1;
 }
 
-TurnTo(pBot, const Float:vecTarget[3]) {
+TurnToEntity(pBot, pTarget) {
+    static Float:vecTarget[3];
+
+    if (ExecuteHam(Ham_IsBSPModel, pTarget)) {
+        ExecuteHamB(Ham_BodyTarget, pTarget, 0, vecTarget);
+    } else {
+        pev(pTarget, pev_origin, vecTarget);
+    }
+
+    TurnToPoint(pBot, vecTarget);
+}
+
+
+TurnToPoint(pBot, const Float:vecTarget[3]) {
     static Float:vecOrigin[3];
     pev(pBot, pev_origin, vecOrigin);
 
@@ -419,4 +584,21 @@ Float:NormalizeAngle(Float:flAngle) {
     flFixedAngle *= iDirection;
 
     return flFixedAngle;
+}
+
+IsEntityReachable(pBot, pTarget) {
+    static Float:vecOrigin[3];
+    pev(pBot, pev_origin, vecOrigin);
+
+    static Float:vecTarget[3];
+    pev(pTarget, pev_origin, vecTarget);
+
+    new pTr = create_tr2();
+    engfunc(EngFunc_TraceLine, vecOrigin, vecTarget, DONT_IGNORE_MONSTERS, pBot, pTr);
+    static Float:flFraction;
+    get_tr2(pTr, TR_flFraction, flFraction);
+    new pHit = get_tr2(pTr, TR_pHit);
+    free_tr2(pTr);
+
+    return flFraction == 1.0 || (pHitTest != -1 && pHit == pHitTest);
 }
