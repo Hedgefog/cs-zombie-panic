@@ -65,7 +65,7 @@ public OnPlayerPreThink_Post(pPlayer) {
     if (!is_user_alive(pPlayer)) {
         return HAM_IGNORED;
     }
-    
+
     if (!is_user_bot(pPlayer)) {
         return HAM_IGNORED;
     }
@@ -87,7 +87,7 @@ public OnPlayerPreThink_Post(pPlayer) {
             g_flPlayerNextThink[pPlayer] = get_gametime() + 0.5;
             return HAM_HANDLED;
         }
-        
+
         if (LookupBreakable(pPlayer)) {
             g_flPlayerNextThink[pPlayer] = get_gametime() + 1.0;
             return HAM_HANDLED;
