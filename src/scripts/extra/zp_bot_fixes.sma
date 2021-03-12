@@ -549,7 +549,6 @@ TurnToEntity(pBot, pTarget) {
     TurnToPoint(pBot, vecTarget);
 }
 
-
 TurnToPoint(pBot, const Float:vecTarget[3]) {
     static Float:vecOrigin[3];
     pev(pBot, pev_origin, vecOrigin);
@@ -572,20 +571,6 @@ TurnToPoint(pBot, const Float:vecTarget[3]) {
     set_pev(pBot, pev_fixangle, 1);
 }
 
-Float:NormalizeAngle(Float:flAngle) {
-    new iDirection = flAngle > 0 ? 1 : -1;
-    new Float:flAbsAngle = flAngle * iDirection;
-
-    new Float:flFixedAngle = (flAbsAngle - (360.0 * floatround(flAbsAngle / 360.0, floatround_floor)));
-    if (flFixedAngle > 180.0) {
-      flFixedAngle -= 360.0;
-    }
-
-    flFixedAngle *= iDirection;
-
-    return flFixedAngle;
-}
-
 IsEntityReachable(pBot, pTarget) {
     static Float:vecOrigin[3];
     pev(pBot, pev_origin, vecOrigin);
@@ -601,4 +586,18 @@ IsEntityReachable(pBot, pTarget) {
     free_tr2(pTr);
 
     return flFraction == 1.0 || (pTarget != -1 && pHit == pTarget);
+}
+
+Float:NormalizeAngle(Float:flAngle) {
+    new iDirection = flAngle > 0 ? 1 : -1;
+    new Float:flAbsAngle = flAngle * iDirection;
+
+    new Float:flFixedAngle = (flAbsAngle - (360.0 * floatround(flAbsAngle / 360.0, floatround_floor)));
+    if (flFixedAngle > 180.0) {
+      flFixedAngle -= 360.0;
+    }
+
+    flFixedAngle *= iDirection;
+
+    return flFixedAngle;
 }
