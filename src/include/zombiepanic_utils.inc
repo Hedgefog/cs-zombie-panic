@@ -217,7 +217,7 @@ stock UTIL_GetAmmoId(const szAmmoName[]) {
     return -1;
 }
 
-bool:UTIL_IsUsableButton(pButton, pPlayer) {
+stock bool:UTIL_IsUsableButton(pButton, pPlayer) {
     new iszMaster = get_ent_data(pButton, "CBaseToggle", "m_sMaster");
 
     if (iszMaster) {
