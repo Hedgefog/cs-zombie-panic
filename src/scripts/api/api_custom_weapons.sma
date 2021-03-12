@@ -1474,7 +1474,7 @@ SpawnWeaponBox(CW:iHandler) {
     set_pev(pItem, pev_owner, pWeaponBox);
 
     new iSlot = GetData(iHandler, CW_Data_SlotId);
-    set_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, pItem, iSlot);
+    set_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, pItem, iSlot + 1);
 
     dllfunc(DLLFunc_Spawn, pWeaponBox);
 
