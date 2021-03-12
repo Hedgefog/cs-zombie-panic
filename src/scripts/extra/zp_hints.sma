@@ -8,7 +8,7 @@
 #include <zombiepanic>
 #include <api_rounds>
 
-#define PLUGIN "[Zombie Panic] Hints HUD"
+#define PLUGIN "[Zombie Panic] Hints"
 #define AUTHOR "Hedgehog Fog"
 
 enum MessageType {
