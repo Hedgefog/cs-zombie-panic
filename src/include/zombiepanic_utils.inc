@@ -216,3 +216,22 @@ stock UTIL_GetAmmoId(const szAmmoName[]) {
 
     return -1;
 }
+
+bool:UTIL_IsUsableButton(pButton, pPlayer) {
+    new iszMaster = get_ent_data(pButton, "CBaseToggle", "m_sMaster");
+
+    if (iszMaster) {
+        static szMaster[32];
+        engfunc(EngFunc_SzFromIndex, iszMaster, szMaster, charsmax(szMaster));
+
+        if (!UTIL_IsMasterTriggered(szMaster, pPlayer)) {
+            return false;
+        }
+    } 
+
+    if (get_ent_data(pButton, "CBaseToggle", "m_toggle_state") != TS_AT_BOTTOM) {
+        return false;
+    }
+
+    return true;
+}
