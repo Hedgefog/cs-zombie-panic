@@ -600,5 +600,5 @@ IsEntityReachable(pBot, pTarget) {
     new pHit = get_tr2(pTr, TR_pHit);
     free_tr2(pTr);
 
-    return flFraction == 1.0 || (pHitTest != -1 && pHit == pHitTest);
+    return flFraction == 1.0 || (pTarget != -1 && pHit == pTarget);
 }
