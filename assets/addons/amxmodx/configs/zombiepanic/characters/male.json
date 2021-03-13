@@ -1,4 +1,5 @@
 {
+  "selectable": true,
   "models": {
     "zombie": "models/zombiepanic/v100/characters/male/zombie.mdl",
     "human": "models/zombiepanic/v100/characters/male/human.mdl",
