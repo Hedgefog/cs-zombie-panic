@@ -519,13 +519,13 @@ public Task_Join(pPlayer) {
 
 CreateTeamMenu() {
     new iMenu = menu_create("What's your plan?", "TeamMenuHandler");
-    menu_additem(iMenu, "I wanna shit my pants");
+    menu_additem(iMenu, "Stay with the survivors");
     menu_additem(iMenu, "Join Zombies");
     menu_addblank2(iMenu);
     menu_addblank2(iMenu);
     menu_addblank2(iMenu);
     menu_additem(iMenu, "Spectate");
-    menu_setprop(iMenu, MPROP_EXIT, MEXIT_NEVER);
+    // menu_setprop(iMenu, MPROP_EXIT, MEXIT_NEVER);
 
     return iMenu;
 }
