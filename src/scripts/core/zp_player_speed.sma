@@ -91,11 +91,6 @@ public OnPlayerItemPreFrame_Post(pPlayer) {
     return HAM_HANDLED;
 }
 
-public TaskUpdatePlayerSpeed(iTaskId) {
-    new pPlayer = iTaskId;
-    UpdatePlayerSpeed(pPlayer);
-}
-
 bool:UpdatePlayerSpeed(pPlayer) {
     if (!is_user_alive(pPlayer)) {
         return false;
