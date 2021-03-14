@@ -15,7 +15,7 @@
 #define AUTHOR "1.0.0"
 
 #define USE_BUTTON_RANGE 64.0
-#define MELEE_ATTACK_BREAKABLE_RANGE 56.0
+#define MELEE_ATTACK_BREAKABLE_RANGE 54.0
 #define MELEE_ATTACK_RANGE 128.0
 #define TEAMMATE_SEARCH_RANGE 128.0
 #define PANIC_RANGE 256.0
@@ -430,7 +430,21 @@ FindBreakableNearby(pBot, Float:flRange) {
         ExecuteHamB(Ham_BodyTarget, pEntity, 0, vecTarget);
 
         new Float:flDistance = get_distance_f(vecOrigin, vecTarget);
-        if (pBreakable == -1 || flDistance < flMinDistance) {
+        if (pBreakable != -1 && flDistance > flMinDistance) {
+            continue;
+        }
+
+        static Float:vecEnd[3];
+        for (new i = 0; i < 3; ++i) {
+            vecEnd[i] = vecOrigin[i] + ((vecTarget[i] - vecOrigin[i]) / flDistance * flRange);
+        }
+
+        new pTr = create_tr2();
+        engfunc(EngFunc_TraceLine, vecOrigin, vecEnd, DONT_IGNORE_MONSTERS, pBot, pTr);
+        new pHit = get_tr2(pTr, TR_pHit);
+        free_tr2(pTr);
+
+        if (pHit == pEntity) {
             flMinDistance = flDistance;
             pBreakable = pEntity;
         }
