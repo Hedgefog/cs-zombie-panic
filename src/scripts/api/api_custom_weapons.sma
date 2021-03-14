@@ -923,7 +923,7 @@ FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:
     new shared_rand = pPlayer > 0 ? get_member(pPlayer, random_seed) : 0;
     new CW_Flags:iFlags = GetData(iHandler, CW_Data_Flags);
 
-    new tr = create_tr2();
+    new pTr = create_tr2();
 
     static Float:vecRight[3];
     get_global_vector(GL_v_right, vecRight);
@@ -957,14 +957,14 @@ FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:
             vecEnd[i] = vecSrc[i] + (vecDir[i] * flDistance);
         }
 
-        engfunc(EngFunc_TraceLine, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, this, tr);
+        engfunc(EngFunc_TraceLine, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, this, pTr);
 
         new Float:flFraction;
-        get_tr2(tr, TR_flFraction, flFraction);
+        get_tr2(pTr, TR_flFraction, flFraction);
         
         // do damage, paint decals
         if (flFraction != 1.0) {
-            new pHit = get_tr2(tr, TR_pHit);
+            new pHit = get_tr2(pTr, TR_pHit);
 
             if (pHit < 0) {
                 pHit = 0;
@@ -974,24 +974,24 @@ FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:
             new Float:flCurrentDamage = flDamage * floatpower(flRangeModifier, flCurrentDistance / 500.0);
 
             rg_multidmg_clear();
-            ExecuteHamB(Ham_TraceAttack, pHit, pAttacker, flCurrentDamage, vecDir, tr, DMG_BULLET | DMG_NEVERGIB);
+            ExecuteHamB(Ham_TraceAttack, pHit, pAttacker, flCurrentDamage, vecDir, pTr, DMG_BULLET | DMG_NEVERGIB);
             rg_multidmg_apply(this, pAttacker);
         
             // TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
             // DecalGunshot( &tr, iBulletType );
 
             // new iDecalIndex = ExecuteHam(Ham_DamageDecal, pHit, DMG_BULLET);
-            // DecalTrace2(tr, iDecalIndex);
+            // DecalTrace2(pTr, iDecalIndex);
 
             if (!ExecuteHam(Ham_IsPlayer, pHit)) {
                 if (~iFlags & CWF_NoBulletSmoke) {
-                    BulletSmoke(tr);
+                    BulletSmoke(pTr);
                 }
                 
                 if (~iFlags & CWF_NoBulletDecal) {
                     new iDecalIndex = GetDecalIndex(pHit);
                     if (iDecalIndex >= 0) {
-                        MakeDecal(tr, pHit, iDecalIndex);
+                        MakeDecal(pTr, pHit, iDecalIndex);
                     }
                 }
             }
@@ -999,7 +999,7 @@ FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:
 
         // make bullet trails
         static Float:vecEndPos[3];
-        get_tr2(tr, TR_vecEndPos, vecEndPos);
+        get_tr2(pTr, TR_vecEndPos, vecEndPos);
 
         BubbleTrail(vecSrc, vecEndPos, floatround((flDistance * flFraction) / 64.0));
     }
@@ -1008,7 +1008,7 @@ FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:
     vecOut[1] = vecMultiplier[1] * vecSpread[1];
     vecOut[2] = 0.0;
 
-    free_tr2(tr);
+    free_tr2(pTr);
 }
 
 GrenadeDetonate(this, Float:flRadius, Float:flMagnitude) {
@@ -1086,8 +1086,8 @@ public Smack(this) {
     new CW:iHandler = GetHandlerByEntity(this);
     new CW_Flags:iFlags = GetData(iHandler, CW_Data_Flags);
 
-    new tr = pev(this, pev_iuser1);
-    new pHit = get_tr2(tr, TR_pHit);
+    new pTr = pev(this, pev_iuser1);
+    new pHit = get_tr2(pTr, TR_pHit);
     if (pHit < 0) {
         pHit = 0;
     }
@@ -1095,11 +1095,11 @@ public Smack(this) {
     if (~iFlags & CWF_NoBulletDecal) {
         new iDecalIndex = GetDecalIndex(pHit);
         if (iDecalIndex >= 0) {
-            MakeDecal(tr, pHit, iDecalIndex, false);
+            MakeDecal(pTr, pHit, iDecalIndex, false);
         }
     }
 
-    free_tr2(tr);
+    free_tr2(pTr);
 
     SetThink(this, NULL_STRING);
 }
@@ -1332,26 +1332,26 @@ DefaultSwing(this, Float:flDamage, Float:flRate, Float:flDistance) {
     MakeAimDir(pPlayer, flDistance, vecEnd);
     xs_vec_add(vecSrc, vecEnd, vecEnd);
 
-    new tr = create_tr2();
-    engfunc(EngFunc_TraceLine, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, this, tr);
+    new pTr = create_tr2();
+    engfunc(EngFunc_TraceLine, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, this, pTr);
 
     new Float:flFraction;
-    get_tr2(tr, TR_flFraction, flFraction);
+    get_tr2(pTr, TR_flFraction, flFraction);
 
     if (flFraction >= 1.0) {
-        engfunc(EngFunc_TraceHull, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, HULL_HEAD, this, tr);
-        get_tr2(tr, TR_flFraction, flFraction);
+        engfunc(EngFunc_TraceHull, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, HULL_HEAD, this, pTr);
+        get_tr2(pTr, TR_flFraction, flFraction);
 
         if (flFraction < 1.0) {
             // Calculate the point of interANCHOR of the line (or hull) and the object we hit
             // This is and approximation of the "best" interANCHOR
-            new pHit = get_tr2(tr, TR_pHit);
+            new pHit = get_tr2(pTr, TR_pHit);
             if (pHit != -1) {
-                FindHullIntersection(vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, this);
+                FindHullIntersection(vecSrc, pTr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, this);
             }
 
-            get_tr2(tr, TR_vecEndPos, vecEnd); // This is the point on the actual surface (the hull could have hit space)
-            get_tr2(tr, TR_flFraction, flFraction);
+            get_tr2(pTr, TR_vecEndPos, vecEnd); // This is the point on the actual surface (the hull could have hit space)
+            get_tr2(pTr, TR_flFraction, flFraction);
         }
     }
 
@@ -1363,13 +1363,13 @@ DefaultSwing(this, Float:flDamage, Float:flRate, Float:flDistance) {
     rg_set_animation(pPlayer, PLAYER_ATTACK1);
 
     if (flFraction >= 1.0) {
-        free_tr2(tr);
+        free_tr2(pTr);
         return -1;
     }
 
-    new pHit = get_tr2(tr, TR_pHit);
+    new pHit = get_tr2(pTr, TR_pHit);
     if (pHit < 0) {
-        set_tr2(tr, TR_pHit, 0);
+        set_tr2(pTr, TR_pHit, 0);
         pHit = 0;
     }
 
@@ -1381,12 +1381,12 @@ DefaultSwing(this, Float:flDamage, Float:flRate, Float:flDistance) {
     xs_vec_normalize(vecDir, vecDir);
 
     rg_multidmg_clear();
-    ExecuteHamB(Ham_TraceAttack, pHit, pPlayer, flDamage, vecDir, tr, DMG_CLUB); 
+    ExecuteHamB(Ham_TraceAttack, pHit, pPlayer, flDamage, vecDir, pTr, DMG_CLUB); 
     rg_multidmg_apply(pPlayer, pPlayer);
     // }
 
 
-    set_pev(this, pev_iuser1, tr);
+    set_pev(this, pev_iuser1, pTr);
     SetThink(this, "Smack");
     set_pev(this, pev_nextthink, get_gametime() + (flRate * 0.5));
 
@@ -1607,7 +1607,7 @@ Float:WaterLevel(const Float:vecPosition[3], Float:flMinZ, Float:flMaxZ) {
     return vecMidUp[2];
 }
 
-FindHullIntersection(const Float:vecSrc[3], &tr, const Float:vecMins[3], const Float:vecMaxs[3], pEntity) {
+FindHullIntersection(const Float:vecSrc[3], &pTr, const Float:vecMins[3], const Float:vecMaxs[3], pEntity) {
     new Float:flDistance = 8192.0;
 
     static Float:rgvecMinsMaxs[2][3];
@@ -1617,7 +1617,7 @@ FindHullIntersection(const Float:vecSrc[3], &tr, const Float:vecMins[3], const F
     }
 
     static Float:vecHullEnd[3];
-    get_tr2(tr, TR_vecEndPos, vecHullEnd);
+    get_tr2(pTr, TR_vecEndPos, vecHullEnd);
 
     for (new i = 0; i < 3; ++i) {
         vecHullEnd[i] = vecSrc[i] + ((vecHullEnd[i] - vecSrc[i]) * 2.0);
@@ -1630,8 +1630,8 @@ FindHullIntersection(const Float:vecSrc[3], &tr, const Float:vecMins[3], const F
     get_tr2(tmpTrace, TR_flFraction, flFraction);
 
     if (flFraction < 1.0) {
-        free_tr2(tr);
-        tr = tmpTrace;
+        free_tr2(pTr);
+        pTr = tmpTrace;
         return;
     }
 
@@ -1652,8 +1652,8 @@ FindHullIntersection(const Float:vecSrc[3], &tr, const Float:vecMins[3], const F
                 if (flFraction < 1.0) {
                     new Float:flThisDistance = get_distance_f(vecEndPos, vecSrc);
                     if (flThisDistance < flDistance) {
-                        free_tr2(tr);
-                        tr = tmpTrace;
+                        free_tr2(pTr);
+                        pTr = tmpTrace;
                         flDistance = flThisDistance;
                     }
                 }
@@ -2345,11 +2345,11 @@ U_Srand(seed) {
     return seed_table[seed & 0xff];
 }
 
-// FireEvent(tr, const szSnd[], const szShellModel[]) {
+// FireEvent(pTr, const szSnd[], const szShellModel[]) {
 //     static Float:flFraction;
-//     get_tr2(tr, TR_flFraction, flFraction);
+//     get_tr2(pTr, TR_flFraction, flFraction);
 
-//     new pHit = get_tr2(tr, TR_pHit);
+//     new pHit = get_tr2(pTr, TR_pHit);
 
 //     if (flFraction != 1.0) {
 //          // Native_PlaySoundAtPosition( $origin = $trace_endpos, $sound = weapons/bullet_hit1.wav );
@@ -2357,7 +2357,7 @@ U_Srand(seed) {
 //          // Native_PlaceDecal( $origin = $trace_endpos, $decal = "{shot2", $trace_entity );
 
 //          new iDecalIndex = random_num(get_decal_index("{shot1"), get_decal_index("{shot5") + 1);
-//          MakeDecal(tr, pHit, iDecalIndex);
+//          MakeDecal(pTr, pHit, iDecalIndex);
 //     }
 // }
 
