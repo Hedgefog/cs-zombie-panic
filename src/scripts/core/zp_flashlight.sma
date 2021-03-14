@@ -51,7 +51,7 @@ public plugin_init() {
     RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
     RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
 
-    g_pCvarConsumptionRate = register_cvar("zp_flashlight_consumption_rate", "0.5");
+    g_pCvarConsumptionRate = register_cvar("zp_flashlight_consumption_rate", "1.0");
     g_pCvarRecoveryRate = register_cvar("zp_flashlight_recovery_rate", "0.5");
 }
 
