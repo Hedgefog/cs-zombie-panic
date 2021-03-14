@@ -88,6 +88,7 @@ forward ZP_Fw_PlayerPanic(pPlayer);
 forward ZP_Fw_PlayerZombieVision(pPlayer, bool:bValue);
 forward ZP_Fw_PlayerAimItem(pPlayer, pItem);
 forward ZP_Fw_PlayerInfected(pPlayer, pInfector);
+forward ZP_Fw_PlayerCured(pPlayer);
 forward ZP_Fw_PlayerTransformationDeath(pPlayer);
 forward ZP_Fw_PlayerTransformed(pPlayer);
 forward ZP_Fw_PlayerEquiped(pPlayer);
