@@ -54,7 +54,7 @@ public OnWeaponBoxTouch(this, pToucher) {
         return HAM_IGNORED;
     }
 
-    if (!CanPickupWeaponBox(pToucher, this, true)) {
+    if (!ShouldPickupWeaponBox(pToucher, this, true)) {
         return HAM_SUPERCEDE;
     }
 
@@ -216,7 +216,7 @@ bool:LookupNearbyItems(pBot) {
         pev(pEntity, pev_classname, szClassname, charsmax(szClassname));
 
         if (equal(szClassname, "weaponbox")) {
-            if (CanPickupWeaponBox(pBot, pEntity, false)) {
+            if (ShouldPickupWeaponBox(pBot, pEntity, false)) {
                 PickupWeaponBox(pBot, pEntity);
                 return true;
             }
@@ -231,7 +231,7 @@ PickupWeaponBox(pBot, pWeaponBox) {
     ExecuteHamB(Ham_Touch, pWeaponBox, pBot);
 }
 
-bool:CanPickupWeaponBox(pBot, pWeaponBox, bool:bTouched) {
+bool:ShouldPickupWeaponBox(pBot, pWeaponBox, bool:bTouched) {
     if (~pev(pWeaponBox, pev_flags) & FL_ONGROUND) {
         return false;
     }
