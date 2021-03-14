@@ -30,10 +30,17 @@ public plugin_init() {
     register_message(gmsgTeamInfo, "OnMessage");
 
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
-    if (ZP_Player_IsZombie(pPlayer) || is_user_bot(pPlayer)) {
+    if (ZP_Player_IsZombie(pPlayer) || UTIL_IsPlayerSpectator(pPlayer) || is_user_bot(pPlayer)) {
+        Reset(pPlayer);
+    }
+}
+
+public OnPlayerKilled_Post(pPlayer) {
+    if (ZP_Player_IsZombie(pPlayer) || UTIL_IsPlayerSpectator(pPlayer) || is_user_bot(pPlayer)) {
         Reset(pPlayer);
     }
 }
@@ -55,9 +62,9 @@ public OnEvent() {
 
         new iTeam = get_member(pPlayer, m_iTeam);
         new bool:bShowTeam = ZP_Player_IsZombie(pPlayer)
-            || ZP_GameRules_IsCompetitive()
+            || UTIL_IsPlayerSpectator(pPlayer)
             || is_user_bot(pPlayer)
-            || UTIL_IsPlayerSpectator(pPlayer);
+            || ZP_GameRules_IsCompetitive();
 
         SendMessage(pPlayer, pTargetPlayer, bShowTeam ? szTeam : g_rgszTeams[iTeam]);
     }
