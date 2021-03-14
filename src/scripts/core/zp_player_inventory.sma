@@ -381,12 +381,17 @@ SelectNextPlayerAmmo(pPlayer, bool:bShowMessage = true) {
     }
 }
 
-DropPlayerSelectedAmmo(pPlayer) {
+DropPlayerSelectedAmmo(pPlayer, bool:bFind = true) {
     new iAmmoIndex = g_pPlayerSelectedAmmo[pPlayer];
     new iAmmoId = ZP_Ammo_GetId(iAmmoIndex);
     new iBpAmmo = get_member(pPlayer, m_rgAmmo, iAmmoId);
 
     if (iBpAmmo <= 0) {
+        if (bFind) {
+            SelectNextPlayerAmmo(pPlayer);
+            DropPlayerSelectedAmmo(pPlayer, false);
+        }
+
         return;
     }
 
@@ -408,6 +413,10 @@ DropPlayerSelectedAmmo(pPlayer) {
     get_global_vector(GL_v_forward, vecVelocity);
     xs_vec_mul_scalar(vecVelocity, random_float(400.0, 450.0), vecVelocity);
     set_pev(pWeaponBox, pev_velocity, vecVelocity);
+
+    if (get_member(pPlayer, m_rgAmmo, iAmmoId) <= 0) {
+        SelectNextPlayerAmmo(pPlayer);
+    }
 
     ZP_Player_UpdateSpeed(pPlayer);
 }
