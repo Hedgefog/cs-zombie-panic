@@ -497,6 +497,10 @@ RespawnPlayers() {
 }
 
 DispatchWin(iTeam) {
+    if (Round_IsRoundEnd()) {
+        return;
+    }
+
     Round_DispatchWin(iTeam, ZP_NEW_ROUND_DELAY);
     ExecuteForward(g_pFwRoundEnd, g_iFwResult, iTeam);
 }
