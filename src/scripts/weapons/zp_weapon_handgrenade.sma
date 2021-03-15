@@ -64,6 +64,10 @@ public @Weapon_PrimaryAttack(this) {
 public @Weapon_Idle(this) {
     new pPlayer = CW_GetPlayer(this);
 
+    if (!is_user_connected(pPlayer)) {
+        return;
+    }
+
     if (!get_member(this, m_flReleaseThrow) && get_member(this, m_flStartThrow)) {
         set_member(this, m_flReleaseThrow, get_gametime());
     }
@@ -105,6 +109,12 @@ public @Weapon_Deploy(this) {
 }
 
 public @Weapon_Holster(this) {
+    new pPlayer = CW_GetPlayer(this);
+
+    if (!is_user_connected(pPlayer)) {
+        return;
+    }
+
     if (get_member(this, m_flStartThrow)) {
         ThrowGrenade(this);
     }
@@ -112,7 +122,6 @@ public @Weapon_Holster(this) {
     // set_member(this, m_flStartThrow, 0.0);
     // set_member(this, m_flReleaseThrow, -1.0);
     
-    new pPlayer = CW_GetPlayer(this);
     if (get_member(pPlayer, m_rgAmmo, g_iAmmoId) <= 0) {
         SetThink(this, "RemovePlayerItem");
         set_pev(this, pev_nextthink, get_gametime() + 0.1);
