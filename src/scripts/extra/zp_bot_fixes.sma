@@ -31,6 +31,15 @@ new CW:g_iCwCrowbarHandler;
 new CW:g_iCwGrenadeHandler;
 new CW:g_iCwSatchelHandler;
 
+new g_pCvarFixMeleeAttack;
+new g_pCvarFixPickup;
+new g_pCvarDropUnloadedGun;
+new g_pCvarDropAmmo;
+new g_pCvarDestroyBreakables;
+new g_pCvarFixGrenadeThrow;
+new g_pCvarPanic;
+new g_pCvarActivateObjectives;
+
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
@@ -41,6 +50,15 @@ public plugin_init() {
 
     RegisterHam(Ham_Touch, "weaponbox", "OnWeaponBoxTouch", .Post = 0);
     RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
+
+    g_pCvarFixMeleeAttack = register_cvar("zp_bot_fix_melee_attack", "1");
+    g_pCvarFixPickup = register_cvar("zp_bot_fix_pickup", "1");
+    g_pCvarDropUnloadedGun = register_cvar("zp_bot_drop_unloaded_gun", "1");
+    g_pCvarDropAmmo = register_cvar("zp_bot_drop_ammo", "1");
+    g_pCvarDestroyBreakables = register_cvar("zp_bot_fix_destroy_breakables", "1");
+    g_pCvarFixGrenadeThrow = register_cvar("zp_bot_fix_grenade_throw", "1");
+    g_pCvarPanic = register_cvar("zp_bot_panic", "1");
+    g_pCvarActivateObjectives = register_cvar("zp_bot_activate_objectives", "1");
 }
 
 public OnWeaponBoxTouch(this, pToucher) {
@@ -153,6 +171,10 @@ DropAmmoToTeammate(pBot, pTeammate, iAmmoIndex) {
 }
 
 bool:LookupObjectiveButton(pBot) {
+    if (!get_pcvar_num(g_pCvarActivateObjectives)) {
+        return false;
+    }
+
     new pObjectiveButton = FindObjectiveButtonNearby(pBot, USE_BUTTON_RANGE);
     if (pObjectiveButton == -1) {
         return false;
@@ -187,6 +209,10 @@ bool:LoockupEnemyToThrowGrenade(pBot) {
 }
 
 bool:LookupBreakable(pBot) {
+    if (!get_pcvar_num(g_pCvarDestroyBreakables)) {
+        return false;
+    }
+
     new pBreakable = FindBreakableNearby(pBot, MELEE_ATTACK_BREAKABLE_RANGE);
     if (pBreakable == -1) {
         return false;
@@ -201,6 +227,10 @@ bool:LookupBreakable(pBot) {
 }
 
 bool:LookupTeamateToSupport(pBot) {
+    if (!get_pcvar_num(g_pCvarDropAmmo)) {
+        return false;
+    }
+
     new pTeammate = FindPlayerNearby(pBot, TEAMMATE_SEARCH_RANGE, ZP_HUMAN_TEAM);
     if (pTeammate == -1) {
         return false;
@@ -216,6 +246,10 @@ bool:LookupTeamateToSupport(pBot) {
 }
 
 bool:LookupNearbyItems(pBot) {
+    if (!get_pcvar_num(g_pCvarFixPickup)) {
+        return false;
+    }
+
     static Float:vecOrigin[3];
     pev(pBot, pev_origin, vecOrigin);
 
@@ -320,6 +354,10 @@ bool:ShouldPickupWeaponBox(pBot, pWeaponBox, bool:bTouched) {
 }
 
 bool:ShouldAttackWithMelee(pBot) {
+    if (!get_pcvar_num(g_pCvarFixMeleeAttack)) {
+        return false;
+    }
+
     new pEnemy = FindPlayerNearby(pBot, MELEE_ATTACK_RANGE, ZP_Player_IsZombie(pBot) ? ZP_HUMAN_TEAM : ZP_ZOMBIE_TEAM);
     if (pEnemy == -1) {
         return false;
@@ -339,6 +377,10 @@ bool:ShouldAttackWithMelee(pBot) {
 }
 
 bool:ShouldThrowGrenade(pBot) {
+    if (!get_pcvar_num(g_pCvarFixGrenadeThrow)) {
+        return false;
+    }
+
     static Float:vecOrigin[3];
     pev(pBot, pev_origin, vecOrigin);
 
@@ -403,6 +445,10 @@ bool:ShouldThrowGrenade(pBot) {
 }
 
 bool:ShouldPanic(pBot) {
+    if (!get_pcvar_num(g_pCvarPanic)) {
+        return false;
+    }
+
     static Float:flMaxSpeed;
     pev(pBot, pev_maxspeed, flMaxSpeed);
 
@@ -418,6 +464,10 @@ bool:ShouldPanic(pBot) {
 }
 
 bool:ShouldDropActiveItem(pBot) {
+    if (!get_pcvar_num(g_pCvarDropUnloadedGun)) {
+        return false;
+    }
+
     new pActiveItem = get_member(pBot, m_pActiveItem);
     if (pActiveItem == -1) {
         return false;
