@@ -21,6 +21,8 @@
 #define PANIC_RANGE 256.0
 #define PICKUP_RANGE 64.0
 #define PANIC_CHANCE 30.0
+#define THROW_GRENADE_MIN_RANGE 128.0
+#define THROW_GRENADE_MAX_RANGE 512.0
 
 new Float:g_flPlayerNextThink[MAX_PLAYERS + 1];
 
@@ -92,6 +94,11 @@ public OnPlayerPreThink_Post(pPlayer) {
             g_flPlayerNextThink[pPlayer] = get_gametime() + 1.0;
             return HAM_HANDLED;
         }
+    } else if (iCwHandler == g_iCwGrenadeHandler) {
+        if (LoockupEnemyToThrowGrenade(pPlayer)) {
+            g_flPlayerNextThink[pPlayer] = get_gametime() + 0.5;
+            return HAM_HANDLED;
+        }
     }
 
     if (!ZP_Player_IsZombie(pPlayer)) {
@@ -159,6 +166,17 @@ bool:LookupObjectiveButton(pBot) {
 
 bool:LookupEnemyToStub(pBot) {
     if (!ShouldAttackWithMelee(pBot)) {
+        return false;
+    }
+
+    new pActiveItem = get_member(pBot, m_pActiveItem);
+    CW_PrimaryAttack(pActiveItem);
+
+    return true;
+}
+
+bool:LoockupEnemyToThrowGrenade(pBot) {
+    if (!ShouldThrowGrenade(pBot)) {
         return false;
     }
 
@@ -255,20 +273,22 @@ bool:ShouldPickupWeaponBox(pBot, pWeaponBox, bool:bTouched) {
 
         new CW:iCwHandler = CW_GetHandlerByEntity(pItem);
 
-        if (iCwHandler == g_iCwGrenadeHandler) {
-            return false;
-        }
+        // if (iCwHandler == g_iCwGrenadeHandler) {
+        //     return false;
+        // }
 
         if (iCwHandler == g_iCwSatchelHandler) {
             return false;
         }
 
-        new iClip = get_member(pItem, m_Weapon_iClip);
-        new iPrimaryAmmoId = get_member(pItem, m_Weapon_iPrimaryAmmoType);
-        new iBpAmmo = get_member(pBot, m_rgAmmo, iPrimaryAmmoId);
+        if (iCwHandler != g_iCwGrenadeHandler) {
+            new iClip = get_member(pItem, m_Weapon_iClip);
+            new iPrimaryAmmoId = get_member(pItem, m_Weapon_iPrimaryAmmoType);
+            new iBpAmmo = get_member(pBot, m_rgAmmo, iPrimaryAmmoId);
 
-        if (!iClip && !iBpAmmo) {
-            return false;
+            if (!iClip && !iBpAmmo) {
+                return false;
+            }
         }
 
         bContainsWeapon = true;
@@ -318,6 +338,54 @@ bool:ShouldAttackWithMelee(pBot) {
     return true;
 }
 
+bool:ShouldThrowGrenade(pBot) {
+    static Float:vecOrigin[3];
+    pev(pBot, pev_origin, vecOrigin);
+
+    static Float:vecViewOfs[3];
+    pev(pBot, pev_view_ofs, vecViewOfs);
+    vecOrigin[2] += vecViewOfs[2];
+
+    new iTeam = get_member(pBot, m_iTeam);
+
+    for (new pTarget = 1; pTarget <= MaxClients; ++pTarget) {
+        if (pTarget == pBot) {
+            continue;
+        }
+
+        if (!is_user_connected(pTarget)) {
+            continue;
+        }
+
+        if (!is_user_alive(pTarget)) {
+            continue;
+        }        
+
+        if (iTeam == get_member(pTarget, m_iTeam)) {
+            continue;
+        }
+
+        static Float:vecTarget[3];
+        pev(pTarget, pev_origin, vecTarget);
+
+        new Float:flDistance = xs_vec_distance(vecOrigin, vecTarget);
+        if (flDistance < THROW_GRENADE_MIN_RANGE || flDistance > THROW_GRENADE_MAX_RANGE) {
+            continue;
+        }
+
+        if (!IsEntityReachable(pBot, pTarget)) {
+            continue;
+        }
+
+        if (!is_in_viewcone(pBot, vecTarget)) {
+            continue;
+        }
+
+        return true;
+    }
+
+    return false;
+}
 
 bool:ShouldPanic(pBot) {
     static Float:flMaxSpeed;
