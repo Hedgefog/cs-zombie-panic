@@ -102,6 +102,10 @@ public bool:Native_IsCompetitive(iPluginId, iArgc) {
 public bool:Native_CanItemRespawn(iPluginId, iArgc) {
     new pItem = get_param(1);
 
+    if (!Round_IsRoundStarted()) {
+        return true;
+    }
+
     if (get_gametime() - Float:get_member_game(m_fRoundStartTime) <= 1.0) {
         return true;
     }
