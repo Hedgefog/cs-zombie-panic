@@ -23,6 +23,7 @@
 #define PANIC_CHANCE 30.0
 #define THROW_GRENADE_MIN_RANGE 256.0
 #define THROW_GRENADE_MAX_RANGE 768.0
+#define PICKUP_HEALTHKIT_MIN_DAMAGE 10.0
 
 new Float:g_flPlayerNextThink[MAX_PLAYERS + 1];
 
@@ -33,6 +34,7 @@ new CW:g_iCwSatchelHandler;
 
 new g_pCvarFixMeleeAttack;
 new g_pCvarFixPickup;
+new g_pCvarPickupHealthkit;
 new g_pCvarDropUnloadedGun;
 new g_pCvarDropAmmo;
 new g_pCvarDestroyBreakables;
@@ -53,6 +55,7 @@ public plugin_init() {
 
     g_pCvarFixMeleeAttack = register_cvar("zp_bot_fix_melee_attack", "1");
     g_pCvarFixPickup = register_cvar("zp_bot_fix_pickup", "1");
+    g_pCvarPickupHealthkit = register_cvar("zp_bot_pickup_healthkit", "1");
     g_pCvarDropUnloadedGun = register_cvar("zp_bot_drop_unloaded_gun", "1");
     g_pCvarDropAmmo = register_cvar("zp_bot_drop_ammo", "1");
     g_pCvarDestroyBreakables = register_cvar("zp_bot_fix_destroy_breakables", "1");
@@ -269,7 +272,12 @@ bool:LookupNearbyItems(pBot) {
 
         if (equal(szClassname, "weaponbox")) {
             if (ShouldPickupWeaponBox(pBot, pEntity, false)) {
-                PickupWeaponBox(pBot, pEntity);
+                PickupItem(pBot, pEntity);
+                return true;
+            }
+        } else if (equal(szClassname, "item_healthkit")) {
+            if (ShouldPickupHealthKit(pBot)) {
+                PickupItem(pBot, pEntity);
                 return true;
             }
         }
@@ -278,9 +286,9 @@ bool:LookupNearbyItems(pBot) {
     return false;
 }
 
-PickupWeaponBox(pBot, pWeaponBox) {
-    TurnToEntity(pBot, pWeaponBox);
-    ExecuteHamB(Ham_Touch, pWeaponBox, pBot);
+PickupItem(pBot, pItem) {
+    TurnToEntity(pBot, pItem);
+    ExecuteHamB(Ham_Touch, pItem, pBot);
 }
 
 bool:ShouldPickupWeaponBox(pBot, pWeaponBox, bool:bTouched) {
@@ -347,6 +355,24 @@ bool:ShouldPickupWeaponBox(pBot, pWeaponBox, bool:bTouched) {
             }
         }
 
+        return false;
+    }
+
+    return true;
+}
+
+bool:ShouldPickupHealthKit(pBot) {
+    if (!get_pcvar_num(g_pCvarPickupHealthkit)) {
+        return false;
+    }
+
+    static Float:flMaxHealth;
+    pev(pBot, pev_max_health, flMaxHealth);
+
+    static Float:flHealth;
+    pev(pBot, pev_health, flHealth);
+
+    if (flMaxHealth - flHealth < PICKUP_HEALTHKIT_MIN_DAMAGE) {
         return false;
     }
 
