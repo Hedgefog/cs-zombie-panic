@@ -102,6 +102,10 @@ RespawnPlayer(pPlayer) {
         return;
     }
 
+    if (get_member(pPlayer, m_iTeam) == 3) {
+        return;
+    }
+
     if (ZP_Player_IsZombie(pPlayer)) {
         if (!ZP_GameRules_GetObjectiveMode()) {
             SetLives(g_iLives - 1);
