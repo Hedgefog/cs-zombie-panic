@@ -21,8 +21,8 @@
 #define PANIC_RANGE 256.0
 #define PICKUP_RANGE 64.0
 #define PANIC_CHANCE 30.0
-#define THROW_GRENADE_MIN_RANGE 128.0
-#define THROW_GRENADE_MAX_RANGE 512.0
+#define THROW_GRENADE_MIN_RANGE 192.0
+#define THROW_GRENADE_MAX_RANGE 768.0
 
 new Float:g_flPlayerNextThink[MAX_PLAYERS + 1];
 
@@ -346,6 +346,26 @@ bool:ShouldThrowGrenade(pBot) {
     pev(pBot, pev_view_ofs, vecViewOfs);
     vecOrigin[2] += vecViewOfs[2];
 
+    static Float:vecAngles[3];
+    pev(pBot, pev_v_angle, vecAngles);
+
+    static Float:vecAimOrigin[3];
+    angle_vector(vecAngles, ANGLEVECTOR_FORWARD, vecAimOrigin);
+    xs_vec_mul_scalar(vecAimOrigin, THROW_GRENADE_MIN_RANGE, vecAimOrigin);
+    xs_vec_add(vecOrigin, vecAimOrigin, vecAimOrigin);
+
+    new pTr = create_tr2();
+    engfunc(EngFunc_TraceLine, vecOrigin, vecAimOrigin, DONT_IGNORE_MONSTERS, pBot, pTr);
+
+    static Float:flFraction;
+    get_tr2(pTr, TR_flFraction, flFraction);
+
+    free_tr2(pTr);
+
+    if (flFraction < 1.0) {
+        return false;
+    }
+
     new iTeam = get_member(pBot, m_iTeam);
 
     for (new pTarget = 1; pTarget <= MaxClients; ++pTarget) {
@@ -368,12 +388,7 @@ bool:ShouldThrowGrenade(pBot) {
         static Float:vecTarget[3];
         pev(pTarget, pev_origin, vecTarget);
 
-        new Float:flDistance = xs_vec_distance(vecOrigin, vecTarget);
-        if (flDistance < THROW_GRENADE_MIN_RANGE || flDistance > THROW_GRENADE_MAX_RANGE) {
-            continue;
-        }
-
-        if (!IsEntityReachable(pBot, pTarget)) {
+        if (xs_vec_distance_2d(vecOrigin, vecTarget) > THROW_GRENADE_MAX_RANGE) {
             continue;
         }
 
