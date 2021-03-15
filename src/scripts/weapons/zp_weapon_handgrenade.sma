@@ -43,6 +43,7 @@ public plugin_precache() {
     CW_Bind(g_iCwHandler, CWB_GetMaxSpeed, "@Weapon_GetMaxSpeed");
     CW_Bind(g_iCwHandler, CWB_Spawn, "@Weapon_Spawn");
     CW_Bind(g_iCwHandler, CWB_WeaponBoxModelUpdate, "@Weapon_WeaponBoxSpawn");
+    CW_Bind(g_iCwHandler, CWB_CanDrop, "@Weapon_CanDrop");
 
     ZP_Weapons_Register(g_iCwHandler, 0.0);
 }
@@ -67,6 +68,8 @@ public @Weapon_Idle(this) {
         set_member(this, m_flReleaseThrow, get_gametime());
     }
 
+    new iBpAmmo = get_member(pPlayer, m_rgAmmo, g_iAmmoId);
+
     if (get_member(this, m_flStartThrow)) {
         ThrowGrenade(this);
         return;
@@ -74,7 +77,7 @@ public @Weapon_Idle(this) {
         // we've finished the throw, restart.
         set_member(this, m_flStartThrow, 0.0);
 
-        if (get_member(pPlayer, m_rgAmmo, g_iAmmoId > 0)) {
+        if (iBpAmmo > 0) {
             CW_PlayAnimation(this, 7, 16.0 / 30.0);
         } else {
             CW_RemovePlayerItem(this);
@@ -85,7 +88,7 @@ public @Weapon_Idle(this) {
         return;
     }
 
-    if (get_member(pPlayer, m_rgAmmo, g_iAmmoId)) {
+    if (iBpAmmo > 0) {
         if (random_float(0.0, 1.0) <= 0.75) {
             CW_PlayAnimation(this, 0, 91.0 / 30.0);
         } else {
@@ -132,6 +135,20 @@ public @Weapon_Spawn(this) {
 public @Weapon_WeaponBoxSpawn(this, pWeaponBox) {
     engfunc(EngFunc_SetModel, pWeaponBox, ZP_WEAPON_GRENADE_W_MODEL);
 }
+
+public @Weapon_CanDrop(this) {
+    if (get_member(this, m_flStartThrow)) {
+        return PLUGIN_HANDLED;
+    }
+
+    new pPlayer = CW_GetPlayer(this);
+    if (!get_member(pPlayer, m_rgAmmo, g_iAmmoId)) {
+        return PLUGIN_HANDLED;
+    }
+
+    return PLUGIN_CONTINUE;
+}
+
 
 ThrowGrenade(this) {
     new pPlayer = CW_GetPlayer(this);
@@ -315,7 +332,10 @@ public BounceTouch(this, pOther) {
 
 public TumbleThink(this) {
     if (!ExecuteHam(Ham_IsInWorld, this)) {
-        engfunc(EngFunc_RemoveEntity, this);
+        set_pev(this, pev_flags, FL_KILLME);
+        set_pev(this, pev_targetname, 0);
+        SetThink(this, "");
+        dllfunc(DLLFunc_Think, this);
         return;
     }
 
