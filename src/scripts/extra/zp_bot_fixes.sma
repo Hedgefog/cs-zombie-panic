@@ -423,6 +423,11 @@ bool:ShouldDropActiveItem(pBot) {
         return false;
     }
 
+    new CW:iCwHandler = CW_GetHandlerByEntity(pActiveItem);
+    if (iCwHandler == g_iCwGrenadeHandler) {
+        return false;
+    }
+
     new iClip = get_member(pActiveItem, m_Weapon_iClip);
     if (iClip) {
         return false;
