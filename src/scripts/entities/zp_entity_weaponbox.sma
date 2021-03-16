@@ -56,7 +56,17 @@ public OnWeaponBoxTouch(pWeaponBox, pToucher) {
 public OnRemoveGuns() {
     new pWeaponBox;
     while((pWeaponBox = engfunc(EngFunc_FindEntityByString, pWeaponBox, "classname", "weaponbox")) > 0) {
-        engfunc(EngFunc_RemoveEntity, pWeaponBox);
+        for (new iSlot = 0; iSlot < 6; ++iSlot) {
+            new pItem = get_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, iSlot);
+            while (pItem != -1) {
+                new pNextItem = get_member(pItem, m_pNext);
+                engfunc(EngFunc_RemoveEntity, pItem);
+                pItem = pNextItem;
+            }
+        }
+
+        set_pev(pWeaponBox, pev_flags, FL_KILLME);
+        dllfunc(DLLFunc_Think, pWeaponBox);
     }
 }
 
