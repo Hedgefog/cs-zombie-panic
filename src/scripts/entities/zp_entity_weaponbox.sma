@@ -24,6 +24,7 @@ public plugin_init() {
     gmsgAmmoPickup = get_user_msgid("AmmoPickup");
 
     RegisterHam(Ham_Touch, "weaponbox", "OnWeaponBoxTouch", .Post = 0);
+    RegisterHookChain(RG_CSGameRules_RemoveGuns, "OnRemoveGuns", .post = 1);
 }
 
 public OnWeaponBoxTouch(pWeaponBox, pToucher) {
@@ -52,10 +53,10 @@ public OnWeaponBoxTouch(pWeaponBox, pToucher) {
     return HAM_SUPERCEDE;
 }
 
-public Round_Fw_NewRound() {
+public OnRemoveGuns() {
     new pWeaponBox;
     while((pWeaponBox = engfunc(EngFunc_FindEntityByString, pWeaponBox, "classname", "weaponbox")) > 0) {
-        set_pev(pWeaponBox, pev_flags, FL_KILLME);
+        engfunc(EngFunc_RemoveEntity, pWeaponBox);
     }
 }
 
