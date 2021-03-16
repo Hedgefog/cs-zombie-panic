@@ -81,6 +81,7 @@ native bool:ZP_Player_IsInfected(pPlayer);
 native bool:ZP_Player_IsTransforming(pPlayer);
 native bool:ZP_Player_IsPartialZombie(pPlayer);
 native ZP_Player_SetInfected(pPlayer, bool:bValue, pInfector = 0);
+native ZP_Player_GetInfector(pPlayer);
 native bool:ZP_Player_SetCharacter(pPlayer, const szCharacter[]);
 
 forward ZP_Fw_PlayerJoined(pPlayer);

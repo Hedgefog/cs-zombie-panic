@@ -79,6 +79,7 @@ public plugin_natives() {
     register_native("ZP_Player_IsInfected", "Native_IsPlayerInfected");
     register_native("ZP_Player_IsPartialZombie", "Native_IsPlayerPartialZombie");
     register_native("ZP_Player_IsTransforming", "Native_IsPlayerTransforming");
+    register_native("ZP_Player_GetInfector", "Native_GetInfector");
 }
 
 public Native_SetInfected(iPluginId, iArgc) {
@@ -105,6 +106,16 @@ public bool:Native_IsPlayerTransforming(iPluginId, iArgc) {
     new pPlayer = get_param(1);
 
     return IsPlayerInfected(pPlayer) && g_iPlayerInfectionState[pPlayer] >= InfectionState_Transformation;
+}
+
+public Native_GetInfector(iPluginId, iArgc) {
+    new pPlayer = get_param(1);
+
+    if (!IsPlayerInfected(pPlayer)) {
+        return -1;
+    }
+
+    return g_pPlayerInfector[pPlayer];
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
