@@ -276,7 +276,7 @@ bool:LookupNearbyItems(pBot) {
                 return true;
             }
         } else if (equal(szClassname, "item_healthkit")) {
-            if (ShouldPickupHealthKit(pBot)) {
+            if (ShouldPickupHealthKit(pBot, pEntity)) {
                 PickupItem(pBot, pEntity);
                 return true;
             }
@@ -361,8 +361,12 @@ bool:ShouldPickupWeaponBox(pBot, pWeaponBox, bool:bTouched) {
     return true;
 }
 
-bool:ShouldPickupHealthKit(pBot) {
+bool:ShouldPickupHealthKit(pBot, pHealthKit) {
     if (!get_pcvar_num(g_pCvarPickupHealthkit)) {
+        return false;
+    }
+
+    if (pev(pHealthKit, pev_solid) == SOLID_NOT) {
         return false;
     }
 
