@@ -257,11 +257,13 @@ bool:LookupNearbyItems(pBot) {
     pev(pBot, pev_origin, vecOrigin);
 
     new pEntity;
-    new iPrevEntity;
+    new pPrevEntity;
     while ((pEntity = engfunc(EngFunc_FindEntityInSphere, pEntity, vecOrigin, PICKUP_RANGE)) != 0) {
-        if (iPrevEntity >= pEntity) {
+        if (pPrevEntity >= pEntity) {
             break;
         }
+
+        pPrevEntity = pEntity;
 
         if (!pev_valid(pEntity)) {
             continue;
@@ -566,11 +568,13 @@ FindBreakableNearby(pBot, Float:flRange) {
     new pBreakable = -1;
 
     new pEntity;
-    new iPrevEntity;
+    new pPrevEntity;
     while ((pEntity = engfunc(EngFunc_FindEntityInSphere, pEntity, vecOrigin, flRange)) != 0) {
-        if (iPrevEntity >= pEntity) {
+        if (pPrevEntity >= pEntity) {
             break;
         }
+
+        pPrevEntity = pEntity;
 
         if (!pev_valid(pEntity)) {
             continue;
@@ -633,11 +637,13 @@ FindObjectiveButtonNearby(pBot, Float:flRange) {
     new pBreakable = -1;
 
     new pEntity;
-    new iPrevEntity;
+    new pPrevEntity;
     while ((pEntity = engfunc(EngFunc_FindEntityInSphere, pEntity, vecOrigin, flRange)) != 0) {
-        if (iPrevEntity >= pEntity) {
+        if (pPrevEntity >= pEntity) {
             break;
         }
+
+        pPrevEntity = pEntity;
 
         if (!pev_valid(pEntity)) {
             continue;

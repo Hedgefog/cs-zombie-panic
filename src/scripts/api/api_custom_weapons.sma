@@ -1680,11 +1680,13 @@ _RadiusDamage(const Float:vecOrigin[3], iInflictor, pAttacker, Float:flDamage, F
     new pTr = create_tr2();
 
     new pEntity;
-    new iPrevEntity;
+    new pPrevEntity;
     while ((pEntity = engfunc(EngFunc_FindEntityInSphere, pEntity, vecSrc, flRadius)) != 0) {
-        if (iPrevEntity >= pEntity) {
+        if (pPrevEntity >= pEntity) {
             break;
         }
+
+        pPrevEntity = pEntity;
 
         if (!pev_valid(pEntity)) {
             continue;
@@ -1753,8 +1755,6 @@ _RadiusDamage(const Float:vecOrigin[3], iInflictor, pAttacker, Float:flDamage, F
         } else {
             ExecuteHamB(Ham_TakeDamage, pEntity, iInflictor, pAttacker, flAdjustedDamage, iDamageBits);
         }
-
-        iPrevEntity = pEntity;
     }
 
     free_tr2(pTr);

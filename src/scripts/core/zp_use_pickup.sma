@@ -121,7 +121,14 @@ public OnPlayerPreThink_Post(pPlayer) {
     free_tr2(pTr);
 
     new pEntity;
+    new pPrevEntity;
     while ((pEntity = engfunc(EngFunc_FindEntityInSphere, pEntity, vecEnd, 1.0)) != 0) {
+        if (pPrevEntity >= pEntity) {
+            break;
+        }
+
+        pPrevEntity = pEntity;
+
         if (pev(pEntity, pev_solid) == SOLID_NOT) {
             continue;
         }
