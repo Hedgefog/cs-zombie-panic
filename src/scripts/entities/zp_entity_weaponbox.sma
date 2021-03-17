@@ -208,15 +208,24 @@ FindPlayerItemById(pPlayer, iId) {
 }
 
 Remove(pWeaponBox) {
+    Free(pWeaponBox);
+    RemoveEntity(pWeaponBox);
+}
+
+Free(pWeaponBox) {
     for (new iSlot = 0; iSlot < 6; ++iSlot) {
         new pItem = get_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, iSlot);
+        set_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, -1, iSlot);
+
         while (pItem != -1) {
             new pNextItem = get_member(pItem, m_pNext);
-            engfunc(EngFunc_RemoveEntity, pItem);
+            RemoveEntity(pItem);
             pItem = pNextItem;
         }
     }
+}
 
-    set_pev(pWeaponBox, pev_flags, FL_KILLME);
-    dllfunc(DLLFunc_Think, pWeaponBox);
+RemoveEntity(pEntity) {
+    set_pev(pEntity, pev_flags, FL_KILLME);
+    dllfunc(DLLFunc_Think, pEntity);
 }
