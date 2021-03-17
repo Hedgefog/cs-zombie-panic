@@ -669,10 +669,10 @@ public OnWeaponClCmd(pPlayer) {
     new CW:iHandler;
     TrieGetCell(g_rgWeaponsMap, szName, iHandler);
 
-    new iWeapon = GetData(iHandler, CW_Data_Id);
+    new iWeaponId = GetData(iHandler, CW_Data_Id);
 
     static szBaseName[32];
-    get_weaponname(iWeapon, szBaseName, charsmax(szBaseName));
+    get_weaponname(iWeaponId, szBaseName, charsmax(szBaseName));
     client_cmd(pPlayer, szBaseName);
 
     return PLUGIN_HANDLED;

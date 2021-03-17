@@ -51,7 +51,7 @@ enum CW_Flags (<<=1) {
 
 native CW:CW_Register(const szName[], iWeaponId, iClipSize = WEAPON_NOCLIP, iPrimaryAmmoType = -1, iPrimaryAmmoMaxAmount = -1, iSecondaryAmmoType = -1, iSecondaryAmmoMaxAmount = -1, iSlotId = 0, iPosition = 0, iWeaponFlags = 0, const szIcon[] = "", CW_Flags:iFlags = CWF_None);
 native CW_Bind(CW:iHandler, CW_Binding:iBinding, const szFunctionName[]);
-native CW:CW_GetHandlerByEntity(iEntity);
+native CW:CW_GetHandlerByEntity(pEntity);
 native CW:CW_GetHandler(const szName[]);
 
 native CW_Deploy(pItem);
