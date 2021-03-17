@@ -236,7 +236,7 @@ DropPlayerItems(pPlayer) {
         set_member(pPlayer, m_rgpPlayerItems, -1, iSlot);
 
         while (pItem != -1) {
-            new iNextItem = get_member(pItem, m_pNext);
+            new pNextItem = get_member(pItem, m_pNext);
 
             if (ExecuteHamB(Ham_CS_Item_CanDrop, pItem)) {
                 new iClip = get_member(pItem, m_Weapon_iClip);
@@ -265,7 +265,7 @@ DropPlayerItems(pPlayer) {
                 }
             }
 
-            pItem = iNextItem;
+            pItem = pNextItem;
         }
     }
 

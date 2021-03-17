@@ -1967,11 +1967,11 @@ RegisterWeaponHooks(iWeaponId) {
 // ANCHOR: Effects
 
 SparkShower(const Float:vecOrigin[3], const Float:vecAngles[3], iOwner) {
-    new iSparkShower = engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, "spark_shower"));
-    engfunc(EngFunc_SetOrigin, iSparkShower, vecOrigin);
-    set_pev(iSparkShower, pev_angles, vecAngles);
-    set_pev(iSparkShower, pev_owner, iOwner);
-    dllfunc(DLLFunc_Spawn, iSparkShower);
+    new pSparkShower = engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, "spark_shower"));
+    engfunc(EngFunc_SetOrigin, pSparkShower, vecOrigin);
+    set_pev(pSparkShower, pev_angles, vecAngles);
+    set_pev(pSparkShower, pev_owner, iOwner);
+    dllfunc(DLLFunc_Spawn, pSparkShower);
 }
 
 GrenadeExplosion(const Float:vecOrigin[3], Float:flDamage) {

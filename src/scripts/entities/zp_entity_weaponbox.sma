@@ -82,7 +82,7 @@ bool:PickupWeaponBoxItems(pPlayer, pWeaponBox) {
 
         new iPrevBoxItem = -1;
         while (pItem != -1) {
-            new iNextItem = get_member(pItem, m_pNext); // get next item
+            new pNextItem = get_member(pItem, m_pNext); // get next item
             set_member(pItem, m_pNext, -1); // reset next item
 
             new iId = get_member(pItem, m_iId);
@@ -110,7 +110,7 @@ bool:PickupWeaponBoxItems(pPlayer, pWeaponBox) {
                 }
             }
 
-            pItem = iNextItem;
+            pItem = pNextItem;
         }
     }
 
