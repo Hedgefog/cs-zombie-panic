@@ -165,6 +165,10 @@ public OnPlayerPostThink_Post(pPlayer) {
         return HAM_IGNORED;
     }
 
+    if (!pev_valid(g_pPlayerAimItem[pPlayer])) {
+        return HAM_IGNORED;
+    }
+
     g_bBlockTouch = false;
     ExecuteHamB(Ham_Touch, g_pPlayerAimItem[pPlayer], pPlayer);
     g_bBlockTouch = true;
