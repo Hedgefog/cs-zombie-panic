@@ -221,7 +221,9 @@ bool:LookupBreakable(pBot) {
         return false;
     }
 
+    if (!ExecuteHamB(Ham_FInViewCone, pBot, pBreakable)) {
     TurnToEntity(pBot, pBreakable);
+    }
 
     new pActiveItem = get_member(pBot, m_pActiveItem);
     CW_PrimaryAttack(pActiveItem);
@@ -390,18 +392,22 @@ bool:ShouldAttackWithMelee(pBot) {
         return false;
     }
 
-    new pEnemy = FindPlayerNearby(pBot, MELEE_ATTACK_RANGE, ZP_Player_IsZombie(pBot) ? ZP_HUMAN_TEAM : ZP_ZOMBIE_TEAM);
+    new pAimEntity = GetAimEntity(pBot, MELEE_ATTACK_RANGE);
+    if (pAimEntity != -1) {
+        if (UTIL_IsPlayer(pAimEntity)) {
+            return true;
+        } else {
+            static szClassname[32];
+            pev(pAimEntity, pev_classname, szClassname, charsmax(szClassname));
+
+            if (equal(szClassname, "func_breakable")) {
+                return true;
+    }
+        }
+    }
+
+    new pEnemy = FindPlayerNearby(pBot, MELEE_ATTACK_RANGE, ZP_Player_IsZombie(pBot) ? ZP_HUMAN_TEAM : ZP_ZOMBIE_TEAM, true);
     if (pEnemy == -1) {
-        return false;
-    }
-
-    static Float:vecTarget[3];
-    pev(pEnemy, pev_origin, vecTarget);
-    if (!is_in_viewcone(pBot, vecTarget)) {
-        return false;
-    }
-
-    if (!IsEntityReachable(pBot, pEnemy)) {
         return false;
     }
 
@@ -416,15 +422,8 @@ bool:ShouldThrowGrenade(pBot) {
     static Float:vecOrigin[3];
     pev(pBot, pev_origin, vecOrigin);
 
-    static Float:vecViewOfs[3];
-    pev(pBot, pev_view_ofs, vecViewOfs);
-    vecOrigin[2] += vecViewOfs[2];
-
-    static Float:vecAngles[3];
-    pev(pBot, pev_v_angle, vecAngles);
-
     static Float:vecAimOrigin[3];
-    angle_vector(vecAngles, ANGLEVECTOR_FORWARD, vecAimOrigin);
+    GetAimDirection(pBot, vecAimOrigin);
     xs_vec_mul_scalar(vecAimOrigin, THROW_GRENADE_MIN_RANGE, vecAimOrigin);
     xs_vec_add(vecOrigin, vecAimOrigin, vecAimOrigin);
 
@@ -466,7 +465,7 @@ bool:ShouldThrowGrenade(pBot) {
             continue;
         }
 
-        if (!is_in_viewcone(pBot, vecTarget)) {
+        if (!ExecuteHamB(Ham_FInViewCone, pBot, pTarget)) {
             continue;
         }
 
@@ -599,7 +598,7 @@ FindBreakableNearby(pBot, Float:flRange) {
         }
 
         static Float:vecTarget[3];
-        ExecuteHamB(Ham_BodyTarget, pEntity, 0, vecTarget);
+        GetOrigin(pEntity, vecTarget);
 
         new Float:flDistance = get_distance_f(vecOrigin, vecTarget);
         if (pBreakable != -1 && flDistance > flMinDistance) {
@@ -665,7 +664,7 @@ FindObjectiveButtonNearby(pBot, Float:flRange) {
         }
 
         static Float:vecTarget[3];
-        ExecuteHamB(Ham_BodyTarget, pEntity, 0, vecTarget);
+        GetOrigin(pEntity, vecTarget);
 
         new Float:flDistance = get_distance_f(vecOrigin, vecTarget);
         if (pBreakable == -1 || flDistance < flMinDistance) {
@@ -677,7 +676,7 @@ FindObjectiveButtonNearby(pBot, Float:flRange) {
     return pBreakable;
 }
 
-FindPlayerNearby(pBot, Float:flRange, iTeam = -1) {
+FindPlayerNearby(pBot, Float:flRange, iTeam = -1, bool:bInViewCone = false) {
     static Float:vecOrigin[3];
     pev(pBot, pev_origin, vecOrigin);
 
@@ -696,6 +695,14 @@ FindPlayerNearby(pBot, Float:flRange, iTeam = -1) {
 
         new iPlayerTeam = get_member(pTarget, m_iTeam);
         if (iTeam != -1 && iTeam != iPlayerTeam) {
+            continue;
+        }
+
+        if (!IsEntityReachable(pBot, pTarget)) {
+            continue;
+        }
+
+        if (bInViewCone && !ExecuteHamB(Ham_FInViewCone, pBot, pTarget)) {
             continue;
         }
 
@@ -727,13 +734,7 @@ FindWeaponByAmmoId(pBot, iAmmoId) {
 
 TurnToEntity(pBot, pTarget) {
     static Float:vecTarget[3];
-
-    if (ExecuteHam(Ham_IsBSPModel, pTarget)) {
-        ExecuteHamB(Ham_BodyTarget, pTarget, 0, vecTarget);
-    } else {
-        pev(pTarget, pev_origin, vecTarget);
-    }
-
+    GetOrigin(pTarget, vecTarget);
     TurnToPoint(pBot, vecTarget);
 }
 
@@ -764,7 +765,7 @@ IsEntityReachable(pBot, pTarget) {
     pev(pBot, pev_origin, vecOrigin);
 
     static Float:vecTarget[3];
-    pev(pTarget, pev_origin, vecTarget);
+    GetOrigin(pTarget, vecTarget);
 
     new pTr = create_tr2();
     engfunc(EngFunc_TraceLine, vecOrigin, vecTarget, DONT_IGNORE_MONSTERS, pBot, pTr);
@@ -788,4 +789,45 @@ Float:NormalizeAngle(Float:flAngle) {
     flFixedAngle *= iDirection;
 
     return flFixedAngle;
+}
+
+GetAimDirection(pBot, Float:vecOut[3]) {
+    static Float:vecOrigin[3];
+    pev(pBot, pev_origin, vecOrigin);
+
+    static Float:vecViewOfs[3];
+    pev(pBot, pev_view_ofs, vecViewOfs);
+    vecOrigin[2] += vecViewOfs[2];
+
+    static Float:vecAngles[3];
+    pev(pBot, pev_v_angle, vecAngles);
+
+    angle_vector(vecAngles, ANGLEVECTOR_FORWARD, vecOut);
+}
+
+GetAimEntity(pBot, Float:flRange = 8192.0) {
+    static Float:vecOrigin[3];
+    pev(pBot, pev_origin, vecOrigin);
+
+    static Float:vecTarget[3];
+    GetAimDirection(pBot, vecTarget);
+    xs_vec_mul_scalar(vecTarget, flRange, vecTarget);
+    xs_vec_add(vecOrigin, vecTarget, vecTarget);
+
+    new pTr = create_tr2();
+    engfunc(EngFunc_TraceLine, vecOrigin, vecTarget, DONT_IGNORE_MONSTERS, pBot, pTr);
+    static Float:flFraction;
+    get_tr2(pTr, TR_flFraction, flFraction);
+    new pHit = get_tr2(pTr, TR_pHit);
+    free_tr2(pTr);
+
+    return pHit;
+}
+
+GetOrigin(pEntity, Float:vecOut[3]) {
+    if (ExecuteHam(Ham_IsBSPModel, pEntity)) {
+        ExecuteHamB(Ham_BodyTarget, pEntity, 0, vecOut);
+    } else {
+        pev(pEntity, pev_origin, vecOut);
+    }
 }
