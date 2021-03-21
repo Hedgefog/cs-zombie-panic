@@ -1346,7 +1346,7 @@ DefaultSwing(this, Float:flDamage, Float:flRate, Float:flDistance) {
             // Calculate the point of interANCHOR of the line (or hull) and the object we hit
             // This is and approximation of the "best" interANCHOR
             new pHit = get_tr2(pTr, TR_pHit);
-            if (pHit != -1) {
+            if (pHit == -1 || ExecuteHamB(Ham_IsBSPModel, pHit)) {
                 FindHullIntersection(vecSrc, pTr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, this);
             }
 
