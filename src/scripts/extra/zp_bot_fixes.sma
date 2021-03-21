@@ -222,7 +222,7 @@ bool:LookupBreakable(pBot) {
     }
 
     if (!ExecuteHamB(Ham_FInViewCone, pBot, pBreakable)) {
-    TurnToEntity(pBot, pBreakable);
+        TurnToEntity(pBot, pBreakable);
     }
 
     new pActiveItem = get_member(pBot, m_pActiveItem);
@@ -395,14 +395,16 @@ bool:ShouldAttackWithMelee(pBot) {
     new pAimEntity = GetAimEntity(pBot, MELEE_ATTACK_RANGE);
     if (pAimEntity != -1) {
         if (UTIL_IsPlayer(pAimEntity)) {
-            return true;
+            if (IsEnemy(pBot, pAimEntity)) {
+                return true;
+            }
         } else {
             static szClassname[32];
             pev(pAimEntity, pev_classname, szClassname, charsmax(szClassname));
 
             if (equal(szClassname, "func_breakable")) {
                 return true;
-    }
+            }
         }
     }
 
@@ -830,4 +832,12 @@ GetOrigin(pEntity, Float:vecOut[3]) {
     } else {
         pev(pEntity, pev_origin, vecOut);
     }
+}
+
+IsEnemy(pBot, pTarget) {
+    if (!is_user_alive(pTarget)) {
+        return false;
+    }
+
+    return get_member(pBot, m_iTeam) != get_member(pTarget, m_iTeam);
 }
