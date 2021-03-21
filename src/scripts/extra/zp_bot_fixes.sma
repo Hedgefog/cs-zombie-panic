@@ -441,8 +441,6 @@ bool:ShouldThrowGrenade(pBot) {
         return false;
     }
 
-    new iTeam = get_member(pBot, m_iTeam);
-
     for (new pTarget = 1; pTarget <= MaxClients; ++pTarget) {
         if (pTarget == pBot) {
             continue;
@@ -452,11 +450,7 @@ bool:ShouldThrowGrenade(pBot) {
             continue;
         }
 
-        if (!is_user_alive(pTarget)) {
-            continue;
-        }        
-
-        if (iTeam == get_member(pTarget, m_iTeam)) {
+        if (!IsEnemy(pBot, pTarget)) {
             continue;
         }
 
