@@ -154,6 +154,18 @@ public bool:Native_CanItemRespawn(iPluginId, iArgc) {
 /*--------------------------------[ Forwards ]--------------------------------*/
 
 public client_disconnected(pPlayer) {
+    if (is_user_alive(pPlayer)) {
+        new iLives = ZP_GameRules_GetZombieLives();
+
+        if (ZP_Player_IsZombie(pPlayer)) {
+            iLives++;
+        } else {
+            iLives = max(iLives - 1, 0);
+        }
+
+        ZP_GameRules_SetZombieLives(iLives);
+    }
+
     CheckWinConditions(pPlayer);
 }
 
