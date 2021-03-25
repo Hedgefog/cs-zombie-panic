@@ -107,6 +107,8 @@ new bool:g_bPrecache;
 
 new Array:g_irgDecals;
 
+new bool:g_bSupercede;
+
 public plugin_precache() {
     g_bPrecache = true;
     
@@ -136,7 +138,9 @@ public plugin_init() {
 
     register_message(gmsgWeaponList, "OnMessage_WeaponList");
     register_message(gmsgDeathMsg, "OnMessage_DeathMsg");
+}
 
+public plugin_cfg() {
     InitWeaponHooks();
 }
 
@@ -476,6 +480,50 @@ public OnItemPostFrame(this) {
     return HAM_SUPERCEDE;
 }
 
+public OnWeaponPrimaryAttack(this) {
+    new CW:iHandler = GetHandlerByEntity(this);
+    if (iHandler == CW_INVALID_HANDLER) {
+        return HAM_IGNORED;
+    }
+
+    g_bSupercede = GetHamReturnStatus() >= HAM_SUPERCEDE;
+
+    return HAM_SUPERCEDE;
+}
+
+public OnWeaponSecondaryAttack(this) {
+    new CW:iHandler = GetHandlerByEntity(this);
+    if (iHandler == CW_INVALID_HANDLER) {
+        return HAM_IGNORED;
+    }
+
+    g_bSupercede = GetHamReturnStatus() >= HAM_SUPERCEDE;
+
+    return HAM_SUPERCEDE;
+}
+
+public OnWeaponReload(this) {
+    new CW:iHandler = GetHandlerByEntity(this);
+    if (iHandler == CW_INVALID_HANDLER) {
+        return HAM_IGNORED;
+    }
+
+    g_bSupercede = GetHamReturnStatus() >= HAM_SUPERCEDE;
+
+    return HAM_SUPERCEDE;
+}
+
+public OnWeaponIdle(this) {
+    new CW:iHandler = GetHandlerByEntity(this);
+    if (iHandler == CW_INVALID_HANDLER) {
+        return HAM_IGNORED;
+    }
+
+    g_bSupercede = GetHamReturnStatus() >= HAM_SUPERCEDE;
+
+    return HAM_SUPERCEDE;
+}
+
 public OnUpdateClientData_Post(pPlayer, iSendWeapons, pCdHandle) {
     if (!is_user_alive(pPlayer)) {
         return FMRES_IGNORED;
@@ -794,6 +842,16 @@ ItemPostFrame(this) {
 }
 
 SecondaryAttack(this) {
+    if (get_member_game(m_bFreezePeriod)) {
+        return;
+    }
+
+    ExecuteHamB(Ham_Weapon_SecondaryAttack, this);
+
+    if (g_bSupercede) {
+        return;
+    }
+
     if (ExecuteBindedFunction(CWB_SecondaryAttack, this) > PLUGIN_CONTINUE) {
         return;
     }
@@ -804,12 +862,24 @@ PrimaryAttack(this) {
         return;
     }
 
+    ExecuteHamB(Ham_Weapon_PrimaryAttack, this);
+
+    if (g_bSupercede) {
+        return;
+    }
+
     if (ExecuteBindedFunction(CWB_PrimaryAttack, this) > PLUGIN_CONTINUE) {
         return;
     }
 }
 
 Reload(this) {
+    ExecuteHamB(Ham_Weapon_Reload, this);
+
+    if (g_bSupercede) {
+        return;
+    }
+    
     if (ExecuteBindedFunction(CWB_Reload, this) > PLUGIN_CONTINUE) {
         return;
     }
@@ -817,6 +887,12 @@ Reload(this) {
 
 WeaponIdle(this) {
     if (get_member(this, m_Weapon_flTimeWeaponIdle) > 0.0) {
+        return;
+    }
+
+    ExecuteHamB(Ham_Weapon_WeaponIdle, this);
+
+    if (g_bSupercede) {
         return;
     }
 
@@ -1960,6 +2036,10 @@ RegisterWeaponHooks(iWeaponId) {
     RegisterHam(Ham_Spawn, szClassname, "OnSpawn_Post", .Post = 1);
     RegisterHam(Ham_CS_Item_CanDrop, szClassname, "OnCanDrop");
     // RegisterHam(Ham_Item_GetItemInfo, szClassname, "OnItemGetItemInfo", .Post = 1);
+    RegisterHam(Ham_Weapon_PrimaryAttack, szClassname, "OnWeaponPrimaryAttack");
+    RegisterHam(Ham_Weapon_SecondaryAttack, szClassname, "OnWeaponSecondaryAttack");
+    RegisterHam(Ham_Weapon_Reload, szClassname, "OnWeaponReload");
+    RegisterHam(Ham_Weapon_WeaponIdle, szClassname, "OnWeaponIdle");
 
     g_bWeaponHooks[iWeaponId] = true;
 }
