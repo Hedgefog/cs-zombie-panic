@@ -1,4 +1,38 @@
 /*
+    1.4.0
+        Additions and improvements:
+            Infected players with symptoms can now pickup healthkit
+            Healthkit is now suspends infection
+            Player disconnection now affets zombie lives
+            Increased flashlight consumption rate
+            Bots no longer affect items respawn
+            Reduced respawn control range for not visible items
+            Added bodyindex property to Character API
+            Added inherit property to Characters API
+            Reduced weapon drop velocity
+            Force disable minmodels
+            Added weapon_crowbar entity
+            Updated humans win message
+            Increased duration for win message screen fade effect
+            Improved team menu
+            Added plugin to fix and improve bots behavior
+
+        Cvars:
+            Added zp_healthkit_suspend_infection cvar
+
+        Fixes:
+            Fixed weaponbox cleanup
+            Fixed a bug when weapons overflow entities storage
+            Grenades can no longer be dropped at the start of a throw
+            Fixed melee hit detection
+            Fixed respawn task for spectators
+            Fixed respawn hints
+            Fixed infected attribute updating
+            Fixed weapon animations for spectators
+            Fixed crosshair for spectators
+            Fixed team info for spectators
+            Fixed game messages on zpo_contingency map
+
     1.3.0
         Additions and improvements:
             Removed default pain sound
