@@ -99,15 +99,15 @@ new Array:g_rgWeapons[CW_Data];
 new Trie:g_rgWeaponsMap;
 new g_iWeaponCount;
 
+new Float:g_flNextPredictionUpdate[MAX_PLAYERS + 1];
+
 new g_iszWeaponBox;
 new g_pNewWeaponboxEnt = -1;
 new g_pKillerItem = -1;
-
+new bool:g_bSupercede;
 new bool:g_bPrecache;
 
 new Array:g_irgDecals;
-
-new bool:g_bSupercede;
 
 public plugin_precache() {
     g_bPrecache = true;
@@ -459,6 +459,11 @@ public OnItemDeploy(this) {
 }
 
 public OnItemHolster(this) {
+    new pPlayer = GetPlayer(this);
+    if (IsWeaponKnife(this)) {
+        g_flNextPredictionUpdate[pPlayer] = get_gametime() + 0.1;
+    }
+
     new CW:iHandler = GetHandlerByEntity(this);
     if (iHandler == CW_INVALID_HANDLER) {
         return HAM_IGNORED;
@@ -611,8 +616,10 @@ public OnPlayerPreThink_Post(pPlayer) {
         return HAM_IGNORED;
     }
 
-    new CW:iHandler = GetHandlerByEntity(pActiveItem);
-    SetWeaponPrediction(pPlayer, iHandler == CW_INVALID_HANDLER);
+    if (get_gametime() >= g_flNextPredictionUpdate[pPlayer]) {
+        new CW:iHandler = GetHandlerByEntity(pActiveItem);
+        SetWeaponPrediction(pPlayer, iHandler == CW_INVALID_HANDLER);
+    }
 
     return HAM_HANDLED;
 }
@@ -919,7 +926,9 @@ WeaponDeploy(this) {
     }
 
     new pPlayer = GetPlayer(this);
-    SetWeaponPrediction(pPlayer, false);
+    if (get_gametime() >= g_flNextPredictionUpdate[pPlayer]) {
+        SetWeaponPrediction(pPlayer, false);
+    }
 
     // SetThink(this, "DisablePrediction");
     // set_pev(this, pev_nextthink, get_gametime() + 0.1);
@@ -1156,6 +1165,18 @@ GrenadeExplode(this, pTr, iDamageBits, Float:flRadius, Float:flMagnitude) {
     }
 }
 
+bool:IsWeaponKnife(pWeapon) {
+    if (GetHandlerByEntity(pWeapon) != CW_INVALID_HANDLER) {
+        return false;
+    }
+
+    if (get_member(pWeapon, m_iId) != CSW_KNIFE) {
+        return false;
+    }
+
+    return true;
+}
+
 // ANCHOR: Weapon Callbacks
 
 public Smack(this) {
@@ -1180,11 +1201,11 @@ public Smack(this) {
     SetThink(this, NULL_STRING);
 }
 
-public DisablePrediction(this) {
-    new pPlayer = GetPlayer(this);
-    SetWeaponPrediction(pPlayer, false);
-    SetThink(this, NULL_STRING);
-}
+// public DisablePrediction(this) {
+//     new pPlayer = GetPlayer(this);
+//     SetWeaponPrediction(pPlayer, false);
+//     SetThink(this, NULL_STRING);
+// }
 
 // ANCHOR: Weapon Entity Default Methods
 
