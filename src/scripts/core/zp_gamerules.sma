@@ -538,7 +538,7 @@ public Task_Join(pPlayer) {
 /*--------------------------------[ Team Menu ]--------------------------------*/
 
 CreateTeamMenu() {
-    new iMenu = menu_create("What's your plan?", "TeamMenuHandler");
+    new iMenu = menu_create("Team Menu", "TeamMenuHandler");
     menu_additem(iMenu, "Stay with the survivors");
     menu_additem(iMenu, "Join Zombies");
     menu_addblank2(iMenu);
