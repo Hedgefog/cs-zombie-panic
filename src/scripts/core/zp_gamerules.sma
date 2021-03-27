@@ -45,7 +45,6 @@ public plugin_init() {
 
     Round_HookCheckWinConditions("OnCheckWinConditions");
 
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn", .Post = 0);
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
     RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
     RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage", .Post = 0);
@@ -256,14 +255,6 @@ public OnClCmd_Drop(pPlayer) {
 
 public OnClientKill(pPlayer) {
     return get_member_game(m_bFreezePeriod) ? FMRES_SUPERCEDE : FMRES_IGNORED;
-}
-
-public OnPlayerSpawn(pPlayer) {
-    if (!is_user_alive(pPlayer)) {
-        return HAM_IGNORED;
-    }
-
-    return HAM_HANDLED;
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
