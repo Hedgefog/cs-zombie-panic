@@ -25,8 +25,8 @@ public OnMessage_DeathMsg(iMsgId, iDest, pPlayer) {
         return PLUGIN_CONTINUE;
     }
 
-    new iKiller = get_msg_arg_int(1);
-    new iVictim = get_msg_arg_int(2);
+    new pKiller = get_msg_arg_int(1);
+    new pVictim = get_msg_arg_int(2);
     new iHeadshot = get_msg_arg_int(3);
 
     static szWeapon[32];
@@ -41,16 +41,16 @@ public OnMessage_DeathMsg(iMsgId, iDest, pPlayer) {
             continue;
         }
 
-        SendDeathMsg(pPlayer, iKiller, iVictim, iHeadshot, szWeapon);
+        SendDeathMsg(pPlayer, pKiller, pVictim, iHeadshot, szWeapon);
     }
 
     return PLUGIN_HANDLED;
 }
 
-SendDeathMsg(pPlayer, iKiller, iVictim, iHeadshot, const szWeapon[]) {
+SendDeathMsg(pPlayer, pKiller, pVictim, iHeadshot, const szWeapon[]) {
     emessage_begin(MSG_ONE, gmsgDeathMsg, _, pPlayer);
-    ewrite_byte(iKiller);
-    ewrite_byte(iVictim);
+    ewrite_byte(pKiller);
+    ewrite_byte(pVictim);
     ewrite_byte(iHeadshot);
     ewrite_string(szWeapon);
     emessage_end();

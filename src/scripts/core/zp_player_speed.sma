@@ -19,6 +19,9 @@ new bool:g_bPlayerDucking[MAX_PLAYERS + 1];
 new bool:g_bPlayerMoveBack[MAX_PLAYERS + 1];
 new bool:g_bPlayerStrafing[MAX_PLAYERS + 1];
 
+new g_pFwPlayerSpeedUpdated;
+new g_iFwResult;
+
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
@@ -30,6 +33,8 @@ public plugin_init() {
     register_message(get_user_msgid("AmmoPickup"), "OnMessage_AmmoPickup");
 
     register_clcmd("drop", "OnClCmd_Drop");
+
+    g_pFwPlayerSpeedUpdated = CreateMultiForward("ZP_Fw_PlayerSpeedUpdated", ET_IGNORE, FP_CELL);
 }
 
 public plugin_natives() {
@@ -86,11 +91,6 @@ public OnPlayerItemPreFrame_Post(pPlayer) {
     return HAM_HANDLED;
 }
 
-public TaskUpdatePlayerSpeed(iTaskId) {
-    new pPlayer = iTaskId;
-    UpdatePlayerSpeed(pPlayer);
-}
-
 bool:UpdatePlayerSpeed(pPlayer) {
     if (!is_user_alive(pPlayer)) {
         return false;
@@ -102,6 +102,8 @@ bool:UpdatePlayerSpeed(pPlayer) {
 
     new Float:flMaxSpeed = CalculatePlayerMaxSpeed(pPlayer);
     set_pev(pPlayer, pev_maxspeed, flMaxSpeed);
+
+    ExecuteForward(g_pFwPlayerSpeedUpdated, g_iFwResult, pPlayer);
 
     return true;
 }

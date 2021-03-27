@@ -39,7 +39,7 @@ public plugin_init() {
 
     g_pCvarUsePickup = register_cvar("zp_use_pickup", "1");
     g_pCvarUsePickupHighlight = register_cvar("zp_use_pickup_highlight", "1");
-    g_pFwAimItem = CreateMultiForward("ZP_Fw_Player_AimItem", ET_IGNORE, FP_CELL, FP_CELL);
+    g_pFwAimItem = CreateMultiForward("ZP_Fw_PlayerAimItem", ET_IGNORE, FP_CELL, FP_CELL);
 }
 
 public OnItemTouch(pEntity, pToucher) {
@@ -121,7 +121,14 @@ public OnPlayerPreThink_Post(pPlayer) {
     free_tr2(pTr);
 
     new pEntity;
+    new pPrevEntity;
     while ((pEntity = engfunc(EngFunc_FindEntityInSphere, pEntity, vecEnd, 1.0)) != 0) {
+        if (pPrevEntity >= pEntity) {
+            break;
+        }
+
+        pPrevEntity = pEntity;
+
         if (pev(pEntity, pev_solid) == SOLID_NOT) {
             continue;
         }
@@ -155,6 +162,10 @@ public OnPlayerPostThink_Post(pPlayer) {
     }
 
     if (g_pPlayerAimItem[pPlayer] == -1) {
+        return HAM_IGNORED;
+    }
+
+    if (!pev_valid(g_pPlayerAimItem[pPlayer])) {
         return HAM_IGNORED;
     }
 

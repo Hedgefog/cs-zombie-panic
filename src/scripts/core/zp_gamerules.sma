@@ -31,6 +31,9 @@ new g_pCvarLivesPerPlayer;
 new g_pCvarCompetitive;
 
 new g_pFwPlayerJoined;
+new g_pFwNewRound;
+new g_pFwRoundStarted;
+new g_pFwRoundEnd;
 new g_iFwResult;
 
 new g_iTeamMenu;
@@ -62,6 +65,9 @@ public plugin_init() {
     g_pCvarCompetitive = register_cvar("zp_competitive", "0");
 
     g_pFwPlayerJoined = CreateMultiForward("ZP_Fw_PlayerJoined", ET_IGNORE, FP_CELL);
+    g_pFwNewRound = CreateMultiForward("ZP_Fw_NewRound", ET_IGNORE);
+    g_pFwRoundStarted = CreateMultiForward("ZP_Fw_RoundStarted", ET_IGNORE);
+    g_pFwRoundEnd = CreateMultiForward("ZP_Fw_RoundEnd", ET_IGNORE, FP_CELL);
 
     g_iTeamMenu = CreateTeamMenu();
 }
@@ -96,12 +102,18 @@ public bool:Native_IsCompetitive(iPluginId, iArgc) {
 public bool:Native_CanItemRespawn(iPluginId, iArgc) {
     new pItem = get_param(1);
 
+    if (!Round_IsRoundStarted()) {
+        return true;
+    }
+
     if (get_gametime() - Float:get_member_game(m_fRoundStartTime) <= 1.0) {
         return true;
     }
 
     new Float:vecOrigin[3];
     pev(pItem, pev_origin, vecOrigin);
+
+    new pTr = create_tr2();
 
     for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         if (!is_user_connected(pPlayer)) {
@@ -112,15 +124,29 @@ public bool:Native_CanItemRespawn(iPluginId, iArgc) {
             continue;
         }
 
+        if (is_user_bot(pPlayer)) {
+            continue;
+        }
+
         new Float:flMinRange = ZP_Player_IsZombie(pPlayer) ? 256.0 :  512.0;
 
         static Float:vecPlayerOrigin[3];
         pev(pPlayer, pev_origin, vecPlayerOrigin);
 
+        engfunc(EngFunc_TraceLine, vecOrigin, vecPlayerOrigin, IGNORE_MONSTERS | IGNORE_GLASS, pPlayer, pTr);
+        static Float:flFraction;
+        get_tr2(pTr, TR_flFraction, flFraction);
+
+        if (flFraction < 1.0) {
+            flMinRange /= 2;
+        }
+
         if (xs_vec_distance(vecOrigin, vecPlayerOrigin) <= flMinRange) {
             return false;
         }
     }
+
+    free_tr2(pTr);
 
     return true;
 }
@@ -128,12 +154,26 @@ public bool:Native_CanItemRespawn(iPluginId, iArgc) {
 /*--------------------------------[ Forwards ]--------------------------------*/
 
 public client_disconnected(pPlayer) {
+    if (is_user_alive(pPlayer)) {
+        new iLives = ZP_GameRules_GetZombieLives();
+
+        if (ZP_Player_IsZombie(pPlayer)) {
+            iLives++;
+        } else {
+            iLives = max(iLives - 1, 0);
+        }
+
+        ZP_GameRules_SetZombieLives(iLives);
+    }
+
     CheckWinConditions(pPlayer);
 }
 
 public Round_Fw_NewRound() {
     ResetPlayerTeamPreferences();
     ShuffleTeams();
+
+    ExecuteForward(g_pFwNewRound, g_iFwResult);
 
     return PLUGIN_CONTINUE;
 }
@@ -152,12 +192,13 @@ public Round_Fw_RoundStart() {
     CheckWinConditions();
     
     log_amx("New round started");
+
+    ExecuteForward(g_pFwRoundStarted, g_iFwResult);
 }
 
 public Round_Fw_RoundExpired() {
     if (!g_bObjectiveMode) {
         DispatchWin(ZP_HUMAN_TEAM);
-
         log_amx("Round expired, survivors win!");
     }
 }
@@ -472,7 +513,12 @@ RespawnPlayers() {
 }
 
 DispatchWin(iTeam) {
+    if (Round_IsRoundEnd()) {
+        return;
+    }
+
     Round_DispatchWin(iTeam, ZP_NEW_ROUND_DELAY);
+    ExecuteForward(g_pFwRoundEnd, g_iFwResult, iTeam);
 }
 
 /*--------------------------------[ Tasks ]--------------------------------*/
@@ -483,7 +529,7 @@ public Task_Join(pPlayer) {
     }
 
     set_member(pPlayer, m_bTeamChanged, get_member(pPlayer, m_bTeamChanged) & ~BIT(8));
-    set_member(pPlayer, m_iTeam, 2);
+    set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
     set_member(pPlayer, m_iJoiningState, 5);
 
     ExecuteForward(g_pFwPlayerJoined, g_iFwResult, pPlayer);
@@ -492,14 +538,14 @@ public Task_Join(pPlayer) {
 /*--------------------------------[ Team Menu ]--------------------------------*/
 
 CreateTeamMenu() {
-    new iMenu = menu_create("What's your plan?", "TeamMenuHandler");
-    menu_additem(iMenu, "I wanna shit my pants");
+    new iMenu = menu_create("Team Menu", "TeamMenuHandler");
+    menu_additem(iMenu, "Stay with the survivors");
     menu_additem(iMenu, "Join Zombies");
     menu_addblank2(iMenu);
     menu_addblank2(iMenu);
     menu_addblank2(iMenu);
     menu_additem(iMenu, "Spectate");
-    menu_setprop(iMenu, MPROP_EXIT, MEXIT_NEVER);
+    // menu_setprop(iMenu, MPROP_EXIT, MEXIT_NEVER);
 
     return iMenu;
 }
@@ -509,27 +555,32 @@ OpenTeamMenu(pPlayer) {
 }
 
 public TeamMenuHandler(pPlayer, iMenu, iItem) {
+    new bool:bIsSpectator = get_member(pPlayer, m_iTeam) == 3;
+
     switch (iItem) {
         case 0: {
             g_iPlayerTeamPreference[pPlayer] = TeamPreference_Human;
 
-            if (get_member(pPlayer, m_iTeam) == 3) {
+            if (bIsSpectator) {
                 set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
             }
         }
         case 1: {
             g_iPlayerTeamPreference[pPlayer] = TeamPreference_Zombie;
 
-            if (get_member(pPlayer, m_iTeam) == 3) {
+            if (bIsSpectator) {
                 set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
             }
         }
         case 5: {
             g_iPlayerTeamPreference[pPlayer] = TeamPreference_Spectator;
-            set_member(pPlayer, m_iTeam, 3);
 
-            if (is_user_alive(pPlayer)) {
-                ExecuteHam(Ham_Killed, pPlayer, pPlayer, 0);
+            if (!bIsSpectator) {
+                set_member(pPlayer, m_iTeam, 3);
+
+                if (is_user_alive(pPlayer)) {
+                    ExecuteHamB(Ham_Killed, pPlayer, pPlayer, 0);
+                }
             }
         }
     }
@@ -537,13 +588,13 @@ public TeamMenuHandler(pPlayer, iMenu, iItem) {
     if (Round_IsRoundStarted()) {
         switch (iItem) {
             case 0: {
-                if (get_member(pPlayer, m_iTeam) == 3) {
+                if (bIsSpectator) {
                     ZP_GameRules_RespawnAsZombie(pPlayer);
                 }
             }
             case 1: {
                 if (!ZP_Player_IsZombie(pPlayer)) {
-                    if (get_member(pPlayer, m_iTeam) == 3) {
+                    if (bIsSpectator) {
                         ZP_GameRules_RespawnAsZombie(pPlayer);
                     } else {
                         ExecuteHamB(Ham_Killed, pPlayer, pPlayer, 0);

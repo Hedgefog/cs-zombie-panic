@@ -24,6 +24,7 @@ public plugin_init() {
     gmsgAmmoPickup = get_user_msgid("AmmoPickup");
 
     RegisterHam(Ham_Touch, "weaponbox", "OnWeaponBoxTouch", .Post = 0);
+    RegisterHookChain(RG_CSGameRules_RemoveGuns, "OnRemoveGuns", .post = 1);
 }
 
 public OnWeaponBoxTouch(pWeaponBox, pToucher) {
@@ -52,10 +53,10 @@ public OnWeaponBoxTouch(pWeaponBox, pToucher) {
     return HAM_SUPERCEDE;
 }
 
-public Round_Fw_NewRound() {
+public OnRemoveGuns() {
     new pWeaponBox;
     while((pWeaponBox = engfunc(EngFunc_FindEntityByString, pWeaponBox, "classname", "weaponbox")) > 0) {
-        set_pev(pWeaponBox, pev_flags, FL_KILLME);
+        Remove(pWeaponBox);
     }
 }
 
@@ -81,7 +82,7 @@ bool:PickupWeaponBoxItems(pPlayer, pWeaponBox) {
 
         new iPrevBoxItem = -1;
         while (pItem != -1) {
-            new iNextItem = get_member(pItem, m_pNext); // get next item
+            new pNextItem = get_member(pItem, m_pNext); // get next item
             set_member(pItem, m_pNext, -1); // reset next item
 
             new iId = get_member(pItem, m_iId);
@@ -109,7 +110,7 @@ bool:PickupWeaponBoxItems(pPlayer, pWeaponBox) {
                 }
             }
 
-            pItem = iNextItem;
+            pItem = pNextItem;
         }
     }
 
@@ -129,7 +130,7 @@ bool:PickupWeaponBoxAmmo(pPlayer, pWeaponBox) {
             continue;
         }
 
-        new iAmmoId = GetAmmoId(szAmmoName);
+        new iAmmoId = UTIL_GetAmmoId(szAmmoName);
         new iAmmoHandler = ZP_Ammo_GetHandlerById(iAmmoId);
         if (iAmmoHandler == -1) {
             continue;
@@ -206,13 +207,25 @@ FindPlayerItemById(pPlayer, iId) {
     return -1;
 }
 
-GetAmmoId(const szAmmoName[]) {
-    new iSize = sizeof(AMMO_LIST);
-    for (new iAmmoId = 0; iAmmoId < iSize; ++iAmmoId) {
-        if (equal(AMMO_LIST[iAmmoId], szAmmoName)) {
-            return iAmmoId;
+Remove(pWeaponBox) {
+    Free(pWeaponBox);
+    RemoveEntity(pWeaponBox);
+}
+
+Free(pWeaponBox) {
+    for (new iSlot = 0; iSlot < 6; ++iSlot) {
+        new pItem = get_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, iSlot);
+        set_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, -1, iSlot);
+
+        while (pItem != -1) {
+            new pNextItem = get_member(pItem, m_pNext);
+            RemoveEntity(pItem);
+            pItem = pNextItem;
         }
     }
+}
 
-    return -1;
+RemoveEntity(pEntity) {
+    set_pev(pEntity, pev_flags, FL_KILLME);
+    dllfunc(DLLFunc_Think, pEntity);
 }

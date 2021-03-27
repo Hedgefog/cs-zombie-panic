@@ -1,6 +1,7 @@
 #pragma semicolon 1
 
 #include <amxmodx>
+#include <hamsandwich>
 #include <reapi>
 
 #include <zombiepanic>
@@ -16,8 +17,33 @@ new gmsgScoreAttrib;
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
+    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
+
     gmsgScoreAttrib = get_user_msgid("ScoreAttrib");
     register_message(gmsgScoreAttrib, "OnMessage");
+}
+
+public OnPlayerSpawn_Post(pPlayer) {
+    if (!ZP_Player_IsZombie(pPlayer)) {
+        return HAM_IGNORED;
+    }
+
+    for (new pTarget = 1; pTarget <= MaxClients; ++pTarget) {
+        if (!is_user_connected(pTarget)) {
+            continue;
+        }
+
+        if (ZP_Player_IsZombie(pTarget)) {
+            continue;
+        }
+
+        message_begin(MSG_ONE, gmsgScoreAttrib, _, pPlayer);
+        write_byte(pTarget);
+        write_byte(ZP_Player_IsInfected(pTarget) ? SCORE_STATUS_VIP : 0);
+        message_end();
+    }
+
+    return HAM_HANDLED;
 }
 
 public OnMessage(iMsgId, iDest, pPlayer) {
@@ -43,7 +69,15 @@ public OnMessage(iMsgId, iDest, pPlayer) {
     return PLUGIN_CONTINUE;
 }
 
-public ZP_Fw_PlayerInfected(pInfectedPlayer) {
+public ZP_Fw_PlayerInfected(pPlayer) {
+    UpdateAttribute(pPlayer);
+}
+
+public ZP_Fw_PlayerCured(pPlayer) {
+    UpdateAttribute(pPlayer);
+}
+
+UpdateAttribute(pTarget) {
     for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         if (!is_user_connected(pPlayer)) {
             continue;
@@ -54,8 +88,8 @@ public ZP_Fw_PlayerInfected(pInfectedPlayer) {
         }
 
         message_begin(MSG_ONE, gmsgScoreAttrib, _, pPlayer);
-        write_byte(pInfectedPlayer);
-        write_byte(SCORE_STATUS_VIP);
+        write_byte(pTarget);
+        write_byte(ZP_Player_IsInfected(pTarget) ? SCORE_STATUS_VIP : 0);
         message_end();
     }
 }

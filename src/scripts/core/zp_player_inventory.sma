@@ -37,6 +37,8 @@ public plugin_natives() {
     register_native("ZP_Player_AddAmmo", "Native_AddAmmo");
     register_native("ZP_Player_DropAmmo", "Native_DropAmmo");
     register_native("ZP_Player_NextAmmo", "Native_NextAmmo");
+    register_native("ZP_Player_GetSelectedAmmo", "Native_GetSelectedAmmo");
+    register_native("ZP_Player_SetSelectedAmmo", "Native_SetSelectedAmmo");
 }
 
 public Native_DropAmmo(iPluginId, iArgc) {
@@ -84,6 +86,26 @@ public Native_AddAmmo(iPluginId, iArgc) {
     new iValue = get_param(3);
 
     return AddAmmo(pPlayer, szAmmo, iValue);
+}
+
+public Native_GetSelectedAmmo(iPluginId, iArgc) {
+    new pPlayer = get_param(1);
+
+    return g_pPlayerSelectedAmmo[pPlayer];
+}
+
+public Native_SetSelectedAmmo(iPluginId, iArgc) {
+    new pPlayer = get_param(1);
+    
+    static szAmmo[16];
+    get_string(2, szAmmo, charsmax(szAmmo));
+
+    new iAmmoHandler = ZP_Ammo_GetHandler(szAmmo);
+    if (iAmmoHandler == -1) {
+        return;
+    }
+
+    g_pPlayerSelectedAmmo[pPlayer] = iAmmoHandler;
 }
 
 public OnPlayerKilled(pPlayer) {
@@ -214,7 +236,7 @@ DropPlayerItems(pPlayer) {
         set_member(pPlayer, m_rgpPlayerItems, -1, iSlot);
 
         while (pItem != -1) {
-            new iNextItem = get_member(pItem, m_pNext);
+            new pNextItem = get_member(pItem, m_pNext);
 
             if (ExecuteHamB(Ham_CS_Item_CanDrop, pItem)) {
                 new iClip = get_member(pItem, m_Weapon_iClip);
@@ -243,7 +265,7 @@ DropPlayerItems(pPlayer) {
                 }
             }
 
-            pItem = iNextItem;
+            pItem = pNextItem;
         }
     }
 
@@ -272,9 +294,9 @@ DropPlayerItem(pPlayer, pItem, iSlot) {
     set_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, pItem, iSlot);
 
     static Float:vecVelocity[3];
-    vecVelocity[0] = random_float(-350.0, 350.0);
-    vecVelocity[1] = random_float(-350.0, 350.0);
-    vecVelocity[2] = random_float(0.0, 350.0);
+    vecVelocity[0] = random_float(-250.0, 250.0);
+    vecVelocity[1] = random_float(-250.0, 250.0);
+    vecVelocity[2] = random_float(0.0, 250.0);
 
     set_pev(pWeaponBox, pev_velocity, vecVelocity);
 

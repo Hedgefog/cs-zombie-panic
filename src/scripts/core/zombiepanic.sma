@@ -23,11 +23,11 @@ public plugin_precache() {
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
+    register_forward(FM_GetGameDescription, "OnGetGameDescription");
+
     g_pCvarVersion = register_cvar("zombiepanic_version", ZP_VERSION, FCVAR_SERVER);
     hook_cvar_change(g_pCvarVersion, "OnVersionCvarChange");
 
-    register_forward(FM_GetGameDescription, "OnGetGameDescription");
-    
     register_cvar("mp_flashlight", "1");
     register_cvar("mp_freezetime", "10");
     register_cvar("mp_scoreboard_showmoney", "0");

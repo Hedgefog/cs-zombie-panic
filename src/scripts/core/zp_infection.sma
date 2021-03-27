@@ -39,6 +39,7 @@ new g_iPlayerFlags[MAX_PLAYERS + 1];
 new g_pCvarInfectionChance;
 
 new g_pFwInfected;
+new g_pFwCured;
 new g_pFwTransformationDeath;
 new g_pFwTransformed;
 new g_iFwResult;
@@ -68,6 +69,7 @@ public plugin_init() {
     g_pCvarInfectionChance = register_cvar("zp_infection_chance", "10");
 
     g_pFwInfected = CreateMultiForward("ZP_Fw_PlayerInfected", ET_IGNORE, FP_CELL, FP_CELL);
+    g_pFwCured = CreateMultiForward("ZP_Fw_PlayerCured", ET_IGNORE, FP_CELL);
     g_pFwTransformationDeath = CreateMultiForward("ZP_Fw_PlayerTransformationDeath", ET_IGNORE, FP_CELL);
     g_pFwTransformed = CreateMultiForward("ZP_Fw_PlayerTransformed", ET_IGNORE, FP_CELL);
 }
@@ -77,6 +79,7 @@ public plugin_natives() {
     register_native("ZP_Player_IsInfected", "Native_IsPlayerInfected");
     register_native("ZP_Player_IsPartialZombie", "Native_IsPlayerPartialZombie");
     register_native("ZP_Player_IsTransforming", "Native_IsPlayerTransforming");
+    register_native("ZP_Player_GetInfector", "Native_GetInfector");
 }
 
 public Native_SetInfected(iPluginId, iArgc) {
@@ -103,6 +106,16 @@ public bool:Native_IsPlayerTransforming(iPluginId, iArgc) {
     new pPlayer = get_param(1);
 
     return IsPlayerInfected(pPlayer) && g_iPlayerInfectionState[pPlayer] >= InfectionState_Transformation;
+}
+
+public Native_GetInfector(iPluginId, iArgc) {
+    new pPlayer = get_param(1);
+
+    if (!IsPlayerInfected(pPlayer)) {
+        return -1;
+    }
+
+    return g_pPlayerInfector[pPlayer];
 }
 
 public OnPlayerSpawn_Post(pPlayer) {
@@ -256,12 +269,12 @@ public OnPlayerBloodColor(pPlayer) {
 }
 
 bool:SetInfected(pPlayer, bool:bValue, pInfector = 0) {
+    if (bValue == IsPlayerInfected(pPlayer)) {
+        return false;
+    }
+
     if (bValue) {
         if (ZP_GameRules_IsCompetitive()) {
-            return false;
-        }
-
-        if (IsPlayerInfected(pPlayer)) {
             return false;
         }
 
@@ -283,6 +296,7 @@ bool:SetInfected(pPlayer, bool:bValue, pInfector = 0) {
 
         ResetRoomType(pPlayer);
         HideInfectionIcon(pPlayer);
+        ExecuteForward(g_pFwCured, g_iFwResult, pPlayer);
     }
 
     return true;

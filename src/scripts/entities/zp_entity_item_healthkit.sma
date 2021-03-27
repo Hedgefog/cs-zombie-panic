@@ -19,6 +19,7 @@
 new g_iModel;
 
 new g_pCvarCureChance;
+new g_pCvarSuspendInfection;
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
@@ -26,6 +27,7 @@ public plugin_init() {
     RegisterHam(Ham_Touch, ENTITY_NAME, "OnTouch", .Post = 0);
 
     g_pCvarCureChance = register_cvar("zp_healthkit_cure_chance", "25");
+    g_pCvarSuspendInfection = register_cvar("zp_healthkit_suspend_infection", "1");
 }
 
 public plugin_precache() {
@@ -65,20 +67,28 @@ public OnTouch(pEntity, pToucher) {
             
             new Float:flHealth;
             pev(pToucher, pev_health, flHealth);
-
+            
             if (flHealth < flMaxHealth) {
                 flHealth = floatmin(flMaxHealth, flHealth + 25.0);
                 set_pev(pToucher, pev_health, flHealth);
-
-                if (ZP_Player_IsInfected(pToucher) && !ZP_Player_IsTransforming(pToucher)) {
-                    if (random(100) < get_pcvar_num(g_pCvarCureChance)) {
-                        ZP_Player_SetInfected(pToucher, false);
-                    }
+            } else {
+                if (!ZP_Player_IsInfected(pToucher) || !ZP_Player_IsPartialZombie(pToucher) || ZP_Player_IsTransforming(pToucher)) {
+                    return HAM_SUPERCEDE;
                 }
-
-                emit_sound(pToucher, CHAN_ITEM, "items/smallmedkit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-                Kill(pEntity);
             }
+
+            if (ZP_Player_IsInfected(pToucher) && !ZP_Player_IsTransforming(pToucher)) {
+                if (random(100) < get_pcvar_num(g_pCvarCureChance)) {
+                    ZP_Player_SetInfected(pToucher, false);
+                } else if (get_pcvar_num(g_pCvarSuspendInfection)) {
+                    new pInfector = ZP_Player_GetInfector(pToucher);
+                    ZP_Player_SetInfected(pToucher, false);
+                    ZP_Player_SetInfected(pToucher, true, pInfector);
+                }
+            }
+
+            emit_sound(pToucher, CHAN_ITEM, "items/smallmedkit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+            Kill(pEntity);
         }
     }
 

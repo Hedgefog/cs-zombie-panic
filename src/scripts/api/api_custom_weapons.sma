@@ -10,7 +10,7 @@
 #include <api_custom_weapons>
 
 #define PLUGIN "[API] Custom Weapons"
-#define VERSION "0.6.0"
+#define VERSION "0.7.0"
 #define AUTHOR "Hedgehog Fog"
 
 #define WALL_PUFF_SPRITE "sprites/wall_puff1.spr"
@@ -99,10 +99,12 @@ new Array:g_rgWeapons[CW_Data];
 new Trie:g_rgWeaponsMap;
 new g_iWeaponCount;
 
+new Float:g_flNextPredictionUpdate[MAX_PLAYERS + 1];
+
 new g_iszWeaponBox;
 new g_pNewWeaponboxEnt = -1;
 new g_pKillerItem = -1;
-
+new bool:g_bSupercede;
 new bool:g_bPrecache;
 
 new Array:g_irgDecals;
@@ -136,7 +138,9 @@ public plugin_init() {
 
     register_message(gmsgWeaponList, "OnMessage_WeaponList");
     register_message(gmsgDeathMsg, "OnMessage_DeathMsg");
+}
 
+public plugin_cfg() {
     InitWeaponHooks();
 }
 
@@ -455,6 +459,11 @@ public OnItemDeploy(this) {
 }
 
 public OnItemHolster(this) {
+    new pPlayer = GetPlayer(this);
+    if (IsWeaponKnife(this)) {
+        g_flNextPredictionUpdate[pPlayer] = get_gametime() + 0.1;
+    }
+
     new CW:iHandler = GetHandlerByEntity(this);
     if (iHandler == CW_INVALID_HANDLER) {
         return HAM_IGNORED;
@@ -476,6 +485,50 @@ public OnItemPostFrame(this) {
     return HAM_SUPERCEDE;
 }
 
+public OnWeaponPrimaryAttack(this) {
+    new CW:iHandler = GetHandlerByEntity(this);
+    if (iHandler == CW_INVALID_HANDLER) {
+        return HAM_IGNORED;
+    }
+
+    g_bSupercede = GetHamReturnStatus() >= HAM_SUPERCEDE;
+
+    return HAM_SUPERCEDE;
+}
+
+public OnWeaponSecondaryAttack(this) {
+    new CW:iHandler = GetHandlerByEntity(this);
+    if (iHandler == CW_INVALID_HANDLER) {
+        return HAM_IGNORED;
+    }
+
+    g_bSupercede = GetHamReturnStatus() >= HAM_SUPERCEDE;
+
+    return HAM_SUPERCEDE;
+}
+
+public OnWeaponReload(this) {
+    new CW:iHandler = GetHandlerByEntity(this);
+    if (iHandler == CW_INVALID_HANDLER) {
+        return HAM_IGNORED;
+    }
+
+    g_bSupercede = GetHamReturnStatus() >= HAM_SUPERCEDE;
+
+    return HAM_SUPERCEDE;
+}
+
+public OnWeaponIdle(this) {
+    new CW:iHandler = GetHandlerByEntity(this);
+    if (iHandler == CW_INVALID_HANDLER) {
+        return HAM_IGNORED;
+    }
+
+    g_bSupercede = GetHamReturnStatus() >= HAM_SUPERCEDE;
+
+    return HAM_SUPERCEDE;
+}
+
 public OnUpdateClientData_Post(pPlayer, iSendWeapons, pCdHandle) {
     if (!is_user_alive(pPlayer)) {
         return FMRES_IGNORED;
@@ -488,7 +541,7 @@ public OnUpdateClientData_Post(pPlayer, iSendWeapons, pCdHandle) {
 
     new CW:iHandler = GetHandlerByEntity(pItem);
     if (iHandler == CW_INVALID_HANDLER) {
-        return HAM_IGNORED;
+        return FMRES_IGNORED;
     }
 
     set_cd(pCdHandle, CD_flNextAttack, get_gametime() + 0.001); // block default animation
@@ -563,8 +616,10 @@ public OnPlayerPreThink_Post(pPlayer) {
         return HAM_IGNORED;
     }
 
-    new CW:iHandler = GetHandlerByEntity(pActiveItem);
-    SetWeaponPrediction(pPlayer, iHandler == CW_INVALID_HANDLER);
+    if (get_gametime() >= g_flNextPredictionUpdate[pPlayer]) {
+        new CW:iHandler = GetHandlerByEntity(pActiveItem);
+        SetWeaponPrediction(pPlayer, iHandler == CW_INVALID_HANDLER);
+    }
 
     return HAM_HANDLED;
 }
@@ -669,10 +724,10 @@ public OnWeaponClCmd(pPlayer) {
     new CW:iHandler;
     TrieGetCell(g_rgWeaponsMap, szName, iHandler);
 
-    new iWeapon = GetData(iHandler, CW_Data_Id);
+    new iWeaponId = GetData(iHandler, CW_Data_Id);
 
     static szBaseName[32];
-    get_weaponname(iWeapon, szBaseName, charsmax(szBaseName));
+    get_weaponname(iWeaponId, szBaseName, charsmax(szBaseName));
     client_cmd(pPlayer, szBaseName);
 
     return PLUGIN_HANDLED;
@@ -774,7 +829,7 @@ ItemPostFrame(this) {
         if (!IsUseable(this) && flNextPrimaryAttack < 0.0) {
             // if (!(iWeaponFlags & ITEM_FLAG_NOAUTOSWITCHEMPTY) && g_pGameRules->GetNextBestWeapon(m_pPlayer, this)) {
             //     set_member(this, m_Weapon_flNextPrimaryAttack, 0.3);
-            // 	return;
+            //     return;
             // }
         } else {
             if (!get_member(this, m_Weapon_iClip) && !(iWeaponFlags & ITEM_FLAG_NOAUTORELOAD) && flNextPrimaryAttack < 0.0) {
@@ -794,6 +849,16 @@ ItemPostFrame(this) {
 }
 
 SecondaryAttack(this) {
+    if (get_member_game(m_bFreezePeriod)) {
+        return;
+    }
+
+    ExecuteHamB(Ham_Weapon_SecondaryAttack, this);
+
+    if (g_bSupercede) {
+        return;
+    }
+
     if (ExecuteBindedFunction(CWB_SecondaryAttack, this) > PLUGIN_CONTINUE) {
         return;
     }
@@ -804,12 +869,24 @@ PrimaryAttack(this) {
         return;
     }
 
+    ExecuteHamB(Ham_Weapon_PrimaryAttack, this);
+
+    if (g_bSupercede) {
+        return;
+    }
+
     if (ExecuteBindedFunction(CWB_PrimaryAttack, this) > PLUGIN_CONTINUE) {
         return;
     }
 }
 
 Reload(this) {
+    ExecuteHamB(Ham_Weapon_Reload, this);
+
+    if (g_bSupercede) {
+        return;
+    }
+    
     if (ExecuteBindedFunction(CWB_Reload, this) > PLUGIN_CONTINUE) {
         return;
     }
@@ -817,6 +894,12 @@ Reload(this) {
 
 WeaponIdle(this) {
     if (get_member(this, m_Weapon_flTimeWeaponIdle) > 0.0) {
+        return;
+    }
+
+    ExecuteHamB(Ham_Weapon_WeaponIdle, this);
+
+    if (g_bSupercede) {
         return;
     }
 
@@ -843,7 +926,9 @@ WeaponDeploy(this) {
     }
 
     new pPlayer = GetPlayer(this);
-    SetWeaponPrediction(pPlayer, false);
+    if (get_gametime() >= g_flNextPredictionUpdate[pPlayer]) {
+        SetWeaponPrediction(pPlayer, false);
+    }
 
     // SetThink(this, "DisablePrediction");
     // set_pev(this, pev_nextthink, get_gametime() + 0.1);
@@ -877,7 +962,36 @@ PlayWeaponAnim(this, iSequence, Float:flDuration) {
 }
 
 SendWeaponAnim(this, iAnim) {
-    ExecuteHamB(Ham_CS_Weapon_SendWeaponAnim, this, iAnim, 0);
+    new pPlayer = GetPlayer(this);
+
+    SendPlayerWeaponAnim(pPlayer, this, iAnim);
+
+    for (new pSpectator = 1; pSpectator <= MaxClients; pSpectator++) {
+        if (!is_user_connected(pSpectator)) {
+            continue;
+        }
+
+        if (pev(pSpectator, pev_iuser1) != OBS_IN_EYE) {
+            continue;
+        }
+
+        if (pev(pSpectator, pev_iuser2) != pPlayer) {
+            continue;
+        }
+
+        SendPlayerWeaponAnim(pSpectator, this, iAnim);
+    }
+}
+
+SendPlayerWeaponAnim(pPlayer, pWeapon, iAnim) {
+    new iBody = pev(pWeapon, pev_body);
+
+    set_pev(pPlayer, pev_weaponanim, iAnim);
+
+    message_begin(MSG_ONE, SVC_WEAPONANIM, _, pPlayer);
+    write_byte(iAnim);
+    write_byte(iBody);
+    message_end();
 }
 
 GetPlayer(this) {
@@ -894,7 +1008,7 @@ FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:
     new shared_rand = pPlayer > 0 ? get_member(pPlayer, random_seed) : 0;
     new CW_Flags:iFlags = GetData(iHandler, CW_Data_Flags);
 
-    new tr = create_tr2();
+    new pTr = create_tr2();
 
     static Float:vecRight[3];
     get_global_vector(GL_v_right, vecRight);
@@ -928,14 +1042,14 @@ FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:
             vecEnd[i] = vecSrc[i] + (vecDir[i] * flDistance);
         }
 
-        engfunc(EngFunc_TraceLine, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, this, tr);
+        engfunc(EngFunc_TraceLine, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, this, pTr);
 
         new Float:flFraction;
-        get_tr2(tr, TR_flFraction, flFraction);
+        get_tr2(pTr, TR_flFraction, flFraction);
         
         // do damage, paint decals
         if (flFraction != 1.0) {
-            new pHit = get_tr2(tr, TR_pHit);
+            new pHit = get_tr2(pTr, TR_pHit);
 
             if (pHit < 0) {
                 pHit = 0;
@@ -945,24 +1059,24 @@ FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:
             new Float:flCurrentDamage = flDamage * floatpower(flRangeModifier, flCurrentDistance / 500.0);
 
             rg_multidmg_clear();
-            ExecuteHamB(Ham_TraceAttack, pHit, pAttacker, flCurrentDamage, vecDir, tr, DMG_BULLET | DMG_NEVERGIB);
+            ExecuteHamB(Ham_TraceAttack, pHit, pAttacker, flCurrentDamage, vecDir, pTr, DMG_BULLET | DMG_NEVERGIB);
             rg_multidmg_apply(this, pAttacker);
         
             // TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
             // DecalGunshot( &tr, iBulletType );
 
             // new iDecalIndex = ExecuteHam(Ham_DamageDecal, pHit, DMG_BULLET);
-            // DecalTrace2(tr, iDecalIndex);
+            // DecalTrace2(pTr, iDecalIndex);
 
             if (!ExecuteHam(Ham_IsPlayer, pHit)) {
                 if (~iFlags & CWF_NoBulletSmoke) {
-                    BulletSmoke(tr);
+                    BulletSmoke(pTr);
                 }
                 
                 if (~iFlags & CWF_NoBulletDecal) {
                     new iDecalIndex = GetDecalIndex(pHit);
                     if (iDecalIndex >= 0) {
-                        MakeDecal(tr, pHit, iDecalIndex);
+                        MakeDecal(pTr, pHit, iDecalIndex);
                     }
                 }
             }
@@ -970,7 +1084,7 @@ FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:
 
         // make bullet trails
         static Float:vecEndPos[3];
-        get_tr2(tr, TR_vecEndPos, vecEndPos);
+        get_tr2(pTr, TR_vecEndPos, vecEndPos);
 
         BubbleTrail(vecSrc, vecEndPos, floatround((flDistance * flFraction) / 64.0));
     }
@@ -979,7 +1093,7 @@ FireBulletsPlayer(this, cShots, Float:vecSrc[3], Float:vecDirShooting[3], Float:
     vecOut[1] = vecMultiplier[1] * vecSpread[1];
     vecOut[2] = 0.0;
 
-    free_tr2(tr);
+    free_tr2(pTr);
 }
 
 GrenadeDetonate(this, Float:flRadius, Float:flMagnitude) {
@@ -1051,14 +1165,26 @@ GrenadeExplode(this, pTr, iDamageBits, Float:flRadius, Float:flMagnitude) {
     }
 }
 
+bool:IsWeaponKnife(pWeapon) {
+    if (GetHandlerByEntity(pWeapon) != CW_INVALID_HANDLER) {
+        return false;
+    }
+
+    if (get_member(pWeapon, m_iId) != CSW_KNIFE) {
+        return false;
+    }
+
+    return true;
+}
+
 // ANCHOR: Weapon Callbacks
 
 public Smack(this) {
     new CW:iHandler = GetHandlerByEntity(this);
     new CW_Flags:iFlags = GetData(iHandler, CW_Data_Flags);
 
-    new tr = pev(this, pev_iuser1);
-    new pHit = get_tr2(tr, TR_pHit);
+    new pTr = pev(this, pev_iuser1);
+    new pHit = get_tr2(pTr, TR_pHit);
     if (pHit < 0) {
         pHit = 0;
     }
@@ -1066,20 +1192,20 @@ public Smack(this) {
     if (~iFlags & CWF_NoBulletDecal) {
         new iDecalIndex = GetDecalIndex(pHit);
         if (iDecalIndex >= 0) {
-            MakeDecal(tr, pHit, iDecalIndex, false);
+            MakeDecal(pTr, pHit, iDecalIndex, false);
         }
     }
 
-    free_tr2(tr);
+    free_tr2(pTr);
 
     SetThink(this, NULL_STRING);
 }
 
-public DisablePrediction(this) {
-    new pPlayer = GetPlayer(this);
-    SetWeaponPrediction(pPlayer, false);
-    SetThink(this, NULL_STRING);
-}
+// public DisablePrediction(this) {
+//     new pPlayer = GetPlayer(this);
+//     SetWeaponPrediction(pPlayer, false);
+//     SetThink(this, NULL_STRING);
+// }
 
 // ANCHOR: Weapon Entity Default Methods
 
@@ -1096,7 +1222,7 @@ bool:DefaultReload(this, iAnim, Float:flDelay) {
     new iClip = get_member(this, m_Weapon_iClip);
     new iClipSize = GetData(iHandler, CW_Data_ClipSize);
 
-    new size = min(iClipSize - iClip, iPrimaryAmmoAmount);	
+    new size = min(iClipSize - iClip, iPrimaryAmmoAmount);
     if (size == 0) {
         return false;
     }
@@ -1150,9 +1276,9 @@ bool:DefaultShotgunReload(this, iStartAnim, iEndAnim, Float:flDelay, Float:flDur
         set_member(this, m_Weapon_fInSpecialReload, 2);
 
         // if (RANDOM_LONG(0,1))
-        // 	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/reload1.wav", 1, ATTN_NORM, 0, 85 + RANDOM_LONG(0,0x1f));
+        // EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/reload1.wav", 1, ATTN_NORM, 0, 85 + RANDOM_LONG(0,0x1f));
         // else
-        // 	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/reload3.wav", 1, ATTN_NORM, 0, 85 + RANDOM_LONG(0,0x1f));
+        // EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/reload3.wav", 1, ATTN_NORM, 0, 85 + RANDOM_LONG(0,0x1f));
 
         PlayWeaponAnim(this, iEndAnim, flDuration);
     } else {
@@ -1200,7 +1326,7 @@ bool:DefaultShotgunIdle(this, iAnim, iReloadEndAnim, Float:flDuration, Float:flR
 
 bool:DefaultDeploy(this, const szViewModel[], const szWeaponModel[], iAnim, const szAnimExt[]) {
     // if (!CanDeploy(this)) {
-    // 	return false;
+    //     return false;
     // }
 
     // new CW:iHandler = GetHandlerByEntity(this);
@@ -1303,26 +1429,26 @@ DefaultSwing(this, Float:flDamage, Float:flRate, Float:flDistance) {
     MakeAimDir(pPlayer, flDistance, vecEnd);
     xs_vec_add(vecSrc, vecEnd, vecEnd);
 
-    new tr = create_tr2();
-    engfunc(EngFunc_TraceLine, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, this, tr);
+    new pTr = create_tr2();
+    engfunc(EngFunc_TraceLine, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, this, pTr);
 
     new Float:flFraction;
-    get_tr2(tr, TR_flFraction, flFraction);
+    get_tr2(pTr, TR_flFraction, flFraction);
 
     if (flFraction >= 1.0) {
-        engfunc(EngFunc_TraceHull, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, HULL_HEAD, this, tr);
-        get_tr2(tr, TR_flFraction, flFraction);
+        engfunc(EngFunc_TraceHull, vecSrc, vecEnd, DONT_IGNORE_MONSTERS, HULL_HEAD, this, pTr);
+        get_tr2(pTr, TR_flFraction, flFraction);
 
         if (flFraction < 1.0) {
             // Calculate the point of interANCHOR of the line (or hull) and the object we hit
             // This is and approximation of the "best" interANCHOR
-            new pHit = get_tr2(tr, TR_pHit);
-            if (pHit != -1) {
-                FindHullIntersection(vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, this);
+            new pHit = get_tr2(pTr, TR_pHit);
+            if (pHit == -1 || ExecuteHamB(Ham_IsBSPModel, pHit)) {
+                FindHullIntersection(vecSrc, pTr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, this);
             }
 
-            get_tr2(tr, TR_vecEndPos, vecEnd); // This is the point on the actual surface (the hull could have hit space)
-            get_tr2(tr, TR_flFraction, flFraction);
+            get_tr2(pTr, TR_vecEndPos, vecEnd); // This is the point on the actual surface (the hull could have hit space)
+            get_tr2(pTr, TR_flFraction, flFraction);
         }
     }
 
@@ -1334,13 +1460,13 @@ DefaultSwing(this, Float:flDamage, Float:flRate, Float:flDistance) {
     rg_set_animation(pPlayer, PLAYER_ATTACK1);
 
     if (flFraction >= 1.0) {
-        free_tr2(tr);
+        free_tr2(pTr);
         return -1;
     }
 
-    new pHit = get_tr2(tr, TR_pHit);
+    new pHit = get_tr2(pTr, TR_pHit);
     if (pHit < 0) {
-        set_tr2(tr, TR_pHit, 0);
+        set_tr2(pTr, TR_pHit, 0);
         pHit = 0;
     }
 
@@ -1352,12 +1478,12 @@ DefaultSwing(this, Float:flDamage, Float:flRate, Float:flDistance) {
     xs_vec_normalize(vecDir, vecDir);
 
     rg_multidmg_clear();
-    ExecuteHamB(Ham_TraceAttack, pHit, pPlayer, flDamage, vecDir, tr, DMG_CLUB); 
+    ExecuteHamB(Ham_TraceAttack, pHit, pPlayer, flDamage, vecDir, pTr, DMG_CLUB); 
     rg_multidmg_apply(pPlayer, pPlayer);
     // }
 
 
-    set_pev(this, pev_iuser1, tr);
+    set_pev(this, pev_iuser1, pTr);
     SetThink(this, "Smack");
     set_pev(this, pev_nextthink, get_gametime() + (flRate * 0.5));
 
@@ -1445,7 +1571,7 @@ SpawnWeaponBox(CW:iHandler) {
     set_pev(pItem, pev_owner, pWeaponBox);
 
     new iSlot = GetData(iHandler, CW_Data_SlotId);
-    set_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, pItem, iSlot);
+    set_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, pItem, iSlot + 1);
 
     dllfunc(DLLFunc_Spawn, pWeaponBox);
 
@@ -1578,7 +1704,7 @@ Float:WaterLevel(const Float:vecPosition[3], Float:flMinZ, Float:flMaxZ) {
     return vecMidUp[2];
 }
 
-FindHullIntersection(const Float:vecSrc[3], &tr, const Float:vecMins[3], const Float:vecMaxs[3], pEntity) {
+FindHullIntersection(const Float:vecSrc[3], &pTr, const Float:vecMins[3], const Float:vecMaxs[3], pEntity) {
     new Float:flDistance = 8192.0;
 
     static Float:rgvecMinsMaxs[2][3];
@@ -1588,7 +1714,7 @@ FindHullIntersection(const Float:vecSrc[3], &tr, const Float:vecMins[3], const F
     }
 
     static Float:vecHullEnd[3];
-    get_tr2(tr, TR_vecEndPos, vecHullEnd);
+    get_tr2(pTr, TR_vecEndPos, vecHullEnd);
 
     for (new i = 0; i < 3; ++i) {
         vecHullEnd[i] = vecSrc[i] + ((vecHullEnd[i] - vecSrc[i]) * 2.0);
@@ -1601,8 +1727,8 @@ FindHullIntersection(const Float:vecSrc[3], &tr, const Float:vecMins[3], const F
     get_tr2(tmpTrace, TR_flFraction, flFraction);
 
     if (flFraction < 1.0) {
-        free_tr2(tr);
-        tr = tmpTrace;
+        free_tr2(pTr);
+        pTr = tmpTrace;
         return;
     }
 
@@ -1623,8 +1749,8 @@ FindHullIntersection(const Float:vecSrc[3], &tr, const Float:vecMins[3], const F
                 if (flFraction < 1.0) {
                     new Float:flThisDistance = get_distance_f(vecEndPos, vecSrc);
                     if (flThisDistance < flDistance) {
-                        free_tr2(tr);
-                        tr = tmpTrace;
+                        free_tr2(pTr);
+                        pTr = tmpTrace;
                         flDistance = flThisDistance;
                     }
                 }
@@ -1651,11 +1777,13 @@ _RadiusDamage(const Float:vecOrigin[3], iInflictor, pAttacker, Float:flDamage, F
     new pTr = create_tr2();
 
     new pEntity;
-    new iPrevEntity;
+    new pPrevEntity;
     while ((pEntity = engfunc(EngFunc_FindEntityInSphere, pEntity, vecSrc, flRadius)) != 0) {
-        if (iPrevEntity >= pEntity) {
+        if (pPrevEntity >= pEntity) {
             break;
         }
+
+        pPrevEntity = pEntity;
 
         if (!pev_valid(pEntity)) {
             continue;
@@ -1724,8 +1852,6 @@ _RadiusDamage(const Float:vecOrigin[3], iInflictor, pAttacker, Float:flDamage, F
         } else {
             ExecuteHamB(Ham_TakeDamage, pEntity, iInflictor, pAttacker, flAdjustedDamage, iDamageBits);
         }
-
-        iPrevEntity = pEntity;
     }
 
     free_tr2(pTr);
@@ -1931,6 +2057,10 @@ RegisterWeaponHooks(iWeaponId) {
     RegisterHam(Ham_Spawn, szClassname, "OnSpawn_Post", .Post = 1);
     RegisterHam(Ham_CS_Item_CanDrop, szClassname, "OnCanDrop");
     // RegisterHam(Ham_Item_GetItemInfo, szClassname, "OnItemGetItemInfo", .Post = 1);
+    RegisterHam(Ham_Weapon_PrimaryAttack, szClassname, "OnWeaponPrimaryAttack");
+    RegisterHam(Ham_Weapon_SecondaryAttack, szClassname, "OnWeaponSecondaryAttack");
+    RegisterHam(Ham_Weapon_Reload, szClassname, "OnWeaponReload");
+    RegisterHam(Ham_Weapon_WeaponIdle, szClassname, "OnWeaponIdle");
 
     g_bWeaponHooks[iWeaponId] = true;
 }
@@ -1938,11 +2068,11 @@ RegisterWeaponHooks(iWeaponId) {
 // ANCHOR: Effects
 
 SparkShower(const Float:vecOrigin[3], const Float:vecAngles[3], iOwner) {
-    new iSparkShower = engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, "spark_shower"));
-    engfunc(EngFunc_SetOrigin, iSparkShower, vecOrigin);
-    set_pev(iSparkShower, pev_angles, vecAngles);
-    set_pev(iSparkShower, pev_owner, iOwner);
-    dllfunc(DLLFunc_Spawn, iSparkShower);
+    new pSparkShower = engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, "spark_shower"));
+    engfunc(EngFunc_SetOrigin, pSparkShower, vecOrigin);
+    set_pev(pSparkShower, pev_angles, vecAngles);
+    set_pev(pSparkShower, pev_owner, iOwner);
+    dllfunc(DLLFunc_Spawn, pSparkShower);
 }
 
 GrenadeExplosion(const Float:vecOrigin[3], Float:flDamage) {
@@ -2271,22 +2401,22 @@ bool:EjectWeaponBrass(this, iModelIndex, iSoundType) {
 // ANCHOR: Random
 
 new const seed_table[256] = {
-	28985, 27138, 26457, 9451, 17764, 10909, 28790, 8716, 6361, 4853, 17798, 21977, 19643, 20662, 10834, 20103,
-	27067, 28634, 18623, 25849, 8576, 26234, 23887, 18228, 32587, 4836, 3306, 1811, 3035, 24559, 18399, 315,
-	26766, 907, 24102, 12370, 9674, 2972, 10472, 16492, 22683, 11529, 27968, 30406, 13213, 2319, 23620, 16823,
-	10013, 23772, 21567, 1251, 19579, 20313, 18241, 30130, 8402, 20807, 27354, 7169, 21211, 17293, 5410, 19223,
-	10255, 22480, 27388, 9946, 15628, 24389, 17308, 2370, 9530, 31683, 25927, 23567, 11694, 26397, 32602, 15031,
-	18255, 17582, 1422, 28835, 23607, 12597, 20602, 10138, 5212, 1252, 10074, 23166, 19823, 31667, 5902, 24630,
-	18948, 14330, 14950, 8939, 23540, 21311, 22428, 22391, 3583, 29004, 30498, 18714, 4278, 2437, 22430, 3439,
-	28313, 23161, 25396, 13471, 19324, 15287, 2563, 18901, 13103, 16867, 9714, 14322, 15197, 26889, 19372, 26241,
-	31925, 14640, 11497, 8941, 10056, 6451, 28656, 10737, 13874, 17356, 8281, 25937, 1661, 4850, 7448, 12744,
-	21826, 5477, 10167, 16705, 26897, 8839, 30947, 27978, 27283, 24685, 32298, 3525, 12398, 28726, 9475, 10208,
-	617, 13467, 22287, 2376, 6097, 26312, 2974, 9114, 21787, 28010, 4725, 15387, 3274, 10762, 31695, 17320,
-	18324, 12441, 16801, 27376, 22464, 7500, 5666, 18144, 15314, 31914, 31627, 6495, 5226, 31203, 2331, 4668,
-	12650, 18275, 351, 7268, 31319, 30119, 7600, 2905, 13826, 11343, 13053, 15583, 30055, 31093, 5067, 761,
-	9685, 11070, 21369, 27155, 3663, 26542, 20169, 12161, 15411, 30401, 7580, 31784, 8985, 29367, 20989, 14203,
-	29694, 21167, 10337, 1706, 28578, 887, 3373, 19477, 14382, 675, 7033, 15111, 26138, 12252, 30996, 21409,
-	25678, 18555, 13256, 23316, 22407, 16727, 991, 9236, 5373, 29402, 6117, 15241, 27715, 19291, 19888, 19847
+    28985, 27138, 26457, 9451, 17764, 10909, 28790, 8716, 6361, 4853, 17798, 21977, 19643, 20662, 10834, 20103,
+    27067, 28634, 18623, 25849, 8576, 26234, 23887, 18228, 32587, 4836, 3306, 1811, 3035, 24559, 18399, 315,
+    26766, 907, 24102, 12370, 9674, 2972, 10472, 16492, 22683, 11529, 27968, 30406, 13213, 2319, 23620, 16823,
+    10013, 23772, 21567, 1251, 19579, 20313, 18241, 30130, 8402, 20807, 27354, 7169, 21211, 17293, 5410, 19223,
+    10255, 22480, 27388, 9946, 15628, 24389, 17308, 2370, 9530, 31683, 25927, 23567, 11694, 26397, 32602, 15031,
+    18255, 17582, 1422, 28835, 23607, 12597, 20602, 10138, 5212, 1252, 10074, 23166, 19823, 31667, 5902, 24630,
+    18948, 14330, 14950, 8939, 23540, 21311, 22428, 22391, 3583, 29004, 30498, 18714, 4278, 2437, 22430, 3439,
+    28313, 23161, 25396, 13471, 19324, 15287, 2563, 18901, 13103, 16867, 9714, 14322, 15197, 26889, 19372, 26241,
+    31925, 14640, 11497, 8941, 10056, 6451, 28656, 10737, 13874, 17356, 8281, 25937, 1661, 4850, 7448, 12744,
+    21826, 5477, 10167, 16705, 26897, 8839, 30947, 27978, 27283, 24685, 32298, 3525, 12398, 28726, 9475, 10208,
+    617, 13467, 22287, 2376, 6097, 26312, 2974, 9114, 21787, 28010, 4725, 15387, 3274, 10762, 31695, 17320,
+    18324, 12441, 16801, 27376, 22464, 7500, 5666, 18144, 15314, 31914, 31627, 6495, 5226, 31203, 2331, 4668,
+    12650, 18275, 351, 7268, 31319, 30119, 7600, 2905, 13826, 11343, 13053, 15583, 30055, 31093, 5067, 761,
+    9685, 11070, 21369, 27155, 3663, 26542, 20169, 12161, 15411, 30401, 7580, 31784, 8985, 29367, 20989, 14203,
+    29694, 21167, 10337, 1706, 28578, 887, 3373, 19477, 14382, 675, 7033, 15111, 26138, 12252, 30996, 21409,
+    25678, 18555, 13256, 23316, 22407, 16727, 991, 9236, 5373, 29402, 6117, 15241, 27715, 19291, 19888, 19847
 };
 
 Float:SharedRandomFloat(seed, Float:low, Float:high) {
@@ -2316,41 +2446,41 @@ U_Srand(seed) {
     return seed_table[seed & 0xff];
 }
 
-// FireEvent(tr, const szSnd[], const szShellModel[]) {
+// FireEvent(pTr, const szSnd[], const szShellModel[]) {
 //     static Float:flFraction;
-//     get_tr2(tr, TR_flFraction, flFraction);
+//     get_tr2(pTr, TR_flFraction, flFraction);
 
-//     new pHit = get_tr2(tr, TR_pHit);
+//     new pHit = get_tr2(pTr, TR_pHit);
 
 //     if (flFraction != 1.0) {
-//             // Native_PlaySoundAtPosition( $origin = $trace_endpos, $sound = weapons/bullet_hit1.wav );
-// 			// Native_ImpactParticles( $origin = $trace_endpos );
-// 			// Native_PlaceDecal( $origin = $trace_endpos, $decal = "{shot2", $trace_entity );
+//          // Native_PlaySoundAtPosition( $origin = $trace_endpos, $sound = weapons/bullet_hit1.wav );
+//          // Native_ImpactParticles( $origin = $trace_endpos );
+//          // Native_PlaceDecal( $origin = $trace_endpos, $decal = "{shot2", $trace_entity );
 
-//             new iDecalIndex = random_num(get_decal_index("{shot1"), get_decal_index("{shot5") + 1);
-//             MakeDecal(tr, pHit, iDecalIndex);
+//          new iDecalIndex = random_num(get_decal_index("{shot1"), get_decal_index("{shot5") + 1);
+//          MakeDecal(pTr, pHit, iDecalIndex);
 //     }
 // }
 
 // BeamPoints(const Float:vecStart[3], const Float:vecEnd[3], const color[3]) {
 //         message_begin(MSG_BROADCAST ,SVC_TEMPENTITY);
 //         write_byte(TE_BEAMPOINTS);
-//         write_coord(floatround(vecStart[0]));	// start position
+//         write_coord(floatround(vecStart[0])); // start position
 //         write_coord(floatround(vecStart[1]));
 //         write_coord(floatround(vecStart[2]));
-//         write_coord(floatround(vecEnd[0]));	// end position
+//         write_coord(floatround(vecEnd[0])); // end position
 //         write_coord(floatround(vecEnd[1]));
 //         write_coord(floatround(vecEnd[2]));
-//         write_short(engfunc(EngFunc_ModelIndex, "sprites/laserbeam.spr"));	// sprite index
-//         write_byte(0);	// starting frame
-//         write_byte(10);	// frame rate in 0.1's
-//         write_byte(30);	// life in 0.1's
-//         write_byte(2);	// line width in 0.1's
-//         write_byte(1);	// noise amplitude in 0.01's
-//         write_byte(color[0]);	// Red
-//         write_byte(color[1]);	// Green
-//         write_byte(color[2]);	// Blue
-//         write_byte(127);	// brightness
-//         write_byte(10);	// scroll speed in 0.1's
+//         write_short(engfunc(EngFunc_ModelIndex, "sprites/laserbeam.spr")); // sprite index
+//         write_byte(0); // starting frame
+//         write_byte(10); // frame rate in 0.1's
+//         write_byte(30); // life in 0.1's
+//         write_byte(2); // line width in 0.1's
+//         write_byte(1); // noise amplitude in 0.01's
+//         write_byte(color[0]); // Red
+//         write_byte(color[1]); // Green
+//         write_byte(color[2]); // Blue
+//         write_byte(127); // brightness
+//         write_byte(10); // scroll speed in 0.1's
 //         message_end();
 // }

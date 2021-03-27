@@ -15,6 +15,7 @@
 
 #define TASKID_AMBIENT 100
 
+#define DOCUMENT_VERSION 2
 #define RESERVED_CHARACTER_COUNT 4
 #define RESERVED_SOUND_COUNT 3
 #define CHARACTER_KEY "zp_character"
@@ -28,7 +29,8 @@ enum CharacterData {
     Character_PanicSounds,
     Character_ZombieAmbientSounds,
     Character_ZombieDeathSounds,
-    Character_IsSelectable
+    Character_IsSelectable,
+    Character_BodyIndex
 }
 
 new gmsgClCorpse;
@@ -43,6 +45,10 @@ new g_iCharacterCount = 0;
 new g_iPlayerCharacter[MAX_PLAYERS + 1] = { -1, ... };
 
 new CW:g_iCwSwipeHandler;
+
+new g_pFwPlayerCharacterUpdated;
+new g_pFwPlayerModelUpdated;
+new g_iFwResult;
 
 public plugin_precache() {
     precache_model(DEFAULT_PLAYER_MODEL);
@@ -69,6 +75,9 @@ public plugin_init() {
     register_message(gmsgClCorpse, "OnMessage_ClCorpse");
 
     g_iCwSwipeHandler = CW_GetHandler(ZP_WEAPON_SWIPE);
+
+    g_pFwPlayerCharacterUpdated = CreateMultiForward("ZP_Fw_PlayerCharacterUpdated", ET_IGNORE, FP_CELL);
+    g_pFwPlayerModelUpdated = CreateMultiForward("ZP_Fw_PlayerModelUpdated", ET_IGNORE, FP_CELL);
 }
 
 public plugin_natives() {
@@ -94,6 +103,12 @@ public bool:Native_SetCharacter(iPluginId, iArgc) {
 
 public client_connect(pPlayer) {
     UpdatePlayerCharacter(pPlayer, true);
+}
+
+public client_putinserver(pPlayer) {
+    if (!is_user_bot(pPlayer)) {
+        set_task(5.0, "Task_DisableMinModels", pPlayer);
+    }
 }
 
 public ZP_Fw_PlayerPanic(pPlayer) {
@@ -156,6 +171,10 @@ public OnMessage_ClCorpse(iMsgId, iMsgDest, pPlayer) {
     static szPlayerModel[MAX_RESOURCE_PATH_LENGTH];
     ArrayGetString(Array:g_rgCharactersData[ZP_Player_IsZombie(pTargetPlayer) ? Character_ZombieModel : Character_HumanModel], iCharacter, szPlayerModel, charsmax(szPlayerModel));
 
+    if (szPlayerModel[0] == '^0') {
+        return;
+    }
+
     set_msg_arg_string(1, szPlayerModel);
 }
 
@@ -166,6 +185,16 @@ public Task_Ambient(iTaskId) {
 
     PlayAmbient(pPlayer);
     set_task(random_float(10.0, 30.0), "Task_Ambient", TASKID_AMBIENT + pPlayer);
+}
+
+public Task_DisableMinModels(iTaskId) {
+    new pPlayer = iTaskId;
+
+    if (!is_user_connected(pPlayer)) {
+        return;
+    }
+
+    client_cmd(pPlayer, "cl_minmodels %d", 0);
 }
 
 /*--------------------------------[ Methods ]--------------------------------*/
@@ -185,17 +214,25 @@ UpdatePlayerModel(pPlayer) {
     new iCharacter = g_iPlayerCharacter[pPlayer];
 
     static szPlayerModel[MAX_RESOURCE_PATH_LENGTH];
+    copy(szPlayerModel, 0, "");
+
     if (g_iPlayerCharacter[pPlayer] != -1) {
         ArrayGetString(Array:g_rgCharactersData[ZP_Player_IsZombie(pPlayer) ? Character_ZombieModel : Character_HumanModel], iCharacter, szPlayerModel, charsmax(szPlayerModel));
-    } else {
+    }
+
+    if (szPlayerModel[0] == '^0') {
         copy(szPlayerModel, charsmax(szPlayerModel), DEFAULT_PLAYER_MODEL);
     }
 
     new iModelIndex = engfunc(EngFunc_ModelIndex, szPlayerModel);
+    new iBody = ArrayGetCell(Array:g_rgCharactersData[Character_BodyIndex], iCharacter);
 
     set_user_info(pPlayer, "model", NULL_STRING);
     set_pev(pPlayer, pev_modelindex, iModelIndex);
+    set_pev(pPlayer, pev_body, iBody);
     set_member(pPlayer, m_modelIndexPlayer, iModelIndex);
+
+    ExecuteForward(g_pFwPlayerModelUpdated, g_iFwResult, pPlayer);
 }
 
 UpdatePlayerCharacter(pPlayer, bool:bOverride = false) {
@@ -217,6 +254,7 @@ UpdatePlayerCharacter(pPlayer, bool:bOverride = false) {
     }
 
     g_iPlayerCharacter[pPlayer] = iCharacter;
+    ExecuteForward(g_pFwPlayerCharacterUpdated, g_iFwResult, pPlayer);
 }
 
 PlayAmbient(pPlayer) {
@@ -235,13 +273,16 @@ PlayVoiceFromCharacterData(pPlayer, CharacterData:iCharacterData) {
     }
 
     new Array:irgSounds = ArrayGetCell(Array:g_rgCharactersData[iCharacterData], g_iPlayerCharacter[pPlayer]);
+    if (!ArraySize(irgSounds)) {
+        return;
+    }
 
     static szSound[MAX_RESOURCE_PATH_LENGTH];
     ArrayGetString(irgSounds, random(ArraySize(irgSounds)), szSound, charsmax(szSound));
     emit_sound(pPlayer, CHAN_VOICE, szSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 }
 
-CreateCharacter() {
+CreateCharacter(iBaseCharacter = -1) {
     new iCharacter = g_iCharacterCount;
 
     for (new i = 0; i < sizeof(g_rgCharactersData); ++i)    {
@@ -254,6 +295,11 @@ CreateCharacter() {
     CrateCharacterSoundsData(iCharacter, Character_ZombieDeathSounds);
 
     ArraySetCell(Array:g_rgCharactersData[Character_IsSelectable], iCharacter, true);
+    ArraySetCell(Array:g_rgCharactersData[Character_BodyIndex], iCharacter, 0);
+
+    if (iBaseCharacter != -1) {
+        InterhitCharacter(iCharacter, iBaseCharacter);
+    }
 
     g_iCharacterCount++;
 
@@ -265,6 +311,43 @@ DestroyCharacter(iCharacter) {
     DestroyCharacterSoundData(iCharacter, Character_PanicSounds);
     DestroyCharacterSoundData(iCharacter, Character_ZombieAmbientSounds);
     DestroyCharacterSoundData(iCharacter, Character_ZombieDeathSounds);
+}
+
+InterhitCharacter(iCharacter, iBaseCharacter) {
+    InterhitCharacterModel(iCharacter, iBaseCharacter, Character_HumanModel);
+    InterhitCharacterModel(iCharacter, iBaseCharacter, Character_ZombieModel);
+    InterhitCharacterModel(iCharacter, iBaseCharacter, Character_SwipeModel);
+    InheritCharacterSounds(iCharacter, iBaseCharacter, Character_HumanDeathSounds);
+    InheritCharacterSounds(iCharacter, iBaseCharacter, Character_PanicSounds);
+    InheritCharacterSounds(iCharacter, iBaseCharacter, Character_ZombieAmbientSounds);
+    InheritCharacterSounds(iCharacter, iBaseCharacter, Character_ZombieDeathSounds);
+    InterhitCharacterValue(iCharacter, iBaseCharacter, Character_BodyIndex);
+    InterhitCharacterValue(iCharacter, iBaseCharacter, Character_IsSelectable);
+}
+
+InterhitCharacterValue(iCharacter, iBaseCharacter, CharacterData:iCharacterData) {
+    new iBaseValue = ArrayGetCell(Array:g_rgCharactersData[iCharacterData], iBaseCharacter);
+    ArraySetCell(Array:g_rgCharactersData[iCharacterData], iCharacter, iBaseValue);
+}
+
+InterhitCharacterModel(iCharacter, iBaseCharacter, CharacterData:iCharacterData) {
+    new szBuffer[MAX_RESOURCE_PATH_LENGTH];
+
+    ArrayGetString(Array:g_rgCharactersData[iCharacterData], iBaseCharacter, szBuffer, charsmax(szBuffer));
+    ArraySetString(Array:g_rgCharactersData[iCharacterData], iCharacter, szBuffer);
+}
+
+InheritCharacterSounds(iCharacter, iBaseCharacter, CharacterData:iCharacterData) {
+    new szBuffer[MAX_RESOURCE_PATH_LENGTH];
+
+    new Array:irgSounds = ArrayGetCell(Array:g_rgCharactersData[iCharacterData], iCharacter);
+    new Array:irgBaseSounds = ArrayGetCell(Array:g_rgCharactersData[iCharacterData], iBaseCharacter);
+    new iSize = ArraySize(irgBaseSounds);
+
+    for (new i = 0; i < iSize; ++i) {
+        ArrayGetString(irgBaseSounds, i, szBuffer, charsmax(szBuffer));
+        ArrayPushString(irgSounds, szBuffer);
+    }
 }
 
 CrateCharacterSoundsData(iCharacter, CharacterData:iCharacterData) {
@@ -296,8 +379,9 @@ LoadCharacters() {
         if (iLen > 5 && equal(szFileName[iLen - 5], ".json")) {
             new szName[16];
             copy(szName, iLen - 5, szFileName);
-            LoadCharacter(szName);
-            log_amx("Character %s loaded.", szName);
+            if (!TrieKeyExists(g_iCharactersMap, szName)) {
+                LoadCharacter(szName);
+            }
         }
 
     } while (next_file(iDir, szFileName, charsmax(szFileName), iFileType));
@@ -309,34 +393,63 @@ LoadCharacter(const szName[]) {
     new szFilePath[MAX_RESOURCE_PATH_LENGTH];
     format(szFilePath, charsmax(szFilePath), "%s/%s.json", g_szCharacterDir, szName);
 
-    new iCharacter = CreateCharacter();
+    new JSON:iDoc = json_parse(szFilePath, true);
+    new iVersion = json_object_get_number(iDoc, "_version");
+    if (iVersion > DOCUMENT_VERSION) {
+        log_amx("Cannot load character %s. Character version should be less than or equal to %d.", szName, DOCUMENT_VERSION);
+        return -1;
+    }
+
+    new iBaseCharacter = -1;
+    if (json_object_has_value(iDoc, "inherit")) {
+        new szBase[16];
+        json_object_get_string(iDoc, "inherit", szBase, charsmax(szBase));
+
+        if (!TrieGetCell(g_iCharactersMap, szBase, iBaseCharacter)) {
+            iBaseCharacter = LoadCharacter(szBase);
+        }
+    }
+
+    new iCharacter = CreateCharacter(iBaseCharacter);
     TrieSetCell(g_iCharactersMap, szName, iCharacter);
 
-    new JSON:iDoc = json_parse(szFilePath, true);
-
     new JSON:iModelsDoc = json_object_get_value(iDoc, "models");
-    LoadCharacterModelData(iCharacter, iModelsDoc, "human", Character_HumanModel);
-    LoadCharacterModelData(iCharacter, iModelsDoc, "zombie", Character_ZombieModel);
-    LoadCharacterModelData(iCharacter, iModelsDoc, "swipe", Character_SwipeModel);
+    if (iModelsDoc != Invalid_JSON) {
+        LoadCharacterModelData(iCharacter, iModelsDoc, "human", Character_HumanModel);
+        LoadCharacterModelData(iCharacter, iModelsDoc, "zombie", Character_ZombieModel);
+        LoadCharacterModelData(iCharacter, iModelsDoc, "swipe", Character_SwipeModel);
+    }
 
     new JSON:iSoundsDoc = json_object_get_value(iDoc, "sounds");
-    LoadCharacterSoundsData(iCharacter, iSoundsDoc, "human.death", Character_HumanDeathSounds);
-    LoadCharacterSoundsData(iCharacter, iSoundsDoc, "human.panic", Character_PanicSounds);
-    LoadCharacterSoundsData(iCharacter, iSoundsDoc, "zombie.ambient", Character_ZombieAmbientSounds);
-    LoadCharacterSoundsData(iCharacter, iSoundsDoc, "zombie.death", Character_ZombieDeathSounds);
+    if (iSoundsDoc != Invalid_JSON) {
+        LoadCharacterSoundsData(iCharacter, iSoundsDoc, "human.death", Character_HumanDeathSounds);
+        LoadCharacterSoundsData(iCharacter, iSoundsDoc, "human.panic", Character_PanicSounds);
+        LoadCharacterSoundsData(iCharacter, iSoundsDoc, "zombie.ambient", Character_ZombieAmbientSounds);
+        LoadCharacterSoundsData(iCharacter, iSoundsDoc, "zombie.death", Character_ZombieDeathSounds);
+    }
 
     if (json_object_has_value(iDoc, "selectable")) {
         ArraySetCell(Array:g_rgCharactersData[Character_IsSelectable], iCharacter, json_object_get_bool(iDoc, "selectable"));
+    }
+
+    if (json_object_has_value(iDoc, "bodyindex")) {
+        ArraySetCell(Array:g_rgCharactersData[Character_BodyIndex], iCharacter, json_object_get_number(iDoc, "bodyindex"));
     }
 
     if (ArrayGetCell(Array:g_rgCharactersData[Character_IsSelectable], iCharacter)) {
         ArrayPushCell(g_iSelectableCharacters, iCharacter);
     }
 
+    log_amx("Character %s loaded.", szName);
+
     return iCharacter;
 }
 
 LoadCharacterModelData(iCharacter, JSON:iModelsDoc, const szKey[], CharacterData:iCharacterData) {
+    if (!json_object_has_value(iModelsDoc, szKey)) {
+        return;
+    }
+
     new szBuffer[MAX_RESOURCE_PATH_LENGTH];
 
     json_object_get_string(iModelsDoc, szKey, szBuffer, charsmax(szBuffer));
@@ -345,11 +458,20 @@ LoadCharacterModelData(iCharacter, JSON:iModelsDoc, const szKey[], CharacterData
 }
 
 LoadCharacterSoundsData(iCharacter, JSON:iSoundDoc, const szKey[], CharacterData:iCharacterData) {
+    if (!json_object_has_value(iSoundDoc, szKey, _, true)) {
+        return;
+    }
+
     new szBuffer[MAX_RESOURCE_PATH_LENGTH];
 
     new JSON:iSoundsDoc = json_object_get_value(iSoundDoc, szKey, true);
     new Array:irgSounds = ArrayGetCell(Array:g_rgCharactersData[iCharacterData], iCharacter);
     new iSize = json_array_get_count(iSoundsDoc);
+
+    if (ArraySize(irgSounds)) {
+        ArrayClear(irgSounds);
+    }
+
     for (new i = 0; i < iSize; ++i) {
         json_array_get_string(iSoundsDoc, i, szBuffer, charsmax(szBuffer));
         ArrayPushString(irgSounds, szBuffer);
@@ -369,6 +491,7 @@ InitializeCharactersStore() {
     g_rgCharactersData[Character_ZombieAmbientSounds] = ArrayCreate(_, RESERVED_CHARACTER_COUNT);
     g_rgCharactersData[Character_ZombieDeathSounds] = ArrayCreate(_, RESERVED_CHARACTER_COUNT);
     g_rgCharactersData[Character_IsSelectable] = ArrayCreate(_, RESERVED_CHARACTER_COUNT);
+    g_rgCharactersData[Character_BodyIndex] = ArrayCreate(_, RESERVED_CHARACTER_COUNT);
 }
 
 DestroyCharactersStore() {

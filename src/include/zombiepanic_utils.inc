@@ -206,3 +206,32 @@ stock UTIL_SetupSpawnerRespawn(pEntity) {
     }
 }
 
+stock UTIL_GetAmmoId(const szAmmoName[]) {
+    new iSize = sizeof(AMMO_LIST);
+    for (new iAmmoId = 0; iAmmoId < iSize; ++iAmmoId) {
+        if (equal(AMMO_LIST[iAmmoId], szAmmoName)) {
+            return iAmmoId;
+        }
+    }
+
+    return -1;
+}
+
+stock bool:UTIL_IsUsableButton(pButton, pPlayer) {
+    new iszMaster = get_ent_data(pButton, "CBaseToggle", "m_sMaster");
+
+    if (iszMaster) {
+        static szMaster[32];
+        engfunc(EngFunc_SzFromIndex, iszMaster, szMaster, charsmax(szMaster));
+
+        if (!UTIL_IsMasterTriggered(szMaster, pPlayer)) {
+            return false;
+        }
+    } 
+
+    if (get_ent_data(pButton, "CBaseToggle", "m_toggle_state") != TS_AT_BOTTOM) {
+        return false;
+    }
+
+    return true;
+}

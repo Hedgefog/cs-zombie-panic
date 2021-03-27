@@ -1,12 +1,10 @@
 #define ZP_TITLE "Zombie Panic"
-#define ZP_VERSION "1.3.0"
+#define ZP_VERSION "1.4.0"
 
 #define ZP_HUMAN_TEAM 2
 #define ZP_ZOMBIE_TEAM 1
-#define ZP_ZOMBIE_WIN_MESSAGE "#Terrorists_Win"
-#define ZP_HUMAN_WIN_MESSAGE "#CTs_Win"
 #define ZP_ZOMBIE_TEAM_NAME "Zombies"
-#define ZP_HUMAN_TEAM_NAME "Survivors"
+#define ZP_HUMAN_TEAM_NAME "Humans"
 
 #define ZP_HUMAN_HEALTH 100.0
 #define ZP_ZOMBIE_HEALTH 200.0

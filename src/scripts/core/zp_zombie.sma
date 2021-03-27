@@ -7,6 +7,7 @@
 
 #include <zombiepanic>
 #include <zombiepanic_utils>
+#include <api_rounds>
 
 #define PLUGIN "[Zombie Panic] Zombie"
 #define AUTHOR "Hedgehog Fog"
@@ -106,5 +107,9 @@ public OnItemTouch(pEntity, pToucher) {
 }
 
 bool:IsPlayerZombie(pPlayer) {
+    if (!Round_IsRoundStarted()) {
+        return false;
+    }
+
     return get_member(pPlayer, m_iTeam) == ZP_ZOMBIE_TEAM;
 }
