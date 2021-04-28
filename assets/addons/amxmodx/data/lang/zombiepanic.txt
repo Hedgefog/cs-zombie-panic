@@ -2,7 +2,7 @@
 ZP_HINT_TITLE = Hint
 ZP_HINT_PANIC = Panic may help you escape from the zombies^nPress <O> to Panic
 ZP_HINT_DROP_AMMO = You can drop your ammo pressing <X>^nPress <Z> to select ammo type
-ZP_HINT_PICKUP = Press <E> to pickup items on dinstance
+ZP_HINT_PICKUP = Press <E> to pickup items on distance
 ZP_WARN_TITLE = Warning
 ZP_WARN_SPEED = A large amount of ammo and weapons slows you down^nDon't forget to get rid of unnecessary ammo
 ZP_OBJECTIVE_TITLE = Survival
@@ -41,3 +41,25 @@ ZP_ITEM_PICKUP_TITLE = <E>
 ZP_ITEM_PICKUP = Подобрать предмет
 ZP_WARN_INFECTION_TITLE = Заражение
 ZP_WARN_INFECTOR = Вы инфицировали игрока
+
+[hu]
+ZP_HINT_TITLE = Tipp
+ZP_HINT_PANIC = A Pánik segíthet a zombik előli menekülésben^nNyomd meg az <O> gombot a Pánikhoz
+ZP_HINT_DROP_AMMO = Eldobhatod a töltényeid az <X> gombbal^nNyomd meg a <Z> gombot a töltény típus váltásához
+ZP_HINT_PICKUP = Az <E> gombbal felvehetsz távolabbi tárgyat is
+ZP_WARN_TITLE = Figyelmeztetés
+ZP_WARN_SPEED = Sok töltény és fegyver viselése lelassít^nDobd el a nem kellő töltényeket
+ZP_OBJECTIVE_TITLE = Túlélő
+ZP_OBJECTIVE_HUMAN = Éld túl a kört vagy ölj meg minden zombit
+ZP_OBJECTIVE_ZOMBIE = Öld meg az összes túlélőt
+ZPO_OBJECTIVE_TITLE = Feladat
+ZPO_OBJECTIVE_HUMAN = Kövesd a jelölést a feladatok teljesítéséhez
+ZPO_OBJECTIVE_ZOMBIE = Ne hagyd, hogy a túlélők feladatot teljesítsenek
+ZP_RESPAWN_TITLE = Újraéledés
+ZP_RESPAWN_ZOMBIE = Hamarosan újraéledsz...^nAz életek számát a jobb alsó sarokban látod
+ZP_RESPAWN_HUMAN = Hamarosan újraéledsz zombiként...
+ZP_RESPAWN_NOLIVES = Nincs több életed^nVárj további életek megjelenésére
+ZP_ITEM_PICKUP_TITLE = <E>
+ZP_ITEM_PICKUP = Tárgy felvétele
+ZP_WARN_INFECTION_TITLE = Fertőzés
+ZP_WARN_INFECTOR = Megfertőzted a játékost
