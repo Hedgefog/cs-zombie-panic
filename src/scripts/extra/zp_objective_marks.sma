@@ -17,11 +17,12 @@
 #define SPRITE_HEIGHT 128.0
 #define SPRITE_SCALE 0.03125
 #define SPRITE_AMT 50.0
-#define MARK_UPDATE_DELAY 0.1
+#define MARK_UPDATE_DELAY 0.01
 #define MARK_MAX_VELOCITY 250.0
 #define MARK_MAX_MOVE_STEP_LENGTH 800.0
 #define MARK_MAX_SCALE_STEP 0.125
 #define MARK_MAX_SCALE_STEP_LENGTH 100.0
+#define MAX_PLAYER_MARKS 16
 
 enum _:Frame { TopLeft, TopRight, BottomLeft, BottomRight };
 
@@ -35,12 +36,12 @@ enum PlayerData {
 
 new Array:g_irgMarks;
 new g_iMarkModelIndex;
-new g_rgPlayerData[MAX_PLAYERS + 1][12][PlayerData];
+new g_rgPlayerData[MAX_PLAYERS + 1][MAX_PLAYER_MARKS][PlayerData];
 
 new g_pCvarEnabled;
 
 public plugin_precache() {
-    g_irgMarks = ArrayCreate();
+    g_irgMarks = ArrayCreate(_, MAX_PLAYER_MARKS);
     g_iMarkModelIndex = precache_model(ZP_OBJECTIVE_MARK_SPRITE);
 
     RegisterHam(Ham_Spawn, "func_button", "OnButtonSpawn_Post", .Post = 1);
@@ -73,6 +74,15 @@ public plugin_end() {
 }
 
 public OnButtonSpawn_Post(pButton) {
+    if (ArraySize(g_irgMarks) >= MAX_PLAYER_MARKS) {
+        log_amx("WARNING: Objective marks limit reached!");
+        return;
+    }
+
+    if (~pev(pButton, pev_spawnflags) & ZP_BUTTON_FLAG_HUMAN_ONLY) {
+        return;
+    }
+
     new pMark = CreateMark(pButton);
     set_pev(pMark, pev_iuser1, ArraySize(g_irgMarks));
     ArrayPushCell(g_irgMarks, pMark);
@@ -119,12 +129,12 @@ public OnAddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
 
     new pButton = pev(pEntity, pev_owner);
     new iMarkIndex = pev(pEntity, pev_iuser1);
-    if (!IsUsableObjective(pHost, pButton)) {
+    if (!UTIL_IsUsableButton(pButton, pHost)) {
         g_rgPlayerData[pHost][iMarkIndex][Player_MarkUpdateTime] = 0.0;
         return FMRES_SUPERCEDE;
     }
     
-    new Float:flDelta = get_gametime() - g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkUpdateTime];
+    new Float:flDelta = get_gametime() - g_rgPlayerData[pHost][iMarkIndex][Player_MarkUpdateTime];
     if (!g_rgPlayerData[pHost][iMarkIndex][Player_MarkUpdateTime] || flDelta >= MARK_UPDATE_DELAY) {
         CalculateMark(pEntity, pHost);
     }
@@ -298,19 +308,6 @@ CalculateMark(pMark, pPlayer) {
     g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkScale] = flScale;
     g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkUpdateTime] = get_gametime();
 }
-
-bool:IsUsableObjective(pPlayer, pButton) {
-    if (!UTIL_IsUsableButton(pButton, pPlayer)) {
-        return false;
-    }
-
-    if (~pev(pButton, pev_spawnflags) & ZP_BUTTON_FLAG_HUMAN_ONLY) {
-        return false;
-    }
-
-    return true;
-}
-
 
 CreateFrame(const Float:vecOrigin[3], Float:flWidth, Float:flHeight, const Float:vecUp[3], const Float:vecRight[3], Float:rgvecFrameOut[Frame][3]) {
     new Float:flHalfWidth = flWidth / 2.0;
