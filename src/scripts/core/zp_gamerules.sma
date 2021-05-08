@@ -29,6 +29,7 @@ enum TeamPreference {
 new g_pCvarLives;
 new g_pCvarLivesPerPlayer;
 new g_pCvarCompetitive;
+new g_pCvarMapInfo;
 
 new g_pFwPlayerJoined;
 new g_pFwNewRound;
@@ -62,6 +63,7 @@ public plugin_init() {
     g_pCvarLives = register_cvar("zp_zombie_lives", "0");
     g_pCvarLivesPerPlayer = register_cvar("zp_zombie_lives_per_player", "2");
     g_pCvarCompetitive = register_cvar("zp_competitive", "0");
+    g_pCvarMapInfo = register_cvar("zp_mapinfo", "0");
 
     g_pFwPlayerJoined = CreateMultiForward("ZP_Fw_PlayerJoined", ET_IGNORE, FP_CELL);
     g_pFwNewRound = CreateMultiForward("ZP_Fw_NewRound", ET_IGNORE);
@@ -266,7 +268,9 @@ public OnPlayerSpawn_Post(pPlayer) {
         set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
         set_pev(pPlayer, pev_takedamage, DAMAGE_NO);
         OpenTeamMenu(pPlayer);
-        ZP_ShowMapInfo(pPlayer);
+        if (get_pcvar_num(g_pCvarMapInfo) > 0) {
+            ZP_ShowMapInfo(pPlayer);
+        }
         // ZP_Player_UpdateSpeed(pPlayer);
     } else {
         CheckWinConditions();
