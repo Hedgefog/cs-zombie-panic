@@ -18,6 +18,8 @@
 #define VEC_DUCK_HULL_MIN Float:{-16.0, -16.0, -18.0}
 #define VEC_DUCK_HULL_MAX Float:{16.0, 16.0, 18.0}
 
+#define IS_PLAYER(%1) (%1 > 0 && %1 <= MAX_PLAYERS)
+
 #define TOKEN 743647146
 
 enum CW_Data {
@@ -100,6 +102,7 @@ new Trie:g_rgWeaponsMap;
 new g_iWeaponCount;
 
 new Float:g_flNextPredictionUpdate[MAX_PLAYERS + 1];
+new bool:g_bKnifeHolstered[MAX_PLAYERS + 1];
 
 new g_iszWeaponBox;
 new g_pNewWeaponboxEnt = -1;
@@ -120,7 +123,7 @@ public plugin_precache() {
     register_forward(FM_SetModel, "OnSetModel_Post", 1);
     register_forward(FM_DecalIndex, "OnDecalIndex_Post", 1);
 
-    RegisterHam(Ham_Spawn, "weaponbox", "OnWeaponboxSpawn_Post");
+    RegisterHam(Ham_Spawn, "weaponbox", "OnWeaponboxSpawn", .Post = 0);
     RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
     RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage", .Post = 0);
     RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage_Post", .Post = 1);
@@ -441,6 +444,10 @@ public Native_RemovePlayerItem(iPluginId, iArgc) {
 
 // ANCHOR: Forwards
 
+public client_connect(pPlayer) {
+    g_bKnifeHolstered[pPlayer] = true;
+}
+
 public client_disconnected(pPlayer) {
     SetWeaponPrediction(pPlayer, true);
 }
@@ -460,9 +467,7 @@ public OnItemDeploy(this) {
 
 public OnItemHolster(this) {
     new pPlayer = GetPlayer(this);
-    if (IsWeaponKnife(this)) {
-        g_flNextPredictionUpdate[pPlayer] = get_gametime() + 0.1;
-    }
+    g_bKnifeHolstered[pPlayer] = IsWeaponKnife(this);
 
     new CW:iHandler = GetHandlerByEntity(this);
     if (iHandler == CW_INVALID_HANDLER) {
@@ -605,21 +610,29 @@ public OnSpawn_Post(this) {
     return HAM_IGNORED;
 }
 
-public OnWeaponboxSpawn_Post(this) {
+public OnWeaponboxSpawn(this) {
     g_pNewWeaponboxEnt = this;
 }
 
 public OnPlayerPreThink_Post(pPlayer) {
-    new pActiveItem = get_member(pPlayer, m_pActiveItem);
+    if (get_gametime() < g_flNextPredictionUpdate[pPlayer]) {
+        return HAM_IGNORED;
+    }
+
+    new iObsMode = pev(pPlayer, pev_iuser1);
+    new pObsTarget = pev(pPlayer, pev_iuser2);
+
+    new pActiveItem = iObsMode == OBS_IN_EYE
+        ? IS_PLAYER(pObsTarget) ? get_member(pObsTarget, m_pActiveItem) : -1
+        : get_member(pPlayer, m_pActiveItem);
+
     if (pActiveItem == -1) {
         SetWeaponPrediction(pPlayer, false);
         return HAM_IGNORED;
     }
 
-    if (get_gametime() >= g_flNextPredictionUpdate[pPlayer]) {
-        new CW:iHandler = GetHandlerByEntity(pActiveItem);
-        SetWeaponPrediction(pPlayer, iHandler == CW_INVALID_HANDLER);
-    }
+    new CW:iHandler = GetHandlerByEntity(pActiveItem);
+    SetWeaponPrediction(pPlayer, iHandler == CW_INVALID_HANDLER);
 
     return HAM_HANDLED;
 }
@@ -910,6 +923,7 @@ WeaponIdle(this) {
 
 WeaponHolster(this) {
     new pPlayer = GetPlayer(this);
+
     SetWeaponPrediction(pPlayer, true);
     set_member(this, m_Weapon_fInReload, 0);
     set_member(this, m_Weapon_fInSpecialReload, 0);
@@ -926,8 +940,43 @@ WeaponDeploy(this) {
     }
 
     new pPlayer = GetPlayer(this);
-    if (get_gametime() >= g_flNextPredictionUpdate[pPlayer]) {
+
+    if (g_bKnifeHolstered[pPlayer]) {
+        g_flNextPredictionUpdate[pPlayer] = get_gametime() + 1.0;
+
+        for (new pSpectator = 1; pSpectator <= MaxClients; pSpectator++) {
+            if (!is_user_connected(pSpectator)) {
+                continue;
+            }
+
+            if (pev(pSpectator, pev_iuser1) != OBS_IN_EYE) {
+                continue;
+            }
+
+            if (pev(pSpectator, pev_iuser2) != pPlayer) {
+                continue;
+            }
+
+            g_flNextPredictionUpdate[pSpectator] = get_gametime() + 1.0;
+        }
+    } else if (get_member(this, m_iId) == CSW_KNIFE) {
         SetWeaponPrediction(pPlayer, false);
+
+        for (new pSpectator = 1; pSpectator <= MaxClients; pSpectator++) {
+            if (!is_user_connected(pSpectator)) {
+                continue;
+            }
+
+            if (pev(pSpectator, pev_iuser1) != OBS_IN_EYE) {
+                continue;
+            }
+
+            if (pev(pSpectator, pev_iuser2) != pPlayer) {
+                continue;
+            }
+
+            SetWeaponPrediction(pSpectator, false);
+        }
     }
 
     // SetThink(this, "DisablePrediction");
