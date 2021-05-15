@@ -54,6 +54,7 @@ public plugin_init() {
 
     RegisterHam(Ham_Touch, "weaponbox", "OnWeaponBoxTouch", .Post = 0);
     RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
+    RegisterHam(Ham_Use, "func_door", "OnDoorUse", .Post = 0);
 
     g_pCvarFixMeleeAttack = register_cvar("zp_bot_fix_melee_attack", "1");
     g_pCvarFixPickup = register_cvar("zp_bot_fix_pickup", "1");
@@ -154,6 +155,25 @@ public OnPlayerPreThink_Post(pPlayer) {
     }
 
     return HAM_HANDLED;
+}
+
+public OnDoorUse(pDoor, pCaller, pActivator) {
+    if (!UTIL_IsPlayer(pActivator)) {
+        return HAM_IGNORED;
+    }
+
+    if (!is_user_bot(pActivator)) {
+        return HAM_IGNORED;
+    }
+
+    static szTargetname[32];
+    pev(pDoor, pev_targetname, szTargetname, charsmax(szTargetname));
+
+    if (szTargetname[0] == '^0') {
+        return HAM_IGNORED;
+    }
+
+    return HAM_SUPERCEDE;
 }
 
 DropActiveItem(pBot) {
