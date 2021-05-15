@@ -31,6 +31,7 @@ new CW:g_iCwSwipeHandler;
 new CW:g_iCwCrowbarHandler;
 new CW:g_iCwGrenadeHandler;
 new CW:g_iCwSatchelHandler;
+new CW:g_iCwPistolHandler;
 
 new g_pCvarFixMeleeAttack;
 new g_pCvarFixPickup;
@@ -49,6 +50,7 @@ public plugin_init() {
     g_iCwCrowbarHandler = CW_GetHandler(ZP_WEAPON_CROWBAR);
     g_iCwGrenadeHandler = CW_GetHandler(ZP_WEAPON_GRENADE);
     g_iCwSatchelHandler = CW_GetHandler(ZP_WEAPON_SATCHEL);
+    g_iCwPistolHandler = CW_GetHandler(ZP_WEAPON_PISTOL);
 
     RegisterHam(Ham_Touch, "weaponbox", "OnWeaponBoxTouch", .Post = 0);
     RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
@@ -313,11 +315,20 @@ bool:ShouldPickupWeaponBox(pBot, pWeaponBox, bool:bTouched) {
             continue;
         }
 
-        if (get_member(pBot, m_rgpPlayerItems, iSlot) != -1) {
-            return false;
-        }
-
+        new pSlotItem = get_member(pBot, m_rgpPlayerItems, iSlot);
         new CW:iCwHandler = CW_GetHandlerByEntity(pItem);
+
+        if (pSlotItem != -1) {
+            new CW:iSlotCwHandler = CW_GetHandlerByEntity(pSlotItem);
+
+            if (iCwHandler == iSlotCwHandler) {
+                return false;
+            }
+
+            if (pSlotItem != -1 && iSlotCwHandler != g_iCwPistolHandler) {
+                return false;
+            }
+        }
 
         // if (iCwHandler == g_iCwGrenadeHandler) {
         //     return false;
