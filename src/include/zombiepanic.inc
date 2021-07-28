@@ -1,4 +1,23 @@
 /*
+    1.4.1
+        Additions and improvements:
+            Reduced shotgun spread
+            Reduced shotgun range modifier
+            Reduced default infection chance
+            Map information is no longer showing by default
+            Bots can now pick multiple secondary weapons
+            Added hu localization (by regener)
+
+        Cvars:
+            Added zp_mapinfo cvar
+
+        Fixes:
+            Fixed satchels drop
+            Fixed and optimized objective marks
+            Fixed custom weapons prediction
+            Fixed bots interaction with doors blocked by master
+            Fixed en localization
+
     1.4.0
         Additions and improvements:
             Infected players with symptoms can now pickup healthkit

@@ -29,6 +29,7 @@ enum TeamPreference {
 new g_pCvarLives;
 new g_pCvarLivesPerPlayer;
 new g_pCvarCompetitive;
+new g_pCvarMapInfo;
 
 new g_pFwPlayerJoined;
 new g_pFwNewRound;
@@ -45,7 +46,6 @@ public plugin_init() {
 
     Round_HookCheckWinConditions("OnCheckWinConditions");
 
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn", .Post = 0);
     RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
     RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
     RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage", .Post = 0);
@@ -63,6 +63,7 @@ public plugin_init() {
     g_pCvarLives = register_cvar("zp_zombie_lives", "0");
     g_pCvarLivesPerPlayer = register_cvar("zp_zombie_lives_per_player", "2");
     g_pCvarCompetitive = register_cvar("zp_competitive", "0");
+    g_pCvarMapInfo = register_cvar("zp_mapinfo", "0");
 
     g_pFwPlayerJoined = CreateMultiForward("ZP_Fw_PlayerJoined", ET_IGNORE, FP_CELL);
     g_pFwNewRound = CreateMultiForward("ZP_Fw_NewRound", ET_IGNORE);
@@ -258,14 +259,6 @@ public OnClientKill(pPlayer) {
     return get_member_game(m_bFreezePeriod) ? FMRES_SUPERCEDE : FMRES_IGNORED;
 }
 
-public OnPlayerSpawn(pPlayer) {
-    if (!is_user_alive(pPlayer)) {
-        return HAM_IGNORED;
-    }
-
-    return HAM_HANDLED;
-}
-
 public OnPlayerSpawn_Post(pPlayer) {
     if (!is_user_alive(pPlayer)) {
         return HAM_IGNORED;
@@ -275,7 +268,9 @@ public OnPlayerSpawn_Post(pPlayer) {
         set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
         set_pev(pPlayer, pev_takedamage, DAMAGE_NO);
         OpenTeamMenu(pPlayer);
-        ZP_ShowMapInfo(pPlayer);
+        if (get_pcvar_num(g_pCvarMapInfo) > 0) {
+            ZP_ShowMapInfo(pPlayer);
+        }
         // ZP_Player_UpdateSpeed(pPlayer);
     } else {
         CheckWinConditions();

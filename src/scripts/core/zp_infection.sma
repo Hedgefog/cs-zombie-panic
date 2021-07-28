@@ -66,7 +66,7 @@ public plugin_init() {
     RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage_Post", .Post = 0);
     RegisterHam(Ham_BloodColor, "player", "OnPlayerBloodColor", .Post = 0);
 
-    g_pCvarInfectionChance = register_cvar("zp_infection_chance", "10");
+    g_pCvarInfectionChance = register_cvar("zp_infection_chance", "5");
 
     g_pFwInfected = CreateMultiForward("ZP_Fw_PlayerInfected", ET_IGNORE, FP_CELL, FP_CELL);
     g_pFwCured = CreateMultiForward("ZP_Fw_PlayerCured", ET_IGNORE, FP_CELL);
