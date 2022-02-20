@@ -16,7 +16,7 @@ __Version:__ 1.4.1
 - Install dependencies `npm i`
 
 #### Customize builder
-Use `config.user.js` file (Generated automatically on dependencies install)
+Use `.amxxpack.js` configuration file
 
 #### Build project
 
