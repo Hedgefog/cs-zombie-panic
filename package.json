@@ -4,7 +4,7 @@
   "description": "Zombie Panic Mod",
   "scripts": {
     "build": "amxxpack build --config .amxxpack.js",
-    "watch": "amxxpack build --watch --config ./.amxxpack.js",
+    "watch": "amxxpack build --watch --config .amxxpack.js",
     "pack": "gulp",
     "update-version": "node ./scripts/update-version.js",
     "update-config": "node ./scripts/update-config.js"
