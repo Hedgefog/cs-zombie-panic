@@ -5,14 +5,16 @@
   "scripts": {
     "build": "amxxpack build --config .amxxpack.js",
     "watch": "amxxpack build --watch --config .amxxpack.js",
+    "fetch-compiler": "amxxpack fetch-compiler --config .amxxpack.js --version 1.9.0-git5294 --addon cstrike --dev",
     "pack": "gulp",
     "update-version": "node ./scripts/update-version.js",
-    "update-config": "node ./scripts/update-config.js"
+    "update-config": "node ./scripts/update-config.js",
+    "prepare": "npm run fetch-compiler"
   },
   "author": "Hedgehog Fog",
   "license": "MIT",
   "devDependencies": {
-    "amxxpack": "^0.0.7",
+    "amxxpack": "^0.1.0",
     "gulp": "^4.0.2",
     "gulp-file": "^0.4.0",
     "gulp-zip": "^5.0.2",
