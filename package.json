@@ -6,7 +6,6 @@
     "build": "amxxpack build",
     "watch": "amxxpack build --watch",
     "postinstall": "amxxpack install",
-    "fetch-compiler": "amxxpack fetch-compiler --config .amxxpack.js --version 1.9.0-git5294 --addon cstrike --dev",
     "pack": "gulp",
     "update-version": "node ./scripts/update-version.js",
     "update-config": "node ./scripts/update-config.js"
