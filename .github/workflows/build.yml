@@ -17,12 +17,6 @@
           uses: actions/setup-node@v1
           with:
             node-version: 12
-        - name: Install Zip
-          uses: montudor/action-zip@v0.1.0
-        - name: Download thirdparty
-          run: |
-            mkdir downloads
-            wget https://github.com/s1lentq/reapi/releases/download/5.19.0.211/reapi_5.19.0.211-dev.zip -P ./downloads
         - name: Setup Build Variables
           id: buildvars
           uses: actions/github-script@v3
@@ -40,10 +34,6 @@
               } catch (err) {
                 core.setFailed(err.message);
               }
-        - name: Install ReAPI
-          run: |
-            mkdir -p ./thirdparty/reapi
-            unzip ./downloads/reapi_5.19.0.211-dev.zip -d ./thirdparty/reapi
         - name: Install Dependencies
           run: npm install
         - name: Build project
@@ -102,7 +92,6 @@
             asset_content_type: application/zip
         - name: Cleanup
           run: |
-            rm -rf ./compiler
-            rm -rf ./thirdparty
+            rm -rf ./.compiler
+            rm -rf ./.thirdparty
             rm -rf ./dist
-            rm -rf ./downloads
