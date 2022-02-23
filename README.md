@@ -16,7 +16,7 @@ __Version:__ 1.4.1
 - Install dependencies `npm i`
 
 #### Customize builder
-Use `.amxxpack.js` configuration file
+Use `.amxxpack.json` configuration file
 
 #### Build project
 
