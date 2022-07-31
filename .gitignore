@@ -2,12 +2,7 @@
 *.max
 *.log
 
-*.user.*
-
 node_modules/
-
-compiler/
-thirdparty/*/**
-
 dist/
-bundles/
+.compiler/
+.thirdparty/

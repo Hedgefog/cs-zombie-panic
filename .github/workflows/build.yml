@@ -17,14 +17,6 @@
           uses: actions/setup-node@v1
           with:
             node-version: 12
-        - name: Install Zip
-          uses: montudor/action-zip@v0.1.0
-        - name: Download thirdparty
-          run: |
-            mkdir downloads
-            wget https://www.amxmodx.org/amxxdrop/1.9/amxmodx-1.9.0-git5271-base-linux.tar.gz -P ./downloads
-            wget https://www.amxmodx.org/amxxdrop/1.9/amxmodx-1.9.0-git5271-cstrike-linux.tar.gz -P ./downloads
-            wget https://github.com/s1lentq/reapi/releases/download/5.19.0.211/reapi_5.19.0.211-dev.zip -P ./downloads
         - name: Setup Build Variables
           id: buildvars
           uses: actions/github-script@v3
@@ -42,13 +34,6 @@
               } catch (err) {
                 core.setFailed(err.message);
               }
-        - name: Setup compiler
-          run: |
-            mkdir ./compiler
-            tar --strip-components=3 -zxf ./downloads/amxmodx-1.9.0-git5271-base-linux.tar.gz -C ./compiler addons/amxmodx/scripting
-            tar --strip-components=3 -zxf ./downloads/amxmodx-1.9.0-git5271-cstrike-linux.tar.gz -C ./compiler addons/amxmodx/scripting
-            mkdir -p ./thirdparty/reapi
-            unzip ./downloads/reapi_5.19.0.211-dev.zip -d ./thirdparty/reapi
         - name: Install Dependencies
           run: npm install
         - name: Build project
@@ -72,7 +57,7 @@
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
             upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: ./dist/bundles/src/zombiepanic-${{ steps.buildvars.outputs.tagversion }}-addons.zip
+            asset_path: ./dist/bundles/zombiepanic-${{ steps.buildvars.outputs.tagversion }}-addons-src.zip
             asset_name: zombiepanic-${{ steps.buildvars.outputs.tagversion }}-addons-src.zip
             asset_content_type: application/zip
         - name: Upload Release Build
@@ -82,7 +67,7 @@
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
             upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: ./dist/bundles/full/zombiepanic-${{ steps.buildvars.outputs.tagversion }}-addons.zip
+            asset_path: ./dist/bundles/zombiepanic-${{ steps.buildvars.outputs.tagversion }}-addons-build.zip
             asset_name: zombiepanic-${{ steps.buildvars.outputs.tagversion }}-addons-build.zip
             asset_content_type: application/zip
         - name: Upload Release Resources
@@ -92,7 +77,7 @@
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
             upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: ./dist/bundles/full/zombiepanic-${{ steps.buildvars.outputs.tagversion }}-resources.zip
+            asset_path: ./dist/bundles/zombiepanic-${{ steps.buildvars.outputs.tagversion }}-resources.zip
             asset_name: zombiepanic-${{ steps.buildvars.outputs.tagversion }}-resources.zip
             asset_content_type: application/zip
         - name: Upload Release SDK
@@ -102,12 +87,11 @@
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
             upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: ./dist/bundles/sdk/zombiepanic-${{ steps.buildvars.outputs.tagversion }}-sdk.zip
+            asset_path: ./dist/bundles/zombiepanic-${{ steps.buildvars.outputs.tagversion }}-sdk.zip
             asset_name: zombiepanic-${{ steps.buildvars.outputs.tagversion }}-sdk.zip
             asset_content_type: application/zip
         - name: Cleanup
           run: |
-            rm -rf ./compiler
-            rm -rf ./thirdparty
+            rm -rf ./.compiler
+            rm -rf ./.thirdparty
             rm -rf ./dist
-            rm -rf ./downloads
