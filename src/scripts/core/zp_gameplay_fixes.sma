@@ -11,6 +11,8 @@
 #define PLUGIN "[Zombie Panic] Gameplay Fixes"
 #define AUTHOR "Hedgehog Fog"
 
+#define AMBIENT_SOUND_START_SILENT (1<<4)
+
 new const g_rgszObjectiveEntities[][] = {
     "func_bomb_target",
     "func_escapezone",
@@ -81,6 +83,10 @@ ResetEntities() {
     while((pEntity = engfunc(EngFunc_FindEntityByString, pEntity, "classname", "multisource")) > 0) {
         ResetMultiSource(pEntity);
     }
+
+    while((pEntity = engfunc(EngFunc_FindEntityByString, pEntity, "classname", "ambient_generic")) > 0) {
+        ResetAmbientGeneric(pEntity);
+    }
 }
 
 ResetButton(pEntity) {
@@ -88,6 +94,29 @@ ResetButton(pEntity) {
     pev(pEntity, pev_target, szTarget, charsmax(szTarget));
     set_ent_data(pEntity, "CBaseToggle", "m_toggle_state", TS_AT_BOTTOM);
     dllfunc(DLLFunc_Think, pEntity);
+}
+
+ResetAmbientGeneric(pEntity) {
+    new szSound[128];
+    pev(pEntity, pev_message, szSound, charsmax(szSound));
+
+    new Float:vecOrigin[3];
+    pev(pEntity, pev_origin, vecOrigin);
+
+    new iSpawnFlags = pev(pEntity, pev_spawnflags);
+    new bool:bStartSilent = iSpawnFlags & AMBIENT_SOUND_START_SILENT;
+
+    if (!bStartSilent) {
+        set_pev(pEntity, pev_spawnflags, iSpawnFlags | AMBIENT_SOUND_START_SILENT);
+    }
+
+    engfunc(EngFunc_EmitAmbientSound, pEntity, vecOrigin, szSound, 0, 0, SND_STOP, 0);
+    dllfunc(DLLFunc_Spawn, pEntity);
+
+    if (!bStartSilent) {
+        ExecuteHamB(Ham_Use, pEntity, 0, 0, USE_TOGGLE, 0.0);
+        set_pev(pEntity, pev_spawnflags, iSpawnFlags & ~AMBIENT_SOUND_START_SILENT);
+    }
 }
 
 ResetDoor(pEntity) {
