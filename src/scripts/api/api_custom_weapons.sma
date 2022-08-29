@@ -10,7 +10,7 @@
 #include <api_custom_weapons>
 
 #define PLUGIN "[API] Custom Weapons"
-#define VERSION "0.7.0"
+#define VERSION "0.7.3"
 #define AUTHOR "Hedgehog Fog"
 
 #define WALL_PUFF_SPRITE "sprites/wall_puff1.spr"
@@ -21,23 +21,6 @@
 #define IS_PLAYER(%1) (%1 > 0 && %1 <= MAX_PLAYERS)
 
 #define TOKEN 743647146
-
-enum CW_Data {
-    CW_Data_PluginId,
-    CW_Data_Name,
-    CW_Data_Icon,
-    CW_Data_Id,
-    CW_Data_ClipSize,
-    CW_Data_PrimaryAmmoType,
-    CW_Data_PrimaryAmmoMaxAmount,
-    CW_Data_SecondaryAmmoType,
-    CW_Data_SecondaryAmmoMaxAmount,
-    CW_Data_SlotId,
-    CW_Data_Position,
-    CW_Data_WeaponFlags,
-    CW_Data_Bindings,
-    CW_Data_Flags
-}
 
 enum _:WeaponListMessage {
     WL_WeaponName[32],
@@ -153,6 +136,8 @@ public plugin_natives() {
     register_native("CW_Register", "Native_Register");
     register_native("CW_GetHandlerByEntity", "Native_GetHandlerByEntity");
     register_native("CW_GetHandler", "Native_GetHandler");
+    register_native("CW_GetWeaponData", "Native_GetWeaponData");
+    register_native("CW_GetWeaponStringData", "Native_GetWeaponStringData");
     register_native("CW_GiveWeapon", "Native_GiveWeapon");
     register_native("CW_SpawnWeapon", "Native_SpawnWeapon");
     register_native("CW_SpawnWeaponBox", "Native_SpawnWeaponBox");
@@ -211,6 +196,24 @@ public CW:Native_GetHandler(iPluginId, iArgc) {
     get_string(1, szName, charsmax(szName));
 
     return GetHandler(szName);
+}
+
+public any:Native_GetWeaponData(iPluginId, iArgc) {
+    new CW:iHandler = CW:get_param(1);
+    new CW_Data:iParam = CW_Data:get_param(2);
+
+    return GetData(iHandler, iParam);
+}
+
+public Native_GetWeaponStringData(iPluginId, iArgc) {
+    new CW:iHandler = CW:get_param(1);
+    new CW_Data:iParam = CW_Data:get_param(2);
+
+    static szValue[128];
+    GetStringData(iHandler, iParam, szValue, charsmax(szValue));
+
+    new iLen = get_param(4);
+    set_string(3, szValue, iLen);
 }
 
 public CW:Native_Register(iPluginId, iArgc) {
@@ -719,6 +722,11 @@ public OnSetModel_Post(this, const szModel[]) {
     ExecuteBindedFunction(CWB_WeaponBoxModelUpdate, pItem, this);
     g_pNewWeaponboxEnt = 0;
 
+    if (!ExecuteHamB(Ham_CS_Item_CanDrop, pItem)) {
+        set_pev(this, pev_flags, pev(this, pev_flags) | FL_KILLME);
+        dllfunc(DLLFunc_Think, this);
+    }
+
     return FMRES_HANDLED;
 }
 
@@ -783,15 +791,20 @@ public OnMessage_WeaponList(iMsgId, iMsgDest, pPlayer) {
 
 CompleteReload(this) {
     new CW:iHandler = GetHandlerByEntity(this);
-    new pPlayer = GetPlayer(this);
-    new iMaxClip = GetData(iHandler, CW_Data_ClipSize);
-    new iClip = get_member(this, m_Weapon_iClip);
-    new iPrimaryAmmoIndex = get_member(this, m_Weapon_iPrimaryAmmoType);
-    new iBpAmmo = get_member(pPlayer, m_rgAmmo, iPrimaryAmmoIndex);
-    new iSize = min(iMaxClip - iClip, iBpAmmo);
+    new CW_Flags:iFlags = GetData(iHandler, CW_Data_Flags);
 
-    set_member(this, m_Weapon_iClip, iClip + iSize);
-    set_member(pPlayer, m_rgAmmo, iBpAmmo - iSize, iPrimaryAmmoIndex);
+    if (~iFlags & CWF_CustomReload) {
+        new pPlayer = GetPlayer(this);
+        new iMaxClip = GetData(iHandler, CW_Data_ClipSize);
+        new iClip = get_member(this, m_Weapon_iClip);
+        new iPrimaryAmmoIndex = get_member(this, m_Weapon_iPrimaryAmmoType);
+        new iBpAmmo = get_member(pPlayer, m_rgAmmo, iPrimaryAmmoIndex);
+        new iSize = min(iMaxClip - iClip, iBpAmmo);
+
+        set_member(this, m_Weapon_iClip, iClip + iSize);
+        set_member(pPlayer, m_rgAmmo, iBpAmmo - iSize, iPrimaryAmmoIndex);
+    }
+
     set_member(this, m_Weapon_fInReload, 0);
 
     ExecuteBindedFunction(CWB_DefaultReloadEnd, this);
@@ -943,40 +956,8 @@ WeaponDeploy(this) {
 
     if (g_bKnifeHolstered[pPlayer]) {
         g_flNextPredictionUpdate[pPlayer] = get_gametime() + 1.0;
-
-        for (new pSpectator = 1; pSpectator <= MaxClients; pSpectator++) {
-            if (!is_user_connected(pSpectator)) {
-                continue;
-            }
-
-            if (pev(pSpectator, pev_iuser1) != OBS_IN_EYE) {
-                continue;
-            }
-
-            if (pev(pSpectator, pev_iuser2) != pPlayer) {
-                continue;
-            }
-
-            g_flNextPredictionUpdate[pSpectator] = get_gametime() + 1.0;
-        }
     } else if (get_member(this, m_iId) == CSW_KNIFE) {
         SetWeaponPrediction(pPlayer, false);
-
-        for (new pSpectator = 1; pSpectator <= MaxClients; pSpectator++) {
-            if (!is_user_connected(pSpectator)) {
-                continue;
-            }
-
-            if (pev(pSpectator, pev_iuser1) != OBS_IN_EYE) {
-                continue;
-            }
-
-            if (pev(pSpectator, pev_iuser2) != pPlayer) {
-                continue;
-            }
-
-            SetWeaponPrediction(pSpectator, false);
-        }
     }
 
     // SetThink(this, "DisablePrediction");
@@ -1016,6 +997,10 @@ SendWeaponAnim(this, iAnim) {
     SendPlayerWeaponAnim(pPlayer, this, iAnim);
 
     for (new pSpectator = 1; pSpectator <= MaxClients; pSpectator++) {
+        if (pSpectator == pPlayer) {
+            continue;
+        }
+        
         if (!is_user_connected(pSpectator)) {
             continue;
         }
@@ -1037,10 +1022,12 @@ SendPlayerWeaponAnim(pPlayer, pWeapon, iAnim) {
 
     set_pev(pPlayer, pev_weaponanim, iAnim);
 
-    message_begin(MSG_ONE, SVC_WEAPONANIM, _, pPlayer);
-    write_byte(iAnim);
-    write_byte(iBody);
-    message_end();
+    if (!is_user_bot(pPlayer)) {
+        message_begin(MSG_ONE, SVC_WEAPONANIM, _, pPlayer);
+        write_byte(iAnim);
+        write_byte(iBody);
+        message_end();
+    }
 }
 
 GetPlayer(this) {
@@ -1635,11 +1622,15 @@ GiveWeapon(pPlayer, CW:iHandler) {
     new pWeapon = SpawnWeapon(iHandler);
     if (ExecuteHamB(Ham_AddPlayerItem, pPlayer, pWeapon)) {
         ExecuteHamB(Ham_Item_AttachToPlayer, pWeapon, pPlayer);
-        emit_sound(pWeapon, CHAN_ITEM, "items/gunpickup2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+        emit_sound(pPlayer, CHAN_ITEM, "items/gunpickup2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
     }
 }
 
 UpdateWeaponList(pPlayer, CW:iHandler) {
+    if (is_user_bot(pPlayer)) {
+        return;
+    }
+
     new iWeaponId = GetData(iHandler, CW_Data_Id);
 
     static szName[64];
@@ -1667,6 +1658,10 @@ UpdateWeaponList(pPlayer, CW:iHandler) {
 }
 
 ResetWeaponList(pPlayer, iWeaponId) {
+    if (is_user_bot(pPlayer)) {
+        return;
+    }
+
     message_begin(MSG_ONE, gmsgWeaponList, _, pPlayer);
     write_string(g_weaponListDefaults[iWeaponId][WL_WeaponName]);
     write_byte(g_weaponListDefaults[iWeaponId][WL_PrimaryAmmoType]);
@@ -1681,8 +1676,32 @@ ResetWeaponList(pPlayer, iWeaponId) {
 }
 
 SetWeaponPrediction(pPlayer, bool:bValue) {
+    if (is_user_bot(pPlayer)) {
+        return;
+    }
+
     new pszInfoBuffer = engfunc(EngFunc_GetInfoKeyBuffer, pPlayer);
     engfunc(EngFunc_SetClientKeyValue, pPlayer, pszInfoBuffer, "cl_lw", bValue ? "1" : "0");
+
+    for (new pSpectator = 1; pSpectator <= MaxClients; pSpectator++) {
+        if (pSpectator == pPlayer) {
+            continue;
+        }
+
+        if (!is_user_connected(pSpectator)) {
+            continue;
+        }
+
+        if (pev(pSpectator, pev_iuser1) != OBS_IN_EYE) {
+            continue;
+        }
+
+        if (pev(pSpectator, pev_iuser2) != pPlayer) {
+            continue;
+        }
+
+        SetWeaponPrediction(pSpectator, false);
+    }
 }
 
 RemovePlayerItem(pItem) {
@@ -2081,7 +2100,7 @@ any:ExecuteBindedFunction(CW_Binding:iBinding, this, any:...) {
     return PLUGIN_CONTINUE;
 }
 
-// ANCHOR: Weapon hooks
+// ANCHOR: Weapon Hooks
 
 InitWeaponHooks() {
     for (new CW:iHandler = CW:0; _:iHandler < g_iWeaponCount; ++iHandler) {
