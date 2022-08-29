@@ -1,4 +1,8 @@
 /*
+    1.4.2
+        Additions and improvements:
+            Add ambient_generic reset
+
     1.4.1
         Additions and improvements:
             Reduced shotgun spread

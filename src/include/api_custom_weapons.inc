@@ -27,6 +27,23 @@
 #define VECTOR_CONE_DM_SHOTGUN {0.08716, 0.04362, 0.00}
 #define VECTOR_CONE_DM_DOUBLESHOTGUN {0.17365, 0.04362, 0.00}
 
+enum CW_Data {
+  CW_Data_PluginId,
+  CW_Data_Name,
+  CW_Data_Icon,
+  CW_Data_Id,
+  CW_Data_ClipSize,
+  CW_Data_PrimaryAmmoType,
+  CW_Data_PrimaryAmmoMaxAmount,
+  CW_Data_SecondaryAmmoType,
+  CW_Data_SecondaryAmmoMaxAmount,
+  CW_Data_SlotId,
+  CW_Data_Position,
+  CW_Data_WeaponFlags,
+  CW_Data_Bindings,
+  CW_Data_Flags
+}
+
 enum CW_Binding {
   CWB_Idle,
   CWB_Holster,
@@ -46,13 +63,16 @@ enum CW_Binding {
 enum CW_Flags (<<=1) {
   CWF_None,
   CWF_NoBulletSmoke = 1,
-  CWF_NoBulletDecal
+  CWF_NoBulletDecal,
+  CWF_CustomReload
 }
 
 native CW:CW_Register(const szName[], iWeaponId, iClipSize = WEAPON_NOCLIP, iPrimaryAmmoType = -1, iPrimaryAmmoMaxAmount = -1, iSecondaryAmmoType = -1, iSecondaryAmmoMaxAmount = -1, iSlotId = 0, iPosition = 0, iWeaponFlags = 0, const szIcon[] = "", CW_Flags:iFlags = CWF_None);
 native CW_Bind(CW:iHandler, CW_Binding:iBinding, const szFunctionName[]);
 native CW:CW_GetHandlerByEntity(pEntity);
 native CW:CW_GetHandler(const szName[]);
+native any:CW_GetWeaponData(CW:iHandler, CW_Data:iParam);
+native CW_GetWeaponStringData(CW:iHandler, CW_Data:iParam, szOut[], iLen);
 
 native CW_Deploy(pItem);
 native CW_Holster(pItem);
