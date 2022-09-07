@@ -139,7 +139,7 @@ stock const ZP_ITEM_MEDKIT_MODEL[] = "models/zombiepanic/v100/items/w_medkit.mdl
 stock const ZP_ITEM_BATTERY_MODEL[] = "models/zombiepanic/v100/items/w_battery.mdl";
 
 stock const ZP_AMMO_PISTOL_MODEL[] = "models/zombiepanic/v100/items/w_9mmclip.mdl";
-stock const ZP_AMMO_RIFLE_MODEL[] = "models/zombiepanic/v100/items/w_556ARclip.mdl";
+stock const ZP_AMMO_RIFLE_MODEL[] = "models/zombiepanic/v100/items/w_556arclip.mdl";
 stock const ZP_AMMO_SHOTGUN_MODEL[] = "models/zombiepanic/v100/items/w_shotbox.mdl";
 stock const ZP_AMMO_MAGNUM_MODEL[] = "models/zombiepanic/v100/items/w_357ammobox.mdl";
 

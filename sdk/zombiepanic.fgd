@@ -238,7 +238,7 @@
 = ammo_9mmclip : "9mm Pistol Ammo" []
 @PointClass
 	base(Weapon)
-	Studio("models/zombiepanic/v100/items/w_556ARclip.mdl")
+	Studio("models/zombiepanic/v100/items/w_556arclip.mdl")
 = ammo_556AR : "5.56mm Assault Rifle Ammo" []
 @PointClass
 	base(Weapon)
