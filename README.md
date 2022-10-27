@@ -1,18 +1,19 @@
-## Zombie Panic Mod for Counter-Strike 1.6 🇺🇦
+## 🧟 Zombie Panic 🇺🇦
 __Version:__ 1.4.2
 
-### Download latest:
+### 📄 About
+__Zombie Panic__ is a server-side modification for __Counter-Strike__ similar to the popular Half-Life modification Zombie Panic!.
+
+### 🔽 Download latest:
 - [Releases](../../releases)
 
-### Requirements
+### 🔄 Requirements
 - Amx Mod X 1.9.0+
 - RegameDLL + ReAPI
 - Metamod-R or Metamod-P (for windows)
 
-### Deployment
+## 🔧 Deployment
 - Clone repository.
-- Extract compiler executable and includes to _"compiler"_ folder of project.
-- Extract ReAPI module to _"thirdparty/reapi"_ folder of project (example: _"thirdparty/reapi/addons"_).
 - Install dependencies `npm i`
 
 #### Customize builder
