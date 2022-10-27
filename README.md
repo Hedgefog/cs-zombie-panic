@@ -1,5 +1,8 @@
 ## 🧟 Zombie Panic 🇺🇦
-__Version:__ 1.4.2
+![GitHub package.json version](https://img.shields.io/github/package-json/v/hedgefog/cs-zombie-panic)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/hedgefog/cs-zombie-panic/CI)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/hedgefog/cs-zombie-panic)
+![GitHub all releases](https://img.shields.io/github/downloads/hedgefog/cs-zombie-panic/total)
 
 ### 📄 About
 __Zombie Panic__ is a server-side modification for __Counter-Strike__ similar to the popular Half-Life modification Zombie Panic!.
