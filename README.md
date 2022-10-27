@@ -1,4 +1,4 @@
-### Zombie Panic Mod for Counter-Strike 1.6
+## Zombie Panic Mod for Counter-Strike 1.6 🇺🇦
 __Version:__ 1.4.2
 
 ### Download latest:
