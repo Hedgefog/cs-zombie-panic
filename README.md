@@ -12,7 +12,7 @@ __Zombie Panic__ is a server-side modification for __Counter-Strike__ similar to
 - RegameDLL + ReAPI
 - Metamod-R or Metamod-P (for windows)
 
-## 🔧 Deployment
+### 🔧 Deployment
 - Clone repository.
 - Install dependencies `npm i`
 
