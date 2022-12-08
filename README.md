@@ -11,9 +11,10 @@ __Zombie Panic__ is a server-side modification for __Counter-Strike__ similar to
 - [Releases](../../releases)
 
 ### 🔄 Requirements
-- [Amx Mod X 1.9.0+](https://www.amxmodx.org/downloads-new.php)
-- [RegameDLL](https://github.com/s1lentq/ReGameDLL_CS) + [ReAPI](https://github.com/s1lentq/reapi)
 - [Metamod-R](https://github.com/theAsmodai/metamod-r) + [ReHLDS](https://github.com/dreamstalker/rehlds) or [Metamod-P](https://github.com/Bots-United/metamod-p)
+- [RegameDLL](https://github.com/s1lentq/ReGameDLL_CS)
+- [Amx Mod X 1.9.0+](https://www.amxmodx.org/downloads-new.php)
+- [ReAPI](https://github.com/s1lentq/reapi)
 
 ### 🔧 Deployment
 - Clone repository.
