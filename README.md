@@ -1,6 +1,6 @@
 ## 🧟 Zombie Panic 🇺🇦
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/hedgefog/cs-zombie-panic)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/hedgefog/cs-zombie-panic/CI)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/hedgefog/cs-zombie-panic/build.yml?branch=release)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/hedgefog/cs-zombie-panic)
 ![GitHub all releases](https://img.shields.io/github/downloads/hedgefog/cs-zombie-panic/total)
 
