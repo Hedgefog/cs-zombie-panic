@@ -104,7 +104,7 @@ ResetAmbientGeneric(pEntity) {
     pev(pEntity, pev_origin, vecOrigin);
 
     new iSpawnFlags = pev(pEntity, pev_spawnflags);
-    new bool:bStartSilent = iSpawnFlags & AMBIENT_SOUND_START_SILENT;
+    new bool:bStartSilent = !!(iSpawnFlags & AMBIENT_SOUND_START_SILENT);
 
     if (!bStartSilent) {
         set_pev(pEntity, pev_spawnflags, iSpawnFlags | AMBIENT_SOUND_START_SILENT);
