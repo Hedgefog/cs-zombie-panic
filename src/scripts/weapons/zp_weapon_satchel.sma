@@ -154,6 +154,10 @@ public @Weapon_WeaponBoxSpawn(this, pWeaponBox) {
 
 public @Weapon_CanDrop(this) {
     new pPlayer = CW_GetPlayer(this);
+    if (pPlayer == -1) {
+        return PLUGIN_CONTINUE;
+    }
+
     return get_member(pPlayer, m_rgAmmo, g_iAmmoId) > 0 && !g_bPlayerChargeReady[pPlayer] ? PLUGIN_CONTINUE : PLUGIN_HANDLED;
 }
 
