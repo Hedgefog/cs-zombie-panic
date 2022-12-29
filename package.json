@@ -1,6 +1,6 @@
 {
   "name": "zombiepanic",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Zombie Panic Mod",
   "scripts": {
     "build": "amxxpack build",

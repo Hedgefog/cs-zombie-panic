@@ -1,5 +1,5 @@
 #define ZP_TITLE "Zombie Panic"
-#define ZP_VERSION "1.4.2"
+#define ZP_VERSION "1.4.3"
 
 #define ZP_HUMAN_TEAM 2
 #define ZP_ZOMBIE_TEAM 1

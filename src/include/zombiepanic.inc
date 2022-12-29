@@ -1,4 +1,9 @@
 /*
+    1.4.3
+        Fixes:
+            Fixed handgrenade respawn
+            Fixed handgrenade and satchel errors
+
     1.4.2
         Additions and improvements:
             Add ambient_generic reset
