@@ -79,27 +79,27 @@ enum _:KVD {
 
 new g_ptrBaseClassname;
 
-new Trie:g_entityHandlers;
-new Array:g_entityName;
-new Array:g_entityPluginID;
-new Array:g_entityModelIndex;
-new Array:g_entityMins;
-new Array:g_entityMaxs;
-new Array:g_entityLifeTime;
-new Array:g_entityRespawnTime;
-new Array:g_entityPreset;
-new Array:g_entityIgnoreRounds;
-new Array:g_entityHooks;
+new Trie:g_entityHandlers = Invalid_Trie;
+new Array:g_entityName = Invalid_Array;
+new Array:g_entityPluginID = Invalid_Array;
+new Array:g_entityModelIndex = Invalid_Array;
+new Array:g_entityMins = Invalid_Array;
+new Array:g_entityMaxs = Invalid_Array;
+new Array:g_entityLifeTime = Invalid_Array;
+new Array:g_entityRespawnTime = Invalid_Array;
+new Array:g_entityPreset = Invalid_Array;
+new Array:g_entityIgnoreRounds = Invalid_Array;
+new Array:g_entityHooks = Invalid_Array;
 
 new g_entityCount = 0;
 
-new Array:g_worldEntities;
-new Array:g_tmpEntities;
+new Array:g_worldEntities = Invalid_Array;
+new Array:g_tmpEntities = Invalid_Array;
 
 new g_lastCEIdx = 0;
 new g_lastCEEnt = 0;
 
-new Array:g_ceKvd;
+new Array:g_ceKvd = Invalid_Array;
 
 public plugin_init()
 {
@@ -227,6 +227,10 @@ public bool:Native_Remove(pluginID, argc)
 
 public Native_GetSize(pluginID, argc)
 {
+	if (!g_entityCount) {
+		return false;
+	}
+	
 	new szClassName[32];
 	get_string(1, szClassName, charsmax(szClassName));
 	
@@ -249,6 +253,10 @@ public Native_GetSize(pluginID, argc)
 
 public Native_GetModelIndex(pluginID, argc)
 {
+	if (!g_entityCount) {
+		return false;
+	}
+	
 	new szClassName[32];
 	get_string(1, szClassName, charsmax(szClassName));
 	
@@ -325,6 +333,10 @@ public OnClCmd_CESpawn(id, level, cid)
 
 public OnKeyValue(ent, kvd)
 {
+	if (!g_entityCount) {
+		return;
+	}
+
 	static szKey[32];
 	get_kvd(kvd, KV_KeyName, szKey, charsmax(szKey));
 	
@@ -381,6 +393,10 @@ public OnTouch(ent, id)
 	}
 	
 	if (!is_user_alive(id)) {
+		return;
+	}
+
+	if (!g_entityCount) {
 		return;
 	}
 
@@ -472,9 +488,9 @@ Register(
 Create(const szClassname[], const Float:vOrigin[3] = {0.0, 0.0, 0.0}, bool:temp = true)
 {
 	new ceIdx;
-	if (!TrieGetCell(g_entityHandlers, szClassname, ceIdx)) {
+	if (!g_entityCount || !TrieGetCell(g_entityHandlers, szClassname, ceIdx)) {
 		log_error(0, "%s Entity %s is not registered as custom entity.", LOG_PREFIX, szClassname);
-		return 0;
+		return -1;
 	}
 	
 	new ent = engfunc(EngFunc_CreateNamedEntity, g_ptrBaseClassname);
@@ -640,7 +656,7 @@ GetHandlerByEntity(ent)
 GetHandler(const szClassname[])
 {
 	new ceIdx;
-	if (!TrieGetCell(g_entityHandlers, szClassname, ceIdx)) {
+	if (!g_entityCount || !TrieGetCell(g_entityHandlers, szClassname, ceIdx)) {
 		return -1;
 	}
 
@@ -834,7 +850,7 @@ SpawnLatestCe()
 RegisterHook(CEFunction:function, const szClassname[], const szCallback[], pluginID = -1)
 {
 	new ceIdx;
-	if (!TrieGetCell(g_entityHandlers, szClassname, ceIdx)) {
+	if (!g_entityCount || !TrieGetCell(g_entityHandlers, szClassname, ceIdx)) {
 		log_error(0, "%s Entity %s is not registered.", LOG_PREFIX, szClassname);
 		return -1;
 	}

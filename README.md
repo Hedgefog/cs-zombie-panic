@@ -1,18 +1,23 @@
-### Zombie Panic Mod for Counter-Strike 1.6
-__Version:__ 1.4.2
+## 🧟 Zombie Panic 🇺🇦
+![GitHub package.json version](https://img.shields.io/github/package-json/v/hedgefog/cs-zombie-panic)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/hedgefog/cs-zombie-panic/build.yml?branch=release)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/hedgefog/cs-zombie-panic)
+![GitHub all releases](https://img.shields.io/github/downloads/hedgefog/cs-zombie-panic/total)
 
-### Download latest:
+### 📄 About
+__Zombie Panic__ is a server-side modification for __Counter-Strike__ similar to the popular Half-Life modification Zombie Panic!.
+
+### 🔽 Download latest:
 - [Releases](../../releases)
 
-### Requirements
-- Amx Mod X 1.9.0+
-- RegameDLL + ReAPI
-- Metamod-R or Metamod-P (for windows)
+### 🔄 Requirements
+- [Metamod-R](https://github.com/theAsmodai/metamod-r) + [ReHLDS](https://github.com/dreamstalker/rehlds) or [Metamod-P](https://github.com/Bots-United/metamod-p)
+- [RegameDLL](https://github.com/s1lentq/ReGameDLL_CS)
+- [Amx Mod X 1.9.0+](https://www.amxmodx.org/downloads-new.php)
+- [ReAPI](https://github.com/s1lentq/reapi)
 
-### Deployment
+### 🔧 Deployment
 - Clone repository.
-- Extract compiler executable and includes to _"compiler"_ folder of project.
-- Extract ReAPI module to _"thirdparty/reapi"_ folder of project (example: _"thirdparty/reapi/addons"_).
 - Install dependencies `npm i`
 
 #### Customize builder

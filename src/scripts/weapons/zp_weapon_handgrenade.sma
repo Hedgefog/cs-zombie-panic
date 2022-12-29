@@ -146,11 +146,15 @@ public @Weapon_WeaponBoxSpawn(this, pWeaponBox) {
 }
 
 public @Weapon_CanDrop(this) {
+    new pPlayer = CW_GetPlayer(this);
+    if (pPlayer == -1) {
+        return PLUGIN_CONTINUE;
+    }
+    
     if (get_member(this, m_flStartThrow)) {
         return PLUGIN_HANDLED;
     }
 
-    new pPlayer = CW_GetPlayer(this);
     if (!get_member(pPlayer, m_rgAmmo, g_iAmmoId)) {
         return PLUGIN_HANDLED;
     }
