@@ -10,7 +10,7 @@
 #include <api_custom_weapons>
 
 #define PLUGIN "[API] Custom Weapons"
-#define VERSION "0.7.5"
+#define VERSION "0.7.6"
 #define AUTHOR "Hedgehog Fog"
 
 #define WALL_PUFF_SPRITE "sprites/wall_puff1.spr"
@@ -738,9 +738,11 @@ public OnSetModel_Post(this, const szModel[]) {
     ExecuteBindedFunction(CWB_WeaponBoxModelUpdate, pItem, this);
     g_pNewWeaponboxEnt = 0;
 
-    if (!ExecuteHamB(Ham_CS_Item_CanDrop, pItem)) {
-        set_pev(this, pev_flags, pev(this, pev_flags) | FL_KILLME);
-        dllfunc(DLLFunc_Think, this);
+    if (!g_bPrecache) {
+        if (!ExecuteHamB(Ham_CS_Item_CanDrop, pItem)) {
+            set_pev(this, pev_flags, pev(this, pev_flags) | FL_KILLME);
+            dllfunc(DLLFunc_Think, this);
+        }
     }
 
     return FMRES_HANDLED;
