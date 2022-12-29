@@ -1,7 +1,6 @@
 {
   "compiler": {
-    "version": "1.9.0-git5294",
-    "dev": true,
+    "version": "1.9",
     "addons": ["cstrike"]
   },
   "include": [
@@ -22,10 +21,10 @@
     "assets": "./assets"
   },
   "output": {
-    "plugins": "./dist/reapi/addons/amxmodx/plugins",
-    "scripts": "./dist/reapi/addons/amxmodx/scripting",
-    "include": "./dist/reapi/addons/amxmodx/scripting/include",
-    "assets": "./dist/reapi"
+    "plugins": "./dist/build/addons/amxmodx/plugins",
+    "scripts": "./dist/build/addons/amxmodx/scripting",
+    "include": "./dist/build/addons/amxmodx/scripting/include",
+    "assets": "./dist/build"
   },
   "rules": {
     "flatCompilation": true
