@@ -63,6 +63,7 @@ public OnEvent() {
         new iTeam = get_member(pPlayer, m_iTeam);
         new bool:bShowTeam = ZP_Player_IsZombie(pPlayer)
             || UTIL_IsPlayerSpectator(pPlayer)
+            || UTIL_IsPlayerSpectator(pTargetPlayer)
             || is_user_bot(pPlayer)
             || ZP_GameRules_IsCompetitive();
 
