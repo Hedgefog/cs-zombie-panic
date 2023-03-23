@@ -10,7 +10,7 @@
 #include <api_custom_weapons>
 
 #define PLUGIN "[API] Custom Weapons"
-#define VERSION "0.7.6"
+#define VERSION "0.7.9"
 #define AUTHOR "Hedgehog Fog"
 
 #define WALL_PUFF_SPRITE "sprites/wall_puff1.spr"
@@ -18,7 +18,7 @@
 #define VEC_DUCK_HULL_MIN Float:{-16.0, -16.0, -18.0}
 #define VEC_DUCK_HULL_MAX Float:{16.0, 16.0, 18.0}
 
-#define IS_PLAYER(%1) (%1 > 0 && %1 <= MAX_PLAYERS)
+#define IS_PLAYER(%1) (%1 > 0 && %1 <= MaxClients)
 
 #define TOKEN 743647146
 
@@ -107,9 +107,9 @@ public plugin_precache() {
     register_forward(FM_DecalIndex, "OnDecalIndex_Post", 1);
 
     RegisterHam(Ham_Spawn, "weaponbox", "OnWeaponboxSpawn", .Post = 0);
-    RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
-    RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage", .Post = 0);
-    RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Player_PreThink, "OnPlayerPreThink_Post", .Post = 1);
+    RegisterHamPlayer(Ham_TakeDamage, "OnPlayerTakeDamage", .Post = 0);
+    RegisterHamPlayer(Ham_TakeDamage, "OnPlayerTakeDamage_Post", .Post = 1);
 
     precache_model(WALL_PUFF_SPRITE);
 }
@@ -250,7 +250,6 @@ public Native_GiveWeapon(iPluginId, iArgc) {
         GiveWeapon(pPlayer, iHandler);
     }
 }
-
 
 public bool:Native_HasWeapon(iPluginId, iArgc) {
     new pPlayer = get_param(1);
@@ -698,7 +697,6 @@ public OnMessage_DeathMsg(iMsgId, iDest, pPlayer) {
         GetStringData(iHandler, CW_Data_Name, szIcon, charsmax(szIcon));
     }
 
-
     set_msg_arg_string(4, szIcon);
 
     return PLUGIN_CONTINUE;
@@ -709,7 +707,7 @@ public OnSetModel_Post(this, const szModel[]) {
         return FMRES_IGNORED;
     }
 
-    if (!g_pNewWeaponboxEnt) {
+    if (g_pNewWeaponboxEnt == -1) {
         return FMRES_IGNORED;
     }
 
@@ -721,7 +719,7 @@ public OnSetModel_Post(this, const szModel[]) {
     pev(this, pev_classname, szClassname, charsmax(szClassname));
 
     if (!equal(szClassname, "weaponbox")) {
-        g_pNewWeaponboxEnt = 0;
+        g_pNewWeaponboxEnt = -1;
         return FMRES_IGNORED;
     }
 
@@ -736,7 +734,7 @@ public OnSetModel_Post(this, const szModel[]) {
     }
 
     ExecuteBindedFunction(CWB_WeaponBoxModelUpdate, pItem, this);
-    g_pNewWeaponboxEnt = 0;
+    g_pNewWeaponboxEnt = -1;
 
     if (!g_bPrecache) {
         if (!ExecuteHamB(Ham_CS_Item_CanDrop, pItem)) {
@@ -776,6 +774,10 @@ public OnCanDrop(this) {
     new CW:iHandler = GetHandlerByEntity(this);
     if (iHandler == CW_INVALID_HANDLER) {
         return HAM_IGNORED;
+    }
+
+    if (GetHamReturnStatus() >= HAM_OVERRIDE) {
+        return GetHamReturnStatus();
     }
 
     SetHamReturnInteger(
@@ -1041,10 +1043,10 @@ SendPlayerWeaponAnim(pPlayer, pWeapon, iAnim) {
     set_pev(pPlayer, pev_weaponanim, iAnim);
 
     if (!is_user_bot(pPlayer)) {
-        message_begin(MSG_ONE, SVC_WEAPONANIM, _, pPlayer);
-        write_byte(iAnim);
-        write_byte(iBody);
-        message_end();
+        emessage_begin(MSG_ONE, SVC_WEAPONANIM, _, pPlayer);
+        ewrite_byte(iAnim);
+        ewrite_byte(iBody);
+        emessage_end();
     }
 }
 
@@ -1594,6 +1596,10 @@ SpawnWeapon(CW:iHandler) {
     new iWeaponId = GetData(iHandler, CW_Data_Id);
 
     new pEntity = engfunc(EngFunc_CreateNamedEntity, g_iszWeaponNames[iWeaponId]);
+    if (!pEntity) {
+        return 0;
+    }
+
     set_pev(pEntity, pev_impulse, TOKEN + _:iHandler);
     dllfunc(DLLFunc_Spawn, pEntity);
 
@@ -1612,16 +1618,26 @@ SpawnWeapon(CW:iHandler) {
 }
 
 SpawnWeaponBox(CW:iHandler) {
-    new pWeaponBox = engfunc(EngFunc_CreateNamedEntity, g_iszWeaponBox);
-    dllfunc(DLLFunc_Spawn, pWeaponBox);
-
     new pItem = SpawnWeapon(iHandler);
+    if (!pItem) {
+        return 0;
+    }
+
     set_pev(pItem, pev_spawnflags, pev(pItem, pev_spawnflags) | SF_NORESPAWN);
     set_pev(pItem, pev_effects, EF_NODRAW);
     set_pev(pItem, pev_movetype, MOVETYPE_NONE);
     set_pev(pItem, pev_solid, SOLID_NOT);
     set_pev(pItem, pev_model, 0);
     set_pev(pItem, pev_modelindex, 0);
+
+    new pWeaponBox = engfunc(EngFunc_CreateNamedEntity, g_iszWeaponBox);
+    if (!pWeaponBox) {
+        set_pev(pItem, pev_flags, pev(pItem, pev_flags) | FL_KILLME);
+        dllfunc(DLLFunc_Think, pItem);
+        return 0;
+    }
+
+    dllfunc(DLLFunc_Spawn, pWeaponBox);
     set_pev(pItem, pev_owner, pWeaponBox);
 
     new iSlot = GetData(iHandler, CW_Data_SlotId);
@@ -1638,6 +1654,10 @@ SpawnWeaponBox(CW:iHandler) {
 
 GiveWeapon(pPlayer, CW:iHandler) {
     new pWeapon = SpawnWeapon(iHandler);
+    if (!pWeapon) {
+        return;
+    }
+
     if (ExecuteHamB(Ham_AddPlayerItem, pPlayer, pWeapon)) {
         ExecuteHamB(Ham_Item_AttachToPlayer, pWeapon, pPlayer);
         emit_sound(pPlayer, CHAN_ITEM, "items/gunpickup2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
@@ -2182,6 +2202,10 @@ RegisterWeaponHooks(iWeaponId) {
 
 SparkShower(const Float:vecOrigin[3], const Float:vecAngles[3], iOwner) {
     new pSparkShower = engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, "spark_shower"));
+    if (!pSparkShower) {
+        return;
+    }
+
     engfunc(EngFunc_SetOrigin, pSparkShower, vecOrigin);
     set_pev(pSparkShower, pev_angles, vecAngles);
     set_pev(pSparkShower, pev_owner, iOwner);
