@@ -28,8 +28,8 @@ new g_pCvarUsePickupHighlight;
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
-    RegisterHam(Ham_Player_PostThink, "player", "OnPlayerPostThink_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Player_PreThink, "OnPlayerPreThink_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Player_PostThink, "OnPlayerPostThink_Post", .Post = 1);
 
     for (new i = 0; i < sizeof(ITEMS_LIST); ++i) {
         RegisterHam(Ham_Touch, ITEMS_LIST[i], "OnItemTouch", .Post = 0);

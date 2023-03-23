@@ -58,13 +58,13 @@ public plugin_init() {
     gmsgScreenShake = get_user_msgid("ScreenShake");
     gmsgStatusIcon = get_user_msgid("StatusIcon");
 
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHam(Ham_Killed, "player", "OnPlayerKilled", .Post = 0);
-    RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
-    RegisterHam(Ham_TraceAttack, "player", "OnPlayerTraceAttack", .Post = 0);
-    RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage", .Post = 0);
-    RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage_Post", .Post = 0);
-    RegisterHam(Ham_BloodColor, "player", "OnPlayerBloodColor", .Post = 0);
+    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled", .Post = 0);
+    RegisterHamPlayer(Ham_Player_PreThink, "OnPlayerPreThink_Post", .Post = 1);
+    RegisterHamPlayer(Ham_TraceAttack, "OnPlayerTraceAttack", .Post = 0);
+    RegisterHamPlayer(Ham_TakeDamage, "OnPlayerTakeDamage", .Post = 0);
+    RegisterHamPlayer(Ham_TakeDamage, "OnPlayerTakeDamage_Post", .Post = 0);
+    RegisterHamPlayer(Ham_BloodColor, "OnPlayerBloodColor", .Post = 0);
 
     g_pCvarInfectionChance = register_cvar("zp_infection_chance", "5");
 

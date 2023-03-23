@@ -25,8 +25,8 @@ public plugin_precache() {
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHam(Ham_Killed, "player", "OnPlayerKilled", .Post = 0);
+    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled", .Post = 0);
 }
 
 public plugin_natives() {

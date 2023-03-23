@@ -29,8 +29,8 @@ public plugin_init() {
     register_event("TeamInfo", "OnEvent", "a");
     register_message(gmsgTeamInfo, "OnMessage");
 
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled_Post", .Post = 1);
 }
 
 public OnPlayerSpawn_Post(pPlayer) {

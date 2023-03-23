@@ -27,7 +27,7 @@ public plugin_init() {
     gmsgScreenShake = get_user_msgid("ScreenShake");
 
     RegisterHam(Ham_Touch, "weaponbox", "OnItemTouch", .Post = 0);
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
 
     g_pFwPanic = CreateMultiForward("ZP_Fw_PlayerPanic", ET_IGNORE, FP_CELL);
 }

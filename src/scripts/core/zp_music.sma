@@ -28,7 +28,7 @@ public plugin_precache() {
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
 
     g_pCvarMusic = register_cvar("zp_music", "1");
     g_pCvarJoinMusic = register_cvar("zp_join_music", "1");

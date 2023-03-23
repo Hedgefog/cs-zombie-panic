@@ -47,9 +47,9 @@ public plugin_init() {
 
     gmsgFlashlight = get_user_msgid("Flashlight");
 
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
-    RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Player_PreThink, "OnPlayerPreThink_Post", .Post = 1);
 
     g_pCvarConsumptionRate = register_cvar("zp_flashlight_consumption_rate", "1.0");
     g_pCvarRecoveryRate = register_cvar("zp_flashlight_recovery_rate", "0.5");

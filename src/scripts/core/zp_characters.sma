@@ -65,9 +65,9 @@ public plugin_init() {
 
     gmsgClCorpse = get_user_msgid("ClCorpse");
 
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
-    RegisterHam(Ham_PainSound, "player", "OnPlayerPainSound_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled_Post", .Post = 1);
+    RegisterHamPlayer(Ham_PainSound, "OnPlayerPainSound_Post", .Post = 1);
     RegisterHam(Ham_Item_Deploy, "weapon_knife", "OnKnifeDeploy_Post", .Post = 1);
 
     register_forward(FM_SetClientKeyValue, "OnSetClientKeyValue");

@@ -77,8 +77,8 @@ public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
     register_dictionary("zombiepanic.txt");
 
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled_Post", .Post = 1);
 
     register_event("AmmoPickup", "OnItemPickup", "be");
     register_event("WeapPickup", "OnItemPickup", "be");

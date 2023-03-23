@@ -22,9 +22,9 @@ new g_iFwResult;
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
-    
+    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled_Post", .Post = 1);
+
     g_pCvarRespawnTime = register_cvar("zp_zombie_respawn_time", "6.0");
 
     g_pFwLivesChanged = CreateMultiForward("ZP_Fw_ZombieLivesChanged", ET_IGNORE, FP_CELL);

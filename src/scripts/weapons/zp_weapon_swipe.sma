@@ -44,8 +44,8 @@ public plugin_init() {
 
     gmsgAmmoX = get_user_msgid("AmmoX");
 
-    RegisterHam(Ham_TraceAttack, "player", "OnPlayerTraceAttack", .Post = 0);
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_TraceAttack, "OnPlayerTraceAttack", .Post = 0);
+    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
 }
 
 public @Weapon_PrimaryAttack(this) {

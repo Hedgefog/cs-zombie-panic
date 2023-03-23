@@ -15,9 +15,9 @@
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHam(Ham_Item_PreFrame, "player", "OnPlayerItemPreFrame_Post", .Post = 1);
-    RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage", .Post = 0);
+    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Item_PreFrame, "OnPlayerItemPreFrame_Post", .Post = 1);
+    RegisterHamPlayer(Ham_TakeDamage, "OnPlayerTakeDamage", .Post = 0);
     RegisterHam(Ham_Use, "func_button", "OnButtonUse", .Post = 0);
 
     for (new i = 0; i < sizeof(ITEMS_LIST); ++i) {

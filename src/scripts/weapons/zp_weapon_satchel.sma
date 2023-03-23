@@ -65,9 +65,9 @@ public plugin_init() {
 
     gmsgAmmoPickup = get_user_msgid("AmmoPickup");
 
-    RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
-    RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
-    RegisterHam(Ham_Player_PostThink, "player", "OnPlayerPostThink_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Player_PreThink, "OnPlayerPreThink_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Player_PostThink, "OnPlayerPostThink_Post", .Post = 1);
 }
 
 public @Weapon_PrimaryAttack(this) {

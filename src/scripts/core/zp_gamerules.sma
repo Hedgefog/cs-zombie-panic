@@ -46,9 +46,9 @@ public plugin_init() {
 
     Round_HookCheckWinConditions("OnCheckWinConditions");
 
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHam(Ham_Killed, "player", "OnPlayerKilled_Post", .Post = 1);
-    RegisterHam(Ham_TakeDamage, "player", "OnPlayerTakeDamage", .Post = 0);
+    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled_Post", .Post = 1);
+    RegisterHamPlayer(Ham_TakeDamage, "OnPlayerTakeDamage", .Post = 0);
 
     register_forward(FM_ClientKill, "OnClientKill");
 

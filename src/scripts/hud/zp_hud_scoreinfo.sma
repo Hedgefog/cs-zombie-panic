@@ -5,6 +5,7 @@
 #include <hamsandwich>
 #include <reapi>
 
+
 #include <zombiepanic>
 #include <zombiepanic_utils>
 
@@ -21,7 +22,7 @@ public plugin_init() {
     register_event("ScoreInfo", "OnEvent", "a");
     register_message(gmsgScoreInfo, "OnMessage");
 
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
 }
 
 public OnPlayerSpawn_Post(pPlayer) {

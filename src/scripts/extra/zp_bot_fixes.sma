@@ -53,7 +53,7 @@ public plugin_init() {
     g_iCwPistolHandler = CW_GetHandler(ZP_WEAPON_PISTOL);
 
     RegisterHam(Ham_Touch, "weaponbox", "OnWeaponBoxTouch", .Post = 0);
-    RegisterHam(Ham_Player_PreThink, "player", "OnPlayerPreThink_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Player_PreThink, "OnPlayerPreThink_Post", .Post = 1);
     RegisterHam(Ham_Use, "func_door", "OnDoorUse", .Post = 0);
 
     g_pCvarFixMeleeAttack = register_cvar("zp_bot_fix_melee_attack", "1");

@@ -25,8 +25,8 @@ new g_iFwResult;
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHam(Ham_Item_PreFrame, "player", "OnPlayerItemPreFrame_Post", .Post = 1);
-    RegisterHam(Ham_AddPlayerItem, "player", "OnPlayerAddItem_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Item_PreFrame, "OnPlayerItemPreFrame_Post", .Post = 1);
+    RegisterHamPlayer(Ham_AddPlayerItem, "OnPlayerAddItem_Post", .Post = 1);
 
     register_forward(FM_CmdStart, "OnCmdStart");
 

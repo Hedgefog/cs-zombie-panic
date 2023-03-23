@@ -60,7 +60,7 @@ public plugin_init() {
         return;
     }
 
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
 
     register_forward(FM_AddToFullPack, "OnAddToFullPack", 0);
     register_forward(FM_AddToFullPack, "OnAddToFullPack_Post", 1);

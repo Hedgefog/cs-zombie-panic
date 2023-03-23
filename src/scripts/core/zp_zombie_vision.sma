@@ -33,8 +33,8 @@ new g_pCvarAuto;
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn", .Post = 1);
-    RegisterHam(Ham_Killed, "player", "OnPlayerKilled", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled", .Post = 1);
 
     register_message(get_user_msgid("ScreenFade"), "OnMessage_ScreenFade");
 

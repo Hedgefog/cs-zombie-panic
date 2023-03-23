@@ -17,7 +17,7 @@ new gmsgScoreAttrib;
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHam(Ham_Spawn, "player", "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
 
     gmsgScoreAttrib = get_user_msgid("ScoreAttrib");
     register_message(gmsgScoreAttrib, "OnMessage");
