@@ -17,10 +17,10 @@ public plugin_init() {
     
     gmsgDeathMsg = get_user_msgid("DeathMsg");
 
-    register_message(gmsgDeathMsg, "OnMessage_DeathMsg");
+    register_message(gmsgDeathMsg, "Message_DeathMsg");
 }
 
-public OnMessage_DeathMsg(iMsgId, iDest, pPlayer) {
+public Message_DeathMsg(iMsgId, iDest, pPlayer) {
     if (pPlayer) {
         return PLUGIN_CONTINUE;
     }

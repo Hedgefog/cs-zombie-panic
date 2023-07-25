@@ -28,7 +28,7 @@ public plugin_precache() {
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
 
     g_pCvarMusic = register_cvar("zp_music", "1");
     g_pCvarJoinMusic = register_cvar("zp_join_music", "1");
@@ -42,7 +42,7 @@ public client_connect(pPlayer) {
     }
 }
 
-public OnPlayerSpawn_Post(pPlayer) {
+public HamHook_Player_Spawn_Post(pPlayer) {
     if (get_pcvar_num(g_pCvarMusic)) {
         if (!g_bPlayerMusic[pPlayer]) {
             set_task(MUSIC_DELAY, "Task_Play", TASKID_PLAY_NEXT_TRACK + pPlayer);

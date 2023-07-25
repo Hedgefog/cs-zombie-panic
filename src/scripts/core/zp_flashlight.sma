@@ -47,9 +47,9 @@ public plugin_init() {
 
     gmsgFlashlight = get_user_msgid("Flashlight");
 
-    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled_Post", .Post = 1);
-    RegisterHamPlayer(Ham_Player_PreThink, "OnPlayerPreThink_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "HamHook_Player_Killed_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Player_PreThink, "HamHook_Player_PreThink_Post", .Post = 1);
 
     g_pCvarConsumptionRate = register_cvar("zp_flashlight_consumption_rate", "1.0");
     g_pCvarRecoveryRate = register_cvar("zp_flashlight_recovery_rate", "0.5");
@@ -68,8 +68,8 @@ public client_disconnected(pPlayer) {
     SetPlayerFlashlight(pPlayer, false);
 }
 
-public OnPlayerSpawn_Post(pPlayer) {
-    if(!is_user_alive(pPlayer)) {
+public HamHook_Player_Spawn_Post(pPlayer) {
+    if (!is_user_alive(pPlayer)) {
         return HAM_IGNORED;
     }
 
@@ -80,13 +80,13 @@ public OnPlayerSpawn_Post(pPlayer) {
     return HAM_HANDLED;
 }
 
-public OnPlayerKilled_Post(pPlayer) {
+public HamHook_Player_Killed_Post(pPlayer) {
     SetPlayerFlashlight(pPlayer, false);
 
     return HAM_HANDLED;
 }
 
-public OnPlayerPreThink_Post(pPlayer) {
+public HamHook_Player_PreThink_Post(pPlayer) {
     FlashlightThink(pPlayer);
 
     return HAM_HANDLED;

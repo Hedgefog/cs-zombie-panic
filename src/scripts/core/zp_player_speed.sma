@@ -25,14 +25,14 @@ new g_iFwResult;
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHamPlayer(Ham_Item_PreFrame, "OnPlayerItemPreFrame_Post", .Post = 1);
-    RegisterHamPlayer(Ham_AddPlayerItem, "OnPlayerAddItem_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Item_PreFrame, "HamHook_Player_ItemPreFrame_Post", .Post = 1);
+    RegisterHamPlayer(Ham_AddPlayerItem, "HamHook_Player_AddItem_Post", .Post = 1);
 
-    register_forward(FM_CmdStart, "OnCmdStart");
+    register_forward(FM_CmdStart, "FMHook_CmdStart");
 
-    register_message(get_user_msgid("AmmoPickup"), "OnMessage_AmmoPickup");
+    register_message(get_user_msgid("AmmoPickup"), "Message_AmmoPickup");
 
-    register_clcmd("drop", "OnClCmd_Drop");
+    register_clcmd("drop", "Command_Drop");
 
     g_pFwPlayerSpeedUpdated = CreateMultiForward("ZP_Fw_PlayerSpeedUpdated", ET_IGNORE, FP_CELL);
 }
@@ -46,19 +46,19 @@ public Native_UpdateSpeed(iPluginId, iArgc) {
     UpdatePlayerSpeed(pPlayer);
 }
 
-public OnClCmd_Drop(pPlayer) {
+public Command_Drop(pPlayer) {
     set_task(0.1, "Task_UpdateSpeed", pPlayer);
 
     return PLUGIN_CONTINUE;
 }
 
-public OnPlayerAddItem_Post(pPlayer) {
+public HamHook_Player_AddItem_Post(pPlayer) {
     UpdatePlayerSpeed(pPlayer);
 
     return HAM_HANDLED;
 }
 
-public OnCmdStart(pPlayer, pHandle) {
+public FMHook_CmdStart(pPlayer, pHandle) {
     new iFlags = pev(pPlayer, pev_flags);
     new iButtons = get_uc(pHandle, UC_Buttons);
     new iOldButtons = pev(pPlayer, pev_oldbuttons);
@@ -75,13 +75,13 @@ public OnCmdStart(pPlayer, pHandle) {
     return HAM_HANDLED;
 }
 
-public OnMessage_AmmoPickup(iMsgId, iMsgDest, pPlayer) {
+public Message_AmmoPickup(iMsgId, iMsgDest, pPlayer) {
     UpdatePlayerSpeed(pPlayer);
 
     return PLUGIN_CONTINUE;
 }
 
-public OnPlayerItemPreFrame_Post(pPlayer) {
+public HamHook_Player_ItemPreFrame_Post(pPlayer) {
     static Float:flMaxSpeed;
     pev(pPlayer, pev_maxspeed, flMaxSpeed);
     g_flPlayerMaxSpeed[pPlayer] = flMaxSpeed;

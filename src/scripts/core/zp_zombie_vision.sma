@@ -33,12 +33,12 @@ new g_pCvarAuto;
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn", .Post = 1);
-    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "HamHook_Player_Killed", .Post = 1);
 
-    register_message(get_user_msgid("ScreenFade"), "OnMessage_ScreenFade");
+    register_message(get_user_msgid("ScreenFade"), "Message_ScreenFade");
 
-    register_forward(FM_AddToFullPack, "OnAddToFullPack_Post", 1);
+    register_forward(FM_AddToFullPack, "FMHook_AddToFullPack_Post", 1);
 
     g_pFwZombieVision = CreateMultiForward("ZP_Fw_PlayerZombieVision", ET_IGNORE, FP_CELL, FP_CELL);
 
@@ -63,12 +63,12 @@ public client_disconnected(pPlayer) {
     remove_task(TASKID_FIX_FADE + pPlayer);
 }
 
-public OnClCmd_ZombieVision(pPlayer) {
+public Command_ZombieVision(pPlayer) {
     Toggle(pPlayer);
     return HAM_HANDLED;
 }
 
-public OnPlayerSpawn(pPlayer) {
+public HamHook_Player_Spawn(pPlayer) {
     if (!is_user_alive(pPlayer)) {
         return HAM_IGNORED;
     }
@@ -86,7 +86,7 @@ public OnPlayerSpawn(pPlayer) {
     return HAM_HANDLED;
 }
 
-public OnPlayerKilled(pPlayer) {
+public HamHook_Player_Killed(pPlayer) {
     SetZombieVision(pPlayer, false);
     remove_task(TASKID_ACTIVATE_VISION + pPlayer);
 
@@ -97,7 +97,7 @@ public OnPlayerKilled(pPlayer) {
     return HAM_HANDLED;
 }
 
-public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
+public FMHook_AddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     if (pEntity == pHost) {
         return FMRES_IGNORED;
     }
@@ -153,7 +153,7 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     return FMRES_HANDLED;
 }
 
-public OnMessage_ScreenFade(iMsgId, iMsgDest, pPlayer) {
+public Message_ScreenFade(iMsgId, iMsgDest, pPlayer) {
     if (g_bIgnoreFadeMessage) {
         return PLUGIN_CONTINUE;
     }

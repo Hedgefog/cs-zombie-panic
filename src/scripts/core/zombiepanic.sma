@@ -23,10 +23,10 @@ public plugin_precache() {
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    register_forward(FM_GetGameDescription, "OnGetGameDescription");
+    register_forward(FM_GetGameDescription, "FMHook_GetGameDescription");
 
     g_pCvarVersion = register_cvar("zombiepanic_version", ZP_VERSION, FCVAR_SERVER);
-    hook_cvar_change(g_pCvarVersion, "OnVersionCvarChange");
+    hook_cvar_change(g_pCvarVersion, "CvarHook_VersionCvar");
 
     register_cvar("mp_flashlight", "1");
     register_cvar("mp_freezetime", "10");
@@ -53,11 +53,11 @@ public plugin_cfg() {
     ExecuteForward(g_pFwConfigLoaded, g_iFwResult);
 }
 
-public OnVersionCvarChange() {
+public CvarHook_VersionCvar() {
     set_pcvar_string(g_pCvarVersion, ZP_VERSION);
 }
 
-public OnGetGameDescription() {
+public FMHook_GetGameDescription() {
     static szGameName[32];
     format(szGameName, charsmax(szGameName), "%s %s", ZP_TITLE, ZP_VERSION);
     forward_return(FMV_STRING, szGameName);

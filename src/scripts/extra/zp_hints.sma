@@ -77,16 +77,16 @@ public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
     register_dictionary("zombiepanic.txt");
 
-    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "HamHook_Player_Killed_Post", .Post = 1);
 
-    register_event("AmmoPickup", "OnItemPickup", "be");
-    register_event("WeapPickup", "OnItemPickup", "be");
+    register_event("AmmoPickup", "Event_ItemPickup", "be");
+    register_event("WeapPickup", "Event_ItemPickup", "be");
 
     g_pCvarEnabled = register_cvar("zp_hints", "1");
 }
 
-public OnPlayerSpawn_Post(pPlayer) {
+public HamHook_Player_Spawn_Post(pPlayer) {
     if (!get_pcvar_num(g_pCvarEnabled)) {
         return HAM_IGNORED;
     }
@@ -154,7 +154,7 @@ public OnPlayerSpawn_Post(pPlayer) {
     return HAM_IGNORED;
 }
 
-public OnPlayerKilled_Post(pPlayer) {
+public HamHook_Player_Killed_Post(pPlayer) {
     if (!get_pcvar_num(g_pCvarEnabled)) {
         return HAM_IGNORED;
     }
@@ -180,7 +180,7 @@ public Round_Fw_NewRound() {
     }
 }
 
-public OnItemPickup(pPlayer) {
+public Event_ItemPickup(pPlayer) {
     if (!get_pcvar_num(g_pCvarEnabled)) {
         return PLUGIN_CONTINUE;
     }

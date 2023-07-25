@@ -11,10 +11,10 @@
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    register_message(get_user_msgid("SendAudio"), "OnMessage_SendAudio");
+    register_message(get_user_msgid("SendAudio"), "Message_SendAudio");
 }
 
-public OnMessage_SendAudio()  {
+public Message_SendAudio()  {
     static szAudio[8];
     get_msg_arg_string(2, szAudio, charsmax(szAudio));
 

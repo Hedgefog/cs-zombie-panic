@@ -22,8 +22,8 @@ new g_iFwResult;
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "HamHook_Player_Killed_Post", .Post = 1);
 
     g_pCvarRespawnTime = register_cvar("zp_zombie_respawn_time", "6.0");
 
@@ -61,11 +61,11 @@ public ZP_Fw_PlayerJoined(pPlayer) {
     return PLUGIN_HANDLED;
 }
 
-public OnPlayerSpawn_Post(pPlayer) {
+public HamHook_Player_Spawn_Post(pPlayer) {
     remove_task(pPlayer);
 }
 
-public OnPlayerKilled_Post(pPlayer) {
+public HamHook_Player_Killed_Post(pPlayer) {
     if (!ZP_Player_IsZombie(pPlayer) && !ZP_GameRules_GetObjectiveMode()) {
         SetLives(g_iLives + 1);
     }

@@ -28,7 +28,7 @@ public Native_Show(iPluginId, iArgc) {
 }
 
 ShowMotd(pPlayer) {
-    if (g_szMotdData[0] == '^0') {
+    if (equal(g_szMotdData, NULL_STRING)) {
         return;
     }
 

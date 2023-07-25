@@ -15,13 +15,13 @@
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHamPlayer(Ham_Item_PreFrame, "OnPlayerItemPreFrame_Post", .Post = 1);
-    RegisterHamPlayer(Ham_TakeDamage, "OnPlayerTakeDamage", .Post = 0);
-    RegisterHam(Ham_Use, "func_button", "OnButtonUse", .Post = 0);
+    RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Item_PreFrame, "HamHook_Player_ItemPreFrame_Post", .Post = 1);
+    RegisterHamPlayer(Ham_TakeDamage, "HamHook_Player_TakeDamage", .Post = 0);
+    RegisterHam(Ham_Use, "func_button", "HamHook_Button_Use", .Post = 0);
 
     for (new i = 0; i < sizeof(ITEMS_LIST); ++i) {
-        RegisterHam(Ham_Touch, ITEMS_LIST[i], "OnItemTouch", .Post = 0);
+        RegisterHam(Ham_Touch, ITEMS_LIST[i], "HamHook_Item_Touch", .Post = 0);
     }
 }
 
@@ -35,7 +35,7 @@ public bool:Native_IsPlayerZombie(iPluginId, iArgc) {
     return IsPlayerZombie(pPlayer);
 }
 
-public OnButtonUse(pEntity, pToucher) {
+public HamHook_Button_Use(pEntity, pToucher) {
     if (!UTIL_IsPlayer(pToucher)) {
         return HAM_IGNORED;
     }
@@ -51,7 +51,7 @@ public OnButtonUse(pEntity, pToucher) {
     return HAM_HANDLED;
 }
 
-public OnPlayerSpawn_Post(pPlayer) {
+public HamHook_Player_Spawn_Post(pPlayer) {
     if (!is_user_alive(pPlayer)) {
         return HAM_IGNORED;
     }
@@ -66,7 +66,7 @@ public OnPlayerSpawn_Post(pPlayer) {
     return HAM_HANDLED;
 }
 
-public OnPlayerTakeDamage(pPlayer, iInflictor, pAttacker, Float:flDamage, iDamageBits) {
+public HamHook_Player_TakeDamage(pPlayer, iInflictor, pAttacker, Float:flDamage, iDamageBits) {
     if (!ZP_Player_IsZombie(pPlayer)) {
         return HAM_IGNORED;
     }
@@ -78,7 +78,7 @@ public OnPlayerTakeDamage(pPlayer, iInflictor, pAttacker, Float:flDamage, iDamag
     return HAM_HANDLED;
 }
 
-public OnPlayerItemPreFrame_Post(pPlayer) {
+public HamHook_Player_ItemPreFrame_Post(pPlayer) {
     if (!ZP_Player_IsZombie(pPlayer)) {
         return HAM_IGNORED;
     }
@@ -94,7 +94,7 @@ public OnPlayerItemPreFrame_Post(pPlayer) {
     return HAM_HANDLED;
 }
 
-public OnItemTouch(pEntity, pToucher) {
+public HamHook_Item_Touch(pEntity, pToucher) {
     if (!UTIL_IsPlayer(pToucher)) {
         return HAM_IGNORED;
     }

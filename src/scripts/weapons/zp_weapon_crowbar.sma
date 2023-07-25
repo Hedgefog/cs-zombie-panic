@@ -50,10 +50,10 @@ public plugin_precache() {
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHamPlayer(Ham_TakeDamage, "OnPlayerTakeDamage_Post", .Post = 1);
+    RegisterHamPlayer(Ham_TakeDamage, "HamHook_Player_TakeDamage_Post", .Post = 1);
 }
 
-public @Weapon_Idle(this) {
+@Weapon_Idle(this) {
     switch (random(3)) {
         case 0: {
             CW_PlayAnimation(this, 0, 36.0 / 13.0);
@@ -67,12 +67,12 @@ public @Weapon_Idle(this) {
     }
 }
 
-public @Weapon_PrimaryAttack(this) {
+@Weapon_PrimaryAttack(this) {
     Swing(this);
     set_member(this, m_Weapon_flNextSecondaryAttack, 0.5);
 }
 
-public @Weapon_SecondaryAttack(this) {
+@Weapon_SecondaryAttack(this) {
     new pPlayer = CW_GetPlayer(this);
     if (is_user_bot(pPlayer)) {
         Swing(this);
@@ -80,27 +80,27 @@ public @Weapon_SecondaryAttack(this) {
     }
 }
 
-public @Weapon_Deploy(this) {
+@Weapon_Deploy(this) {
     CW_DefaultDeploy(this, ZP_WEAPON_CROWBAR_V_MODEL, ZP_WEAPON_CROWBAR_P_MODEL, 1, "grenade");
 }
 
-public Float:@Weapon_GetMaxSpeed(this) {
+Float:@Weapon_GetMaxSpeed(this) {
     return ZP_HUMAN_SPEED;
 }
 
-public @Weapon_Spawn(this) {
+@Weapon_Spawn(this) {
     engfunc(EngFunc_SetModel, this, ZP_WEAPON_CROWBAR_W_MODEL);
 }
 
-public @Weapon_WeaponBoxSpawn(this, pWeaponBox) {
+@Weapon_WeaponBoxSpawn(this, pWeaponBox) {
     engfunc(EngFunc_SetModel, pWeaponBox, ZP_WEAPON_CROWBAR_W_MODEL);
 }
 
-public @Weapon_CanDrop(this) {
+@Weapon_CanDrop(this) {
     return PLUGIN_HANDLED;
 }
 
-public OnPlayerTakeDamage_Post(this, pInflictor, pAttacker) {
+public HamHook_Player_TakeDamage_Post(this, pInflictor, pAttacker) {
     if (!UTIL_IsPlayer(pAttacker)) {
         return HAM_IGNORED;
     }

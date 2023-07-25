@@ -21,23 +21,23 @@ new g_iModel;
 new g_pCvarCureChance;
 new g_pCvarSuspendInfection;
 
+public plugin_precache() {
+    precache_sound("items/smallmedkit1.wav");
+    g_iModel = precache_model(ZP_ITEM_MEDKIT_MODEL);
+
+    RegisterHam(Ham_Spawn, ENTITY_NAME, "HamHook_HealthKit_Spawn_Post", .Post = 1);
+}
+
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHam(Ham_Touch, ENTITY_NAME, "OnTouch", .Post = 0);
+    RegisterHam(Ham_Touch, ENTITY_NAME, "HamHook_HealthKit_Touch", .Post = 0);
 
     g_pCvarCureChance = register_cvar("zp_healthkit_cure_chance", "25");
     g_pCvarSuspendInfection = register_cvar("zp_healthkit_suspend_infection", "1");
 }
 
-public plugin_precache() {
-    precache_sound("items/smallmedkit1.wav");
-    g_iModel = precache_model(ZP_ITEM_MEDKIT_MODEL);
-
-    RegisterHam(Ham_Spawn, ENTITY_NAME, "OnSpawn_Post", .Post = 1);
-}
-
-public OnSpawn_Post(pEntity) {
+public HamHook_HealthKit_Spawn_Post(pEntity) {
     set_pev(pEntity, pev_modelindex, g_iModel);
     set_pev(pEntity, pev_solid, SOLID_TRIGGER);
     set_pev(pEntity, pev_effects, pev(pEntity, pev_effects) & ~EF_NODRAW);
@@ -51,7 +51,7 @@ public OnSpawn_Post(pEntity) {
     return HAM_HANDLED;
 }
 
-public OnTouch(pEntity, pToucher) {
+public HamHook_HealthKit_Touch(pEntity, pToucher) {
     if (!UTIL_IsPlayer(pToucher)) {
         return HAM_IGNORED;
     }

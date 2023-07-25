@@ -23,13 +23,13 @@ public plugin_init() {
     gmsgSetFOV = get_user_msgid("SetFOV");
     gmsgCurWeapon = get_user_msgid("CurWeapon");
 
-    register_message(gmsgHideWeapon, "OnMessage_HideWeapon");
+    register_message(gmsgHideWeapon, "Message_HideWeapon");
 
-    register_event("HideWeapon", "OnEvent_HideWeapon", "b", "1=1");
-    register_event("CurWeapon", "OnEvent_CurWeapon", "b", "1=1");
+    register_event("HideWeapon", "Event_HideWeapon", "b", "1=1");
+    register_event("CurWeapon", "Event_CurWeapon", "b", "1=1");
 }
 
-public OnMessage_HideWeapon(iMsgId, iMsgDest, pPlayer) {
+public Message_HideWeapon(iMsgId, iMsgDest, pPlayer) {
     if (is_user_bot(pPlayer)) {
         return PLUGIN_CONTINUE;
     }
@@ -39,7 +39,7 @@ public OnMessage_HideWeapon(iMsgId, iMsgDest, pPlayer) {
     return PLUGIN_CONTINUE;
 }
 
-public OnEvent_HideWeapon(pPlayer) {
+public Event_HideWeapon(pPlayer) {
     if (is_user_bot(pPlayer)) {
         return PLUGIN_CONTINUE;
     }
@@ -49,7 +49,7 @@ public OnEvent_HideWeapon(pPlayer) {
     return PLUGIN_CONTINUE;
 }
 
-public OnEvent_CurWeapon(pPlayer) {
+public Event_CurWeapon(pPlayer) {
     if (is_user_bot(pPlayer)) {
         return PLUGIN_CONTINUE;
     }

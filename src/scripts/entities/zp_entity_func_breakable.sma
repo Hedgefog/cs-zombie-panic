@@ -30,20 +30,20 @@ public plugin_precache() {
     TrieSetCell(g_iSpawnObjectMap, "11", engfunc(EngFunc_AllocString, ZP_WEAPON_GRENADE));
     TrieSetCell(g_iSpawnObjectMap, "12", engfunc(EngFunc_AllocString, ZP_WEAPON_SATCHEL));
 
-    RegisterHam(Ham_Keyvalue, "func_breakable", "OnKvd_Post", .Post = 1);
+    RegisterHam(Ham_Keyvalue, "func_breakable", "HamHook_Breakable_KeyValue_Post", .Post = 1);
 }
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHam(Ham_TakeDamage, "func_breakable", "OnTakeDamage_Post", .Post = 1);
+    RegisterHam(Ham_TakeDamage, "func_breakable", "HamHook_Breakable_TakeDamage_Post", .Post = 1);
 }
 
 public plugin_end() {
     TrieDestroy(g_iSpawnObjectMap);
 }
 
-public OnKvd_Post(pEntity, pKvdHandle) {
+public HamHook_Breakable_KeyValue_Post(pEntity, pKvdHandle) {
     new szKey[32];
     get_kvd(pKvdHandle, KV_KeyName, szKey, charsmax(szKey));
 
@@ -54,7 +54,7 @@ public OnKvd_Post(pEntity, pKvdHandle) {
     new szValue[32];
     get_kvd(pKvdHandle, KV_Value, szValue, charsmax(szValue));
 
-    if (szValue[0] == '^0') {
+    if (equal(szValue, NULL_STRING)) {
         return HAM_IGNORED;
     }
 
@@ -68,7 +68,7 @@ public OnKvd_Post(pEntity, pKvdHandle) {
     return HAM_HANDLED;
 }
 
-public OnTakeDamage_Post(pEntity) {
+public HamHook_Breakable_TakeDamage_Post(pEntity) {
     new Float:flHealth;
     pev(pEntity, pev_health, flHealth);
 

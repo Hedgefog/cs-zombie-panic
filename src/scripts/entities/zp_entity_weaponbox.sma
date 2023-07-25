@@ -23,11 +23,10 @@ public plugin_init() {
 
     gmsgAmmoPickup = get_user_msgid("AmmoPickup");
 
-    RegisterHam(Ham_Touch, "weaponbox", "OnWeaponBoxTouch", .Post = 0);
-    RegisterHookChain(RG_CSGameRules_RemoveGuns, "OnRemoveGuns", .post = 1);
+    RegisterHam(Ham_Touch, "weaponbox", "HamHook_WeaponBox_Touch", .Post = 0);
 }
 
-public OnWeaponBoxTouch(pWeaponBox, pToucher) {
+public HamHook_WeaponBox_Touch(pWeaponBox, pToucher) {
     if (!pev_valid(pWeaponBox)) {
         return HAM_IGNORED;
     }
@@ -51,13 +50,6 @@ public OnWeaponBoxTouch(pWeaponBox, pToucher) {
     }
 
     return HAM_SUPERCEDE;
-}
-
-public OnRemoveGuns() {
-    new pWeaponBox;
-    while((pWeaponBox = engfunc(EngFunc_FindEntityByString, pWeaponBox, "classname", "weaponbox")) > 0) {
-        Remove(pWeaponBox);
-    }
 }
 
 PickupWeaponBox(pPlayer, pWeaponBox) {
@@ -126,7 +118,7 @@ bool:PickupWeaponBoxAmmo(pPlayer, pWeaponBox) {
         static szAmmoName[16];
         get_member(pWeaponBox, m_WeaponBox_rgiszAmmo, szAmmoName, charsmax(szAmmoName), iSlot);
 
-        if (szAmmoName[0] == '^0') {
+        if (equal(szAmmoName, NULL_STRING)) {
             continue;
         }
 
@@ -205,27 +197,4 @@ FindPlayerItemById(pPlayer, iId) {
     }
 
     return -1;
-}
-
-Remove(pWeaponBox) {
-    Free(pWeaponBox);
-    RemoveEntity(pWeaponBox);
-}
-
-Free(pWeaponBox) {
-    for (new iSlot = 0; iSlot < 6; ++iSlot) {
-        new pItem = get_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, iSlot);
-        set_member(pWeaponBox, m_WeaponBox_rgpPlayerItems, -1, iSlot);
-
-        while (pItem != -1) {
-            new pNextItem = get_member(pItem, m_pNext);
-            RemoveEntity(pItem);
-            pItem = pNextItem;
-        }
-    }
-}
-
-RemoveEntity(pEntity) {
-    set_pev(pEntity, pev_flags, FL_KILLME);
-    dllfunc(DLLFunc_Think, pEntity);
 }

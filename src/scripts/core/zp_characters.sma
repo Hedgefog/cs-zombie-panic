@@ -7,8 +7,10 @@
 #include <reapi>
 #include <json>
 
-#include <zombiepanic>
 #include <api_custom_weapons>
+#include <api_player_model>
+
+#include <zombiepanic>
 
 #define PLUGIN "[Zombie Panic] Characters"
 #define AUTHOR "Hedgehog Fog"
@@ -33,8 +35,6 @@ enum CharacterData {
     Character_BodyIndex
 }
 
-new gmsgClCorpse;
-
 new g_szCharacterDir[MAX_RESOURCE_PATH_LENGTH];
 
 new Array:g_rgCharactersData[CharacterData];
@@ -48,7 +48,6 @@ new CW:g_iCwSwipeHandler;
 
 new g_pFwPlayerCharacterUpdated;
 new g_pFwPlayerModelUpdated;
-new g_iFwResult;
 
 public plugin_precache() {
     precache_model(DEFAULT_PLAYER_MODEL);
@@ -63,16 +62,10 @@ public plugin_precache() {
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    gmsgClCorpse = get_user_msgid("ClCorpse");
-
-    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled_Post", .Post = 1);
-    RegisterHamPlayer(Ham_PainSound, "OnPlayerPainSound_Post", .Post = 1);
-    RegisterHam(Ham_Item_Deploy, "weapon_knife", "OnKnifeDeploy_Post", .Post = 1);
-
-    register_forward(FM_SetClientKeyValue, "OnSetClientKeyValue");
-
-    register_message(gmsgClCorpse, "OnMessage_ClCorpse");
+    RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "HamHook_Player_Killed_Post", .Post = 1);
+    RegisterHamPlayer(Ham_PainSound, "HamHook_Player_PainSound_Post", .Post = 1);
+    RegisterHam(Ham_Item_Deploy, "weapon_knife", "HamHook_Knife_Deploy_Post", .Post = 1);
 
     g_iCwSwipeHandler = CW_GetHandler(ZP_WEAPON_SWIPE);
 
@@ -121,7 +114,11 @@ public ZP_Fw_PlayerZombieVision(pPlayer) {
 
 /*--------------------------------[ Hooks ]--------------------------------*/
 
-public OnPlayerSpawn_Post(pPlayer) {
+public HamHook_Player_Spawn_Post(pPlayer) {
+    if (!is_user_alive(pPlayer)) {
+        return HAM_IGNORED;
+    }
+
     UpdatePlayerCharacter(pPlayer);
     UpdatePlayerModel(pPlayer);
 
@@ -131,16 +128,16 @@ public OnPlayerSpawn_Post(pPlayer) {
     return HAM_HANDLED;
 }
 
-public OnPlayerKilled_Post(pPlayer) {
+public HamHook_Player_Killed_Post(pPlayer) {
     PlayVoiceFromCharacterData(pPlayer, ZP_Player_IsZombie(pPlayer) && !ZP_Player_IsInfected(pPlayer) ? Character_ZombieDeathSounds : Character_HumanDeathSounds);
     return HAM_HANDLED;
 }
 
-public OnPlayerPainSound_Post(pPlayer) {
+public HamHook_Player_PainSound_Post(pPlayer) {
     emit_sound(pPlayer, CHAN_VOICE, "common/null.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 }
 
-public OnKnifeDeploy_Post(pKnife) {
+public HamHook_Knife_Deploy_Post(pKnife) {
     if (CW_GetHandlerByEntity(pKnife) == g_iCwSwipeHandler) {
         new pPlayer = CW_GetPlayer(pKnife);
         if (g_iPlayerCharacter[pPlayer] == -1) {
@@ -153,29 +150,6 @@ public OnKnifeDeploy_Post(pKnife) {
     }
 
     return HAM_HANDLED;
-}
-
-public OnSetClientKeyValue(pPlayer, const szInfoBuffer[], const szKey[], const szValue[]) {
-    if (equal(szKey, "model")) {
-        UpdatePlayerModel(pPlayer);
-        return FMRES_SUPERCEDE;
-    }
-
-    return FMRES_IGNORED;
-}
-
-public OnMessage_ClCorpse(iMsgId, iMsgDest, pPlayer) {
-    new pTargetPlayer = get_msg_arg_int(12);
-    new iCharacter = g_iPlayerCharacter[pTargetPlayer];
-
-    static szPlayerModel[MAX_RESOURCE_PATH_LENGTH];
-    ArrayGetString(Array:g_rgCharactersData[ZP_Player_IsZombie(pTargetPlayer) ? Character_ZombieModel : Character_HumanModel], iCharacter, szPlayerModel, charsmax(szPlayerModel));
-
-    if (szPlayerModel[0] == '^0') {
-        return;
-    }
-
-    set_msg_arg_string(1, szPlayerModel);
 }
 
 /*--------------------------------[ Tasks ]--------------------------------*/
@@ -214,25 +188,24 @@ UpdatePlayerModel(pPlayer) {
     new iCharacter = g_iPlayerCharacter[pPlayer];
 
     static szPlayerModel[MAX_RESOURCE_PATH_LENGTH];
-    copy(szPlayerModel, 0, "");
+    copy(szPlayerModel, charsmax(szPlayerModel), NULL_STRING);
 
     if (g_iPlayerCharacter[pPlayer] != -1) {
-        ArrayGetString(Array:g_rgCharactersData[ZP_Player_IsZombie(pPlayer) ? Character_ZombieModel : Character_HumanModel], iCharacter, szPlayerModel, charsmax(szPlayerModel));
+        new Array:irgCharacterModels = Array:g_rgCharactersData[ZP_Player_IsZombie(pPlayer) ? Character_ZombieModel : Character_HumanModel];
+        ArrayGetString(irgCharacterModels, iCharacter, szPlayerModel, charsmax(szPlayerModel));
     }
 
-    if (szPlayerModel[0] == '^0') {
+    if (equal(szPlayerModel, NULL_STRING)) {
         copy(szPlayerModel, charsmax(szPlayerModel), DEFAULT_PLAYER_MODEL);
     }
 
-    new iModelIndex = engfunc(EngFunc_ModelIndex, szPlayerModel);
+    PlayerModel_Set(pPlayer, szPlayerModel);
+    PlayerModel_Update(pPlayer);
+
     new iBody = ArrayGetCell(Array:g_rgCharactersData[Character_BodyIndex], iCharacter);
-
-    set_user_info(pPlayer, "model", NULL_STRING);
-    set_pev(pPlayer, pev_modelindex, iModelIndex);
     set_pev(pPlayer, pev_body, iBody);
-    set_member(pPlayer, m_modelIndexPlayer, iModelIndex);
 
-    ExecuteForward(g_pFwPlayerModelUpdated, g_iFwResult, pPlayer);
+    ExecuteForward(g_pFwPlayerModelUpdated, _, pPlayer);
 }
 
 UpdatePlayerCharacter(pPlayer, bool:bOverride = false) {
@@ -254,7 +227,7 @@ UpdatePlayerCharacter(pPlayer, bool:bOverride = false) {
     }
 
     g_iPlayerCharacter[pPlayer] = iCharacter;
-    ExecuteForward(g_pFwPlayerCharacterUpdated, g_iFwResult, pPlayer);
+    ExecuteForward(g_pFwPlayerCharacterUpdated, _, pPlayer);
 }
 
 PlayAmbient(pPlayer) {

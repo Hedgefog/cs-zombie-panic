@@ -26,8 +26,8 @@ public plugin_init() {
 
     gmsgScreenShake = get_user_msgid("ScreenShake");
 
-    RegisterHam(Ham_Touch, "weaponbox", "OnItemTouch", .Post = 0);
-    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHam(Ham_Touch, "weaponbox", "HamHook_WeaponBox_Touch", .Post = 0);
+    RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
 
     g_pFwPanic = CreateMultiForward("ZP_Fw_PlayerPanic", ET_IGNORE, FP_CELL);
 }
@@ -49,7 +49,7 @@ public bool:Native_InPanic(iPluginId, iArgc) {
     return g_bPlayerPanic[pPlayer];
 }
 
-public OnItemTouch(pItem, pToucher) {
+public HamHook_WeaponBox_Touch(pItem, pToucher) {
     if (!UTIL_IsPlayer(pToucher)) {
         return HAM_IGNORED;
     }
@@ -61,7 +61,7 @@ public OnItemTouch(pItem, pToucher) {
     return HAM_SUPERCEDE;
 }
 
-public OnPlayerSpawn_Post(pPlayer) {
+public HamHook_Player_Spawn_Post(pPlayer) {
     g_flPlayerLastPanic[pPlayer] = -PANIC_DELAY;
 }
 

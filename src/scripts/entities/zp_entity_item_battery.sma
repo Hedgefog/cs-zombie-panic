@@ -18,20 +18,20 @@
 
 new g_iModelIndex;
 
-public plugin_init() {
-    register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
-
-    RegisterHam(Ham_Touch, ENTITY_NAME, "OnTouch", .Post = 0);
-}
-
 public plugin_precache() {
     precache_sound("items/tr_kevlar.wav");
     g_iModelIndex = precache_model(ZP_ITEM_BATTERY_MODEL);
 
-    RegisterHam(Ham_Spawn, ENTITY_NAME, "OnSpawn_Post", .Post = 1);
+    RegisterHam(Ham_Spawn, ENTITY_NAME, "HamHook_Battery_Spawn_Post", .Post = 1);
 }
 
-public OnSpawn_Post(pEntity) {
+public plugin_init() {
+    register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+
+    RegisterHam(Ham_Touch, ENTITY_NAME, "HamHook_Battery_Touch", .Post = 0);
+}
+
+public HamHook_Battery_Spawn_Post(pEntity) {
     set_pev(pEntity, pev_modelindex, g_iModelIndex);
     set_pev(pEntity, pev_solid, SOLID_TRIGGER);
     set_pev(pEntity, pev_effects, pev(pEntity, pev_effects) & ~EF_NODRAW);
@@ -45,7 +45,7 @@ public OnSpawn_Post(pEntity) {
     return HAM_HANDLED;
 }
 
-public OnTouch(pEntity, pToucher) {
+public HamHook_Battery_Touch(pEntity, pToucher) {
     if (!UTIL_IsPlayer(pToucher)) {
         return HAM_IGNORED;
     }

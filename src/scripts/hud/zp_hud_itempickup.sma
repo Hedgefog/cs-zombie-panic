@@ -13,10 +13,10 @@ public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
     gmsgWeapPickup = get_user_msgid("WeapPickup");
-    register_message(gmsgWeapPickup, "OnMessage");
+    register_message(gmsgWeapPickup, "Message_WeapPickup");
 }
 
-public OnMessage(iMsgId, iDest, pPlayer) {
+public Message_WeapPickup(iMsgId, iDest, pPlayer) {
     if (is_user_bot(pPlayer)) {
         return PLUGIN_CONTINUE;
     }

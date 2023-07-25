@@ -28,21 +28,21 @@ new g_pCvarUsePickupHighlight;
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHamPlayer(Ham_Player_PreThink, "OnPlayerPreThink_Post", .Post = 1);
-    RegisterHamPlayer(Ham_Player_PostThink, "OnPlayerPostThink_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Player_PreThink, "HamHook_Player_PreThink_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Player_PostThink, "HamHook_Player_PostThink_Post", .Post = 1);
 
     for (new i = 0; i < sizeof(ITEMS_LIST); ++i) {
-        RegisterHam(Ham_Touch, ITEMS_LIST[i], "OnItemTouch", .Post = 0);
+        RegisterHam(Ham_Touch, ITEMS_LIST[i], "HamHook_Item_Touch", .Post = 0);
     }
 
-    register_forward(FM_AddToFullPack, "OnAddToFullPack_Post", 1);
+    register_forward(FM_AddToFullPack, "FMHook_AddToFullPack_Post", 1);
 
     g_pCvarUsePickup = register_cvar("zp_use_pickup", "1");
     g_pCvarUsePickupHighlight = register_cvar("zp_use_pickup_highlight", "1");
     g_pFwAimItem = CreateMultiForward("ZP_Fw_PlayerAimItem", ET_IGNORE, FP_CELL, FP_CELL);
 }
 
-public OnItemTouch(pEntity, pToucher) {
+public HamHook_Item_Touch(pEntity, pToucher) {
     if (!UTIL_IsPlayer(pToucher)) {
         return HAM_IGNORED;
     }
@@ -50,7 +50,7 @@ public OnItemTouch(pEntity, pToucher) {
     return get_pcvar_num(g_pCvarUsePickup) && g_bBlockTouch && !is_user_bot(pToucher) ? HAM_SUPERCEDE : HAM_HANDLED;
 }
 
-public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
+public FMHook_AddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     if (!get_pcvar_num(g_pCvarUsePickup)) {
         return FMRES_IGNORED;
     }
@@ -81,7 +81,7 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     return FMRES_HANDLED;
 }
 
-public OnPlayerPreThink_Post(pPlayer) {
+public HamHook_Player_PreThink_Post(pPlayer) {
     g_bPlayerPickup[pPlayer] = pev(pPlayer, pev_button) & IN_USE && ~pev(pPlayer, pev_oldbuttons) & IN_USE;
 
     if (get_gametime() - g_flPlayerLastFind[pPlayer] < 0.1) {
@@ -156,7 +156,7 @@ public OnPlayerPreThink_Post(pPlayer) {
     return HAM_HANDLED;
 }
 
-public OnPlayerPostThink_Post(pPlayer) {
+public HamHook_Player_PostThink_Post(pPlayer) {
     if (!g_bPlayerPickup[pPlayer]) {
         return HAM_IGNORED;
     }

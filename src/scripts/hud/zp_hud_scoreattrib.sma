@@ -17,13 +17,13 @@ new gmsgScoreAttrib;
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
 
     gmsgScoreAttrib = get_user_msgid("ScoreAttrib");
-    register_message(gmsgScoreAttrib, "OnMessage");
+    register_message(gmsgScoreAttrib, "Message");
 }
 
-public OnPlayerSpawn_Post(pPlayer) {
+public HamHook_Player_Spawn_Post(pPlayer) {
     if (!ZP_Player_IsZombie(pPlayer)) {
         return HAM_IGNORED;
     }
@@ -46,7 +46,7 @@ public OnPlayerSpawn_Post(pPlayer) {
     return HAM_HANDLED;
 }
 
-public OnMessage(iMsgId, iDest, pPlayer) {
+public Message(iMsgId, iDest, pPlayer) {
     if (!pPlayer) {
         return PLUGIN_CONTINUE;
     }

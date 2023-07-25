@@ -63,14 +63,7 @@ stock UTIL_Message_Dlight(
 }
 
 stock UTIL_CreateAmmoBox(iAmmoId, iAmount) {
-    static iszWeaponbox = 0;
-
-    if (!iszWeaponbox) {
-        iszWeaponbox = engfunc(EngFunc_AllocString, "weaponbox");
-    }
-
-
-    new pWeaponBox = engfunc(EngFunc_CreateNamedEntity, iszWeaponbox);
+    new pWeaponBox = rg_create_entity("weaponbox", true);
     dllfunc(DLLFunc_Spawn, pWeaponBox);
 
     set_member(pWeaponBox, m_WeaponBox_rgiszAmmo, AMMO_LIST[iAmmoId], 0);
@@ -120,10 +113,12 @@ stock UTIL_BeamPoints(const Float:vecStart[3], const Float:vecEnd[3], const colo
 }
 
 stock bool:UTIL_IsMasterTriggered(const szMaster[], pActivator) {
-    new pMaster = engfunc(EngFunc_FindEntityByString, 0, "targetname", szMaster);
+    if (!equal(szMaster, NULL_STRING)) {
+        new pMaster = engfunc(EngFunc_FindEntityByString, 0, "targetname", szMaster);
 
-    if (pMaster && (ExecuteHam(Ham_ObjectCaps, pMaster) & FCAP_MASTER)) {
+        if (pMaster && (ExecuteHam(Ham_ObjectCaps, pMaster) & FCAP_MASTER)) {
         return !!ExecuteHamB(Ham_IsTriggered, pMaster, pActivator);
+        }
     }
 
     return true;
@@ -189,6 +184,7 @@ stock UTIL_InitWithSpawner(pEntity, pSpawner) {
     new Float:vecOrigin[3];
     pev(pSpawner, pev_origin, vecOrigin);
     engfunc(EngFunc_SetOrigin, pEntity, vecOrigin);
+    // log_amx("UTIL_InitWithSpawner %d [%.4f, %.4f, %.4f]", pEntity, vecOrigin[0], vecOrigin[1], vecOrigin[2]);
 
     new Float:vecAngles[3];
     pev(pSpawner, pev_angles, vecAngles);
@@ -199,10 +195,12 @@ stock UTIL_InitWithSpawner(pEntity, pSpawner) {
     engfunc(EngFunc_DropToFloor, pEntity);
 }
 
-stock UTIL_SetupSpawnerRespawn(pEntity) {
-    new pOwner = pev(pEntity, pev_owner);
-    if (pev_valid(pOwner) && CE_GetHandlerByEntity(pOwner) != -1) {
-        CE_Kill(pOwner);
+stock UTIL_HandleSpawnerItemTouch(pEntity, iCeSpawnerHandler) {
+    if (pev(pEntity, pev_flags) & FL_KILLME) {
+        new pOwner = pev(pEntity, pev_owner);
+        if (pev_valid(pOwner) && CE_GetHandlerByEntity(pOwner) == iCeSpawnerHandler) {
+            CE_Kill(pOwner);
+        }
     }
 }
 

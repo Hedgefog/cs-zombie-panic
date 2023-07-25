@@ -32,7 +32,7 @@ new g_pFwEntitySpawn;
 public plugin_precache() {
     CreateHiddenBuyZone();
 
-    g_pFwEntitySpawn = register_forward(FM_Spawn, "OnSpawn");
+    g_pFwEntitySpawn = register_forward(FM_Spawn, "FMHook_Spawn");
 }
 
 public plugin_init() {
@@ -41,11 +41,7 @@ public plugin_init() {
     unregister_forward(FM_Spawn, g_pFwEntitySpawn);
 }
 
-public OnGameScoreSpawn(pEntity) {
-    engfunc(EngFunc_RemoveEntity, pEntity);
-}
-
-public OnSpawn(pEntity) {
+public FMHook_Spawn(pEntity) {
     if (!pev_valid(pEntity)) {
         return FMRES_IGNORED;
     }

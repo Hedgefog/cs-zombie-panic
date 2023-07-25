@@ -14,19 +14,16 @@
 #define AUTHOR "Hedgehog Fog"
 
 new g_pPlayerSelectedAmmo[MAX_PLAYERS + 1];
-new g_iszWeaponBox;
 
 public plugin_precache() {
     precache_model(ZP_WEAPONBOX_MODEL);
-
-    g_iszWeaponBox = engfunc(EngFunc_AllocString, "weaponbox");
 }
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled", .Post = 0);
+    RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "HamHook_Player_Killed", .Post = 0);
 }
 
 public plugin_natives() {
@@ -108,12 +105,12 @@ public Native_SetSelectedAmmo(iPluginId, iArgc) {
     g_pPlayerSelectedAmmo[pPlayer] = iAmmoHandler;
 }
 
-public OnPlayerKilled(pPlayer) {
+public HamHook_Player_Killed(pPlayer) {
     DropPlayerUnactiveWeapons(pPlayer);
     DropPlayerAmmo(pPlayer);
 }
 
-public OnPlayerSpawn_Post(pPlayer) {
+public HamHook_Player_Spawn_Post(pPlayer) {
     g_pPlayerSelectedAmmo[pPlayer] = 0;
     SelectNextPlayerAmmo(pPlayer, false);
 }
@@ -171,7 +168,7 @@ DropPlayerUnactiveWeapons(pPlayer) {
 }
 
 DropPlayerWeaponBox(pPlayer) {
-    new pWeaponBox = engfunc(EngFunc_CreateNamedEntity, g_iszWeaponBox);
+    new pWeaponBox = rg_create_entity("weaponbox", true);
     dllfunc(DLLFunc_Spawn, pWeaponBox);
 
     ThrowPlayerItem(pPlayer, pWeaponBox);

@@ -19,32 +19,32 @@
 new g_iszInfoPlayerStart;
 new g_iszInfoPlayerDeathmatch;
 
-public plugin_init() {
-    register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
-}
-
 public plugin_precache() {
     CE_Register(ENTITY_NAME_1);
-    CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME_1, "OnInfoPlayerTeamSpawn");
+    CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME_1, "@Entity_Spawn");
 
     CE_Register(ENTITY_NAME_2);
-    CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME_2, "OnInfoPlayerTeamSpawn");
+    CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME_2, "@Entity_Spawn");
 
     g_iszInfoPlayerStart = engfunc(EngFunc_AllocString, "info_player_start");
     g_iszInfoPlayerDeathmatch = engfunc(EngFunc_AllocString, "info_player_deathmatch");
 }
 
-public OnInfoPlayerTeamSpawn(pEntity) {
+public plugin_init() {
+    register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+}
+
+@Entity_Spawn(this) {
     new szClassname[32];
-    pev(pEntity, pev_classname, szClassname, charsmax(szClassname));
+    pev(this, pev_classname, szClassname, charsmax(szClassname));
 
     new Float:vecOrigin[3];
-    pev(pEntity, pev_origin, vecOrigin);
+    pev(this, pev_origin, vecOrigin);
 
     new Float:vecAngles[3];
-    pev(pEntity, pev_angles, vecAngles);
+    pev(this, pev_angles, vecAngles);
 
-    CE_Remove(pEntity);
+    CE_Remove(this);
 
     new iszClassname = szClassname[16] == '1' ? g_iszInfoPlayerStart : g_iszInfoPlayerDeathmatch;
 

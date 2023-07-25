@@ -52,9 +52,9 @@ public plugin_init() {
     g_iCwSatchelHandler = CW_GetHandler(ZP_WEAPON_SATCHEL);
     g_iCwPistolHandler = CW_GetHandler(ZP_WEAPON_PISTOL);
 
-    RegisterHam(Ham_Touch, "weaponbox", "OnWeaponBoxTouch", .Post = 0);
-    RegisterHamPlayer(Ham_Player_PreThink, "OnPlayerPreThink_Post", .Post = 1);
-    RegisterHam(Ham_Use, "func_door", "OnDoorUse", .Post = 0);
+    RegisterHam(Ham_Touch, "weaponbox", "HamHook_WeaponBox_Touch", .Post = 0);
+    RegisterHamPlayer(Ham_Player_PreThink, "HamHook_Player_PreThink_Post", .Post = 1);
+    RegisterHam(Ham_Use, "func_door", "HamHook_Door_Use", .Post = 0);
 
     g_pCvarFixMeleeAttack = register_cvar("zp_bot_fix_melee_attack", "1");
     g_pCvarFixPickup = register_cvar("zp_bot_fix_pickup", "1");
@@ -67,7 +67,7 @@ public plugin_init() {
     g_pCvarActivateObjectives = register_cvar("zp_bot_activate_objectives", "1");
 }
 
-public OnWeaponBoxTouch(this, pToucher) {
+public HamHook_WeaponBox_Touch(this, pToucher) {
     if (!UTIL_IsPlayer(pToucher)) {
         return HAM_IGNORED;
     }
@@ -87,7 +87,7 @@ public OnWeaponBoxTouch(this, pToucher) {
     return HAM_HANDLED;
 }
 
-public OnPlayerPreThink_Post(pPlayer) {
+public HamHook_Player_PreThink_Post(pPlayer) {
     if (!is_user_alive(pPlayer)) {
         return HAM_IGNORED;
     }
@@ -157,7 +157,7 @@ public OnPlayerPreThink_Post(pPlayer) {
     return HAM_HANDLED;
 }
 
-public OnDoorUse(pDoor, pCaller, pActivator) {
+public HamHook_Door_Use(pDoor, pCaller, pActivator) {
     if (!UTIL_IsPlayer(pActivator)) {
         return HAM_IGNORED;
     }
@@ -169,7 +169,7 @@ public OnDoorUse(pDoor, pCaller, pActivator) {
     static szTargetname[32];
     pev(pDoor, pev_targetname, szTargetname, charsmax(szTargetname));
 
-    if (szTargetname[0] == '^0') {
+    if (equal(szTargetname, NULL_STRING)) {
         return HAM_IGNORED;
     }
 
@@ -375,7 +375,7 @@ bool:ShouldPickupWeaponBox(pBot, pWeaponBox, bool:bTouched) {
         for (new iSlot = 0; iSlot < 32; ++iSlot) {
             static szAmmoName[16];
             get_member(pWeaponBox, m_WeaponBox_rgiszAmmo, szAmmoName, charsmax(szAmmoName), iSlot);
-            if (szAmmoName[0] == '^0') {
+            if (equal(szAmmoName, NULL_STRING)) {
                 continue;
             }
 

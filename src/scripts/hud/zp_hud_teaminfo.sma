@@ -26,30 +26,30 @@ public plugin_init() {
 
     gmsgTeamInfo = get_user_msgid("TeamInfo");
 
-    register_event("TeamInfo", "OnEvent", "a");
-    register_message(gmsgTeamInfo, "OnMessage");
+    register_event("TeamInfo", "Event_TeamInfo", "a");
+    register_message(gmsgTeamInfo, "Message_TeamInfo");
 
-    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "HamHook_Player_Killed_Post", .Post = 1);
 }
 
-public OnPlayerSpawn_Post(pPlayer) {
+public HamHook_Player_Spawn_Post(pPlayer) {
     if (ZP_Player_IsZombie(pPlayer) || UTIL_IsPlayerSpectator(pPlayer) || is_user_bot(pPlayer)) {
         Reset(pPlayer);
     }
 }
 
-public OnPlayerKilled_Post(pPlayer) {
+public HamHook_Player_Killed_Post(pPlayer) {
     if (ZP_Player_IsZombie(pPlayer) || UTIL_IsPlayerSpectator(pPlayer) || is_user_bot(pPlayer)) {
         Reset(pPlayer);
     }
 }
 
-public OnMessage(iMsgId, iDest, pPlayer) {
+public Message_TeamInfo(iMsgId, iDest, pPlayer) {
     return pPlayer ? PLUGIN_CONTINUE : PLUGIN_HANDLED;
 }
 
-public OnEvent() {
+public Event_TeamInfo() {
     new pTargetPlayer = read_data(1);
 
     static szTeam[16];

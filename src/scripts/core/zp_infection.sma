@@ -58,13 +58,13 @@ public plugin_init() {
     gmsgScreenShake = get_user_msgid("ScreenShake");
     gmsgStatusIcon = get_user_msgid("StatusIcon");
 
-    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled", .Post = 0);
-    RegisterHamPlayer(Ham_Player_PreThink, "OnPlayerPreThink_Post", .Post = 1);
-    RegisterHamPlayer(Ham_TraceAttack, "OnPlayerTraceAttack", .Post = 0);
-    RegisterHamPlayer(Ham_TakeDamage, "OnPlayerTakeDamage", .Post = 0);
-    RegisterHamPlayer(Ham_TakeDamage, "OnPlayerTakeDamage_Post", .Post = 0);
-    RegisterHamPlayer(Ham_BloodColor, "OnPlayerBloodColor", .Post = 0);
+    RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "HamHook_Player_Killed", .Post = 0);
+    RegisterHamPlayer(Ham_Player_PreThink, "HamHook_Player_PreThink_Post", .Post = 1);
+    RegisterHamPlayer(Ham_TraceAttack, "HamHook_Player_TraceAttack", .Post = 0);
+    RegisterHamPlayer(Ham_TakeDamage, "HamHook_Player_TakeDamage", .Post = 0);
+    RegisterHamPlayer(Ham_TakeDamage, "HamHook_Player_TakeDamage_Post", .Post = 0);
+    RegisterHamPlayer(Ham_BloodColor, "HamHook_Player_BloodColor", .Post = 0);
 
     g_pCvarInfectionChance = register_cvar("zp_infection_chance", "5");
 
@@ -118,16 +118,16 @@ public Native_GetInfector(iPluginId, iArgc) {
     return g_pPlayerInfector[pPlayer];
 }
 
-public OnPlayerSpawn_Post(pPlayer) {
+public HamHook_Player_Spawn_Post(pPlayer) {
     SetInfected(pPlayer, false);
 }
 
-public OnPlayerKilled(pPlayer) {
+public HamHook_Player_Killed(pPlayer) {
     ResetRoomType(pPlayer);
     HideInfectionIcon(pPlayer);
 }
 
-public OnPlayerPreThink_Post(pPlayer) {
+public HamHook_Player_PreThink_Post(pPlayer) {
     if (!IsPlayerInfected(pPlayer)) {
         return HAM_IGNORED;
     }
@@ -177,7 +177,7 @@ public OnPlayerPreThink_Post(pPlayer) {
     return HAM_HANDLED;
 }
 
-public OnPlayerTraceAttack(pPlayer, pAttacker, Float:flDamage, Float:vecDir[3], pTr, iDamageBits) {
+public HamHook_Player_TraceAttack(pPlayer, pAttacker, Float:flDamage, Float:vecDir[3], pTr, iDamageBits) {
     if (!IsPlayerInfected(pPlayer)) {
         return HAM_IGNORED;
     }
@@ -207,7 +207,7 @@ public OnPlayerTraceAttack(pPlayer, pAttacker, Float:flDamage, Float:vecDir[3], 
     return HAM_SUPERCEDE;
 }
 
-public OnPlayerTakeDamage(pPlayer, pInflictor, pAttacker, Float:flDamage, iDamageBits) {
+public HamHook_Player_TakeDamage(pPlayer, pInflictor, pAttacker, Float:flDamage, iDamageBits) {
     if (!IsPlayerInfected(pPlayer)) {
         return HAM_IGNORED;
     }
@@ -237,7 +237,7 @@ public OnPlayerTakeDamage(pPlayer, pInflictor, pAttacker, Float:flDamage, iDamag
     return HAM_SUPERCEDE;
 }
 
-public OnPlayerTakeDamage_Post(pPlayer, pInflictor, pAttacker) {
+public HamHook_Player_TakeDamage_Post(pPlayer, pInflictor, pAttacker) {
     if (!UTIL_IsPlayer(pAttacker)) {
         return HAM_IGNORED;
     }
@@ -259,7 +259,7 @@ public OnPlayerTakeDamage_Post(pPlayer, pInflictor, pAttacker) {
     return HAM_HANDLED;
 }
 
-public OnPlayerBloodColor(pPlayer) {
+public HamHook_Player_BloodColor(pPlayer) {
     if (g_iPlayerInfectionState[pPlayer] < InfectionState_PartialZombie) {
         return HAM_IGNORED;
     }

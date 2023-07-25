@@ -46,7 +46,7 @@ public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 }
 
-public @Weapon_PrimaryAttack(this) {
+@Weapon_PrimaryAttack(this) {
     static Float:vecSpread[3];
     UTIL_CalculateWeaponSpread(this, Float:VECTOR_CONE_8DEGREES, 1.1125, 1.0, 0.95, 2.0, vecSpread);
 
@@ -61,7 +61,7 @@ public @Weapon_PrimaryAttack(this) {
     }
 }
 
-public @Weapon_Reload(this) {
+@Weapon_Reload(this) {
     if (CW_DefaultShotgunReload(this, 5, 3, 0.6, 0.5)) {
         new flInSpecialReload = get_member(this, m_Weapon_fInSpecialReload);
 
@@ -72,30 +72,30 @@ public @Weapon_Reload(this) {
     }
 }
 
-public @Weapon_Idle(this) {
+@Weapon_Idle(this) {
     new Float:flRand = random_float(0.0, 1.0); // UTIL_SharedRandomFloat( m_pPlayer->random_seed, 0, 1 );
     CW_DefaultShotgunIdle(this, flRand > 0.96 ? 0 : 7, 4, (flRand > 0.96 ? (18.0 / 3.0) : (18.0 / 2.0)), 1.5, ZP_WEAPON_SHOTGUN_PUMP_SOUND);
 }
 
-public @Weapon_Pump(this) {
+@Weapon_Pump(this) {
     new pPlayer = CW_GetPlayer(this);
     emit_sound(pPlayer, CHAN_ITEM, ZP_WEAPON_SHOTGUN_PUMP_SOUND, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 }
 
-public @Weapon_Deploy(this) {
+@Weapon_Deploy(this) {
     new pPlayer = CW_GetPlayer(this);
     CW_DefaultDeploy(this, ZP_WEAPON_SHOTGUN_V_MODEL, ZP_WEAPON_SHOTGUN_P_MODEL, 4, "shotgun");
     emit_sound(pPlayer, CHAN_ITEM, ZP_WEAPON_SHOTGUN_PUMP_SOUND, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 }
 
-public Float:@Weapon_GetMaxSpeed(this) {
+Float:@Weapon_GetMaxSpeed(this) {
     return ZP_HUMAN_SPEED;
 }
 
-public @Weapon_Spawn(this) {
+@Weapon_Spawn(this) {
     engfunc(EngFunc_SetModel, this, ZP_WEAPON_SHOTGUN_W_MODEL);
 }
 
-public @Weapon_WeaponBoxSpawn(this, pWeaponBox) {
+@Weapon_WeaponBoxSpawn(this, pWeaponBox) {
     engfunc(EngFunc_SetModel, pWeaponBox, ZP_WEAPON_SHOTGUN_W_MODEL);
 }

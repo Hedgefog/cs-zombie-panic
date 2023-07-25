@@ -13,15 +13,15 @@
 
 #define ENTITY_NAME "func_vip_safetyzone"
 
+public plugin_precache() {
+    RegisterHam(Ham_Spawn, ENTITY_NAME, "HamHook_VipSafeZone_Spawn_Post", .Post = 1);
+}
+
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 }
 
-public plugin_precache() {
-    RegisterHam(Ham_Spawn, ENTITY_NAME, "OnSpawn_Post", .Post = 1);
-}
-
-public OnSpawn_Post(pEntity) {
+public HamHook_VipSafeZone_Spawn_Post(pEntity) {
     new szModel[32];
     pev(pEntity, pev_model, szModel, charsmax(szModel));
 

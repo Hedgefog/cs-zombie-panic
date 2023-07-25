@@ -44,70 +44,8 @@ public plugin_init() {
 
     gmsgAmmoX = get_user_msgid("AmmoX");
 
-    RegisterHamPlayer(Ham_TraceAttack, "OnPlayerTraceAttack", .Post = 0);
-    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
-}
-
-public @Weapon_PrimaryAttack(this) {
-    Swing(this);
-    set_member(this, m_Weapon_flNextSecondaryAttack, 0.5);
-}
-
-public @Weapon_SecondaryAttack(this) {
-    new pPlayer = CW_GetPlayer(this);
-    if (is_user_bot(pPlayer)) {
-        Swing(this);
-        set_member(this, m_Weapon_flNextSecondaryAttack, 0.5);
-    }
-}
-
-public @Weapon_Deploy(this) {
-    CW_DefaultDeploy(this, NULL_STRING, NULL_STRING, 1, "dualpistols");
-}
-
-public @Weapon_Idle(this) {
-    new pPlayer = CW_GetPlayer(this);
-    set_member(pPlayer, m_szAnimExtention, "dualpistols");
-
-    switch (random(3)) {
-        case 0: {
-            CW_PlayAnimation(this, 0, 36.0 / 13.0);
-        }
-        case 1: {
-            CW_PlayAnimation(this, 9, 61.0 / 15.0);
-        }
-        case 2: {
-            CW_PlayAnimation(this, 10, 61.0 / 15.0);
-        }
-    }
-}
-
-public Float:@Weapon_GetMaxSpeed(this) {
-    return ZP_ZOMBIE_SPEED;
-}
-
-public @Weapon_CanDrop(this) {
-    return PLUGIN_HANDLED;
-}
-
-public OnPlayerSpawn_Post(pPlayer) {
-    UpdatePlayerZombieLives(pPlayer);
-    return HAM_HANDLED;
-}
-
-public OnPlayerTraceAttack(this, pAttacker, Float:flDamage, Float:vecDir[3], pTr, iDamageBits) {
-    if (!UTIL_IsPlayer(pAttacker)) {
-        return HAM_IGNORED;
-    }
-
-    new pItem = get_member(pAttacker, m_pActiveItem);
-    if (CW_GetHandlerByEntity(pItem) != g_iCwHandler) {
-        return HAM_IGNORED;
-    }
-
-    set_tr2(pTr, TR_iHitgroup, get_tr2(pTr, TR_iHitgroup) & ~HIT_HEAD);
-
-    return HAM_HANDLED;
+    RegisterHamPlayer(Ham_TraceAttack, "HamHook_Player_TraceAttack", .Post = 0);
+    RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
 }
 
 public ZP_Fw_ZombieLivesChanged() {
@@ -124,11 +62,73 @@ public ZP_Fw_ZombieLivesChanged() {
             continue;
         }
 
-        UpdatePlayerZombieLives(pPlayer);
+        @Player_UpdateZombieLivesHud(pPlayer);
     }
 }
 
-Swing(this) {
+public HamHook_Player_Spawn_Post(pPlayer) {
+    @Player_UpdateZombieLivesHud(pPlayer);
+    return HAM_HANDLED;
+}
+
+public HamHook_Player_TraceAttack(this, pAttacker, Float:flDamage, Float:vecDir[3], pTr, iDamageBits) {
+    if (!UTIL_IsPlayer(pAttacker)) {
+        return HAM_IGNORED;
+    }
+
+    new pItem = get_member(pAttacker, m_pActiveItem);
+    if (CW_GetHandlerByEntity(pItem) != g_iCwHandler) {
+        return HAM_IGNORED;
+    }
+
+    set_tr2(pTr, TR_iHitgroup, get_tr2(pTr, TR_iHitgroup) & ~HIT_HEAD);
+
+    return HAM_HANDLED;
+}
+
+@Weapon_PrimaryAttack(this) {
+    @Weapon_Swing(this);
+    set_member(this, m_Weapon_flNextSecondaryAttack, 0.5);
+}
+
+@Weapon_SecondaryAttack(this) {
+    new pPlayer = CW_GetPlayer(this);
+    if (is_user_bot(pPlayer)) {
+        @Weapon_Swing(this);
+        set_member(this, m_Weapon_flNextSecondaryAttack, 0.5);
+    }
+}
+
+@Weapon_Deploy(this) {
+    CW_DefaultDeploy(this, NULL_STRING, NULL_STRING, 1, "dualpistols");
+}
+
+@Weapon_Idle(this) {
+    new pPlayer = CW_GetPlayer(this);
+    set_member(pPlayer, m_szAnimExtention, "dualpistols");
+
+    switch (random(3)) {
+        case 0: {
+            CW_PlayAnimation(this, 0, 36.0 / 13.0);
+        }
+        case 1: {
+            CW_PlayAnimation(this, 9, 61.0 / 15.0);
+        }
+        case 2: {
+            CW_PlayAnimation(this, 10, 61.0 / 15.0);
+        }
+    }
+}
+
+Float:@Weapon_GetMaxSpeed(this) {
+    return ZP_ZOMBIE_SPEED;
+}
+
+@Weapon_CanDrop(this) {
+    return PLUGIN_HANDLED;
+}
+
+@Weapon_Swing(this) {
     new pPlayer = CW_GetPlayer(this);
 
     if (random(2) == 0) {
@@ -158,8 +158,8 @@ Swing(this) {
     }
 }
 
-UpdatePlayerZombieLives(pPlayer) {
-    message_begin(MSG_ONE, gmsgAmmoX, _, pPlayer);
+@Player_UpdateZombieLivesHud(this) {
+    message_begin(MSG_ONE, gmsgAmmoX, _, this);
     write_byte(PRIMARY_AMMO_ID);
     write_byte(ZP_GameRules_GetZombieLives());
     message_end();

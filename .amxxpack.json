@@ -15,7 +15,7 @@
       },
       {
         "name": "cs-modding-kit",
-        "url": "https://github.com/Hedgefog/cs-modding-kit/archive/refs/tags/1.2.0.zip",
+        "url": "https://github.com/Hedgefog/cs-modding-kit/archive/refs/heads/next.zip",
         "strip": 1,
         "filter": [
           "api_custom_entities.@(sma|inc)",
@@ -46,5 +46,13 @@
   },
   "rules": {
     "flatCompilation": true
+  },
+  "cli": {
+    "templates": {
+      "context": {
+        "PLUGIN_VERSION": "1.0.0",
+        "PLUGIN_AUTHOR": "Hedgehog Fog"
+      }
+    }
   }
 }

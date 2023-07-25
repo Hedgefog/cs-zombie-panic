@@ -12,11 +12,11 @@
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    register_message(get_user_msgid("TextMsg"), "OnMessage_OnTextMsg");
-    register_message(get_user_msgid("SendAudio"), "OnMessage_SendAudio");
+    register_message(get_user_msgid("TextMsg"), "Message_OnTextMsg");
+    register_message(get_user_msgid("SendAudio"), "Message_SendAudio");
 }
 
-public OnMessage_OnTextMsg(iMsgId, iDest, pPlayer) {
+public Message_OnTextMsg(iMsgId, iDest, pPlayer) {
     static szMessage[32];
     get_msg_arg_string(2, szMessage, charsmax(szMessage));
 
@@ -31,7 +31,7 @@ public OnMessage_OnTextMsg(iMsgId, iDest, pPlayer) {
     return PLUGIN_CONTINUE;
 }
 
-public OnMessage_SendAudio(iMsgId, iDest, pPlayer) {
+public Message_SendAudio(iMsgId, iDest, pPlayer) {
     static szMessage[32];
     get_msg_arg_string(2, szMessage, charsmax(szMessage));
 

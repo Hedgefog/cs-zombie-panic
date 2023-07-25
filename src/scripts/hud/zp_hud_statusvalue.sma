@@ -23,10 +23,10 @@ public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
     gmsgStatusValue = get_user_msgid("StatusValue");
-    register_message(gmsgStatusValue, "OnMessage");
+    register_message(gmsgStatusValue, "Message_StatusValue");
 }
 
-public OnMessage(iMsgId, iDest, pPlayer) {
+public Message_StatusValue(iMsgId, iDest, pPlayer) {
     if (is_user_bot(pPlayer)) {
         return PLUGIN_CONTINUE;
     }

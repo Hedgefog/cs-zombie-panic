@@ -14,14 +14,14 @@ new Float:g_rgflPlayerVelocity[MAX_PLAYERS + 1][3];
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHamPlayer(Ham_TakeDamage, "OnPlayerTakeDamage", .Post = 0);
-    RegisterHamPlayer(Ham_TakeDamage, "OnPlayerTakeDamage_Post", .Post = 1);
+    RegisterHamPlayer(Ham_TakeDamage, "HamHook_Player_TakeDamage", .Post = 0);
+    RegisterHamPlayer(Ham_TakeDamage, "HamHook_Player_TakeDamage_Post", .Post = 1);
 }
 
-public OnPlayerTakeDamage(pPlayer) {
+public HamHook_Player_TakeDamage(pPlayer) {
     pev(pPlayer, pev_velocity, g_rgflPlayerVelocity[pPlayer]);
 }
 
-public OnPlayerTakeDamage_Post(pPlayer) {
+public HamHook_Player_TakeDamage_Post(pPlayer) {
     set_pev(pPlayer, pev_velocity, g_rgflPlayerVelocity[pPlayer]); // reset knockback
 }

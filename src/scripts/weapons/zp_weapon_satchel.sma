@@ -65,12 +65,12 @@ public plugin_init() {
 
     gmsgAmmoPickup = get_user_msgid("AmmoPickup");
 
-    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled_Post", .Post = 1);
-    RegisterHamPlayer(Ham_Player_PreThink, "OnPlayerPreThink_Post", .Post = 1);
-    RegisterHamPlayer(Ham_Player_PostThink, "OnPlayerPostThink_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "HamHook_Player_Killed_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Player_PreThink, "HamHook_Player_PreThink_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Player_PostThink, "HamHook_Player_PostThink_Post", .Post = 1);
 }
 
-public @Weapon_PrimaryAttack(this) {
+@Weapon_PrimaryAttack(this) {
     new pPlayer = CW_GetPlayer(this);
 
     if (g_bPlayerChargeReady[pPlayer]) {
@@ -87,7 +87,7 @@ public @Weapon_PrimaryAttack(this) {
     g_bPlayerRedeploy[pPlayer] = true;
 }
 
-public @Weapon_SecondaryAttack(this) {
+@Weapon_SecondaryAttack(this) {
     new pPlayer = CW_GetPlayer(this);
 
     if (!g_bPlayerChargeReady[pPlayer]) {
@@ -103,7 +103,7 @@ public @Weapon_SecondaryAttack(this) {
     set_member(this, m_Weapon_flNextSecondaryAttack, 0.53);
 }
 
-public @Weapon_Deploy(this) {
+@Weapon_Deploy(this) {
     new pPlayer = CW_GetPlayer(this);
 
     if (g_bPlayerChargeReady[pPlayer] || get_member(pPlayer, m_rgAmmo, g_iAmmoId) <= 0) {
@@ -113,7 +113,7 @@ public @Weapon_Deploy(this) {
     }
 }
 
-public @Weapon_Holster(this) {
+@Weapon_Holster(this) {
     new pPlayer = CW_GetPlayer(this);
     if (get_member(pPlayer, m_rgAmmo, g_iAmmoId) <= 0 && !g_bPlayerChargeReady[pPlayer]) {
         SetThink(this, "RemovePlayerItem");
@@ -125,11 +125,11 @@ public RemovePlayerItem(this) {
     CW_RemovePlayerItem(this);
 }
 
-public Float:@Weapon_GetMaxSpeed(this) {
+Float:@Weapon_GetMaxSpeed(this) {
     return ZP_HUMAN_SPEED;
 }
 
-public @Weapon_Idle(this) {
+@Weapon_Idle(this) {
     new pPlayer = CW_GetPlayer(this);
     if (g_bPlayerRedeploy[pPlayer]) {
         ExecuteHamB(Ham_Item_Deploy, this);
@@ -143,16 +143,16 @@ public @Weapon_Idle(this) {
     }
 }
 
-public @Weapon_Spawn(this) {
+@Weapon_Spawn(this) {
     set_member(this, m_Weapon_iDefaultAmmo, 1);
     engfunc(EngFunc_SetModel, this, ZP_WEAPON_SATCHEL_W_MODEL);
 }
 
-public @Weapon_WeaponBoxSpawn(this, pWeaponBox) {
+@Weapon_WeaponBoxSpawn(this, pWeaponBox) {
     engfunc(EngFunc_SetModel, pWeaponBox, ZP_WEAPON_SATCHEL_W_MODEL);
 }
 
-public @Weapon_CanDrop(this) {
+@Weapon_CanDrop(this) {
     new pPlayer = CW_GetPlayer(this);
     if (pPlayer == -1) {
         return PLUGIN_CONTINUE;
@@ -370,12 +370,12 @@ public Round_Fw_NewRound() {
     }
 }
 
-public OnPlayerKilled_Post(pPlayer) {
+public HamHook_Player_Killed_Post(pPlayer) {
     DeactivateSatchels(pPlayer);
 }
 
 
-public OnPlayerPreThink_Post(pPlayer) {
+public HamHook_Player_PreThink_Post(pPlayer) {
     if (!is_user_alive(pPlayer)) {
         return HAM_IGNORED;
     }
@@ -428,7 +428,7 @@ public OnPlayerPreThink_Post(pPlayer) {
     return HAM_HANDLED;
 }
 
-public OnPlayerPostThink_Post(pPlayer) {
+public HamHook_Player_PostThink_Post(pPlayer) {
     if (g_pPlayerPickupCharge[pPlayer] != -1) {
         if (ZP_Player_AddAmmo(pPlayer, ZP_AMMO_SATCHEL, 1)) {
             Deactivate(g_pPlayerPickupCharge[pPlayer]);

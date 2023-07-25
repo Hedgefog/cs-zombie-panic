@@ -48,7 +48,7 @@ public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 }
 
-public @Weapon_Idle(this) {
+@Weapon_Idle(this) {
     new Float:flRand = random_float(0.0, 1.0);
     
     if (flRand < 0.5) {
@@ -62,7 +62,7 @@ public @Weapon_Idle(this) {
     }
 }
 
-public @Weapon_PrimaryAttack(this) {
+@Weapon_PrimaryAttack(this) {
     if (get_member(this, m_Weapon_iShotsFired) > 0) {
         return;
     }
@@ -85,33 +85,33 @@ public @Weapon_PrimaryAttack(this) {
     }
 }
 
-public @Weapon_Reload(this) {
+@Weapon_Reload(this) {
     if (CW_DefaultReload(this, 3, 2.5)) {
         set_member(this, m_Weapon_flNextReload, get_gametime() + 0.75);
     }
 }
 
-public @Weapon_Deploy(this) {
+@Weapon_Deploy(this) {
     CW_DefaultDeploy(this, ZP_WEAPON_MAGNUM_V_MODEL, ZP_WEAPON_MAGNUM_P_MODEL, 5, "onehanded");
 }
 
-public Float:@Weapon_GetMaxSpeed(this) {
+Float:@Weapon_GetMaxSpeed(this) {
     return ZP_HUMAN_SPEED;
 }
 
-public @Weapon_Spawn(this) {
+@Weapon_Spawn(this) {
     engfunc(EngFunc_SetModel, this, ZP_WEAPON_MAGNUM_W_MODEL);
 }
 
-public @Weapon_WeaponBoxSpawn(this, pWeaponBox) {
+@Weapon_WeaponBoxSpawn(this, pWeaponBox) {
     engfunc(EngFunc_SetModel, pWeaponBox, ZP_WEAPON_MAGNUM_W_MODEL);
 }
 
-public @Weapon_Holster(this) {
+@Weapon_Holster(this) {
     CW_PlayAnimation(this, 4, 16.0 / 30.0);
 }
 
-public @Weapon_Pump(this) {
+@Weapon_Pump(this) {
     new pPlayer = CW_GetPlayer(this);
     new iClip = get_member(this, m_Weapon_iClip);
     new iModelIndex = engfunc(EngFunc_ModelIndex, "models/shell.mdl");

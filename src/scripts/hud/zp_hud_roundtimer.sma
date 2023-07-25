@@ -18,11 +18,11 @@ public plugin_init() {
 
     gmsgHideWeapon = get_user_msgid("HideWeapon");
 
-    register_event("ResetHUD", "OnResetHUD", "b");
-    register_message(gmsgHideWeapon, "OnMessage_HideWeapon");
+    register_event("ResetHUD", "Event_ResetHUD", "b");
+    register_message(gmsgHideWeapon, "Message_HideWeapon");
 }
 
-public OnResetHUD(pPlayer) {
+public Event_ResetHUD(pPlayer) {
     if (is_user_bot(pPlayer)) {
         return PLUGIN_CONTINUE;
     }
@@ -42,7 +42,7 @@ public OnResetHUD(pPlayer) {
     return PLUGIN_CONTINUE;
 }
 
-public OnMessage_HideWeapon(iMsgId, iMsgDest, pPlayer) {
+public Message_HideWeapon(iMsgId, iMsgDest, pPlayer) {
     if (is_user_bot(pPlayer)) {
         return PLUGIN_CONTINUE;
     }

@@ -52,7 +52,7 @@ public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 }
 
-public @Weapon_PrimaryAttack(this) {
+@Weapon_PrimaryAttack(this) {
     new pPlayer = CW_GetPlayer(this);
     if (!get_member(this, m_flStartThrow) && get_member(pPlayer, m_rgAmmo, g_iAmmoId) > 0) {
         set_member(this, m_flStartThrow, get_gametime());
@@ -61,7 +61,7 @@ public @Weapon_PrimaryAttack(this) {
     }
 }
 
-public @Weapon_Idle(this) {
+@Weapon_Idle(this) {
     new pPlayer = CW_GetPlayer(this);
 
     if (!is_user_connected(pPlayer)) {
@@ -103,12 +103,12 @@ public @Weapon_Idle(this) {
     }
 }
 
-public @Weapon_Deploy(this) {
+@Weapon_Deploy(this) {
     set_member(this, m_flReleaseThrow, -1.0);
     CW_DefaultDeploy(this, ZP_WEAPON_GRENADE_V_MODEL, ZP_WEAPON_GRENADE_P_MODEL, 7, "grenade");
 }
 
-public @Weapon_Holster(this) {
+@Weapon_Holster(this) {
     new pPlayer = CW_GetPlayer(this);
 
     if (!is_user_connected(pPlayer)) {
@@ -132,20 +132,20 @@ public RemovePlayerItem(this) {
     CW_RemovePlayerItem(this);
 }
 
-public Float:@Weapon_GetMaxSpeed(this) {
+Float:@Weapon_GetMaxSpeed(this) {
     return ZP_HUMAN_SPEED;
 }
 
-public @Weapon_Spawn(this) {
+@Weapon_Spawn(this) {
     set_member(this, m_Weapon_iDefaultAmmo, 1);
     engfunc(EngFunc_SetModel, this, ZP_WEAPON_GRENADE_W_MODEL);
 }
 
-public @Weapon_WeaponBoxSpawn(this, pWeaponBox) {
+@Weapon_WeaponBoxSpawn(this, pWeaponBox) {
     engfunc(EngFunc_SetModel, pWeaponBox, ZP_WEAPON_GRENADE_W_MODEL);
 }
 
-public @Weapon_CanDrop(this) {
+@Weapon_CanDrop(this) {
     new pPlayer = CW_GetPlayer(this);
     if (pPlayer == -1) {
         return PLUGIN_CONTINUE;

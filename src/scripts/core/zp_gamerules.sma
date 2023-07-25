@@ -44,21 +44,19 @@ new TeamPreference:g_iPlayerTeamPreference[MAX_PLAYERS + 1];
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    Round_HookCheckWinConditions("OnCheckWinConditions");
+    RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Killed, "HamHook_Player_Killed_Post", .Post = 1);
+    RegisterHamPlayer(Ham_TakeDamage, "HamHook_Player_TakeDamage", .Post = 0);
 
-    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
-    RegisterHamPlayer(Ham_Killed, "OnPlayerKilled_Post", .Post = 1);
-    RegisterHamPlayer(Ham_TakeDamage, "OnPlayerTakeDamage", .Post = 0);
+    register_forward(FM_ClientKill, "FMHook_ClientKill");
 
-    register_forward(FM_ClientKill, "OnClientKill");
+    register_message(get_user_msgid("ShowMenu"), "Message_ShowMenu");
+    register_message(get_user_msgid("VGUIMenu"), "Message_VGUIMenu");
 
-    register_message(get_user_msgid("ShowMenu"), "OnMessage_ShowMenu");
-    register_message(get_user_msgid("VGUIMenu"), "OnMessage_VGUIMenu");
-
-    register_clcmd("chooseteam", "OnPlayerChangeTeam");
-    register_clcmd("jointeam", "OnPlayerChangeTeam");
-    register_clcmd("joinclass", "OnPlayerChangeTeam");
-    register_clcmd("drop", "OnClCmd_Drop");
+    register_clcmd("chooseteam", "HamHook_Player_ChangeTeam");
+    register_clcmd("jointeam", "HamHook_Player_ChangeTeam");
+    register_clcmd("joinclass", "HamHook_Player_ChangeTeam");
+    register_clcmd("drop", "Command_Drop");
 
     g_pCvarLives = register_cvar("zp_zombie_lives", "0");
     g_pCvarLivesPerPlayer = register_cvar("zp_zombie_lives_per_player", "2");
@@ -206,7 +204,7 @@ public Round_Fw_RoundExpired() {
 
 /*--------------------------------[ Hooks ]--------------------------------*/
 
-public OnMessage_ShowMenu(iMsgId, iDest, pPlayer) {
+public Message_ShowMenu(iMsgId, iDest, pPlayer) {
     static szBuffer[32];
     get_msg_arg_string(4, szBuffer, charsmax(szBuffer));
 
@@ -223,7 +221,7 @@ public OnMessage_ShowMenu(iMsgId, iDest, pPlayer) {
     return PLUGIN_CONTINUE;
 }
 
-public OnMessage_VGUIMenu(iMsgId, iDest, pPlayer) {
+public Message_VGUIMenu(iMsgId, iDest, pPlayer) {
     new iMenuId = get_msg_arg_int(1);
 
     if (iMenuId == CHOOSE_TEAM_VGUI_MENU_ID) {
@@ -243,7 +241,7 @@ public OnMessage_VGUIMenu(iMsgId, iDest, pPlayer) {
 }
 
 
-public OnPlayerChangeTeam(pPlayer, iKey) {
+public HamHook_Player_ChangeTeam(pPlayer, iKey) {
     if (get_member(pPlayer, m_iTeam) == 3) {
         OpenTeamMenu(pPlayer);
     }
@@ -251,15 +249,15 @@ public OnPlayerChangeTeam(pPlayer, iKey) {
     return PLUGIN_HANDLED;
 }
 
-public OnClCmd_Drop(pPlayer) {
+public Command_Drop(pPlayer) {
     return get_member_game(m_bFreezePeriod) ? PLUGIN_HANDLED : PLUGIN_CONTINUE;
 }
 
-public OnClientKill(pPlayer) {
+public FMHook_ClientKill(pPlayer) {
     return get_member_game(m_bFreezePeriod) ? FMRES_SUPERCEDE : FMRES_IGNORED;
 }
 
-public OnPlayerSpawn_Post(pPlayer) {
+public HamHook_Player_Spawn_Post(pPlayer) {
     if (!is_user_alive(pPlayer)) {
         return HAM_IGNORED;
     }
@@ -279,17 +277,17 @@ public OnPlayerSpawn_Post(pPlayer) {
     return HAM_HANDLED;
 }
 
-public OnPlayerKilled_Post(pPlayer) {
+public HamHook_Player_Killed_Post(pPlayer) {
     CheckWinConditions();
 
     return HAM_HANDLED;
 }
 
-public OnPlayerTakeDamage(pPlayer) {
+public HamHook_Player_TakeDamage(pPlayer) {
     return Round_IsRoundEnd() ? HAM_SUPERCEDE : HAM_IGNORED;
 }
 
-public OnCheckWinConditions() {
+public Round_Fw_CheckWinCondition() {
     return PLUGIN_HANDLED;
 }
 

@@ -20,12 +20,12 @@ new g_iFwResult;
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHookChain(RG_CBasePlayer_OnSpawnEquip, "OnPlayerSpawnEquip");
+    RegisterHookChain(RG_CBasePlayer_OnSpawnEquip, "HC_Player_SpawnEquip");
 
     g_pFwPlayerEquiped = CreateMultiForward("ZP_Fw_PlayerEquiped", ET_IGNORE, FP_CELL);
 }
 
-public OnPlayerSpawnEquip(pPlayer) {
+public HC_Player_SpawnEquip(pPlayer) {
     rg_remove_all_items(pPlayer);
 
     set_member(pPlayer, m_szAnimExtention, PLAYER_IDLE_ANIMEXT);

@@ -28,14 +28,14 @@ public plugin_init() {
     gmsgRadar = get_user_msgid("Radar");
     gmsgCrosshair = get_user_msgid("Crosshair");
 
-    register_message(gmsgScoreAttrib, "OnMessage_ScoreAttrib");
-    register_message(gmsgHideWeapon, "OnMessage_HideWeapon");
-    register_message(gmsgRadar, "OnMessage_Radar");
+    register_message(gmsgScoreAttrib, "Message_ScoreAttrib");
+    register_message(gmsgHideWeapon, "Message_HideWeapon");
+    register_message(gmsgRadar, "Message_Radar");
 
-    // register_forward(FM_CmdStart, "OnCmdStart");
+    // register_forward(FM_CmdStart, "FMHook_CmdStart");
 }
 
-public OnMessage_Radar(iMsgId, iMsgDest, pPlayer) {
+public Message_Radar(iMsgId, iMsgDest, pPlayer) {
     if (is_user_bot(pPlayer)) {
         return PLUGIN_CONTINUE;
     }
@@ -43,19 +43,19 @@ public OnMessage_Radar(iMsgId, iMsgDest, pPlayer) {
     return PLUGIN_HANDLED;
 }
 
-public OnMessage_ScoreAttrib(iMsgId, iMsgDest, pPlayer) {
+public Message_ScoreAttrib(iMsgId, iMsgDest, pPlayer) {
     if (is_user_bot(pPlayer)) {
         return PLUGIN_CONTINUE;
     }
 
-    if(get_msg_arg_int(1) == pPlayer) {
+    if (get_msg_arg_int(1) == pPlayer) {
         set_msg_arg_int(2, ARG_BYTE, get_msg_arg_int(2) | (g_bPlayerInScore[pPlayer] ? 0 : SCORE_STATUS_DEAD));
     }
 
     return PLUGIN_CONTINUE;
 }
 
-public OnMessage_HideWeapon(iMsgId, iMsgDest, pPlayer) {
+public Message_HideWeapon(iMsgId, iMsgDest, pPlayer) {
     if (is_user_bot(pPlayer)) {
         return PLUGIN_CONTINUE;
     }
@@ -65,7 +65,7 @@ public OnMessage_HideWeapon(iMsgId, iMsgDest, pPlayer) {
     return PLUGIN_CONTINUE;
 }
 
-public OnCmdStart(pPlayer, pCmd) {
+public FMHook_CmdStart(pPlayer, pCmd) {
     // new iButtons = pev(pPlayer, pev_button);
     new iButtons = get_uc(pCmd, UC_Buttons);
     new iOldButtons = pev(pPlayer, pev_oldbuttons);

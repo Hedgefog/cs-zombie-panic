@@ -44,7 +44,7 @@ public plugin_precache() {
     g_irgMarks = ArrayCreate(_, MAX_PLAYER_MARKS);
     g_iMarkModelIndex = precache_model(ZP_OBJECTIVE_MARK_SPRITE);
 
-    RegisterHam(Ham_Spawn, "func_button", "OnButtonSpawn_Post", .Post = 1);
+    RegisterHam(Ham_Spawn, "func_button", "HamHook_Button_Spawn_Post", .Post = 1);
 }
 
 public plugin_init() {
@@ -60,11 +60,11 @@ public plugin_init() {
         return;
     }
 
-    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
 
-    register_forward(FM_AddToFullPack, "OnAddToFullPack", 0);
-    register_forward(FM_AddToFullPack, "OnAddToFullPack_Post", 1);
-    register_forward(FM_CheckVisibility, "OnCheckVisibility");
+    register_forward(FM_AddToFullPack, "FMHook_AddToFullPack", 0);
+    register_forward(FM_AddToFullPack, "FMHook_AddToFullPack_Post", 1);
+    register_forward(FM_CheckVisibility, "FMHook_CheckVisibility");
 
     g_pCvarEnabled = register_cvar("zp_objective_marks", "1");
 }
@@ -73,7 +73,7 @@ public plugin_end() {
     ArrayDestroy(g_irgMarks);
 }
 
-public OnButtonSpawn_Post(pButton) {
+public HamHook_Button_Spawn_Post(pButton) {
     if (ArraySize(g_irgMarks) >= MAX_PLAYER_MARKS) {
         log_amx("WARNING: Objective marks limit reached!");
         return;
@@ -88,14 +88,14 @@ public OnButtonSpawn_Post(pButton) {
     ArrayPushCell(g_irgMarks, pMark);
 }
 
-public OnPlayerSpawn_Post(pPlayer) {
+public HamHook_Player_Spawn_Post(pPlayer) {
     new iMarkCount = ArraySize(g_irgMarks);
     for (new iMarkIndex = 0; iMarkIndex < iMarkCount; ++iMarkIndex) {
         g_rgPlayerData[pPlayer][iMarkIndex][Player_MarkUpdateTime] = 0.0;
     }
 }
 
-public OnAddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
+public FMHook_AddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     if (!UTIL_IsPlayer(pHost)) {
         return FMRES_IGNORED;
     }
@@ -142,7 +142,7 @@ public OnAddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     return FMRES_HANDLED;
 }
 
-public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
+public FMHook_AddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     if (!UTIL_IsPlayer(pHost)) {
         return FMRES_IGNORED;
     }
@@ -180,7 +180,7 @@ public OnAddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
     return FMRES_HANDLED;
 }
 
-public OnCheckVisibility(pEntity) {
+public FMHook_CheckVisibility(pEntity) {
     if (!pev_valid(pEntity)) {
         return FMRES_IGNORED;
     }

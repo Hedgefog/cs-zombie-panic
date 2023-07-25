@@ -1,7 +1,7 @@
 {
   "name": "zombiepanic",
-  "version": "1.4.3",
-  "description": "Zombie Panic Mod",
+  "version": "1.5.0",
+  "description": "CS Zombie Panic",
   "scripts": {
     "build": "amxxpack build",
     "watch": "amxxpack build --watch",
@@ -13,7 +13,7 @@
   "author": "Hedgehog Fog",
   "license": "MIT",
   "devDependencies": {
-    "amxxpack": "^1.3.3",
+    "amxxpack": "^1.4.4",
     "gulp": "^4.0.2",
     "gulp-file": "^0.4.0",
     "gulp-zip": "^5.0.2",

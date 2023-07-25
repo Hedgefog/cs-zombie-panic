@@ -44,7 +44,7 @@ public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 }
 
-public @Weapon_Idle(this) {
+@Weapon_Idle(this) {
     switch (random(3)) {
         case 0: {
             CW_PlayAnimation(this, 0, 61.0 / 16.0);
@@ -58,7 +58,7 @@ public @Weapon_Idle(this) {
     }
 }
 
-public @Weapon_PrimaryAttack(this) {
+@Weapon_PrimaryAttack(this) {
     if (get_member(this, m_Weapon_iShotsFired) > 0) {
         return;
     }
@@ -83,34 +83,34 @@ public @Weapon_PrimaryAttack(this) {
     }
 }
 
-public @Weapon_Reload(this) {
+@Weapon_Reload(this) {
     // new pPlayer = CW_GetPlayer(this);
     if (CW_DefaultReload(this, 5, 1.68)) {
         // emit_sound(pPlayer, CHAN_WEAPON, ZP_WEAPON_PISTOL_RELOAD_START_SOUND, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
     }
 }
 
-public @Weapon_DefaultReloadEnd(this) {
+@Weapon_DefaultReloadEnd(this) {
     // new pPlayer = CW_GetPlayer(this);
     // emit_sound(pPlayer, CHAN_WEAPON, ZP_WEAPON_PISTOL_RELOAD_END_SOUND, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 }
 
-public @Weapon_Deploy(this) {
+@Weapon_Deploy(this) {
     CW_DefaultDeploy(this, ZP_WEAPON_PISTOL_V_MODEL, ZP_WEAPON_PISTOL_P_MODEL, 7, "onehanded");
 }
 
-public Float:@Weapon_GetMaxSpeed(this) {
+Float:@Weapon_GetMaxSpeed(this) {
     return ZP_HUMAN_SPEED;
 }
 
-public @Weapon_Spawn(this) {
+@Weapon_Spawn(this) {
     engfunc(EngFunc_SetModel, this, ZP_WEAPON_PISTOL_W_MODEL);
 }
 
-public @Weapon_WeaponBoxSpawn(this, pWeaponBox) {
+@Weapon_WeaponBoxSpawn(this, pWeaponBox) {
     engfunc(EngFunc_SetModel, pWeaponBox, ZP_WEAPON_PISTOL_W_MODEL);
 }
 
-public @Weapon_Holster(this) {
+@Weapon_Holster(this) {
     CW_PlayAnimation(this, 8, 16.0 / 20.0);
 }

@@ -19,12 +19,12 @@ new g_pCvarRegenerationRate;
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
-    RegisterHamPlayer(Ham_TakeDamage, "OnPlayerTakeDamage_Post", .Post = 1);
+    RegisterHamPlayer(Ham_TakeDamage, "HamHook_Player_TakeDamage_Post", .Post = 1);
 
     g_pCvarRegenerationRate = register_cvar("zp_zombie_regeneration_rate", "5.0");
 }
 
-public OnPlayerTakeDamage_Post(pPlayer) {
+public HamHook_Player_TakeDamage_Post(pPlayer) {
     if (!ZP_Player_IsZombie(pPlayer)) {
         return HAM_IGNORED;
     }

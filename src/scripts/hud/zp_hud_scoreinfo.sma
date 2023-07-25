@@ -19,13 +19,13 @@ public plugin_init() {
 
     gmsgScoreInfo = get_user_msgid("ScoreInfo");
 
-    register_event("ScoreInfo", "OnEvent", "a");
-    register_message(gmsgScoreInfo, "OnMessage");
+    register_event("ScoreInfo", "Event_ScoreInfo", "a");
+    register_message(gmsgScoreInfo, "Message_ScoreInfo");
 
-    RegisterHamPlayer(Ham_Spawn, "OnPlayerSpawn_Post", .Post = 1);
+    RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
 }
 
-public OnPlayerSpawn_Post(pPlayer) {
+public HamHook_Player_Spawn_Post(pPlayer) {
     for (new pTargetPlayer = 1; pTargetPlayer <= MaxClients; ++pTargetPlayer) {
         if (!is_user_connected(pTargetPlayer)) {
             continue;
@@ -35,11 +35,11 @@ public OnPlayerSpawn_Post(pPlayer) {
     }
 }
 
-public OnMessage(iMsgId, iDest, pPlayer) {
+public Message_ScoreInfo(iMsgId, iDest, pPlayer) {
     return pPlayer ? PLUGIN_CONTINUE : PLUGIN_HANDLED;
 }
 
-public OnEvent() {
+public Event_ScoreInfo() {
     new pTargetPlayer = read_data(1);
 
     for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
