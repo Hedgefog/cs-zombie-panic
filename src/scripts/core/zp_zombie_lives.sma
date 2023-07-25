@@ -48,14 +48,14 @@ public Native_SetZombieLives(iPluginId, iArgc) {
 public Native_RespawnAsZombie(iPluginId, iArgc) {
     new pPlayer = get_param(1);
     set_member(pPlayer, m_iTeam, ZP_ZOMBIE_TEAM);
-    SetupRespawnTask(pPlayer);
+    @Player_SetupRespawnTask(pPlayer);
 }
 
 public ZP_Fw_PlayerJoined(pPlayer) {
     ExecuteHam(Ham_Player_PreThink, pPlayer);
 
     if (!is_user_alive(pPlayer)) {
-        SetupRespawnTask(pPlayer);
+        @Player_SetupRespawnTask(pPlayer);
     }
 
     return PLUGIN_HANDLED;
@@ -71,22 +71,22 @@ public HamHook_Player_Killed_Post(pPlayer) {
     }
 
     if (get_member(pPlayer, m_iTeam) != 3) {
-        SetupRespawnTask(pPlayer);
+        @Player_SetupRespawnTask(pPlayer);
     }
 }
 
-SetupRespawnTask(pPlayer) {
-    if (ZP_GameRules_IsCompetitive() && !ZP_Player_IsZombie(pPlayer)) {
+@Player_SetupRespawnTask(this) {
+    if (ZP_GameRules_IsCompetitive() && !ZP_Player_IsZombie(this)) {
         return;
     }
 
-    remove_task(TASKID_PLAYER_RESPAWN + pPlayer);
-    set_task(get_pcvar_float(g_pCvarRespawnTime), "Task_RespawnPlayer", TASKID_PLAYER_RESPAWN + pPlayer);
+    remove_task(TASKID_PLAYER_RESPAWN + this);
+    set_task(get_pcvar_float(g_pCvarRespawnTime), "Task_RespawnPlayer", TASKID_PLAYER_RESPAWN + this);
 }
 
-RespawnPlayer(pPlayer) {
+@Player_Respawn(this) {
     if (!g_iLives || get_member_game(m_bFreezePeriod)) {
-        SetupRespawnTask(pPlayer);
+        @Player_SetupRespawnTask(this);
         return;
     }
 
@@ -94,27 +94,27 @@ RespawnPlayer(pPlayer) {
         return;
     }
 
-    if (!is_user_connected(pPlayer)) {
+    if (!is_user_connected(this)) {
         return;
     }
 
-    if (is_user_alive(pPlayer)) {
+    if (is_user_alive(this)) {
         return;
     }
 
-    if (get_member(pPlayer, m_iTeam) == 3) {
+    if (get_member(this, m_iTeam) == 3) {
         return;
     }
 
-    if (ZP_Player_IsZombie(pPlayer)) {
+    if (ZP_Player_IsZombie(this)) {
         if (!ZP_GameRules_GetObjectiveMode()) {
             SetLives(g_iLives - 1);
         }
     } else {
-        set_member(pPlayer, m_iTeam, ZP_ZOMBIE_TEAM);
+        set_member(this, m_iTeam, ZP_ZOMBIE_TEAM);
     }
 
-    ExecuteHamB(Ham_CS_RoundRespawn, pPlayer);
+    ExecuteHamB(Ham_CS_RoundRespawn, this);
 }
 
 SetLives(iValue) {
@@ -124,5 +124,5 @@ SetLives(iValue) {
 
 public Task_RespawnPlayer(iTaskId) {
     new pPlayer = iTaskId - TASKID_PLAYER_RESPAWN;
-    RespawnPlayer(pPlayer);
+    @Player_Respawn(pPlayer);
 }

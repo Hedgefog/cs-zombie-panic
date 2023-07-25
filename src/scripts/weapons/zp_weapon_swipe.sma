@@ -9,7 +9,7 @@
 #include <zombiepanic_utils>
 #include <api_custom_weapons>
 
-#define PLUGIN "[Zombie Panic] Weapon Crowbar"
+#define PLUGIN "[Zombie Panic] Weapon Swipe"
 #define AUTHOR "Hedgehog Fog"
 
 #define PRIMARY_AMMO_ID 13

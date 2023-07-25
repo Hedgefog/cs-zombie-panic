@@ -31,7 +31,7 @@ public HamHook_Player_Spawn_Post(pPlayer) {
             continue;
         }
 
-        Update(pPlayer, pTargetPlayer);
+        @Player_UpdatePlayerScoreInfo(pPlayer, pTargetPlayer);
     }
 }
 
@@ -47,29 +47,39 @@ public Event_ScoreInfo() {
             continue;
         }
 
-        Update(pPlayer, pTargetPlayer);
+        @Player_UpdatePlayerScoreInfo(pPlayer, pTargetPlayer);
     }
 
     return PLUGIN_HANDLED;
 }
 
-Update(pPlayer, pTargetPlayer) {
-    new iScore = get_user_frags(pTargetPlayer);
-    new iDeaths = ZP_Player_IsZombie(pPlayer) || pTargetPlayer == pPlayer ? get_member(pTargetPlayer, m_iDeaths) : 0;
-    new iClassId = 0;
-    new bool:bShowTeam = ZP_Player_IsZombie(pPlayer)
-        || UTIL_IsPlayerSpectator(pPlayer)
-        || is_user_bot(pPlayer)
-        || ZP_GameRules_IsCompetitive();
+@Player_UpdatePlayerScoreInfo(this, pPlayer) {
+    new iTeam = get_member(pPlayer, m_iTeam);
 
-    new iTeam = bShowTeam ? get_member(pTargetPlayer, m_iTeam) : get_member(pPlayer, m_iTeam);
+    new iTargetScore = get_user_frags(pPlayer);
+    new iTargetDeaths = get_member(pPlayer, m_iDeaths);
+    new iTargetClassId = 0;
+    new iTargetTeam = get_member(pPlayer, m_iTeam);
 
-    SendMessage(pPlayer, pTargetPlayer, iScore, iDeaths, iClassId, iTeam);
+    if (UTIL_IsPlayerSpectator(pPlayer)) {
+        @Player_SendPlayerScoreInfo(this, pPlayer, iTargetScore, iTargetDeaths, iTargetClassId, 3);
+        return;
+    }
+
+    new bool:bShowTeam = (
+        pPlayer == this ||
+        ZP_Player_IsZombie(this) ||
+        UTIL_IsPlayerSpectator(this) ||
+        is_user_bot(this) ||
+        ZP_GameRules_IsCompetitive()
+    );
+
+    @Player_SendPlayerScoreInfo(this, pPlayer, iTargetScore, bShowTeam ? iTargetDeaths : 0, iTargetClassId, bShowTeam ? iTargetTeam : iTeam);
 }
 
-SendMessage(pPlayer, pTargetPlayer, iScore, iDeaths, iClassId, iTeam) {
-    emessage_begin(MSG_ONE, gmsgScoreInfo, _, pPlayer);
-    ewrite_byte(pTargetPlayer);
+@Player_SendPlayerScoreInfo(this, pPlayer, iScore, iDeaths, iClassId, iTeam) {
+    emessage_begin(MSG_ONE, gmsgScoreInfo, _, this);
+    ewrite_byte(pPlayer);
     ewrite_short(iScore);
     ewrite_short(iDeaths);
     ewrite_short(iClassId);

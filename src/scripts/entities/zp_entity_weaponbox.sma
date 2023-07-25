@@ -45,20 +45,20 @@ public HamHook_WeaponBox_Touch(pWeaponBox, pToucher) {
 
     if (GetHamReturnStatus() < HAM_SUPERCEDE) {
         if (!get_member_game(m_bFreezePeriod)) {
-            PickupWeaponBox(pToucher, pWeaponBox);
+            @Player_PickupWeaponBox(pToucher, pWeaponBox);
         }
     }
 
     return HAM_SUPERCEDE;
 }
 
-PickupWeaponBox(pPlayer, pWeaponBox) {
-    if (ZP_Player_IsZombie(pPlayer)) {
+@Player_PickupWeaponBox(this, pWeaponBox) {
+    if (ZP_Player_IsZombie(this)) {
         return;
     }
     
-    new bDestroy = PickupWeaponBoxItems(pPlayer, pWeaponBox);
-    bDestroy = PickupWeaponBoxAmmo(pPlayer, pWeaponBox) && bDestroy;
+    new bDestroy = PickupWeaponBoxItems(this, pWeaponBox);
+    bDestroy = PickupWeaponBoxAmmo(this, pWeaponBox) && bDestroy;
 
     if (bDestroy) {
         set_pev(pWeaponBox, pev_flags, FL_KILLME);
@@ -81,7 +81,7 @@ bool:PickupWeaponBoxItems(pPlayer, pWeaponBox) {
             
             new bAmmoExtracted = ExtractAmmo(pItem, pPlayer);
 
-            new pPlayerItem = FindPlayerItemById(pPlayer, iId);
+            new pPlayerItem = @Player_FindItemById(pPlayer, iId);
             if (pPlayerItem != -1) { // return item to weaponbox if player has the item
                 if (!bAmmoExtracted) {
                     // if (get_member(pItem, m_Weapon_iClip) != -1 || get_member(pItem, m_Weapon_iPrimaryAmmoType) <= 0) {
@@ -128,7 +128,7 @@ bool:PickupWeaponBoxAmmo(pPlayer, pWeaponBox) {
             continue;
         }
         
-        iAmount -= AddAmmo(pPlayer, iAmmoHandler, iAmount);
+        iAmount -= @Player_AddAmmo(pPlayer, iAmmoHandler, iAmount);
         set_member(pWeaponBox, m_WeaponBox_rgAmmo, iAmount, iSlot);
 
         if (!iAmount) {
@@ -157,33 +157,33 @@ bool:ExtractAmmo(pItem, pPlayer) {
         return false;
     }
  
-    iAmmoAmount -= AddAmmo(pPlayer, iAmmoHandler, iAmmoAmount);
+    iAmmoAmount -= @Player_AddAmmo(pPlayer, iAmmoHandler, iAmmoAmount);
     set_member(pItem, m_Weapon_iDefaultAmmo, iAmmoAmount);
 
     return !iAmmoAmount;
 }
 
-AddAmmo(pPlayer, iAmmoHandler, iAmount) {
+@Player_AddAmmo(this, iAmmoHandler, iAmount) {
     new iAmmoId = ZP_Ammo_GetId(iAmmoHandler);
 
     static szAmmo[16];
     ZP_Ammo_GetName(iAmmoHandler, szAmmo, charsmax(szAmmo));
 
-    iAmount = ZP_Player_AddAmmo(pPlayer, szAmmo, iAmount);
+    iAmount = ZP_Player_AddAmmo(this, szAmmo, iAmount);
 
     if (iAmount) {
-        emessage_begin(MSG_ONE, gmsgAmmoPickup, _, pPlayer);
+        emessage_begin(MSG_ONE, gmsgAmmoPickup, _, this);
         ewrite_byte(iAmmoId);
         ewrite_byte(iAmount);
         emessage_end();
 
-        emit_sound(pPlayer, CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+        emit_sound(this, CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
     }
 
     return iAmount;
 }
 
-FindPlayerItemById(pPlayer, iId) {
+@Player_FindItemById(pPlayer, iId) {
     for (new iSlot = 0; iSlot < 6; ++iSlot) {
         new pItem = get_member(pPlayer, m_rgpPlayerItems, iSlot);
         

@@ -12,7 +12,7 @@
 #include <api_rounds>
 #include <api_custom_weapons>
 
-#define PLUGIN "[Zombie Panic] Weapon Crowbar"
+#define PLUGIN "[Zombie Panic] Weapon Satchel"
 #define AUTHOR "Hedgehog Fog"
 
 new const g_rgszBounceSounds[][] = {

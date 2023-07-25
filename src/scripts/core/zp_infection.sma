@@ -87,31 +87,31 @@ public Native_SetInfected(iPluginId, iArgc) {
     new bool:bValue = bool:get_param(2);
     new pInfector = get_param(3);
 
-    SetInfected(pPlayer, bValue, pInfector);
+    @Player_SetInfected(pPlayer, bValue, pInfector);
 }
 
 public Native_IsPlayerInfected(iPluginId, iArgc) {
     new pPlayer = get_param(1);
 
-    return IsPlayerInfected(pPlayer);
+    return @Player_IsInfected(pPlayer);
 }
 
 public bool:Native_IsPlayerPartialZombie(iPluginId, iArgc) {
     new pPlayer = get_param(1);
 
-    return IsPlayerInfected(pPlayer) && g_rgiPlayerInfectionState[pPlayer] >= InfectionState_PartialZombie;
+    return @Player_IsInfected(pPlayer) && g_rgiPlayerInfectionState[pPlayer] >= InfectionState_PartialZombie;
 }
 
 public bool:Native_IsPlayerTransforming(iPluginId, iArgc) {
     new pPlayer = get_param(1);
 
-    return IsPlayerInfected(pPlayer) && g_rgiPlayerInfectionState[pPlayer] >= InfectionState_Transformation;
+    return @Player_IsInfected(pPlayer) && g_rgiPlayerInfectionState[pPlayer] >= InfectionState_Transformation;
 }
 
 public Native_GetInfector(iPluginId, iArgc) {
     new pPlayer = get_param(1);
 
-    if (!IsPlayerInfected(pPlayer)) {
+    if (!@Player_IsInfected(pPlayer)) {
         return -1;
     }
 
@@ -119,16 +119,16 @@ public Native_GetInfector(iPluginId, iArgc) {
 }
 
 public HamHook_Player_Spawn_Post(pPlayer) {
-    SetInfected(pPlayer, false);
+    @Player_SetInfected(pPlayer, false, 0);
 }
 
 public HamHook_Player_Killed(pPlayer) {
-    ResetRoomType(pPlayer);
-    HideInfectionIcon(pPlayer);
+    @Player_ResetRoomType(pPlayer);
+    @Player_HideInfectionIcon(pPlayer);
 }
 
 public HamHook_Player_PreThink_Post(pPlayer) {
-    if (!IsPlayerInfected(pPlayer)) {
+    if (!@Player_IsInfected(pPlayer)) {
         return HAM_IGNORED;
     }
 
@@ -139,15 +139,15 @@ public HamHook_Player_PreThink_Post(pPlayer) {
                 return HAM_IGNORED;
             }
 
-            TransformPlayer(pPlayer);
+            @Player_Transform(pPlayer);
             g_rgiPlayerInfectionState[pPlayer] = InfectionState_TransformationDeath;
         } else {
             if (is_user_alive(pPlayer)) {
                 return HAM_IGNORED;
             }
 
-            EndPlayerTransformation(pPlayer);
-            SendBlinkEffect(pPlayer);
+            @Player_EndTransformation(pPlayer);
+            @Player_SendBlinkEffect(pPlayer);
         }
     } else if (flTimeLeft <= TRANSFORMATION_DURATION) {
         if (!is_user_alive(pPlayer)) {
@@ -155,7 +155,7 @@ public HamHook_Player_PreThink_Post(pPlayer) {
         }
 
         if (g_rgiPlayerInfectionState[pPlayer] != InfectionState_Transformation) {
-            SendScreenShake(pPlayer);
+            @Player_SendScreenShake(pPlayer);
             client_cmd(pPlayer, "spk %s", ZP_TRANSFORMATION_SOUND);
             g_rgiPlayerInfectionState[pPlayer] = InfectionState_Transformation;
         }
@@ -166,10 +166,10 @@ public HamHook_Player_PreThink_Post(pPlayer) {
 
         if (g_rgiPlayerInfectionState[pPlayer] != InfectionState_PartialZombie) {
             g_rgiPlayerRoomType[pPlayer] = floatround(get_member(pPlayer, m_flSndRoomtype));
-            SendBlinkEffect(pPlayer);
-            SendRoomType(pPlayer);
+            @Player_SendBlinkEffect(pPlayer);
+            @Player_SendRoomType(pPlayer);
             client_cmd(pPlayer, "spk %s", ZP_JOLT_SOUNDS[random(sizeof(ZP_JOLT_SOUNDS))]);
-            ShowInfectionIcon(pPlayer);
+            @Player_ShowInfectionIcon(pPlayer);
             g_rgiPlayerInfectionState[pPlayer] = InfectionState_PartialZombie;
         }
     }
@@ -178,7 +178,7 @@ public HamHook_Player_PreThink_Post(pPlayer) {
 }
 
 public HamHook_Player_TraceAttack(pPlayer, pAttacker, Float:flDamage, Float:vecDir[3], pTr, iDamageBits) {
-    if (!IsPlayerInfected(pPlayer)) {
+    if (!@Player_IsInfected(pPlayer)) {
         return HAM_IGNORED;
     }
 
@@ -208,7 +208,7 @@ public HamHook_Player_TraceAttack(pPlayer, pAttacker, Float:flDamage, Float:vecD
 }
 
 public HamHook_Player_TakeDamage(pPlayer, pInflictor, pAttacker, Float:flDamage, iDamageBits) {
-    if (!IsPlayerInfected(pPlayer)) {
+    if (!@Player_IsInfected(pPlayer)) {
         return HAM_IGNORED;
     }
 
@@ -251,7 +251,7 @@ public HamHook_Player_TakeDamage_Post(pPlayer, pInflictor, pAttacker) {
     }
 
     if (random(100) < get_pcvar_num(g_pCvarInfectionChance)) {
-        if (SetInfected(pPlayer, true, pAttacker)) {
+        if (@Player_SetInfected(pPlayer, true, pAttacker)) {
             client_print(pAttacker, print_chat, "You've infected %n.", pPlayer);
         }
     }
@@ -268,8 +268,8 @@ public HamHook_Player_BloodColor(pPlayer) {
     return HAM_SUPERCEDE;
 }
 
-bool:SetInfected(pPlayer, bool:bValue, pInfector = 0) {
-    if (bValue == IsPlayerInfected(pPlayer)) {
+bool:@Player_SetInfected(this, bool:bValue, pInfector) {
+    if (bValue == @Player_IsInfected(this)) {
         return false;
     }
 
@@ -278,81 +278,81 @@ bool:SetInfected(pPlayer, bool:bValue, pInfector = 0) {
             return false;
         }
 
-        if (!is_user_alive(pPlayer)) {
+        if (!is_user_alive(this)) {
             return false;
         }
 
-        if (ZP_Player_IsZombie(pPlayer)) {
+        if (ZP_Player_IsZombie(this)) {
             return false;
         }
 
-        g_rgiPlayerInfectionState[pPlayer] = InfectionState_Infected;
-        g_rgflPlayerTransformationTime[pPlayer] = get_gametime() + TRANSFORMATION_DELAY;
-        g_rgpPlayerInfector[pPlayer] = pInfector;
+        g_rgiPlayerInfectionState[this] = InfectionState_Infected;
+        g_rgflPlayerTransformationTime[this] = get_gametime() + TRANSFORMATION_DELAY;
+        g_rgpPlayerInfector[this] = pInfector;
 
-        ExecuteForward(g_pFwInfected, g_iFwResult, pPlayer, pInfector);
+        ExecuteForward(g_pFwInfected, g_iFwResult, this, pInfector);
     } else {
-        g_rgiPlayerInfectionState[pPlayer] = InfectionState_None;
+        g_rgiPlayerInfectionState[this] = InfectionState_None;
 
-        ResetRoomType(pPlayer);
-        HideInfectionIcon(pPlayer);
-        ExecuteForward(g_pFwCured, g_iFwResult, pPlayer);
+        @Player_ResetRoomType(this);
+        @Player_HideInfectionIcon(this);
+        ExecuteForward(g_pFwCured, g_iFwResult, this);
     }
 
     return true;
 }
 
-bool:IsPlayerInfected(pPlayer) {
-    // if (ZP_Player_IsZombie(pPlayer)) {
+bool:@Player_IsInfected(this) {
+    // if (ZP_Player_IsZombie(this)) {
     //     return false;
     // }
 
-    return g_rgiPlayerInfectionState[pPlayer] > InfectionState_None;
+    return g_rgiPlayerInfectionState[this] > InfectionState_None;
 }
 
-TransformPlayer(pPlayer) {
-    pev(pPlayer, pev_origin, g_rgflPlayerOrigin[pPlayer]);
-    pev(pPlayer, pev_angles, g_rgflPlayerAngles[pPlayer]);
-    pev(pPlayer, pev_v_angle, g_rgflPlayerViewAngles[pPlayer]);
-    g_rgiPlayerFlags[pPlayer] = pev(pPlayer, pev_flags);
+@Player_Transform(this) {
+    pev(this, pev_origin, g_rgflPlayerOrigin[this]);
+    pev(this, pev_angles, g_rgflPlayerAngles[this]);
+    pev(this, pev_v_angle, g_rgflPlayerViewAngles[this]);
+    g_rgiPlayerFlags[this] = pev(this, pev_flags);
 
-    ExecuteForward(g_pFwTransformationDeath, g_iFwResult, pPlayer);
-    ExecuteHamB(Ham_Killed, pPlayer, g_rgpPlayerInfector[pPlayer], 0);
-    emit_sound(pPlayer, CHAN_VOICE, "common/null.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    ExecuteForward(g_pFwTransformationDeath, g_iFwResult, this);
+    ExecuteHamB(Ham_Killed, this, g_rgpPlayerInfector[this], 0);
+    emit_sound(this, CHAN_VOICE, "common/null.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 }
 
-EndPlayerTransformation(pPlayer) {
-    set_member(pPlayer, m_iTeam, ZP_ZOMBIE_TEAM);
-    ExecuteHamB(Ham_CS_RoundRespawn, pPlayer);
+@Player_EndTransformation(this) {
+    set_member(this, m_iTeam, ZP_ZOMBIE_TEAM);
+    ExecuteHamB(Ham_CS_RoundRespawn, this);
 
-    set_pev(pPlayer, pev_origin, g_rgflPlayerOrigin[pPlayer]);
-    set_pev(pPlayer, pev_angles, g_rgflPlayerAngles[pPlayer]);
-    set_pev(pPlayer, pev_v_angle, g_rgflPlayerViewAngles[pPlayer]);
-    set_pev(pPlayer, pev_flags, g_rgiPlayerFlags[pPlayer]);
+    set_pev(this, pev_origin, g_rgflPlayerOrigin[this]);
+    set_pev(this, pev_angles, g_rgflPlayerAngles[this]);
+    set_pev(this, pev_v_angle, g_rgflPlayerViewAngles[this]);
+    set_pev(this, pev_flags, g_rgiPlayerFlags[this]);
 
-    ExecuteForward(g_pFwTransformed, g_iFwResult, pPlayer);
+    ExecuteForward(g_pFwTransformed, g_iFwResult, this);
 }
 
-SendRoomType(pPlayer) {
-    emessage_begin(MSG_ONE, SVC_ROOMTYPE, _, pPlayer);
+@Player_SendRoomType(this) {
+    emessage_begin(MSG_ONE, SVC_ROOMTYPE, _, this);
     ewrite_short(16);
     emessage_end();
 }
 
-ResetRoomType(pPlayer) {
-    if (g_rgiPlayerRoomType[pPlayer] == -1) {
+@Player_ResetRoomType(this) {
+    if (g_rgiPlayerRoomType[this] == -1) {
         return;
     }
 
-    emessage_begin(MSG_ONE, SVC_ROOMTYPE, _, pPlayer);
-    ewrite_short(g_rgiPlayerRoomType[pPlayer]);
+    emessage_begin(MSG_ONE, SVC_ROOMTYPE, _, this);
+    ewrite_short(g_rgiPlayerRoomType[this]);
     emessage_end();
 
-    g_rgiPlayerRoomType[pPlayer] = -1;
+    g_rgiPlayerRoomType[this] = -1;
 }
 
-ShowInfectionIcon(pPlayer) {
-    message_begin(MSG_ONE, gmsgStatusIcon, _, pPlayer);
+@Player_ShowInfectionIcon(this) {
+    message_begin(MSG_ONE, gmsgStatusIcon, _, this);
     write_byte(1);
     write_string(INFECTION_ICON);
     write_byte(255);
@@ -361,21 +361,21 @@ ShowInfectionIcon(pPlayer) {
     message_end();
 }
 
-HideInfectionIcon(pPlayer) {
-    message_begin(MSG_ONE, gmsgStatusIcon, _, pPlayer);
+@Player_HideInfectionIcon(this) {
+    message_begin(MSG_ONE, gmsgStatusIcon, _, this);
     write_byte(0);
     write_string(INFECTION_ICON);
     message_end();
 }
 
-SendScreenShake(pPlayer) {
-    emessage_begin(MSG_ONE, gmsgScreenShake, _, pPlayer);
+@Player_SendScreenShake(this) {
+    emessage_begin(MSG_ONE, gmsgScreenShake, _, this);
     ewrite_short(floatround(2.5 * (1<<12)));
     ewrite_short(floatround(10.0 * (1<<12)));
     ewrite_short(floatround(1.0 * (1<<12)));
     emessage_end();
 }
 
-SendBlinkEffect(pPlayer) {
-    UTIL_ScreenFade(pPlayer, {0, 0, 0}, 0.25, 0.0, 255, FFADE_IN, false, true);
+@Player_SendBlinkEffect(this) {
+    UTIL_ScreenFade(this, {0, 0, 0}, 0.25, 0.0, 255, FFADE_IN, false, true);
 }

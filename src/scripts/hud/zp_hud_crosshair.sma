@@ -44,7 +44,7 @@ public Event_HideWeapon(pPlayer) {
         return PLUGIN_CONTINUE;
     }
 
-    UpdateCrosshair(pPlayer);
+    @Player_UpdateCrosshair(pPlayer);
 
     return PLUGIN_CONTINUE;
 }
@@ -54,28 +54,28 @@ public Event_CurWeapon(pPlayer) {
         return PLUGIN_CONTINUE;
     }
 
-    UpdateCrosshair(pPlayer);
+    @Player_UpdateCrosshair(pPlayer);
 
     return PLUGIN_CONTINUE;
 }
 
-UpdateCrosshair(pPlayer) {
-    emessage_begin(MSG_ONE, gmsgHideWeapon, _, pPlayer);
-    ewrite_byte(g_rgiPlayerHideWeapon[pPlayer] | HIDEHUD_CROSSHAIR | HIDEHUD_OBSERVER_CROSSHAIR);
+@Player_UpdateCrosshair(this) {
+    emessage_begin(MSG_ONE, gmsgHideWeapon, _, this);
+    ewrite_byte(g_rgiPlayerHideWeapon[this] | HIDEHUD_CROSSHAIR | HIDEHUD_OBSERVER_CROSSHAIR);
     emessage_end();
 
-    message_begin(MSG_ONE, gmsgSetFOV, _, pPlayer);
+    message_begin(MSG_ONE, gmsgSetFOV, _, this);
     write_byte(89);
     message_end();
     
-    if (is_user_alive(pPlayer)) {
-        new pActiveItem = get_member(pPlayer, m_pActiveItem);
+    if (is_user_alive(this)) {
+        new pActiveItem = get_member(this, m_pActiveItem);
 
         if (pActiveItem != -1) {
             new iWeaponId = get_member(pActiveItem, m_iId);
-            new iClip = is_user_alive(pPlayer) ? get_member(pActiveItem, m_Weapon_iClip) : 0;
+            new iClip = is_user_alive(this) ? get_member(pActiveItem, m_Weapon_iClip) : 0;
 
-            message_begin(MSG_ONE, gmsgCurWeapon, _, pPlayer);
+            message_begin(MSG_ONE, gmsgCurWeapon, _, this);
             write_byte(1);
             write_byte(iWeaponId);
             write_byte(iClip);
@@ -83,7 +83,7 @@ UpdateCrosshair(pPlayer) {
         }
     }
 
-    message_begin(MSG_ONE, gmsgSetFOV, _, pPlayer);
-    write_byte(get_member(pPlayer, m_iFOV));
+    message_begin(MSG_ONE, gmsgSetFOV, _, this);
+    write_byte(get_member(this, m_iFOV));
     message_end();
 }

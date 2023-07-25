@@ -20,7 +20,7 @@ public plugin_init() {
     RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
 
     gmsgScoreAttrib = get_user_msgid("ScoreAttrib");
-    register_message(gmsgScoreAttrib, "Message");
+    register_message(gmsgScoreAttrib, "Message_ScoreAttrib");
 }
 
 public HamHook_Player_Spawn_Post(pPlayer) {
@@ -46,7 +46,7 @@ public HamHook_Player_Spawn_Post(pPlayer) {
     return HAM_HANDLED;
 }
 
-public Message(iMsgId, iDest, pPlayer) {
+public Message_ScoreAttrib(iMsgId, iDest, pPlayer) {
     if (!pPlayer) {
         return PLUGIN_CONTINUE;
     }

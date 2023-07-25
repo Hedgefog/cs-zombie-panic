@@ -89,13 +89,13 @@ public bool:Native_SetCharacter(iPluginId, iArgc) {
     new szCharacter[32];
     get_string(2, szCharacter, charsmax(szCharacter));
 
-    return SetCharacter(pPlayer, szCharacter);
+    return @Player_SetCharacter(pPlayer, szCharacter);
 }
 
 /*--------------------------------[ Forwards ]--------------------------------*/
 
 public client_connect(pPlayer) {
-    UpdatePlayerCharacter(pPlayer, true);
+    @Player_UpdateCharacter(pPlayer, true);
 }
 
 public client_putinserver(pPlayer) {
@@ -105,11 +105,11 @@ public client_putinserver(pPlayer) {
 }
 
 public ZP_Fw_PlayerPanic(pPlayer) {
-    PlayVoiceFromCharacterData(pPlayer, Character_PanicSounds);
+    @Player_PlayVoiceFromCharacterData(pPlayer, Character_PanicSounds);
 }
 
 public ZP_Fw_PlayerZombieVision(pPlayer) {
-    PlayAmbient(pPlayer);
+    @Player_PlayAmbient(pPlayer);
 }
 
 /*--------------------------------[ Hooks ]--------------------------------*/
@@ -119,8 +119,8 @@ public HamHook_Player_Spawn_Post(pPlayer) {
         return HAM_IGNORED;
     }
 
-    UpdatePlayerCharacter(pPlayer);
-    UpdatePlayerModel(pPlayer);
+    @Player_UpdateCharacter(pPlayer, false);
+    @Player_UpdateModel(pPlayer);
 
     remove_task(TASKID_AMBIENT + pPlayer);
     set_task(0.1, "Task_Ambient", TASKID_AMBIENT + pPlayer);
@@ -129,7 +129,7 @@ public HamHook_Player_Spawn_Post(pPlayer) {
 }
 
 public HamHook_Player_Killed_Post(pPlayer) {
-    PlayVoiceFromCharacterData(pPlayer, ZP_Player_IsZombie(pPlayer) && !ZP_Player_IsInfected(pPlayer) ? Character_ZombieDeathSounds : Character_HumanDeathSounds);
+    @Player_PlayVoiceFromCharacterData(pPlayer, ZP_Player_IsZombie(pPlayer) && !ZP_Player_IsInfected(pPlayer) ? Character_ZombieDeathSounds : Character_HumanDeathSounds);
     return HAM_HANDLED;
 }
 
@@ -157,7 +157,7 @@ public HamHook_Knife_Deploy_Post(pKnife) {
 public Task_Ambient(iTaskId) {
     new pPlayer = iTaskId - TASKID_AMBIENT;
 
-    PlayAmbient(pPlayer);
+    @Player_PlayAmbient(pPlayer);
     set_task(random_float(10.0, 30.0), "Task_Ambient", TASKID_AMBIENT + pPlayer);
 }
 
@@ -173,25 +173,25 @@ public Task_DisableMinModels(iTaskId) {
 
 /*--------------------------------[ Methods ]--------------------------------*/
 
-bool:SetCharacter(pPlayer, const szCharacter[]) {
+bool:@Player_SetCharacter(this, const szCharacter[]) {
     new iCharacter;
     if (!TrieGetCell(g_iCharactersMap, szCharacter, iCharacter)) {
         return false;
     }
 
-    g_rgiPlayerCharacter[pPlayer] = iCharacter;
+    g_rgiPlayerCharacter[this] = iCharacter;
 
     return true;
 }
 
-UpdatePlayerModel(pPlayer) {
-    new iCharacter = g_rgiPlayerCharacter[pPlayer];
+@Player_UpdateModel(this) {
+    new iCharacter = g_rgiPlayerCharacter[this];
 
     static szPlayerModel[MAX_RESOURCE_PATH_LENGTH];
     copy(szPlayerModel, charsmax(szPlayerModel), NULL_STRING);
 
-    if (g_rgiPlayerCharacter[pPlayer] != -1) {
-        new Array:irgCharacterModels = Array:g_rgCharactersData[ZP_Player_IsZombie(pPlayer) ? Character_ZombieModel : Character_HumanModel];
+    if (g_rgiPlayerCharacter[this] != -1) {
+        new Array:irgCharacterModels = Array:g_rgCharactersData[ZP_Player_IsZombie(this) ? Character_ZombieModel : Character_HumanModel];
         ArrayGetString(irgCharacterModels, iCharacter, szPlayerModel, charsmax(szPlayerModel));
     }
 
@@ -199,22 +199,22 @@ UpdatePlayerModel(pPlayer) {
         copy(szPlayerModel, charsmax(szPlayerModel), DEFAULT_PLAYER_MODEL);
     }
 
-    PlayerModel_Set(pPlayer, szPlayerModel);
-    PlayerModel_Update(pPlayer);
+    PlayerModel_Set(this, szPlayerModel);
+    PlayerModel_Update(this);
 
     new iBody = ArrayGetCell(Array:g_rgCharactersData[Character_BodyIndex], iCharacter);
-    set_pev(pPlayer, pev_body, iBody);
+    set_pev(this, pev_body, iBody);
 
-    ExecuteForward(g_pFwPlayerModelUpdated, _, pPlayer);
+    ExecuteForward(g_pFwPlayerModelUpdated, _, this);
 }
 
-UpdatePlayerCharacter(pPlayer, bool:bOverride = false) {
+@Player_UpdateCharacter(this, bool:bOverride) {
     if (!g_iCharacterCount) {
         return;
     }
 
     static szCharacter[16];
-    get_user_info(pPlayer, CHARACTER_KEY, szCharacter, charsmax(szCharacter));
+    get_user_info(this, CHARACTER_KEY, szCharacter, charsmax(szCharacter));
 
     new iCharacter;
     if (!TrieGetCell(g_iCharactersMap, szCharacter, iCharacter)
@@ -226,33 +226,33 @@ UpdatePlayerCharacter(pPlayer, bool:bOverride = false) {
         iCharacter = ArrayGetCell(g_iSelectableCharacters, random(ArraySize(g_iSelectableCharacters)));
     }
 
-    g_rgiPlayerCharacter[pPlayer] = iCharacter;
-    ExecuteForward(g_pFwPlayerCharacterUpdated, _, pPlayer);
+    g_rgiPlayerCharacter[this] = iCharacter;
+    ExecuteForward(g_pFwPlayerCharacterUpdated, _, this);
 }
 
-PlayAmbient(pPlayer) {
-    if (!is_user_alive(pPlayer)) {
+@Player_PlayAmbient(this) {
+    if (!is_user_alive(this)) {
         return;
     }
 
-    if (ZP_Player_IsZombie(pPlayer)) {
-        PlayVoiceFromCharacterData(pPlayer, Character_ZombieAmbientSounds);
+    if (ZP_Player_IsZombie(this)) {
+        @Player_PlayVoiceFromCharacterData(this, Character_ZombieAmbientSounds);
     }
 }
 
-PlayVoiceFromCharacterData(pPlayer, CharacterData:iCharacterData) {
-    if (g_rgiPlayerCharacter[pPlayer] == -1) {
+@Player_PlayVoiceFromCharacterData(this, CharacterData:iCharacterData) {
+    if (g_rgiPlayerCharacter[this] == -1) {
         return;
     }
 
-    new Array:irgSounds = ArrayGetCell(Array:g_rgCharactersData[iCharacterData], g_rgiPlayerCharacter[pPlayer]);
+    new Array:irgSounds = ArrayGetCell(Array:g_rgCharactersData[iCharacterData], g_rgiPlayerCharacter[this]);
     if (!ArraySize(irgSounds)) {
         return;
     }
 
     static szSound[MAX_RESOURCE_PATH_LENGTH];
     ArrayGetString(irgSounds, random(ArraySize(irgSounds)), szSound, charsmax(szSound));
-    emit_sound(pPlayer, CHAN_VOICE, szSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    emit_sound(this, CHAN_VOICE, szSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 }
 
 CreateCharacter(iBaseCharacter = -1) {

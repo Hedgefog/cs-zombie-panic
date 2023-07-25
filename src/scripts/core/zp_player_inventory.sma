@@ -40,23 +40,23 @@ public plugin_natives() {
 
 public Native_DropAmmo(iPluginId, iArgc) {
     new pPlayer = get_param(1);
-    DropPlayerSelectedAmmo(pPlayer);
+    @Player_DropSelectedAmmo(pPlayer);
 }
 
 public Native_NextAmmo(iPluginId, iArgc) {
     new pPlayer = get_param(1);
-    SelectNextPlayerAmmo(pPlayer);
+    @Player_SelectNextAmmo(pPlayer, true);
 }
 
 public Native_DropUnactiveWeapons(iPluginid, iArgc) {
     new pPlayer = get_param(1);
 
-    DropPlayerUnactiveWeapons(pPlayer);
+    @Player_DropUnactiveWeapons(pPlayer);
 }
 public Native_DropUnactiveAmmo(iPluginid, iArgc) {
     new pPlayer = get_param(1);
 
-    DropPlayerAmmo(pPlayer, true);
+    @Player_DropAmmo(pPlayer, true);
 }
 
 public Native_GetAmmo(iPluginId, iArgc) {
@@ -64,7 +64,7 @@ public Native_GetAmmo(iPluginId, iArgc) {
     static szAmmo[16];
     get_string(2, szAmmo, charsmax(szAmmo));
     
-    return GetAmmo(pPlayer, szAmmo);
+    return @Player_GetAmmo(pPlayer, szAmmo);
 }
 
 public bool:Native_SetAmmo(iPluginId, iArgc) {
@@ -73,7 +73,7 @@ public bool:Native_SetAmmo(iPluginId, iArgc) {
     get_string(2, szAmmo, charsmax(szAmmo));
     new iValue = get_param(3);
 
-    return SetAmmo(pPlayer, szAmmo, iValue);
+    return @Player_SetAmmo(pPlayer, szAmmo, iValue);
 }
 
 public Native_AddAmmo(iPluginId, iArgc) {
@@ -82,7 +82,7 @@ public Native_AddAmmo(iPluginId, iArgc) {
     get_string(2, szAmmo, charsmax(szAmmo));
     new iValue = get_param(3);
 
-    return AddAmmo(pPlayer, szAmmo, iValue);
+    return @Player_AddAmmo(pPlayer, szAmmo, iValue);
 }
 
 public Native_GetSelectedAmmo(iPluginId, iArgc) {
@@ -106,18 +106,18 @@ public Native_SetSelectedAmmo(iPluginId, iArgc) {
 }
 
 public HamHook_Player_Killed(pPlayer) {
-    DropPlayerUnactiveWeapons(pPlayer);
-    DropPlayerAmmo(pPlayer);
+    @Player_DropUnactiveWeapons(pPlayer);
+    @Player_DropAmmo(pPlayer, false);
 }
 
 public HamHook_Player_Spawn_Post(pPlayer) {
     g_rgpPlayerSelectedAmmo[pPlayer] = 0;
-    SelectNextPlayerAmmo(pPlayer, false);
+    @Player_SelectNextAmmo(pPlayer, false);
 }
 
-DropPlayerAmmo(pPlayer, bool:bUnactiveOnly = false) {
-    new pWeaponBox = DropPlayerWeaponBox(pPlayer);
-    new iAmmoTypesCount = PackPlayerAmmo(pPlayer, pWeaponBox, bUnactiveOnly);
+@Player_DropAmmo(this, bool:bUnactiveOnly) {
+    new pWeaponBox = @Player_DropWeaponBox(this);
+    new iAmmoTypesCount = @Player_PackAmmo(this, pWeaponBox, bUnactiveOnly);
 
     if (!iAmmoTypesCount) {
         engfunc(EngFunc_RemoveEntity, pWeaponBox);
@@ -127,7 +127,7 @@ DropPlayerAmmo(pPlayer, bool:bUnactiveOnly = false) {
     engfunc(EngFunc_SetModel, pWeaponBox, ZP_WEAPONBOX_MODEL);
 
     static Float:vecThrowAngle[3];
-    pev(pPlayer, pev_v_angle, vecThrowAngle);
+    pev(this, pev_v_angle, vecThrowAngle);
     engfunc(EngFunc_MakeVectors, vecThrowAngle); 
 
     static Float:vecVelocity[3];
@@ -143,60 +143,60 @@ DropPlayerAmmo(pPlayer, bool:bUnactiveOnly = false) {
 
     set_pev(pWeaponBox, pev_angles, vecAngles);
 
-    ZP_Player_UpdateSpeed(pPlayer);
+    ZP_Player_UpdateSpeed(this);
 }
 
-DropPlayerUnactiveWeapons(pPlayer) {
-    new pActiveItem = get_member(pPlayer, m_pActiveItem);
+@Player_DropUnactiveWeapons(this) {
+    new pActiveItem = get_member(this, m_pActiveItem);
     new iActiveSlot;
 
     if (pActiveItem != -1) {
         // remove active item from player's inventory
-        TakePlayerItem(pPlayer, pActiveItem, iActiveSlot);
+        @Player_TakeItem(this, pActiveItem, iActiveSlot);
     }
 
-    DropPlayerItems(pPlayer);
+    @Player_DropItems(this);
 
     if (pActiveItem != -1) {
         // return the active item to player's inventory for the default drop logic
-        set_member(pActiveItem, m_pPlayer, pPlayer);
-        set_member(pPlayer, m_pActiveItem, pActiveItem);
-        set_member(pPlayer, m_rgpPlayerItems, pActiveItem, iActiveSlot);
+        set_member(pActiveItem, m_pPlayer, this);
+        set_member(this, m_pActiveItem, pActiveItem);
+        set_member(this, m_rgpPlayerItems, pActiveItem, iActiveSlot);
     }
 
-    ZP_Player_UpdateSpeed(pPlayer);
+    ZP_Player_UpdateSpeed(this);
 }
 
-DropPlayerWeaponBox(pPlayer) {
+@Player_DropWeaponBox(this) {
     new pWeaponBox = rg_create_entity("weaponbox", true);
     dllfunc(DLLFunc_Spawn, pWeaponBox);
 
-    ThrowPlayerItem(pPlayer, pWeaponBox);
+    @Player_ThrowItem(this, pWeaponBox);
 
     return pWeaponBox;
 }
 
-ThrowPlayerItem(pPlayer, pEntity) {
+@Player_ThrowItem(this, pEntity) {
     static Float:vecAngles[3];
-    pev(pPlayer, pev_angles, vecAngles);
+    pev(this, pev_angles, vecAngles);
     vecAngles[0] = 0.0;
     vecAngles[2] = 0.0;
     set_pev(pEntity, pev_angles, vecAngles);
 
     static Float:vecOrigin[3];
-    pev(pPlayer, pev_origin, vecOrigin);
+    pev(this, pev_origin, vecOrigin);
     engfunc(EngFunc_SetOrigin, pEntity, vecOrigin);
 }
 
-TakePlayerItem(pPlayer, pItemToDrop, &_iSlot = 0) {
-    new pActiveItem = get_member(pPlayer, m_pActiveItem);
+@Player_TakeItem(this, pItemToDrop, &_iSlot) {
+    new pActiveItem = get_member(this, m_pActiveItem);
 
     if (pItemToDrop == pActiveItem) {
-        set_member(pPlayer, m_pActiveItem, -1);
+        set_member(this, m_pActiveItem, -1);
     }
 
     for (new iSlot = 0; iSlot < 6; ++iSlot) {
-        new pItem = get_member(pPlayer, m_rgpPlayerItems, iSlot);
+        new pItem = get_member(this, m_rgpPlayerItems, iSlot);
 
         new pPrevItem = -1;
         while (pItem != -1) {
@@ -204,7 +204,7 @@ TakePlayerItem(pPlayer, pItemToDrop, &_iSlot = 0) {
 
             if (pItem == pItemToDrop) {
                 if (pPrevItem == -1) {
-                    set_member(pPlayer, m_rgpPlayerItems, pNextItem, iSlot);
+                    set_member(this, m_rgpPlayerItems, pNextItem, iSlot);
                 } else {
                     set_member(pPrevItem, m_pNext, pNextItem);
                 }
@@ -212,7 +212,7 @@ TakePlayerItem(pPlayer, pItemToDrop, &_iSlot = 0) {
                 set_member(pItem, m_pNext, -1);
                 set_member(pItem, m_pPlayer, -1);
                 _iSlot = iSlot;
-                ZP_Player_UpdateSpeed(pPlayer);
+                ZP_Player_UpdateSpeed(this);
                 return pItem;
             }
 
@@ -224,13 +224,13 @@ TakePlayerItem(pPlayer, pItemToDrop, &_iSlot = 0) {
     return -1;
 }
 
-DropPlayerItems(pPlayer) {
-    set_member(pPlayer, m_pActiveItem, -1);
+@Player_DropItems(this) {
+    set_member(this, m_pActiveItem, -1);
 
     for (new iSlot = 0; iSlot < 6; ++iSlot) {
-        new pItem = get_member(pPlayer, m_rgpPlayerItems, iSlot);
+        new pItem = get_member(this, m_rgpPlayerItems, iSlot);
         
-        set_member(pPlayer, m_rgpPlayerItems, -1, iSlot);
+        set_member(this, m_rgpPlayerItems, -1, iSlot);
 
         while (pItem != -1) {
             new pNextItem = get_member(pItem, m_pNext);
@@ -240,25 +240,25 @@ DropPlayerItems(pPlayer) {
                 new iPrimaryAmmoType = get_member(pItem, m_Weapon_iPrimaryAmmoType);
 
                 if (iClip == -1 && iPrimaryAmmoType > 0) {
-                    new iPrimaryAmmoAmount = get_member(pPlayer, m_rgAmmo, iPrimaryAmmoType);
+                    new iPrimaryAmmoAmount = get_member(this, m_rgAmmo, iPrimaryAmmoType);
                     if (iPrimaryAmmoAmount > 0) {
-                        new pWeaponBox = DropPlayerItem(pPlayer, pItem, iSlot);
+                        new pWeaponBox = @Player_DropItem(this, pItem, iSlot);
                         set_member(pWeaponBox, m_WeaponBox_rgAmmo, iPrimaryAmmoAmount, iPrimaryAmmoType);
                         set_member(pWeaponBox, m_WeaponBox_rgiszAmmo, AMMO_LIST[iPrimaryAmmoType], iPrimaryAmmoType);
                         set_member(pWeaponBox, m_WeaponBox_cAmmoTypes, 1);
-                        set_member(pPlayer, m_rgAmmo, 0, iPrimaryAmmoType);
+                        set_member(this, m_rgAmmo, 0, iPrimaryAmmoType);
                     }
                 } else {
-                    DropPlayerItem(pPlayer, pItem, iSlot);
+                    @Player_DropItem(this, pItem, iSlot);
                 }
             } else {
-                get_member(pPlayer, m_rgpPlayerItems, iSlot);
+                get_member(this, m_rgpPlayerItems, iSlot);
                 
-                new pPlayerItem = get_member(pPlayer, m_rgpPlayerItems, iSlot);
+                new pPlayerItem = get_member(this, m_rgpPlayerItems, iSlot);
                 if (pPlayerItem != -1) {
                     set_member(pPlayerItem, m_pNext, pItem);
                 } else {
-                    set_member(pPlayer, m_rgpPlayerItems, pItem, iSlot);
+                    set_member(this, m_rgpPlayerItems, pItem, iSlot);
                 }
             }
 
@@ -266,13 +266,13 @@ DropPlayerItems(pPlayer) {
         }
     }
 
-    set_member(pPlayer, m_pLastItem, -1);
+    set_member(this, m_pLastItem, -1);
 
-    ZP_Player_UpdateSpeed(pPlayer);
+    ZP_Player_UpdateSpeed(this);
 }
 
-DropPlayerItem(pPlayer, pItem, iSlot) {
-    new pWeaponBox = DropPlayerWeaponBox(pPlayer);
+@Player_DropItem(this, pItem, iSlot) {
+    new pWeaponBox = @Player_DropWeaponBox(this);
 
     set_pev(pItem, pev_spawnflags, pev(pItem, pev_spawnflags) | SF_NORESPAWN);
     set_pev(pItem, pev_effects, EF_NODRAW);
@@ -283,7 +283,7 @@ DropPlayerItem(pPlayer, pItem, iSlot) {
     set_pev(pItem, pev_owner, pWeaponBox);
 
     new iWeaponId = get_member(pItem, m_iId);
-    set_pev(pPlayer, pev_weapons, pev(pPlayer, pev_weapons) &~ (1<<iWeaponId));
+    set_pev(this, pev_weapons, pev(this, pev_weapons) &~ (1<<iWeaponId));
 
     set_member(pItem, m_pPlayer, -1);
     set_member(pItem, m_pNext, -1);
@@ -299,12 +299,12 @@ DropPlayerItem(pPlayer, pItem, iSlot) {
 
     dllfunc(DLLFunc_Spawn, pWeaponBox); // fix model
 
-    ZP_Player_UpdateSpeed(pPlayer);
+    ZP_Player_UpdateSpeed(this);
 
     return pWeaponBox;
 }
 
-PackPlayerAmmo(pPlayer, pWeaponBox, bool:bUnactiveOnly = false) {
+@Player_PackAmmo(this, pWeaponBox, bool:bUnactiveOnly) {
     new iWeaponBoxAmmoIndex = 0;
 
     new iSize = sizeof(AMMO_LIST);
@@ -313,7 +313,7 @@ PackPlayerAmmo(pPlayer, pWeaponBox, bool:bUnactiveOnly = false) {
             new bool:bSkip = false;
 
             for (new iSlot = 0; iSlot < 6; ++iSlot) {
-                new pItem = get_member(pPlayer, m_rgpPlayerItems, iSlot);
+                new pItem = get_member(this, m_rgpPlayerItems, iSlot);
 
                 while (pItem != -1) {
                     if (iAmmoId == get_member(pItem, m_Weapon_iPrimaryAmmoType)) {
@@ -330,12 +330,12 @@ PackPlayerAmmo(pPlayer, pWeaponBox, bool:bUnactiveOnly = false) {
             }
         }
 
-        new iBpAmmo = get_member(pPlayer, m_rgAmmo, iAmmoId);
+        new iBpAmmo = get_member(this, m_rgAmmo, iAmmoId);
 
         if (iBpAmmo > 0) {
             set_member(pWeaponBox, m_WeaponBox_rgiszAmmo, AMMO_LIST[iAmmoId], iWeaponBoxAmmoIndex);
             set_member(pWeaponBox, m_WeaponBox_rgAmmo, iBpAmmo, iWeaponBoxAmmoIndex);
-            set_member(pPlayer, m_rgAmmo, 0, iAmmoId);
+            set_member(this, m_rgAmmo, 0, iAmmoId);
             iWeaponBoxAmmoIndex++;
         }
     }
@@ -343,9 +343,9 @@ PackPlayerAmmo(pPlayer, pWeaponBox, bool:bUnactiveOnly = false) {
     return iWeaponBoxAmmoIndex;
 }
 
-SelectNextPlayerAmmo(pPlayer, bool:bShowMessage = true) {
+@Player_SelectNextAmmo(this, bool:bShowMessage) {
     new iAmmoId;
-    new iAmmoIndex = g_rgpPlayerSelectedAmmo[pPlayer];
+    new iAmmoIndex = g_rgpPlayerSelectedAmmo[this];
 
     do {
         iAmmoIndex++;
@@ -356,32 +356,32 @@ SelectNextPlayerAmmo(pPlayer, bool:bShowMessage = true) {
 
         iAmmoId = ZP_Ammo_GetId(iAmmoIndex);
 
-        if (ZP_Ammo_GetPackSize(iAmmoIndex) != -1 && get_member(pPlayer, m_rgAmmo, iAmmoId) > 0) {
+        if (ZP_Ammo_GetPackSize(iAmmoIndex) != -1 && get_member(this, m_rgAmmo, iAmmoId) > 0) {
             break;
         }
-    } while (iAmmoIndex != g_rgpPlayerSelectedAmmo[pPlayer]);
+    } while (iAmmoIndex != g_rgpPlayerSelectedAmmo[this]);
 
-    new iAmmoAmount = get_member(pPlayer, m_rgAmmo, iAmmoId);
-    if (g_rgpPlayerSelectedAmmo[pPlayer] == iAmmoIndex && !iAmmoAmount) {
+    new iAmmoAmount = get_member(this, m_rgAmmo, iAmmoId);
+    if (g_rgpPlayerSelectedAmmo[this] == iAmmoIndex && !iAmmoAmount) {
         return;
     }
 
-    g_rgpPlayerSelectedAmmo[pPlayer] = iAmmoIndex;
+    g_rgpPlayerSelectedAmmo[this] = iAmmoIndex;
 
     if (bShowMessage) {
         static szAmmoName[32];
-        ZP_Ammo_GetName(g_rgpPlayerSelectedAmmo[pPlayer], szAmmoName, charsmax(szAmmoName));
+        ZP_Ammo_GetName(g_rgpPlayerSelectedAmmo[this], szAmmoName, charsmax(szAmmoName));
 
         new iMaxAmmo = ZP_Ammo_GetMaxAmount(iAmmoIndex);
 
-        client_print(pPlayer, print_chat, "Selected %s ammo [%d/%d]", szAmmoName, iAmmoAmount, iMaxAmmo);
+        client_print(this, print_chat, "Selected %s ammo [%d/%d]", szAmmoName, iAmmoAmount, iMaxAmmo);
     }
 }
 
-DropPlayerSelectedAmmo(pPlayer) {
-    new iAmmoIndex = g_rgpPlayerSelectedAmmo[pPlayer];
+@Player_DropSelectedAmmo(this) {
+    new iAmmoIndex = g_rgpPlayerSelectedAmmo[this];
     new iAmmoId = ZP_Ammo_GetId(iAmmoIndex);
-    new iBpAmmo = get_member(pPlayer, m_rgAmmo, iAmmoId);
+    new iBpAmmo = get_member(this, m_rgAmmo, iAmmoId);
 
     if (iBpAmmo <= 0) {
         return;
@@ -389,16 +389,16 @@ DropPlayerSelectedAmmo(pPlayer) {
 
     new iPackSize = min(ZP_Ammo_GetPackSize(iAmmoIndex), iBpAmmo);
     new pWeaponBox = UTIL_CreateAmmoBox(iAmmoId, iPackSize);
-    ThrowPlayerItem(pPlayer, pWeaponBox);
+    @Player_ThrowItem(this, pWeaponBox);
 
-    set_member(pPlayer, m_rgAmmo, iBpAmmo - iPackSize, iAmmoId);
+    set_member(this, m_rgAmmo, iBpAmmo - iPackSize, iAmmoId);
 
     static szAmmoModel[64];
     ZP_Ammo_GetPackModel(iAmmoIndex, szAmmoModel, charsmax(szAmmoModel));
     engfunc(EngFunc_SetModel, pWeaponBox, szAmmoModel);
 
     static Float:vecThrowAngle[3];
-    pev(pPlayer, pev_v_angle, vecThrowAngle);
+    pev(this, pev_v_angle, vecThrowAngle);
     engfunc(EngFunc_MakeVectors, vecThrowAngle); 
 
     static Float:vecVelocity[3];
@@ -406,10 +406,10 @@ DropPlayerSelectedAmmo(pPlayer) {
     xs_vec_mul_scalar(vecVelocity, random_float(400.0, 450.0), vecVelocity);
     set_pev(pWeaponBox, pev_velocity, vecVelocity);
 
-    ZP_Player_UpdateSpeed(pPlayer);
+    ZP_Player_UpdateSpeed(this);
 }
 
-GetAmmo(pPlayer, const szAmmo[]) {
+@Player_GetAmmo(this, const szAmmo[]) {
     new iAmmoHandler = ZP_Ammo_GetHandler(szAmmo);
     if (iAmmoHandler == -1) {
         return 0;
@@ -417,35 +417,35 @@ GetAmmo(pPlayer, const szAmmo[]) {
 
     new iId = ZP_Ammo_GetId(iAmmoHandler);
 
-    return get_member(pPlayer, m_rgAmmo, iId);
+    return get_member(this, m_rgAmmo, iId);
 }
 
-bool:SetAmmo(pPlayer, const szAmmo[], iValue) {
+bool:@Player_SetAmmo(this, const szAmmo[], iValue) {
     new iAmmoHandler = ZP_Ammo_GetHandler(szAmmo);
     if (iAmmoHandler == -1) {
         return false;
     }
 
     new iId = ZP_Ammo_GetId(iAmmoHandler);
-    set_member(pPlayer, m_rgAmmo, iValue, iId);
+    set_member(this, m_rgAmmo, iValue, iId);
 
-    ZP_Player_UpdateSpeed(pPlayer);
+    ZP_Player_UpdateSpeed(this);
 
     return true;
 }
 
-AddAmmo(pPlayer, const szAmmo[], iValue) {
+@Player_AddAmmo(this, const szAmmo[], iValue) {
     new iAmmoHandler = ZP_Ammo_GetHandler(szAmmo);
     if (iAmmoHandler == -1) {
         return 0;
     }
 
     new iId = ZP_Ammo_GetId(iAmmoHandler);
-    new iAmount = get_member(pPlayer, m_rgAmmo, iId);
+    new iAmount = get_member(this, m_rgAmmo, iId);
     new iNewAmount = min(iAmount + iValue, ZP_Ammo_GetMaxAmount(iAmmoHandler));
-    set_member(pPlayer, m_rgAmmo, iNewAmount, iId);
+    set_member(this, m_rgAmmo, iNewAmount, iId);
 
-    ZP_Player_UpdateSpeed(pPlayer);
+    ZP_Player_UpdateSpeed(this);
 
     return iNewAmount - iAmount;
 }

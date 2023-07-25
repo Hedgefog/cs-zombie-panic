@@ -51,7 +51,7 @@ public plugin_natives() {
 
 public bool:Native_Toggle(iPluginId, iArgc) {
     new pPlayer = get_param(1);
-    return Toggle(pPlayer);
+    return @Player_ToggleVission(pPlayer);
 }
 
 public client_connect(pPlayer) {
@@ -64,7 +64,7 @@ public client_disconnected(pPlayer) {
 }
 
 public Command_ZombieVision(pPlayer) {
-    Toggle(pPlayer);
+    @Player_ToggleVission(pPlayer);
     return HAM_HANDLED;
 }
 
@@ -73,7 +73,7 @@ public HamHook_Player_Spawn(pPlayer) {
         return HAM_IGNORED;
     }
 
-    SetZombieVision(pPlayer, false);
+    @Player_SetVision(pPlayer, false);
 
     if (!ZP_Player_IsZombie(pPlayer)) {
         return HAM_IGNORED;
@@ -87,7 +87,7 @@ public HamHook_Player_Spawn(pPlayer) {
 }
 
 public HamHook_Player_Killed(pPlayer) {
-    SetZombieVision(pPlayer, false);
+    @Player_SetVision(pPlayer, false);
     remove_task(TASKID_ACTIVATE_VISION + pPlayer);
 
     if (!ZP_Player_IsZombie(pPlayer)) {
@@ -171,14 +171,14 @@ public Message_ScreenFade(iMsgId, iMsgDest, pPlayer) {
     new Float:flDuration = (float(get_msg_arg_int(1)) / (1<<12)) + (float(get_msg_arg_int(2)) / (1<<12));
     if (flDuration > 0.0) {
         if (pPlayer > 0) {
-            HandleExternalFade(pPlayer, flDuration);
+            @Player_HandleExternalFade(pPlayer, flDuration);
         } else {
             for (new pTargetPlayer = 1; pTargetPlayer <= MaxClients; ++pTargetPlayer) {
                 if (!is_user_connected(pTargetPlayer)) {
                     continue;
                 }
 
-                HandleExternalFade(pTargetPlayer, flDuration);
+                @Player_HandleExternalFade(pTargetPlayer, flDuration);
             }
         }
     }
@@ -186,52 +186,52 @@ public Message_ScreenFade(iMsgId, iMsgDest, pPlayer) {
     return PLUGIN_CONTINUE;
 }
 
-bool:Toggle(pPlayer) {
-    SetZombieVision(pPlayer, !g_rgbPlayerVision[pPlayer]);
-    return g_rgbPlayerVision[pPlayer];
+bool:@Player_ToggleVission(this) {
+    @Player_SetVision(this, !g_rgbPlayerVision[this]);
+    return g_rgbPlayerVision[this];
 }
 
-SetZombieVision(pPlayer, bool:bValue) {
-    if (bValue == g_rgbPlayerVision[pPlayer]) {
+@Player_SetVision(this, bool:bValue) {
+    if (bValue == g_rgbPlayerVision[this]) {
         return;
     }
     
     if (bValue) {
-        if (!ZP_Player_IsZombie(pPlayer)) {
+        if (!ZP_Player_IsZombie(this)) {
             return;
         }
 
-        if (g_rgbPlayerVision[pPlayer]) {
+        if (g_rgbPlayerVision[this]) {
             return;
         }
     }
 
-    VisionFadeEffect(pPlayer, bValue);
-    g_rgbPlayerVision[pPlayer] = bValue;
+    @Player_VisionFadeEffect(this, bValue);
+    g_rgbPlayerVision[this] = bValue;
 
-    ExecuteForward(g_pFwZombieVision, g_iFwResult, pPlayer, bValue);
+    ExecuteForward(g_pFwZombieVision, g_iFwResult, this, bValue);
 }
 
-VisionFadeEffect(pPlayer, bool:bValue) {
-    if (g_rgbPlayerExternalFade[pPlayer]) {
+@Player_VisionFadeEffect(this, bool:bValue) {
+    if (g_rgbPlayerExternalFade[this]) {
         return;
     }
 
     g_bIgnoreFadeMessage = true;
-    UTIL_ScreenFade(pPlayer, {VISION_SCREEN_FADE_COLOR}, VISION_EFFECT_TIME, 0.0, VISION_ALPHA, (bValue ? FFADE_OUT | FFADE_STAYOUT : FFADE_IN), .bExternal = true);
+    UTIL_ScreenFade(this, {VISION_SCREEN_FADE_COLOR}, VISION_EFFECT_TIME, 0.0, VISION_ALPHA, (bValue ? FFADE_OUT | FFADE_STAYOUT : FFADE_IN), .bExternal = true);
     g_bIgnoreFadeMessage = false;
 }
 
-HandleExternalFade(pPlayer, Float:flHoldTime) {
-    g_rgbPlayerExternalFade[pPlayer] = true;
-    set_task(flHoldTime, "Task_FixVisionScreenFade", TASKID_FIX_FADE + pPlayer);
+@Player_HandleExternalFade(this, Float:flHoldTime) {
+    g_rgbPlayerExternalFade[this] = true;
+    set_task(flHoldTime, "Task_FixVisionScreenFade", TASKID_FIX_FADE + this);
 }
 
 public Task_FixVisionScreenFade(iTaskId) {
     new pPlayer = iTaskId - TASKID_FIX_FADE;
 
     if (is_user_connected(pPlayer) && g_rgbPlayerVision[pPlayer]) {
-        VisionFadeEffect(pPlayer, true);
+        @Player_VisionFadeEffect(pPlayer, true);
     }
 
     g_rgbPlayerExternalFade[pPlayer] = false;
@@ -240,5 +240,5 @@ public Task_FixVisionScreenFade(iTaskId) {
 public Task_ActivateVision(iTaskId) {
     new pPlayer = iTaskId - TASKID_ACTIVATE_VISION;
 
-    SetZombieVision(pPlayer, true);
+    @Player_SetVision(pPlayer, true);
 }

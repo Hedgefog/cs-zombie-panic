@@ -36,19 +36,19 @@ public HamHook_Player_TakeDamage_Post(pPlayer) {
     return HAM_HANDLED;
 }
 
-SetupRegenerateTask(pPlayer) {
-    set_task(REGENERATION_DELAY, "Task_Regenerate", TASKID_REGENERATE + pPlayer);
+@Player_SetupRegenerateTask(this) {
+    set_task(REGENERATION_DELAY, "Task_Regenerate", TASKID_REGENERATE + this);
 }
 
 public Task_StartRegenerate(iTaskId) {
     new pPlayer = iTaskId - TASKID_START_REGENERATE;
-    SetupRegenerateTask(pPlayer);
+    @Player_SetupRegenerateTask(pPlayer);
 }
 
 public Task_Regenerate(iTaskId) {
     new pPlayer = iTaskId - TASKID_REGENERATE;
 
     if (ExecuteHamB(Ham_TakeHealth, pPlayer, (get_pcvar_float(g_pCvarRegenerationRate) * REGENERATION_DELAY), 0)) {
-        SetupRegenerateTask(pPlayer);
+        @Player_SetupRegenerateTask(pPlayer);
     }
 }

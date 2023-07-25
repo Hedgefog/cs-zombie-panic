@@ -61,11 +61,11 @@ public plugin_natives() {
 
 public bool:Native_Toggle(iPluginId, iArgc) {
     new pPlayer = get_param(1);
-    return SetPlayerFlashlight(pPlayer, !g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_On]);
+    return @Player_SetFlashlight(pPlayer, !g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_On]);
 }
 
 public client_disconnected(pPlayer) {
-    SetPlayerFlashlight(pPlayer, false);
+    @Player_SetFlashlight(pPlayer, false);
 }
 
 public HamHook_Player_Spawn_Post(pPlayer) {
@@ -73,7 +73,7 @@ public HamHook_Player_Spawn_Post(pPlayer) {
         return HAM_IGNORED;
     }
 
-    SetPlayerFlashlight(pPlayer, false);
+    @Player_SetFlashlight(pPlayer, false);
     g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_Charge] = FLASHLIGHT_DEF_CHARGE;
     set_pev(pPlayer, pev_framerate, 1.0);
     
@@ -81,42 +81,42 @@ public HamHook_Player_Spawn_Post(pPlayer) {
 }
 
 public HamHook_Player_Killed_Post(pPlayer) {
-    SetPlayerFlashlight(pPlayer, false);
+    @Player_SetFlashlight(pPlayer, false);
 
     return HAM_HANDLED;
 }
 
 public HamHook_Player_PreThink_Post(pPlayer) {
-    FlashlightThink(pPlayer);
+    @Player_FlashlightThink(pPlayer);
 
     return HAM_HANDLED;
 }
 
-public FlashlightThink(pPlayer) {
-    new Float:flDelta = get_gametime() - g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_LastThink];
+public @Player_FlashlightThink(this) {
+    new Float:flDelta = get_gametime() - g_rgPlayerFlashlight[this][PlayerFlashlight_LastThink];
     if (flDelta < FLASHLIGHT_RATE) {
         return;
     }
 
-    if (g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_On]) {
-        if (g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_Charge] > FLASHLIGHT_MIN_CHARGE) {
-            CreatePlayerFlashlightLight(pPlayer);
-            g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_Charge] -= (get_pcvar_float(g_pCvarConsumptionRate) * flDelta);
-            g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_Charge] = floatmax(g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_Charge], FLASHLIGHT_MIN_CHARGE);
-            set_pev(pPlayer, pev_framerate, 0.5);
+    if (g_rgPlayerFlashlight[this][PlayerFlashlight_On]) {
+        if (g_rgPlayerFlashlight[this][PlayerFlashlight_Charge] > FLASHLIGHT_MIN_CHARGE) {
+            @Player_CreateFlashlightLight(this);
+            g_rgPlayerFlashlight[this][PlayerFlashlight_Charge] -= (get_pcvar_float(g_pCvarConsumptionRate) * flDelta);
+            g_rgPlayerFlashlight[this][PlayerFlashlight_Charge] = floatmax(g_rgPlayerFlashlight[this][PlayerFlashlight_Charge], FLASHLIGHT_MIN_CHARGE);
+            set_pev(this, pev_framerate, 0.5);
         } else {
-             SetPlayerFlashlight(pPlayer, false);
+             @Player_SetFlashlight(this, false);
         }
-    } else if (g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_Charge] < FLASHLIGHT_MAX_CHARGE) {
-        g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_Charge] += (get_pcvar_float(g_pCvarRecoveryRate) * flDelta);
-        g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_Charge] = floatmin(g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_Charge], FLASHLIGHT_MAX_CHARGE);
+    } else if (g_rgPlayerFlashlight[this][PlayerFlashlight_Charge] < FLASHLIGHT_MAX_CHARGE) {
+        g_rgPlayerFlashlight[this][PlayerFlashlight_Charge] += (get_pcvar_float(g_pCvarRecoveryRate) * flDelta);
+        g_rgPlayerFlashlight[this][PlayerFlashlight_Charge] = floatmin(g_rgPlayerFlashlight[this][PlayerFlashlight_Charge], FLASHLIGHT_MAX_CHARGE);
     }
 
-    g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_LastThink] = get_gametime();
+    g_rgPlayerFlashlight[this][PlayerFlashlight_LastThink] = get_gametime();
 }
 
-bool:SetPlayerFlashlight(pPlayer, bool:bValue) {   
-    if (bValue == g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_On]) {
+bool:@Player_SetFlashlight(this, bool:bValue) {   
+    if (bValue == g_rgPlayerFlashlight[this][PlayerFlashlight_On]) {
         return true;
     }
 
@@ -125,35 +125,35 @@ bool:SetPlayerFlashlight(pPlayer, bool:bValue) {
             return false;
         }
 
-        if (ZP_Player_IsZombie(pPlayer) || !is_user_alive(pPlayer)) {
+        if (ZP_Player_IsZombie(this) || !is_user_alive(this)) {
             return false;
         }
 
-        if (g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_Charge] < FLASHLIGHT_MIN_CHARGE_TO_ACTIVATE) {
+        if (g_rgPlayerFlashlight[this][PlayerFlashlight_Charge] < FLASHLIGHT_MIN_CHARGE_TO_ACTIVATE) {
             return false;
         }
     }
 
-    g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_On] = bValue;
+    g_rgPlayerFlashlight[this][PlayerFlashlight_On] = bValue;
 
-    remove_task(TASKID_FLASHLIGHT_HUD + pPlayer);
+    remove_task(TASKID_FLASHLIGHT_HUD + this);
 
     if (bValue) {
-        ShowLightConeEntity(pPlayer);
-        set_task(1.0, "Task_FlashlightHud", TASKID_FLASHLIGHT_HUD + pPlayer, _, _, "b");
+        @Player_ShowLightConeEntity(this);
+        set_task(1.0, "Task_FlashlightHud", TASKID_FLASHLIGHT_HUD + this, _, _, "b");
     } else {
-        HideLightConeEntity(pPlayer);
+        @Player_HideLightConeEntityy(this);
     }
 
-    if (is_user_connected(pPlayer)) {
-        UpdateFlashlightHud(pPlayer);
-        emit_sound(pPlayer, CHAN_ITEM, ZP_FLASHLIGHT_SOUND, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    if (is_user_connected(this)) {
+        @Player_UpdateFlashlightHud(this);
+        emit_sound(this, CHAN_ITEM, ZP_FLASHLIGHT_SOUND, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
     }
 
     return true;
 }
 
-CreateLightConeEntity(pPlayer) {
+@Player_CreateLightConeEntity(this) {
     static iszClassname;
     if (!iszClassname) {
         iszClassname = engfunc(EngFunc_AllocString, "info_target");
@@ -163,51 +163,51 @@ CreateLightConeEntity(pPlayer) {
 
     set_pev(pEntity, pev_classname, "lightcone");
     set_pev(pEntity, pev_movetype, MOVETYPE_FOLLOW);
-    set_pev(pEntity, pev_aiment, pPlayer);
-    set_pev(pEntity, pev_owner, pPlayer);
+    set_pev(pEntity, pev_aiment, this);
+    set_pev(pEntity, pev_owner, this);
 
     engfunc(EngFunc_SetModel, pEntity, ZP_FLASHLIGHT_LIGHTCONE_MODEL);
 
-    g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_ConeEntity] = pEntity;
+    g_rgPlayerFlashlight[this][PlayerFlashlight_ConeEntity] = pEntity;
 
     return pEntity;
 }
 
-ShowLightConeEntity(pPlayer) {
-    new iLightconeEntity = g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_ConeEntity];
+@Player_ShowLightConeEntity(this) {
+    new iLightconeEntity = g_rgPlayerFlashlight[this][PlayerFlashlight_ConeEntity];
     if (!iLightconeEntity) {
-        iLightconeEntity = CreateLightConeEntity(pPlayer);
+        iLightconeEntity = @Player_CreateLightConeEntity(this);
     }
 
     set_pev(iLightconeEntity, pev_effects, pev(iLightconeEntity, pev_effects) & ~EF_NODRAW);
-    set_pev(pPlayer, pev_framerate, 0.5);
+    set_pev(this, pev_framerate, 0.5);
 }
 
-HideLightConeEntity(pPlayer) {
-    new iLightconeEntity = g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_ConeEntity];
+@Player_HideLightConeEntityy(this) {
+    new iLightconeEntity = g_rgPlayerFlashlight[this][PlayerFlashlight_ConeEntity];
     if (iLightconeEntity) {
         set_pev(iLightconeEntity, pev_effects, pev(iLightconeEntity, pev_effects) | EF_NODRAW);
-        set_pev(pPlayer, pev_framerate, 1.0);
+        set_pev(this, pev_framerate, 1.0);
     }
 }
 
-UpdateFlashlightHud(pPlayer) {
-    message_begin(MSG_ONE, gmsgFlashlight, _, pPlayer);
-    write_byte(g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_On]);
-    write_byte(floatround(g_rgPlayerFlashlight[pPlayer][PlayerFlashlight_Charge]));
+@Player_UpdateFlashlightHud(this) {
+    message_begin(MSG_ONE, gmsgFlashlight, _, this);
+    write_byte(g_rgPlayerFlashlight[this][PlayerFlashlight_On]);
+    write_byte(floatround(g_rgPlayerFlashlight[this][PlayerFlashlight_Charge]));
     message_end();
 }
 
-CreatePlayerFlashlightLight(pPlayer) {
+@Player_CreateFlashlightLight(this) {
     static Float:vecViewOfs[3];
-    pev(pPlayer, pev_view_ofs, vecViewOfs);
+    pev(this, pev_view_ofs, vecViewOfs);
 
     static Float:vecStart[3];
-    pev(pPlayer, pev_origin, vecStart);
+    pev(this, pev_origin, vecStart);
     vecStart[2] += vecViewOfs[2];
 
     static Float:vecEnd[3];
-    pev(pPlayer, pev_v_angle, vecEnd);
+    pev(this, pev_v_angle, vecEnd);
     engfunc(EngFunc_MakeVectors, vecEnd); 
     get_global_vector(GL_v_forward, vecEnd);
 
@@ -216,7 +216,7 @@ CreatePlayerFlashlightLight(pPlayer) {
     }
 
     new pTr = create_tr2();
-    engfunc(EngFunc_TraceLine, vecStart, vecEnd, DONT_IGNORE_MONSTERS, pPlayer, pTr);
+    engfunc(EngFunc_TraceLine, vecStart, vecEnd, DONT_IGNORE_MONSTERS, this, pTr);
     get_tr2(pTr, TR_vecEndPos, vecEnd);
     free_tr2(pTr);
 
@@ -243,5 +243,5 @@ CreatePlayerFlashlightLight(pPlayer) {
 public Task_FlashlightHud(iTaskId) {
     new pPlayer = iTaskId - TASKID_FLASHLIGHT_HUD;
 
-    UpdateFlashlightHud(pPlayer);
+    @Player_UpdateFlashlightHud(pPlayer);
 }

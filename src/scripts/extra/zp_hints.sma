@@ -91,7 +91,7 @@ public HamHook_Player_Spawn_Post(pPlayer) {
         return HAM_IGNORED;
     }
 
-    if (!IsPlayerHintsEnabled(pPlayer)) {
+    if (!@Player_IsHintsEnabled(pPlayer)) {
         return HAM_IGNORED;
     }
 
@@ -159,7 +159,7 @@ public HamHook_Player_Killed_Post(pPlayer) {
         return HAM_IGNORED;
     }
 
-    if (!IsPlayerHintsEnabled(pPlayer)) {
+    if (!@Player_IsHintsEnabled(pPlayer)) {
         return HAM_IGNORED;
     }
 
@@ -185,7 +185,7 @@ public Event_ItemPickup(pPlayer) {
         return PLUGIN_CONTINUE;
     }
 
-    if (!IsPlayerHintsEnabled(pPlayer)) {
+    if (!@Player_IsHintsEnabled(pPlayer)) {
         return PLUGIN_CONTINUE;
     }
 
@@ -227,7 +227,7 @@ public ZP_Fw_PlayerAimItem(pPlayer) {
         return;
     }
 
-    if (!IsPlayerHintsEnabled(pPlayer)) {
+    if (!@Player_IsHintsEnabled(pPlayer)) {
         return;
     }
 
@@ -323,9 +323,9 @@ ShowMessage(pPlayer, MessageType:iType, Float:flPosX = -1.0, Float:flPosY = -1.0
     show_hudmessage(pPlayer, g_message[Message_Text]);
 }
 
-IsPlayerHintsEnabled(pPlayer) {
+@Player_IsHintsEnabled(this) {
     static szValue[2];
-    get_user_info(pPlayer, HINTS_KEY, szValue, charsmax(szValue));
+    get_user_info(this, HINTS_KEY, szValue, charsmax(szValue));
 
     return szValue[0] != '0';
 }

@@ -40,7 +40,7 @@ public plugin_natives() {
 public bool:Native_Panic(iPluginId, iArgc) {
     new pPlayer = get_param(1);
 
-    return Panic(pPlayer);
+    return @Player_Panic(pPlayer);
 }
 
 public bool:Native_InPanic(iPluginId, iArgc) {
@@ -65,8 +65,8 @@ public HamHook_Player_Spawn_Post(pPlayer) {
     g_rgflPlayerLastPanic[pPlayer] = -PANIC_DELAY;
 }
 
-bool:Panic(pPlayer) {
-    if (g_rgbPlayerPanic[pPlayer]) {
+bool:@Player_Panic(this) {
+    if (g_rgbPlayerPanic[this]) {
         return false;
     }
 
@@ -74,24 +74,24 @@ bool:Panic(pPlayer) {
         return false;
     }
     
-    if (get_gametime() - g_rgflPlayerLastPanic[pPlayer] < PANIC_DELAY) {
+    if (get_gametime() - g_rgflPlayerLastPanic[this] < PANIC_DELAY) {
         return false;
     }
 
-    g_rgbPlayerPanic[pPlayer] = true;
-    ZP_Player_DropUnactiveWeapons(pPlayer);
-    ZP_Player_DropUnactiveAmmo(pPlayer);
-    // ZP_Player_UpdateSpeed(pPlayer);
+    g_rgbPlayerPanic[this] = true;
+    ZP_Player_DropUnactiveWeapons(this);
+    ZP_Player_DropUnactiveAmmo(this);
+    // ZP_Player_UpdateSpeed(this);
 
-    emessage_begin(MSG_ONE, gmsgScreenShake, _, pPlayer);
+    emessage_begin(MSG_ONE, gmsgScreenShake, _, this);
     ewrite_short(floatround(1.5 * (1<<12)));
     ewrite_short(floatround(1.0 * (1<<12)));
     ewrite_short(floatround(1.0 * (1<<12)));
     emessage_end();
 
-    set_task(PANIC_DURATION, "Task_EndPanic", pPlayer);
+    set_task(PANIC_DURATION, "Task_EndPanic", this);
 
-    ExecuteForward(g_pFwPanic, g_iFwResult, pPlayer);
+    ExecuteForward(g_pFwPanic, g_iFwResult, this);
 
     return true;
 }

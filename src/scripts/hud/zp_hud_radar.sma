@@ -31,8 +31,6 @@ public plugin_init() {
     register_message(gmsgScoreAttrib, "Message_ScoreAttrib");
     register_message(gmsgHideWeapon, "Message_HideWeapon");
     register_message(gmsgRadar, "Message_Radar");
-
-    // register_forward(FM_CmdStart, "FMHook_CmdStart");
 }
 
 public Message_Radar(iMsgId, iMsgDest, pPlayer) {
@@ -61,37 +59,6 @@ public Message_HideWeapon(iMsgId, iMsgDest, pPlayer) {
     }
     
     g_rgiPlayerHideWeapon[pPlayer] = get_msg_arg_int(1);
-
-    return PLUGIN_CONTINUE;
-}
-
-public FMHook_CmdStart(pPlayer, pCmd) {
-    // new iButtons = pev(pPlayer, pev_button);
-    new iButtons = get_uc(pCmd, UC_Buttons);
-    new iOldButtons = pev(pPlayer, pev_oldbuttons);
-
-    if (iButtons & IN_SCORE == iOldButtons & IN_SCORE)    {
-        return PLUGIN_CONTINUE;
-    }
-
-    g_rgbPlayerInScore[pPlayer] = !!(iButtons & IN_SCORE);
-
-    emessage_begin(MSG_ONE, gmsgScoreAttrib, _, pPlayer);
-    ewrite_byte(pPlayer);
-    ewrite_byte(g_rgbPlayerInScore[pPlayer] ? 0 : SCORE_STATUS_DEAD);
-    emessage_end();
-
-    emessage_begin(MSG_ONE, gmsgHideWeapon, _, pPlayer);
-    if (g_rgbPlayerInScore[pPlayer]) {
-        ewrite_byte(g_rgiPlayerHideWeapon[pPlayer] | HIDEHUD_ALL);
-    } else {
-        ewrite_byte(g_rgiPlayerHideWeapon[pPlayer] & ~HIDEHUD_ALL);
-    }
-    emessage_end();
-
-    emessage_begin(MSG_ONE, gmsgCrosshair, _, pPlayer);
-    ewrite_byte(0);
-    emessage_end();
 
     return PLUGIN_CONTINUE;
 }

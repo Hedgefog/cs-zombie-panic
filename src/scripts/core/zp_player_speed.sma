@@ -43,7 +43,7 @@ public plugin_natives() {
 
 public Native_UpdateSpeed(iPluginId, iArgc) {
     new pPlayer = get_param(1);
-    UpdatePlayerSpeed(pPlayer);
+    @Player_UpdateSpeed(pPlayer);
 }
 
 public Command_Drop(pPlayer) {
@@ -53,7 +53,7 @@ public Command_Drop(pPlayer) {
 }
 
 public HamHook_Player_AddItem_Post(pPlayer) {
-    UpdatePlayerSpeed(pPlayer);
+    @Player_UpdateSpeed(pPlayer);
 
     return HAM_HANDLED;
 }
@@ -69,14 +69,14 @@ public FMHook_CmdStart(pPlayer, pHandle) {
     g_rgbPlayerStrafing[pPlayer] = !!((iButtons & IN_MOVELEFT || iButtons & IN_MOVERIGHT) && ~iButtons & IN_FORWARD);
 
     if ((iButtons & SPEED_BUTTONS) != (iOldButtons & SPEED_BUTTONS) || g_rgbPlayerDucking[pPlayer] != bPrevDucking) {
-        UpdatePlayerSpeed(pPlayer);
+        @Player_UpdateSpeed(pPlayer);
     }
 
     return HAM_HANDLED;
 }
 
 public Message_AmmoPickup(iMsgId, iMsgDest, pPlayer) {
-    UpdatePlayerSpeed(pPlayer);
+    @Player_UpdateSpeed(pPlayer);
 
     return PLUGIN_CONTINUE;
 }
@@ -86,13 +86,13 @@ public HamHook_Player_ItemPreFrame_Post(pPlayer) {
     pev(pPlayer, pev_maxspeed, flMaxSpeed);
     g_rgflPlayerMaxSpeed[pPlayer] = flMaxSpeed;
 
-    UpdatePlayerSpeed(pPlayer);
+    @Player_UpdateSpeed(pPlayer);
 
     return HAM_HANDLED;
 }
 
-bool:UpdatePlayerSpeed(pPlayer) {
-    if (!is_user_alive(pPlayer)) {
+bool:@Player_UpdateSpeed(this) {
+    if (!is_user_alive(this)) {
         return false;
     }
 
@@ -100,10 +100,10 @@ bool:UpdatePlayerSpeed(pPlayer) {
         return false;
     }
 
-    new Float:flMaxSpeed = CalculatePlayerMaxSpeed(pPlayer);
-    set_pev(pPlayer, pev_maxspeed, flMaxSpeed);
+    new Float:flMaxSpeed = CalculatePlayerMaxSpeed(this);
+    set_pev(this, pev_maxspeed, flMaxSpeed);
 
-    ExecuteForward(g_pFwPlayerSpeedUpdated, g_iFwResult, pPlayer);
+    ExecuteForward(g_pFwPlayerSpeedUpdated, g_iFwResult, this);
 
     return true;
 }
@@ -189,5 +189,5 @@ Float:CalculatePlayerAmmoWeight(pPlayer) {
 
 public Task_UpdateSpeed(iTaskId) {
     new pPlayer = iTaskId;
-    UpdatePlayerSpeed(pPlayer);
+    @Player_UpdateSpeed(pPlayer);
 }

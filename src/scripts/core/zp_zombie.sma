@@ -32,7 +32,7 @@ public plugin_natives() {
 public bool:Native_IsPlayerZombie(iPluginId, iArgc) {
     new pPlayer = get_param(1);
 
-    return IsPlayerZombie(pPlayer);
+    return @Player_IsZombie(pPlayer);
 }
 
 public HamHook_Button_Use(pEntity, pToucher) {
@@ -106,7 +106,7 @@ public HamHook_Item_Touch(pEntity, pToucher) {
     return HAM_SUPERCEDE;
 }
 
-bool:IsPlayerZombie(pPlayer) {
+bool:@Player_IsZombie(pPlayer) {
     if (!Round_IsRoundStarted()) {
         return false;
     }
