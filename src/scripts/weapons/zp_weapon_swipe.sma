@@ -72,7 +72,7 @@ public HamHook_Player_Spawn_Post(pPlayer) {
 }
 
 public HamHook_Player_TraceAttack(this, pAttacker, Float:flDamage, Float:vecDir[3], pTr, iDamageBits) {
-    if (!UTIL_IsPlayer(pAttacker)) {
+    if (!IS_PLAYER(pAttacker)) {
         return HAM_IGNORED;
     }
 

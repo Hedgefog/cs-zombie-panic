@@ -101,7 +101,7 @@ Float:@Weapon_GetMaxSpeed(this) {
 }
 
 public HamHook_Player_TakeDamage_Post(this, pInflictor, pAttacker) {
-    if (!UTIL_IsPlayer(pAttacker)) {
+    if (!IS_PLAYER(pAttacker)) {
         return HAM_IGNORED;
     }
 
@@ -144,7 +144,7 @@ Swing(this) {
             case 2: CW_PlayAnimation(this, 8, 19.0 / 24.0);
         }
 
-        if (UTIL_IsPlayer(pHit)) {
+        if (IS_PLAYER(pHit)) {
             emit_sound(pPlayer, CHAN_ITEM, ZP_WEAPON_CROWBAR_HITBODY_SOUNDS[random(sizeof(ZP_WEAPON_CROWBAR_HITBODY_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
         } else {
             emit_sound(pPlayer, CHAN_ITEM, ZP_WEAPON_CROWBAR_HIT_SOUNDS[random(sizeof(ZP_WEAPON_CROWBAR_HIT_SOUNDS))], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);

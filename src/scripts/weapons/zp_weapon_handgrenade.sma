@@ -289,7 +289,7 @@ public BounceTouch(this, pOther) {
 
     // only do damage if we're moving fairly fast
     if (get_member(this, m_flNextAttack) < get_gametime() && xs_vec_len(vecVelocity) > 100.0) {
-        if (UTIL_IsPlayer(pOwner) && UTIL_IsPlayer(pOther) && rg_is_player_can_takedamage(pOther, pOwner)) {
+        if (IS_PLAYER(pOwner) && IS_PLAYER(pOther) && rg_is_player_can_takedamage(pOther, pOwner)) {
             new pTr = create_tr2();
             rg_multidmg_clear();
             static Float:vecForward[3];

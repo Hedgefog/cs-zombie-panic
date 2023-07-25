@@ -43,7 +43,7 @@ public plugin_init() {
 }
 
 public HamHook_Item_Touch(pEntity, pToucher) {
-    if (!UTIL_IsPlayer(pToucher)) {
+    if (!IS_PLAYER(pToucher)) {
         return HAM_IGNORED;
     }
 
@@ -59,7 +59,7 @@ public FMHook_AddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSe
         return FMRES_IGNORED;
     }
 
-    if (!UTIL_IsPlayer(pHost)) {
+    if (!IS_PLAYER(pHost)) {
         return FMRES_IGNORED;
     }
 

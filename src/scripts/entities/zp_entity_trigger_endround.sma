@@ -10,11 +10,10 @@
 #include <api_custom_entities>
 
 #include <zombiepanic>
+#include <zombiepanic_utils>
 
 #define PLUGIN "[Entity] trigger_endround"
 #define AUTHOR "Hedgehog Fog"
-
-#define IS_PLAYER(%1) (%1 >= 1 && %1 <= MaxClients)
 
 #define ENTITY_NAME "trigger_endround"
 #define MEMBER_PLAYER_FLAGS "playerflags"

@@ -182,7 +182,7 @@ public HamHook_Player_TraceAttack(pPlayer, pAttacker, Float:flDamage, Float:vecD
         return HAM_IGNORED;
     }
 
-    if (!UTIL_IsPlayer(pAttacker)) {
+    if (!IS_PLAYER(pAttacker)) {
         return HAM_IGNORED;
     }
 
@@ -212,7 +212,7 @@ public HamHook_Player_TakeDamage(pPlayer, pInflictor, pAttacker, Float:flDamage,
         return HAM_IGNORED;
     }
 
-    if (!UTIL_IsPlayer(pAttacker)) {
+    if (!IS_PLAYER(pAttacker)) {
         return HAM_IGNORED;
     }
 
@@ -238,7 +238,7 @@ public HamHook_Player_TakeDamage(pPlayer, pInflictor, pAttacker, Float:flDamage,
 }
 
 public HamHook_Player_TakeDamage_Post(pPlayer, pInflictor, pAttacker) {
-    if (!UTIL_IsPlayer(pAttacker)) {
+    if (!IS_PLAYER(pAttacker)) {
         return HAM_IGNORED;
     }
 

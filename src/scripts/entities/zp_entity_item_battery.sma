@@ -46,7 +46,7 @@ public HamHook_Battery_Spawn_Post(pEntity) {
 }
 
 public HamHook_Battery_Touch(pEntity, pToucher) {
-    if (!UTIL_IsPlayer(pToucher)) {
+    if (!IS_PLAYER(pToucher)) {
         return HAM_IGNORED;
     }
 

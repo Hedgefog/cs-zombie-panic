@@ -1,3 +1,5 @@
+#define IS_PLAYER(%1) (%1 >= 1 && %1 <= MaxClients)
+
 // #define ITEM_FLAG_SELECTONEMPTY     1
 // #define ITEM_FLAG_NOAUTORELOAD      2
 // #define ITEM_FLAG_NOAUTOSWITCHEMPTY 4
@@ -31,15 +33,6 @@ stock const ITEMS_LIST[][] = {
     "weapon_shield",
     "grenade"
 };
-
-stock bool:UTIL_IsPlayer(pEntity) {
-    static c_iMaxPlayers;
-    if (!c_iMaxPlayers) {
-      c_iMaxPlayers = get_maxplayers();
-    }
-
-    return (pEntity > 0 && pEntity <= c_iMaxPlayers);
-}
 
 stock UTIL_Message_Dlight(
     const Float:vecOrigin[3],

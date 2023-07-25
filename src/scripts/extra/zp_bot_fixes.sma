@@ -68,7 +68,7 @@ public plugin_init() {
 }
 
 public HamHook_WeaponBox_Touch(this, pToucher) {
-    if (!UTIL_IsPlayer(pToucher)) {
+    if (!IS_PLAYER(pToucher)) {
         return HAM_IGNORED;
     }
 
@@ -158,7 +158,7 @@ public HamHook_Player_PreThink_Post(pPlayer) {
 }
 
 public HamHook_Door_Use(pDoor, pCaller, pActivator) {
-    if (!UTIL_IsPlayer(pActivator)) {
+    if (!IS_PLAYER(pActivator)) {
         return HAM_IGNORED;
     }
 
@@ -425,7 +425,7 @@ bool:ShouldAttackWithMelee(pBot) {
 
     new pAimEntity = GetAimEntity(pBot, MELEE_ATTACK_RANGE);
     if (pAimEntity != -1) {
-        if (UTIL_IsPlayer(pAimEntity)) {
+        if (IS_PLAYER(pAimEntity)) {
             if (IsEnemy(pBot, pAimEntity)) {
                 return true;
             }

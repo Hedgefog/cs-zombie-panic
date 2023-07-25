@@ -98,15 +98,7 @@ public HamHook_Player_Killed(pPlayer) {
 }
 
 public FMHook_AddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
-    if (pEntity == pHost) {
-        return FMRES_IGNORED;
-    }
-
-    if (!UTIL_IsPlayer(pHost)) {
-        return FMRES_IGNORED;
-    }
-
-    if (!UTIL_IsPlayer(pEntity)) {
+    if (!IS_PLAYER(pHost)) {
         return FMRES_IGNORED;
     }
 
@@ -114,10 +106,28 @@ public FMHook_AddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSe
         return FMRES_IGNORED;
     }
 
-    if (!is_user_alive(pEntity)) {
+    if (!pev_valid(pEntity)) {
         return FMRES_IGNORED;
     }
-    
+
+    new pTargetPlayer = 0;
+    if (IS_PLAYER(pEntity)) {
+        pTargetPlayer = pEntity;
+    } else {
+        new pAimEnt = pev(pEntity, pev_aiment);
+        if (IS_PLAYER(pAimEnt)) {
+            pTargetPlayer = pAimEnt;
+        }
+    }
+
+    if (pTargetPlayer == pHost) {
+        return FMRES_IGNORED;
+    }
+
+    if (!is_user_alive(pTargetPlayer)) {
+        return FMRES_IGNORED;
+    }
+
     if (g_bPlayerVision[pHost]) {
         set_es(es, ES_RenderMode, kRenderNormal);
         set_es(es, ES_RenderFx, kRenderFxGlowShell);
@@ -125,17 +135,17 @@ public FMHook_AddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSe
 
         static iColor[3];
 
-        if (!ZP_Player_IsZombie(pEntity)) {
-            if (ZP_Player_IsInfected(pEntity)) {
+        if (!ZP_Player_IsZombie(pTargetPlayer)) {
+            if (ZP_Player_IsInfected(pTargetPlayer)) {
                 iColor[0] = 255;
                 iColor[1] = 120;
                 iColor[2] = 0;
             } else {
                 static Float:flMaxHealth;
-                pev(pEntity, pev_max_health, flMaxHealth);
+                pev(pTargetPlayer, pev_max_health, flMaxHealth);
 
                 static Float:flHealth;
-                pev(pEntity, pev_health, flHealth);
+                pev(pTargetPlayer, pev_health, flHealth);
 
                 iColor[0] = floatround(MAX_BRIGHTNESS * (1.0 - (flHealth / flMaxHealth)));
                 iColor[1] = 0;

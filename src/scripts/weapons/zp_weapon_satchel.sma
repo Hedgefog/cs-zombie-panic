@@ -252,7 +252,7 @@ Deactivate(this) {
     set_pev(this, pev_flags, pev(this, pev_flags) | FL_KILLME);
 
     new pOwner = pev(this, pev_owner);
-    if (UTIL_IsPlayer(pOwner)) {
+    if (IS_PLAYER(pOwner)) {
         g_iPlayerChargeCount[pOwner]--;
     }
 }
@@ -354,7 +354,7 @@ public GrenadeDetonate(this) {
     SetThink(this, "GrenadeSmoke");
     set_pev(this, pev_nextthink, get_gametime() + 0.1);
 
-    if (UTIL_IsPlayer(pOwner)) {
+    if (IS_PLAYER(pOwner)) {
         g_iPlayerChargeCount[pOwner]--;
     }
 }

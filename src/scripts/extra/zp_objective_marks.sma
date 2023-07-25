@@ -96,7 +96,7 @@ public HamHook_Player_Spawn_Post(pPlayer) {
 }
 
 public FMHook_AddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
-    if (!UTIL_IsPlayer(pHost)) {
+    if (!IS_PLAYER(pHost)) {
         return FMRES_IGNORED;
     }
 
@@ -143,7 +143,7 @@ public FMHook_AddToFullPack(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
 }
 
 public FMHook_AddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSet) {
-    if (!UTIL_IsPlayer(pHost)) {
+    if (!IS_PLAYER(pHost)) {
         return FMRES_IGNORED;
     }
 

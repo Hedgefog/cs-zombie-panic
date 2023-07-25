@@ -50,7 +50,7 @@ public bool:Native_InPanic(iPluginId, iArgc) {
 }
 
 public HamHook_WeaponBox_Touch(pItem, pToucher) {
-    if (!UTIL_IsPlayer(pToucher)) {
+    if (!IS_PLAYER(pToucher)) {
         return HAM_IGNORED;
     }
 

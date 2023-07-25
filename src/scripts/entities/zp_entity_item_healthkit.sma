@@ -52,7 +52,7 @@ public HamHook_HealthKit_Spawn_Post(pEntity) {
 }
 
 public HamHook_HealthKit_Touch(pEntity, pToucher) {
-    if (!UTIL_IsPlayer(pToucher)) {
+    if (!IS_PLAYER(pToucher)) {
         return HAM_IGNORED;
     }
 

@@ -36,7 +36,7 @@ public bool:Native_IsPlayerZombie(iPluginId, iArgc) {
 }
 
 public HamHook_Button_Use(pEntity, pToucher) {
-    if (!UTIL_IsPlayer(pToucher)) {
+    if (!IS_PLAYER(pToucher)) {
         return HAM_IGNORED;
     }
 
@@ -95,7 +95,7 @@ public HamHook_Player_ItemPreFrame_Post(pPlayer) {
 }
 
 public HamHook_Item_Touch(pEntity, pToucher) {
-    if (!UTIL_IsPlayer(pToucher)) {
+    if (!IS_PLAYER(pToucher)) {
         return HAM_IGNORED;
     }
 

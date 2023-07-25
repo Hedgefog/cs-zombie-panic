@@ -35,7 +35,7 @@ public HamHook_WeaponBox_Touch(pWeaponBox, pToucher) {
         return HAM_SUPERCEDE;
     }
 
-    if (!UTIL_IsPlayer(pToucher)) {
+    if (!IS_PLAYER(pToucher)) {
         return HAM_IGNORED;
     }
 
