@@ -35,13 +35,13 @@ public plugin_init() {
 
 public HamHook_Player_Spawn_Post(pPlayer) {
     if (ZP_Player_IsZombie(pPlayer) || UTIL_IsPlayerSpectator(pPlayer) || is_user_bot(pPlayer)) {
-        Reset(pPlayer);
+        @Player_ResetPlayerTeams(pPlayer);
     }
 }
 
 public HamHook_Player_Killed_Post(pPlayer) {
     if (ZP_Player_IsZombie(pPlayer) || UTIL_IsPlayerSpectator(pPlayer) || is_user_bot(pPlayer)) {
-        Reset(pPlayer);
+        @Player_ResetPlayerTeams(pPlayer);
     }
 }
 
@@ -51,41 +51,50 @@ public Message_TeamInfo(iMsgId, iDest, pPlayer) {
 
 public Event_TeamInfo() {
     new pTargetPlayer = read_data(1);
-
-    static szTeam[16];
-    read_data(2, szTeam, charsmax(szTeam));
+    new iTargetTeam = get_member(pTargetPlayer, m_iTeam);
 
     for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         if (!is_user_connected(pPlayer)) {
             continue;
         }
 
-        new iTeam = get_member(pPlayer, m_iTeam);
-        new bool:bShowTeam = ZP_Player_IsZombie(pPlayer)
-            || UTIL_IsPlayerSpectator(pPlayer)
-            || UTIL_IsPlayerSpectator(pTargetPlayer)
-            || is_user_bot(pPlayer)
-            || ZP_GameRules_IsCompetitive();
-
-        SendMessage(pPlayer, pTargetPlayer, bShowTeam ? szTeam : g_rgszTeams[iTeam]);
-    }
-}
-
-Reset(pPlayer) {
-    for (new pTargetPlayer = 1; pTargetPlayer <= MaxClients; ++pTargetPlayer) {
-        if (!is_user_connected(pTargetPlayer)) {
+        if (is_user_bot(pPlayer)) {
             continue;
         }
 
-        static szTeam[16];
-        get_user_team(pTargetPlayer, szTeam, charsmax(szTeam));
-        SendMessage(pPlayer, pTargetPlayer, szTeam);
+        if (UTIL_IsPlayerSpectator(pTargetPlayer)) {
+            @Player_SendPlayerTeam(pPlayer, pTargetPlayer, g_rgszTeams[3]);
+            continue;
+        }
+
+        new iTeam = get_member(pPlayer, m_iTeam);
+
+        new bool:bShowTeam = (
+            pPlayer == pTargetPlayer ||
+            ZP_Player_IsZombie(pPlayer) ||
+            UTIL_IsPlayerSpectator(pPlayer) ||
+            is_user_bot(pPlayer) ||
+            ZP_GameRules_IsCompetitive()
+        );
+
+        @Player_SendPlayerTeam(pPlayer, pTargetPlayer, bShowTeam ? g_rgszTeams[iTargetTeam] : g_rgszTeams[iTeam]);
     }
 }
 
-SendMessage(pPlayer, pTargetPlayer, const szTeam[]) {
-    emessage_begin(MSG_ONE, gmsgTeamInfo, _, pPlayer);
-    ewrite_byte(pTargetPlayer);
+@Player_ResetPlayerTeams(this) {
+    for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
+        if (!is_user_connected(pPlayer)) {
+            continue;
+        }
+
+        new iTeam = get_member(pPlayer, m_iTeam);
+        @Player_SendPlayerTeam(this, pPlayer, g_rgszTeams[iTeam]);
+    }
+}
+
+@Player_SendPlayerTeam(this, pPlayer, const szTeam[]) {
+    emessage_begin(MSG_ONE, gmsgTeamInfo, _, this);
+    ewrite_byte(pPlayer);
     ewrite_string(szTeam);
     emessage_end();
 }
