@@ -2,8 +2,9 @@
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
     "amxxpawn.compiler.includePaths": [
-        "${workspaceRoot}/src/include",
         "${workspaceRoot}/.compiler/include",
-        "${workspaceRoot}/.thirdparty/reapi/addons/amxmodx/scripting/include"
+        "${workspaceRoot}/.thirdparty/reapi/addons/amxmodx/scripting/include",
+        "${workspaceRoot}/.thirdparty/cs-modding-kit/include",
+        "${workspaceRoot}/src/include"
     ]
 }

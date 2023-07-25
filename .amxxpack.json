@@ -12,19 +12,37 @@
       {
         "name": "reapi",
         "url": "https://github.com/s1lentq/reapi/releases/download/5.21.0.252/reapi-bin-5.21.0.252.zip"
+      },
+      {
+        "name": "cs-modding-kit",
+        "url": "https://github.com/Hedgefog/cs-modding-kit/archive/refs/tags/1.2.0.zip",
+        "strip": 1,
+        "filter": [
+          "api_custom_entities.@(sma|inc)",
+          "api_custom_weapons.@(sma|inc)",
+          "api_player_model.@(sma|inc)",
+          "api_rounds.@(sma|inc)"
+        ]
       }
     ]
   },
   "input": {
-    "scripts": "./src/scripts",
-    "include": "./src/include",
+    "scripts": [
+      "./.thirdparty/cs-modding-kit",
+      "./src/scripts"
+    ],
+    "include": [
+      "./.thirdparty/cs-modding-kit/include",
+      "./src/include"
+    ],
     "assets": "./assets"
   },
   "output": {
-    "plugins": "./dist/build/addons/amxmodx/plugins",
-    "scripts": "./dist/build/addons/amxmodx/scripting",
-    "include": "./dist/build/addons/amxmodx/scripting/include",
-    "assets": "./dist/build"
+    "base": "./dist/build",
+    "plugins": "./addons/amxmodx/plugins",
+    "scripts": "./addons/amxmodx/scripting",
+    "include": "./addons/amxmodx/scripting/include",
+    "assets": "./"
   },
   "rules": {
     "flatCompilation": true
