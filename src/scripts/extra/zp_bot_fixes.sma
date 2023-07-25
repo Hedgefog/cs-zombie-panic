@@ -25,7 +25,7 @@
 #define THROW_GRENADE_MAX_RANGE 768.0
 #define PICKUP_HEALTHKIT_MIN_DAMAGE 10.0
 
-new Float:g_flPlayerNextThink[MAX_PLAYERS + 1];
+new Float:g_rgflPlayerNextThink[MAX_PLAYERS + 1];
 
 new CW:g_iCwSwipeHandler;
 new CW:g_iCwCrowbarHandler;
@@ -96,11 +96,11 @@ public HamHook_Player_PreThink_Post(pPlayer) {
         return HAM_IGNORED;
     }
 
-    if (g_flPlayerNextThink[pPlayer] > get_gametime()) {
+    if (g_rgflPlayerNextThink[pPlayer] > get_gametime()) {
         return HAM_IGNORED;
     }
 
-    g_flPlayerNextThink[pPlayer] = get_gametime() + 0.5;
+    g_rgflPlayerNextThink[pPlayer] = get_gametime() + 0.5;
 
     new pActiveItem = get_member(pPlayer, m_pActiveItem);
     if (pActiveItem == -1) {
@@ -110,46 +110,46 @@ public HamHook_Player_PreThink_Post(pPlayer) {
     new CW:iCwHandler = CW_GetHandlerByEntity(pActiveItem);
     if (iCwHandler == g_iCwSwipeHandler || iCwHandler == g_iCwCrowbarHandler) {
         if (LookupEnemyToStub(pPlayer)) {
-            g_flPlayerNextThink[pPlayer] = get_gametime() + 0.5;
+            g_rgflPlayerNextThink[pPlayer] = get_gametime() + 0.5;
             return HAM_HANDLED;
         }
 
         if (LookupBreakable(pPlayer)) {
-            g_flPlayerNextThink[pPlayer] = get_gametime() + 1.0;
+            g_rgflPlayerNextThink[pPlayer] = get_gametime() + 1.0;
             return HAM_HANDLED;
         }
     } else if (iCwHandler == g_iCwGrenadeHandler) {
         if (LoockupEnemyToThrowGrenade(pPlayer)) {
-            g_flPlayerNextThink[pPlayer] = get_gametime() + 0.5;
+            g_rgflPlayerNextThink[pPlayer] = get_gametime() + 0.5;
             return HAM_HANDLED;
         }
     }
 
     if (!ZP_Player_IsZombie(pPlayer)) {
         if (LookupObjectiveButton(pPlayer)) {
-            g_flPlayerNextThink[pPlayer] = get_gametime() + 1.5;
+            g_rgflPlayerNextThink[pPlayer] = get_gametime() + 1.5;
             return HAM_HANDLED;
         }
 
         if (ShouldDropActiveItem(pPlayer)) {
             DropActiveItem(pPlayer);
-            g_flPlayerNextThink[pPlayer] = get_gametime() + 0.25;
+            g_rgflPlayerNextThink[pPlayer] = get_gametime() + 0.25;
             return HAM_HANDLED;
         }
 
         if (LookupNearbyItems(pPlayer)) {
-            g_flPlayerNextThink[pPlayer] = get_gametime() + 1.0;
+            g_rgflPlayerNextThink[pPlayer] = get_gametime() + 1.0;
             return HAM_HANDLED;
         }
 
         if (LookupTeamateToSupport(pPlayer)) {
-            g_flPlayerNextThink[pPlayer] = get_gametime() + 2.0;
+            g_rgflPlayerNextThink[pPlayer] = get_gametime() + 2.0;
             return HAM_HANDLED;
         }
 
         if (ShouldPanic(pPlayer)) {
             ZP_Player_Panic(pPlayer);
-            g_flPlayerNextThink[pPlayer] = get_gametime() + 5.0;
+            g_rgflPlayerNextThink[pPlayer] = get_gametime() + 5.0;
             return HAM_HANDLED;
         }
     }

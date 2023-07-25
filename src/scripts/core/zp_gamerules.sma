@@ -39,7 +39,7 @@ new g_iFwResult;
 
 new g_iTeamMenu;
 new bool:g_bObjectiveMode = false;
-new TeamPreference:g_iPlayerTeamPreference[MAX_PLAYERS + 1];
+new TeamPreference:g_rgiPlayerTeamPreference[MAX_PLAYERS + 1];
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
@@ -299,7 +299,7 @@ DistributeTeams() {
             continue;
         }
 
-        if (g_iPlayerTeamPreference[pPlayer] != TeamPreference_Spectator) {
+        if (g_rgiPlayerTeamPreference[pPlayer] != TeamPreference_Spectator) {
             set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
         }
     }
@@ -340,7 +340,7 @@ ProcessZombiePlayers(iMaxZombies) {
             continue;
         }
 
-        if (g_iPlayerTeamPreference[pPlayer] != TeamPreference_Zombie) {
+        if (g_rgiPlayerTeamPreference[pPlayer] != TeamPreference_Zombie) {
             continue;
         }
 
@@ -487,7 +487,7 @@ ResetPlayerTeamPreferences() {
             continue;
         }
 
-        g_iPlayerTeamPreference[pPlayer] = get_member(pPlayer, m_iTeam) == 3 ? TeamPreference_Spectator : TeamPreference_Human;
+        g_rgiPlayerTeamPreference[pPlayer] = get_member(pPlayer, m_iTeam) == 3 ? TeamPreference_Spectator : TeamPreference_Human;
     }
 }
 
@@ -552,21 +552,21 @@ public TeamMenuHandler(pPlayer, iMenu, iItem) {
 
     switch (iItem) {
         case 0: {
-            g_iPlayerTeamPreference[pPlayer] = TeamPreference_Human;
+            g_rgiPlayerTeamPreference[pPlayer] = TeamPreference_Human;
 
             if (bIsSpectator) {
                 set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
             }
         }
         case 1: {
-            g_iPlayerTeamPreference[pPlayer] = TeamPreference_Zombie;
+            g_rgiPlayerTeamPreference[pPlayer] = TeamPreference_Zombie;
 
             if (bIsSpectator) {
                 set_member(pPlayer, m_iTeam, ZP_HUMAN_TEAM);
             }
         }
         case 5: {
-            g_iPlayerTeamPreference[pPlayer] = TeamPreference_Spectator;
+            g_rgiPlayerTeamPreference[pPlayer] = TeamPreference_Spectator;
 
             if (!bIsSpectator) {
                 set_member(pPlayer, m_iTeam, 3);

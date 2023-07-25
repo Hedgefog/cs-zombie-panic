@@ -10,7 +10,7 @@
 
 new gmsgHideWeapon;
 
-new g_iPlayerHideWeapon[MAX_PLAYERS + 1];
+new g_rgiPlayerHideWeapon[MAX_PLAYERS + 1];
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
@@ -31,7 +31,7 @@ public Event_ResetHUD(pPlayer) {
 
 public Message_HideWeapon(iMsgId, iMsgDest, pPlayer) {
     set_msg_arg_int(1, ARG_BYTE, get_msg_arg_int(1) | HIDEHUD_MONEY);
-    g_iPlayerHideWeapon[pPlayer] = get_msg_arg_int(1);
+    g_rgiPlayerHideWeapon[pPlayer] = get_msg_arg_int(1);
 
     return PLUGIN_CONTINUE;
 }

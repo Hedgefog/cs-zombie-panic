@@ -23,10 +23,10 @@ new const g_rgszBounceSounds[][] = {
 
 new gmsgAmmoPickup;
 
-new bool:g_bPlayerChargeReady[MAX_PLAYERS + 1];
-new bool:g_bPlayerRedeploy[MAX_PLAYERS + 1];
-new g_pPlayerPickupCharge[MAX_PLAYERS + 1] = { -1, ... };
-new g_iPlayerChargeCount[MAX_PLAYERS + 1] = { 0, ... };
+new bool:g_rgbPlayerChargeReady[MAX_PLAYERS + 1];
+new bool:g_rgbPlayerRedeploy[MAX_PLAYERS + 1];
+new g_rgpPlayerPickupCharge[MAX_PLAYERS + 1] = { -1, ... };
+new g_rgiPlayerChargeCount[MAX_PLAYERS + 1] = { 0, ... };
 new g_iAmmoId;
 
 new CW:g_iCwHandler;
@@ -73,7 +73,7 @@ public plugin_init() {
 @Weapon_PrimaryAttack(this) {
     new pPlayer = CW_GetPlayer(this);
 
-    if (g_bPlayerChargeReady[pPlayer]) {
+    if (g_rgbPlayerChargeReady[pPlayer]) {
             Detonate(this);
     } else {
             if (get_member(pPlayer, m_rgAmmo, g_iAmmoId) <= 0) {
@@ -84,13 +84,13 @@ public plugin_init() {
     }
 
     CW_PlayAnimation(this, 3, 0.5);
-    g_bPlayerRedeploy[pPlayer] = true;
+    g_rgbPlayerRedeploy[pPlayer] = true;
 }
 
 @Weapon_SecondaryAttack(this) {
     new pPlayer = CW_GetPlayer(this);
 
-    if (!g_bPlayerChargeReady[pPlayer]) {
+    if (!g_rgbPlayerChargeReady[pPlayer]) {
         return;
     }
 
@@ -106,7 +106,7 @@ public plugin_init() {
 @Weapon_Deploy(this) {
     new pPlayer = CW_GetPlayer(this);
 
-    if (g_bPlayerChargeReady[pPlayer] || get_member(pPlayer, m_rgAmmo, g_iAmmoId) <= 0) {
+    if (g_rgbPlayerChargeReady[pPlayer] || get_member(pPlayer, m_rgAmmo, g_iAmmoId) <= 0) {
         CW_DefaultDeploy(this, ZP_WEAPON_SATCHELRADIO_V_MODEL, ZP_WEAPON_SATCHELRADIO_P_MODEL, 2, "grenade");
     } else {
         CW_DefaultDeploy(this, ZP_WEAPON_SATCHEL_V_MODEL, ZP_WEAPON_SATCHEL_P_MODEL, 2, "grenade");
@@ -115,7 +115,7 @@ public plugin_init() {
 
 @Weapon_Holster(this) {
     new pPlayer = CW_GetPlayer(this);
-    if (get_member(pPlayer, m_rgAmmo, g_iAmmoId) <= 0 && !g_bPlayerChargeReady[pPlayer]) {
+    if (get_member(pPlayer, m_rgAmmo, g_iAmmoId) <= 0 && !g_rgbPlayerChargeReady[pPlayer]) {
         SetThink(this, "RemovePlayerItem");
         set_pev(this, pev_nextthink, get_gametime() + 0.1);
     }
@@ -131,14 +131,14 @@ Float:@Weapon_GetMaxSpeed(this) {
 
 @Weapon_Idle(this) {
     new pPlayer = CW_GetPlayer(this);
-    if (g_bPlayerRedeploy[pPlayer]) {
+    if (g_rgbPlayerRedeploy[pPlayer]) {
         ExecuteHamB(Ham_Item_Deploy, this);
-        g_bPlayerRedeploy[pPlayer] = false;
+        g_rgbPlayerRedeploy[pPlayer] = false;
     } else {
         CW_PlayAnimation(this, 0, 5.5);
     }
 
-    if (get_member(pPlayer, m_rgAmmo, g_iAmmoId) <= 0 && !g_bPlayerChargeReady[pPlayer]) {
+    if (get_member(pPlayer, m_rgAmmo, g_iAmmoId) <= 0 && !g_rgbPlayerChargeReady[pPlayer]) {
         RemovePlayerItem(this);
     }
 }
@@ -158,7 +158,7 @@ Float:@Weapon_GetMaxSpeed(this) {
         return PLUGIN_CONTINUE;
     }
 
-    return get_member(pPlayer, m_rgAmmo, g_iAmmoId) > 0 && !g_bPlayerChargeReady[pPlayer] ? PLUGIN_CONTINUE : PLUGIN_HANDLED;
+    return get_member(pPlayer, m_rgAmmo, g_iAmmoId) > 0 && !g_rgbPlayerChargeReady[pPlayer] ? PLUGIN_CONTINUE : PLUGIN_HANDLED;
 }
 
 Throw(this) {
@@ -190,12 +190,12 @@ Throw(this) {
     set_pev(pSatchelCharge, pev_avelocity, Float:{0.0, 100.0, 0.0});
     set_pev(pSatchelCharge, pev_owner, pPlayer);
     set_pev(pSatchelCharge, pev_team, get_member(pPlayer, m_iTeam));
-    g_iPlayerChargeCount[pPlayer]++;
+    g_rgiPlayerChargeCount[pPlayer]++;
 
     set_member(pPlayer, m_rgAmmo, iAmmoAmount - 1, g_iAmmoId);
     rg_set_animation(pPlayer, PLAYER_ATTACK1);
 
-    g_bPlayerChargeReady[pPlayer] = true;
+    g_rgbPlayerChargeReady[pPlayer] = true;
 
     set_member(this, m_Weapon_flNextPrimaryAttack, 1.0);
     set_member(this, m_Weapon_flNextSecondaryAttack, 0.5);
@@ -213,7 +213,7 @@ Detonate(this) {
         }
     }
 
-    g_bPlayerChargeReady[pPlayer] = false;
+    g_rgbPlayerChargeReady[pPlayer] = false;
 
     set_member(this, m_Weapon_flNextPrimaryAttack, 0.5);
     set_member(this, m_Weapon_flNextSecondaryAttack, 0.5);
@@ -253,7 +253,7 @@ Deactivate(this) {
 
     new pOwner = pev(this, pev_owner);
     if (IS_PLAYER(pOwner)) {
-        g_iPlayerChargeCount[pOwner]--;
+        g_rgiPlayerChargeCount[pOwner]--;
     }
 }
 
@@ -265,7 +265,7 @@ DeactivateSatchels(pOwner) {
         }
     }
 
-    g_bPlayerChargeReady[pOwner] = false;
+    g_rgbPlayerChargeReady[pOwner] = false;
 }
 
 public SatchelChargeSlide(pEntity) {
@@ -355,7 +355,7 @@ public GrenadeDetonate(this) {
     set_pev(this, pev_nextthink, get_gametime() + 0.1);
 
     if (IS_PLAYER(pOwner)) {
-        g_iPlayerChargeCount[pOwner]--;
+        g_rgiPlayerChargeCount[pOwner]--;
     }
 }
 
@@ -380,7 +380,7 @@ public HamHook_Player_PreThink_Post(pPlayer) {
         return HAM_IGNORED;
     }
 
-    g_pPlayerPickupCharge[pPlayer] = -1;
+    g_rgpPlayerPickupCharge[pPlayer] = -1;
     
     if (~pev(pPlayer, pev_button) & IN_USE || pev(pPlayer, pev_oldbuttons) & IN_USE) {
         return HAM_IGNORED;
@@ -420,7 +420,7 @@ public HamHook_Player_PreThink_Post(pPlayer) {
         pev(pEntity, pev_origin, vecOrigin);
 
         if (xs_vec_distance(vecOrigin, vecEnd) < 16.0) {
-            g_pPlayerPickupCharge[pPlayer] = pEntity;
+            g_rgpPlayerPickupCharge[pPlayer] = pEntity;
             break;
         }
     }
@@ -429,19 +429,19 @@ public HamHook_Player_PreThink_Post(pPlayer) {
 }
 
 public HamHook_Player_PostThink_Post(pPlayer) {
-    if (g_pPlayerPickupCharge[pPlayer] != -1) {
+    if (g_rgpPlayerPickupCharge[pPlayer] != -1) {
         if (ZP_Player_AddAmmo(pPlayer, ZP_AMMO_SATCHEL, 1)) {
-            Deactivate(g_pPlayerPickupCharge[pPlayer]);
+            Deactivate(g_rgpPlayerPickupCharge[pPlayer]);
 
-            if (!g_iPlayerChargeCount[pPlayer]) {
+            if (!g_rgiPlayerChargeCount[pPlayer]) {
                 new pActiveItem = get_member(pPlayer, m_pActiveItem);
 
                 if (pActiveItem != 1 && CW_GetHandlerByEntity(pActiveItem) == g_iCwHandler) {
-                    g_bPlayerRedeploy[pPlayer] = true;
+                    g_rgbPlayerRedeploy[pPlayer] = true;
                     set_member(pActiveItem, m_Weapon_flTimeWeaponIdle, 0.0);
                 }
 
-                g_bPlayerChargeReady[pPlayer] = false;
+                g_rgbPlayerChargeReady[pPlayer] = false;
             }
 
             emessage_begin(MSG_ONE, gmsgAmmoPickup, _, pPlayer);
@@ -452,7 +452,7 @@ public HamHook_Player_PostThink_Post(pPlayer) {
             emit_sound(pPlayer, CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
         }
 
-        g_pPlayerPickupCharge[pPlayer] = -1;
+        g_rgpPlayerPickupCharge[pPlayer] = -1;
     }
 
     return HAM_HANDLED;

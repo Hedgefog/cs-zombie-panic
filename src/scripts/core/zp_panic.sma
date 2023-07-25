@@ -15,8 +15,8 @@
 
 new gmsgScreenShake;
 
-new bool:g_bPlayerPanic[MAX_PLAYERS + 1];
-new Float:g_flPlayerLastPanic[MAX_PLAYERS + 1];
+new bool:g_rgbPlayerPanic[MAX_PLAYERS + 1];
+new Float:g_rgflPlayerLastPanic[MAX_PLAYERS + 1];
 
 new g_pFwPanic;
 new g_iFwResult;
@@ -46,7 +46,7 @@ public bool:Native_Panic(iPluginId, iArgc) {
 public bool:Native_InPanic(iPluginId, iArgc) {
     new pPlayer = get_param(1);
 
-    return g_bPlayerPanic[pPlayer];
+    return g_rgbPlayerPanic[pPlayer];
 }
 
 public HamHook_WeaponBox_Touch(pItem, pToucher) {
@@ -54,7 +54,7 @@ public HamHook_WeaponBox_Touch(pItem, pToucher) {
         return HAM_IGNORED;
     }
 
-    if (!g_bPlayerPanic[pToucher]) {
+    if (!g_rgbPlayerPanic[pToucher]) {
         return HAM_IGNORED;
     }
 
@@ -62,11 +62,11 @@ public HamHook_WeaponBox_Touch(pItem, pToucher) {
 }
 
 public HamHook_Player_Spawn_Post(pPlayer) {
-    g_flPlayerLastPanic[pPlayer] = -PANIC_DELAY;
+    g_rgflPlayerLastPanic[pPlayer] = -PANIC_DELAY;
 }
 
 bool:Panic(pPlayer) {
-    if (g_bPlayerPanic[pPlayer]) {
+    if (g_rgbPlayerPanic[pPlayer]) {
         return false;
     }
 
@@ -74,11 +74,11 @@ bool:Panic(pPlayer) {
         return false;
     }
     
-    if (get_gametime() - g_flPlayerLastPanic[pPlayer] < PANIC_DELAY) {
+    if (get_gametime() - g_rgflPlayerLastPanic[pPlayer] < PANIC_DELAY) {
         return false;
     }
 
-    g_bPlayerPanic[pPlayer] = true;
+    g_rgbPlayerPanic[pPlayer] = true;
     ZP_Player_DropUnactiveWeapons(pPlayer);
     ZP_Player_DropUnactiveAmmo(pPlayer);
     // ZP_Player_UpdateSpeed(pPlayer);
@@ -98,7 +98,7 @@ bool:Panic(pPlayer) {
 
 public Task_EndPanic(iTaskId) {
     new pPlayer = iTaskId;
-    g_bPlayerPanic[pPlayer] = false;
-    g_flPlayerLastPanic[pPlayer] = get_gametime();
+    g_rgbPlayerPanic[pPlayer] = false;
+    g_rgflPlayerLastPanic[pPlayer] = get_gametime();
     ZP_Player_UpdateSpeed(pPlayer);
 }

@@ -17,8 +17,8 @@ new gmsgHideWeapon;
 new gmsgRadar;
 new gmsgCrosshair;
 
-new g_bPlayerInScore[MAX_PLAYERS + 1];
-new g_iPlayerHideWeapon[MAX_PLAYERS + 1];
+new bool:g_rgbPlayerInScore[MAX_PLAYERS + 1];
+new g_rgiPlayerHideWeapon[MAX_PLAYERS + 1];
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
@@ -49,7 +49,7 @@ public Message_ScoreAttrib(iMsgId, iMsgDest, pPlayer) {
     }
 
     if (get_msg_arg_int(1) == pPlayer) {
-        set_msg_arg_int(2, ARG_BYTE, get_msg_arg_int(2) | (g_bPlayerInScore[pPlayer] ? 0 : SCORE_STATUS_DEAD));
+        set_msg_arg_int(2, ARG_BYTE, get_msg_arg_int(2) | (g_rgbPlayerInScore[pPlayer] ? 0 : SCORE_STATUS_DEAD));
     }
 
     return PLUGIN_CONTINUE;
@@ -60,7 +60,7 @@ public Message_HideWeapon(iMsgId, iMsgDest, pPlayer) {
         return PLUGIN_CONTINUE;
     }
     
-    g_iPlayerHideWeapon[pPlayer] = get_msg_arg_int(1);
+    g_rgiPlayerHideWeapon[pPlayer] = get_msg_arg_int(1);
 
     return PLUGIN_CONTINUE;
 }
@@ -74,18 +74,18 @@ public FMHook_CmdStart(pPlayer, pCmd) {
         return PLUGIN_CONTINUE;
     }
 
-    g_bPlayerInScore[pPlayer] = !!(iButtons & IN_SCORE);
+    g_rgbPlayerInScore[pPlayer] = !!(iButtons & IN_SCORE);
 
     emessage_begin(MSG_ONE, gmsgScoreAttrib, _, pPlayer);
     ewrite_byte(pPlayer);
-    ewrite_byte(g_bPlayerInScore[pPlayer] ? 0 : SCORE_STATUS_DEAD);
+    ewrite_byte(g_rgbPlayerInScore[pPlayer] ? 0 : SCORE_STATUS_DEAD);
     emessage_end();
 
     emessage_begin(MSG_ONE, gmsgHideWeapon, _, pPlayer);
-    if (g_bPlayerInScore[pPlayer]) {
-        ewrite_byte(g_iPlayerHideWeapon[pPlayer] | HIDEHUD_ALL);
+    if (g_rgbPlayerInScore[pPlayer]) {
+        ewrite_byte(g_rgiPlayerHideWeapon[pPlayer] | HIDEHUD_ALL);
     } else {
-        ewrite_byte(g_iPlayerHideWeapon[pPlayer] & ~HIDEHUD_ALL);
+        ewrite_byte(g_rgiPlayerHideWeapon[pPlayer] & ~HIDEHUD_ALL);
     }
     emessage_end();
 

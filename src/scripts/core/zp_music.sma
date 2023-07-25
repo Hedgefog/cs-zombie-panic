@@ -12,7 +12,7 @@
 
 #define MUSIC_DELAY 5.0
 
-new bool:g_bPlayerMusic[MAX_PLAYERS + 1];
+new bool:g_rgbPlayerMusic[MAX_PLAYERS + 1];
 
 new g_pCvarMusic;
 new g_pCvarJoinMusic;
@@ -35,7 +35,7 @@ public plugin_init() {
 }
 
 public client_connect(pPlayer) {
-    g_bPlayerMusic[pPlayer] = false;
+    g_rgbPlayerMusic[pPlayer] = false;
 
     if (get_pcvar_num(g_pCvarJoinMusic) > 0) {
         PlayMusic(pPlayer, ZP_STARTUP_SOUND, true);
@@ -44,13 +44,13 @@ public client_connect(pPlayer) {
 
 public HamHook_Player_Spawn_Post(pPlayer) {
     if (get_pcvar_num(g_pCvarMusic)) {
-        if (!g_bPlayerMusic[pPlayer]) {
+        if (!g_rgbPlayerMusic[pPlayer]) {
             set_task(MUSIC_DELAY, "Task_Play", TASKID_PLAY_NEXT_TRACK + pPlayer);
-            g_bPlayerMusic[pPlayer] = true;
+            g_rgbPlayerMusic[pPlayer] = true;
         }
     } else {
         remove_task(TASKID_PLAY_NEXT_TRACK + pPlayer);
-        g_bPlayerMusic[pPlayer] = false;
+        g_rgbPlayerMusic[pPlayer] = false;
     }
 }
 

@@ -14,10 +14,10 @@
 
 #define SPEED_BUTTONS (IN_DUCK | IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT)
 
-new Float:g_flPlayerMaxSpeed[MAX_PLAYERS + 1];
-new bool:g_bPlayerDucking[MAX_PLAYERS + 1];
-new bool:g_bPlayerMoveBack[MAX_PLAYERS + 1];
-new bool:g_bPlayerStrafing[MAX_PLAYERS + 1];
+new Float:g_rgflPlayerMaxSpeed[MAX_PLAYERS + 1];
+new bool:g_rgbPlayerDucking[MAX_PLAYERS + 1];
+new bool:g_rgbPlayerMoveBack[MAX_PLAYERS + 1];
+new bool:g_rgbPlayerStrafing[MAX_PLAYERS + 1];
 
 new g_pFwPlayerSpeedUpdated;
 new g_iFwResult;
@@ -62,13 +62,13 @@ public FMHook_CmdStart(pPlayer, pHandle) {
     new iFlags = pev(pPlayer, pev_flags);
     new iButtons = get_uc(pHandle, UC_Buttons);
     new iOldButtons = pev(pPlayer, pev_oldbuttons);
-    new bool:bPrevDucking = g_bPlayerDucking[pPlayer];
+    new bool:bPrevDucking = g_rgbPlayerDucking[pPlayer];
 
-    g_bPlayerDucking[pPlayer] = iButtons & IN_DUCK && iFlags & FL_DUCKING;
-    g_bPlayerMoveBack[pPlayer] = !!(iButtons & IN_BACK);
-    g_bPlayerStrafing[pPlayer] = !!((iButtons & IN_MOVELEFT || iButtons & IN_MOVERIGHT) && ~iButtons & IN_FORWARD);
+    g_rgbPlayerDucking[pPlayer] = iButtons & IN_DUCK && iFlags & FL_DUCKING;
+    g_rgbPlayerMoveBack[pPlayer] = !!(iButtons & IN_BACK);
+    g_rgbPlayerStrafing[pPlayer] = !!((iButtons & IN_MOVELEFT || iButtons & IN_MOVERIGHT) && ~iButtons & IN_FORWARD);
 
-    if ((iButtons & SPEED_BUTTONS) != (iOldButtons & SPEED_BUTTONS) || g_bPlayerDucking[pPlayer] != bPrevDucking) {
+    if ((iButtons & SPEED_BUTTONS) != (iOldButtons & SPEED_BUTTONS) || g_rgbPlayerDucking[pPlayer] != bPrevDucking) {
         UpdatePlayerSpeed(pPlayer);
     }
 
@@ -84,7 +84,7 @@ public Message_AmmoPickup(iMsgId, iMsgDest, pPlayer) {
 public HamHook_Player_ItemPreFrame_Post(pPlayer) {
     static Float:flMaxSpeed;
     pev(pPlayer, pev_maxspeed, flMaxSpeed);
-    g_flPlayerMaxSpeed[pPlayer] = flMaxSpeed;
+    g_rgflPlayerMaxSpeed[pPlayer] = flMaxSpeed;
 
     UpdatePlayerSpeed(pPlayer);
 
@@ -111,7 +111,7 @@ bool:UpdatePlayerSpeed(pPlayer) {
 Float:CalculatePlayerMaxSpeed(pPlayer) {
     new Float:flMaxSpeed = floatmin(
         ZP_Player_IsZombie(pPlayer) ? ZP_ZOMBIE_SPEED : ZP_HUMAN_SPEED,
-        g_flPlayerMaxSpeed[pPlayer]
+        g_rgflPlayerMaxSpeed[pPlayer]
     );
 
     flMaxSpeed -= CalculatePlayerInventoryWeight(pPlayer);
@@ -120,13 +120,13 @@ Float:CalculatePlayerMaxSpeed(pPlayer) {
         flMaxSpeed *= ZP_PANIC_SPEED_MODIFIER;
     }
 
-    if (g_bPlayerDucking[pPlayer]) {
+    if (g_rgbPlayerDucking[pPlayer]) {
         flMaxSpeed *= ZP_DUCK_SPEED_MODIFIER;
     }
 
-    if (g_bPlayerMoveBack[pPlayer]) {
+    if (g_rgbPlayerMoveBack[pPlayer]) {
         flMaxSpeed *= ZP_BACKWARD_SPEED_MODIFIER;
-    } else if (g_bPlayerStrafing[pPlayer]) {
+    } else if (g_rgbPlayerStrafing[pPlayer]) {
         flMaxSpeed *= ZP_STRAFE_SPEED_MODIFIER;
     }
 

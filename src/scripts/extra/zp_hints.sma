@@ -68,8 +68,8 @@ new g_rgMessageColors[MessageType][3] = {
 new g_message[Message];
 
 new bool:g_bShowObjectiveMessage[MAX_PLAYERS + 1] = { true, ... };
-new bool:g_bPlayerShowSpeedWarning[MAX_PLAYERS + 1] = { true, ... };
-new Float:g_flPlayerLastPickupHint[MAX_PLAYERS + 1] = { 0.0, ... };
+new bool:g_rgbPlayerShowSpeedWarning[MAX_PLAYERS + 1] = { true, ... };
+new Float:g_rgflPlayerLastPickupHint[MAX_PLAYERS + 1] = { 0.0, ... };
 
 new g_pCvarEnabled;
 
@@ -175,8 +175,8 @@ public HamHook_Player_Killed_Post(pPlayer) {
 public Round_Fw_NewRound() {
     for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
         g_bShowObjectiveMessage[pPlayer] = true;
-        g_bPlayerShowSpeedWarning[pPlayer] = true;
-        g_flPlayerLastPickupHint[pPlayer] = 0.0;
+        g_rgbPlayerShowSpeedWarning[pPlayer] = true;
+        g_rgflPlayerLastPickupHint[pPlayer] = 0.0;
     }
 }
 
@@ -189,7 +189,7 @@ public Event_ItemPickup(pPlayer) {
         return PLUGIN_CONTINUE;
     }
 
-    if (!g_bPlayerShowSpeedWarning[pPlayer]) {
+    if (!g_rgbPlayerShowSpeedWarning[pPlayer]) {
         return PLUGIN_CONTINUE;
     }
 
@@ -216,7 +216,7 @@ public Event_ItemPickup(pPlayer) {
             MESSAGE_SPEED_FADEOUT_TIME
         );
 
-        g_bPlayerShowSpeedWarning[pPlayer] = false;
+        g_rgbPlayerShowSpeedWarning[pPlayer] = false;
     }
 
     return PLUGIN_CONTINUE;
@@ -231,7 +231,7 @@ public ZP_Fw_PlayerAimItem(pPlayer) {
         return;
     }
 
-    if (get_gametime() - g_flPlayerLastPickupHint[pPlayer] < 1.0) {
+    if (get_gametime() - g_rgflPlayerLastPickupHint[pPlayer] < 1.0) {
         return;
     }
 
@@ -247,7 +247,7 @@ public ZP_Fw_PlayerAimItem(pPlayer) {
         MESSAGE_PICKUP_FADEOUT_TIME
     );
 
-    g_flPlayerLastPickupHint[pPlayer] = get_gametime();
+    g_rgflPlayerLastPickupHint[pPlayer] = get_gametime();
 }
 
 public ZP_Fw_PlayerInfected(pPlayer, pInfector) {

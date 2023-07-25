@@ -21,8 +21,8 @@
 #define VISION_ALPHA 20
 #define MAX_BRIGHTNESS 150
 
-new bool:g_bPlayerVision[MAX_PLAYERS + 1];
-new bool:g_bPlayerExternalFade[MAX_PLAYERS + 1];
+new bool:g_rgbPlayerVision[MAX_PLAYERS + 1];
+new bool:g_rgbPlayerExternalFade[MAX_PLAYERS + 1];
 new bool:g_bIgnoreFadeMessage;
 
 new g_pFwZombieVision;
@@ -55,8 +55,8 @@ public bool:Native_Toggle(iPluginId, iArgc) {
 }
 
 public client_connect(pPlayer) {
-    g_bPlayerVision[pPlayer] = false;
-    g_bPlayerExternalFade[pPlayer] = false;
+    g_rgbPlayerVision[pPlayer] = false;
+    g_rgbPlayerExternalFade[pPlayer] = false;
 }
 
 public client_disconnected(pPlayer) {
@@ -128,7 +128,7 @@ public FMHook_AddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSe
         return FMRES_IGNORED;
     }
 
-    if (g_bPlayerVision[pHost]) {
+    if (g_rgbPlayerVision[pHost]) {
         set_es(es, ES_RenderMode, kRenderNormal);
         set_es(es, ES_RenderFx, kRenderFxGlowShell);
         set_es(es, ES_RenderAmt, 1);
@@ -187,12 +187,12 @@ public Message_ScreenFade(iMsgId, iMsgDest, pPlayer) {
 }
 
 bool:Toggle(pPlayer) {
-    SetZombieVision(pPlayer, !g_bPlayerVision[pPlayer]);
-    return g_bPlayerVision[pPlayer];
+    SetZombieVision(pPlayer, !g_rgbPlayerVision[pPlayer]);
+    return g_rgbPlayerVision[pPlayer];
 }
 
 SetZombieVision(pPlayer, bool:bValue) {
-    if (bValue == g_bPlayerVision[pPlayer]) {
+    if (bValue == g_rgbPlayerVision[pPlayer]) {
         return;
     }
     
@@ -201,19 +201,19 @@ SetZombieVision(pPlayer, bool:bValue) {
             return;
         }
 
-        if (g_bPlayerVision[pPlayer]) {
+        if (g_rgbPlayerVision[pPlayer]) {
             return;
         }
     }
 
     VisionFadeEffect(pPlayer, bValue);
-    g_bPlayerVision[pPlayer] = bValue;
+    g_rgbPlayerVision[pPlayer] = bValue;
 
     ExecuteForward(g_pFwZombieVision, g_iFwResult, pPlayer, bValue);
 }
 
 VisionFadeEffect(pPlayer, bool:bValue) {
-    if (g_bPlayerExternalFade[pPlayer]) {
+    if (g_rgbPlayerExternalFade[pPlayer]) {
         return;
     }
 
@@ -223,18 +223,18 @@ VisionFadeEffect(pPlayer, bool:bValue) {
 }
 
 HandleExternalFade(pPlayer, Float:flHoldTime) {
-    g_bPlayerExternalFade[pPlayer] = true;
+    g_rgbPlayerExternalFade[pPlayer] = true;
     set_task(flHoldTime, "Task_FixVisionScreenFade", TASKID_FIX_FADE + pPlayer);
 }
 
 public Task_FixVisionScreenFade(iTaskId) {
     new pPlayer = iTaskId - TASKID_FIX_FADE;
 
-    if (is_user_connected(pPlayer) && g_bPlayerVision[pPlayer]) {
+    if (is_user_connected(pPlayer) && g_rgbPlayerVision[pPlayer]) {
         VisionFadeEffect(pPlayer, true);
     }
 
-    g_bPlayerExternalFade[pPlayer] = false;
+    g_rgbPlayerExternalFade[pPlayer] = false;
 }
 
 public Task_ActivateVision(iTaskId) {

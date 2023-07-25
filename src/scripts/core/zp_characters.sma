@@ -42,7 +42,7 @@ new Trie:g_iCharactersMap;
 new Array:g_iSelectableCharacters;
 new g_iCharacterCount = 0;
 
-new g_iPlayerCharacter[MAX_PLAYERS + 1] = { -1, ... };
+new g_rgiPlayerCharacter[MAX_PLAYERS + 1] = { -1, ... };
 
 new CW:g_iCwSwipeHandler;
 
@@ -140,12 +140,12 @@ public HamHook_Player_PainSound_Post(pPlayer) {
 public HamHook_Knife_Deploy_Post(pKnife) {
     if (CW_GetHandlerByEntity(pKnife) == g_iCwSwipeHandler) {
         new pPlayer = CW_GetPlayer(pKnife);
-        if (g_iPlayerCharacter[pPlayer] == -1) {
+        if (g_rgiPlayerCharacter[pPlayer] == -1) {
             return HAM_IGNORED;
         }
 
         static szModel[64];
-        ArrayGetString(Array:g_rgCharactersData[Character_SwipeModel], g_iPlayerCharacter[pPlayer], szModel, charsmax(szModel));
+        ArrayGetString(Array:g_rgCharactersData[Character_SwipeModel], g_rgiPlayerCharacter[pPlayer], szModel, charsmax(szModel));
         set_pev(pPlayer, pev_viewmodel2, szModel);
     }
 
@@ -179,18 +179,18 @@ bool:SetCharacter(pPlayer, const szCharacter[]) {
         return false;
     }
 
-    g_iPlayerCharacter[pPlayer] = iCharacter;
+    g_rgiPlayerCharacter[pPlayer] = iCharacter;
 
     return true;
 }
 
 UpdatePlayerModel(pPlayer) {
-    new iCharacter = g_iPlayerCharacter[pPlayer];
+    new iCharacter = g_rgiPlayerCharacter[pPlayer];
 
     static szPlayerModel[MAX_RESOURCE_PATH_LENGTH];
     copy(szPlayerModel, charsmax(szPlayerModel), NULL_STRING);
 
-    if (g_iPlayerCharacter[pPlayer] != -1) {
+    if (g_rgiPlayerCharacter[pPlayer] != -1) {
         new Array:irgCharacterModels = Array:g_rgCharactersData[ZP_Player_IsZombie(pPlayer) ? Character_ZombieModel : Character_HumanModel];
         ArrayGetString(irgCharacterModels, iCharacter, szPlayerModel, charsmax(szPlayerModel));
     }
@@ -226,7 +226,7 @@ UpdatePlayerCharacter(pPlayer, bool:bOverride = false) {
         iCharacter = ArrayGetCell(g_iSelectableCharacters, random(ArraySize(g_iSelectableCharacters)));
     }
 
-    g_iPlayerCharacter[pPlayer] = iCharacter;
+    g_rgiPlayerCharacter[pPlayer] = iCharacter;
     ExecuteForward(g_pFwPlayerCharacterUpdated, _, pPlayer);
 }
 
@@ -241,11 +241,11 @@ PlayAmbient(pPlayer) {
 }
 
 PlayVoiceFromCharacterData(pPlayer, CharacterData:iCharacterData) {
-    if (g_iPlayerCharacter[pPlayer] == -1) {
+    if (g_rgiPlayerCharacter[pPlayer] == -1) {
         return;
     }
 
-    new Array:irgSounds = ArrayGetCell(Array:g_rgCharactersData[iCharacterData], g_iPlayerCharacter[pPlayer]);
+    new Array:irgSounds = ArrayGetCell(Array:g_rgCharactersData[iCharacterData], g_rgiPlayerCharacter[pPlayer]);
     if (!ArraySize(irgSounds)) {
         return;
     }

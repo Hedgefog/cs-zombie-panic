@@ -13,7 +13,7 @@
 #define PLUGIN "[Zombie Panic] Player Inventory"
 #define AUTHOR "Hedgehog Fog"
 
-new g_pPlayerSelectedAmmo[MAX_PLAYERS + 1];
+new g_rgpPlayerSelectedAmmo[MAX_PLAYERS + 1];
 
 public plugin_precache() {
     precache_model(ZP_WEAPONBOX_MODEL);
@@ -88,7 +88,7 @@ public Native_AddAmmo(iPluginId, iArgc) {
 public Native_GetSelectedAmmo(iPluginId, iArgc) {
     new pPlayer = get_param(1);
 
-    return g_pPlayerSelectedAmmo[pPlayer];
+    return g_rgpPlayerSelectedAmmo[pPlayer];
 }
 
 public Native_SetSelectedAmmo(iPluginId, iArgc) {
@@ -102,7 +102,7 @@ public Native_SetSelectedAmmo(iPluginId, iArgc) {
         return;
     }
 
-    g_pPlayerSelectedAmmo[pPlayer] = iAmmoHandler;
+    g_rgpPlayerSelectedAmmo[pPlayer] = iAmmoHandler;
 }
 
 public HamHook_Player_Killed(pPlayer) {
@@ -111,7 +111,7 @@ public HamHook_Player_Killed(pPlayer) {
 }
 
 public HamHook_Player_Spawn_Post(pPlayer) {
-    g_pPlayerSelectedAmmo[pPlayer] = 0;
+    g_rgpPlayerSelectedAmmo[pPlayer] = 0;
     SelectNextPlayerAmmo(pPlayer, false);
 }
 
@@ -345,7 +345,7 @@ PackPlayerAmmo(pPlayer, pWeaponBox, bool:bUnactiveOnly = false) {
 
 SelectNextPlayerAmmo(pPlayer, bool:bShowMessage = true) {
     new iAmmoId;
-    new iAmmoIndex = g_pPlayerSelectedAmmo[pPlayer];
+    new iAmmoIndex = g_rgpPlayerSelectedAmmo[pPlayer];
 
     do {
         iAmmoIndex++;
@@ -359,18 +359,18 @@ SelectNextPlayerAmmo(pPlayer, bool:bShowMessage = true) {
         if (ZP_Ammo_GetPackSize(iAmmoIndex) != -1 && get_member(pPlayer, m_rgAmmo, iAmmoId) > 0) {
             break;
         }
-    } while (iAmmoIndex != g_pPlayerSelectedAmmo[pPlayer]);
+    } while (iAmmoIndex != g_rgpPlayerSelectedAmmo[pPlayer]);
 
     new iAmmoAmount = get_member(pPlayer, m_rgAmmo, iAmmoId);
-    if (g_pPlayerSelectedAmmo[pPlayer] == iAmmoIndex && !iAmmoAmount) {
+    if (g_rgpPlayerSelectedAmmo[pPlayer] == iAmmoIndex && !iAmmoAmount) {
         return;
     }
 
-    g_pPlayerSelectedAmmo[pPlayer] = iAmmoIndex;
+    g_rgpPlayerSelectedAmmo[pPlayer] = iAmmoIndex;
 
     if (bShowMessage) {
         static szAmmoName[32];
-        ZP_Ammo_GetName(g_pPlayerSelectedAmmo[pPlayer], szAmmoName, charsmax(szAmmoName));
+        ZP_Ammo_GetName(g_rgpPlayerSelectedAmmo[pPlayer], szAmmoName, charsmax(szAmmoName));
 
         new iMaxAmmo = ZP_Ammo_GetMaxAmount(iAmmoIndex);
 
@@ -379,7 +379,7 @@ SelectNextPlayerAmmo(pPlayer, bool:bShowMessage = true) {
 }
 
 DropPlayerSelectedAmmo(pPlayer) {
-    new iAmmoIndex = g_pPlayerSelectedAmmo[pPlayer];
+    new iAmmoIndex = g_rgpPlayerSelectedAmmo[pPlayer];
     new iAmmoId = ZP_Ammo_GetId(iAmmoIndex);
     new iBpAmmo = get_member(pPlayer, m_rgAmmo, iAmmoId);
 

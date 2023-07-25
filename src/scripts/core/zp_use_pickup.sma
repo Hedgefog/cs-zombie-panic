@@ -15,9 +15,9 @@
 #define HIGHLIGHT_COLOR 96, 64, 16
 
 new bool:g_bBlockTouch = true;
-new Float:g_flPlayerLastFind[MAX_PLAYERS + 1] = { 0.0, ... };
-new g_pPlayerAimItem[MAX_PLAYERS + 1] = { -1, ... };
-new g_bPlayerPickup[MAX_PLAYERS + 1] = { false, ... };
+new Float:g_rgflPlayerLastFind[MAX_PLAYERS + 1] = { 0.0, ... };
+new g_rgpPlayerAimItem[MAX_PLAYERS + 1] = { -1, ... };
+new bool:g_rgbPlayerPickup[MAX_PLAYERS + 1] = { false, ... };
 
 new g_pFwAimItem;
 new g_iFwResult;
@@ -71,7 +71,7 @@ public FMHook_AddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSe
         return FMRES_IGNORED;
     }
 
-    if (pEntity == g_pPlayerAimItem[pHost]) {
+    if (pEntity == g_rgpPlayerAimItem[pHost]) {
         set_es(es, ES_RenderMode, kRenderNormal);
         set_es(es, ES_RenderFx, kRenderFxGlowShell);
         set_es(es, ES_RenderAmt, 1);
@@ -82,14 +82,14 @@ public FMHook_AddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSe
 }
 
 public HamHook_Player_PreThink_Post(pPlayer) {
-    g_bPlayerPickup[pPlayer] = pev(pPlayer, pev_button) & IN_USE && ~pev(pPlayer, pev_oldbuttons) & IN_USE;
+    g_rgbPlayerPickup[pPlayer] = pev(pPlayer, pev_button) & IN_USE && ~pev(pPlayer, pev_oldbuttons) & IN_USE;
 
-    if (get_gametime() - g_flPlayerLastFind[pPlayer] < 0.1) {
+    if (get_gametime() - g_rgflPlayerLastFind[pPlayer] < 0.1) {
         return HAM_IGNORED;
     }
 
-    new pPrevAimItem = g_pPlayerAimItem[pPlayer];
-    g_pPlayerAimItem[pPlayer] = -1;
+    new pPrevAimItem = g_rgpPlayerAimItem[pPlayer];
+    g_rgpPlayerAimItem[pPlayer] = -1;
 
     if (!is_user_alive(pPlayer)) {
         return HAM_IGNORED;
@@ -141,7 +141,7 @@ public HamHook_Player_PreThink_Post(pPlayer) {
         pev(pEntity, pev_classname, szClassname, charsmax(szClassname));
 
         if (equal(szClassname, "weaponbox") || equali(szClassname, "item_", 5)) {
-            g_pPlayerAimItem[pPlayer] = pEntity;
+            g_rgpPlayerAimItem[pPlayer] = pEntity;
 
             if (pEntity != pPrevAimItem) {
                 ExecuteForward(g_pFwAimItem, g_iFwResult, pPlayer, pEntity);
@@ -151,30 +151,30 @@ public HamHook_Player_PreThink_Post(pPlayer) {
         }
     }
 
-    g_flPlayerLastFind[pPlayer] = get_gametime();
+    g_rgflPlayerLastFind[pPlayer] = get_gametime();
 
     return HAM_HANDLED;
 }
 
 public HamHook_Player_PostThink_Post(pPlayer) {
-    if (!g_bPlayerPickup[pPlayer]) {
+    if (!g_rgbPlayerPickup[pPlayer]) {
         return HAM_IGNORED;
     }
 
-    if (g_pPlayerAimItem[pPlayer] == -1) {
+    if (g_rgpPlayerAimItem[pPlayer] == -1) {
         return HAM_IGNORED;
     }
 
-    if (!pev_valid(g_pPlayerAimItem[pPlayer])) {
+    if (!pev_valid(g_rgpPlayerAimItem[pPlayer])) {
         return HAM_IGNORED;
     }
 
     g_bBlockTouch = false;
-    ExecuteHamB(Ham_Touch, g_pPlayerAimItem[pPlayer], pPlayer);
+    ExecuteHamB(Ham_Touch, g_rgpPlayerAimItem[pPlayer], pPlayer);
     g_bBlockTouch = true;
 
-    g_bPlayerPickup[pPlayer] = false;
-    g_pPlayerAimItem[pPlayer] = -1;
+    g_rgbPlayerPickup[pPlayer] = false;
+    g_rgpPlayerAimItem[pPlayer] = -1;
 
     return HAM_HANDLED;
 }

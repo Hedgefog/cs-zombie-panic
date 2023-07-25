@@ -27,14 +27,14 @@ enum InfectionState {
 new gmsgScreenShake;
 new gmsgStatusIcon;
 
-new g_pPlayerInfector[MAX_PLAYERS + 1];
-new Float:g_flPlayerTransformationTime[MAX_PLAYERS + 1];
-new InfectionState:g_iPlayerInfectionState[MAX_PLAYERS + 1];
-new g_iPlayerRoomType[MAX_PLAYERS + 1] = { -1, ... };
-new Float:g_flPlayerOrigin[MAX_PLAYERS + 1][3];
-new Float:g_flPlayerAngles[MAX_PLAYERS + 1][3];
-new Float:g_flPlayerViewAngles[MAX_PLAYERS + 1][3];
-new g_iPlayerFlags[MAX_PLAYERS + 1];
+new g_rgpPlayerInfector[MAX_PLAYERS + 1];
+new Float:g_rgflPlayerTransformationTime[MAX_PLAYERS + 1];
+new InfectionState:g_rgiPlayerInfectionState[MAX_PLAYERS + 1];
+new g_rgiPlayerRoomType[MAX_PLAYERS + 1] = { -1, ... };
+new Float:g_rgflPlayerOrigin[MAX_PLAYERS + 1][3];
+new Float:g_rgflPlayerAngles[MAX_PLAYERS + 1][3];
+new Float:g_rgflPlayerViewAngles[MAX_PLAYERS + 1][3];
+new g_rgiPlayerFlags[MAX_PLAYERS + 1];
 
 new g_pCvarInfectionChance;
 
@@ -99,13 +99,13 @@ public Native_IsPlayerInfected(iPluginId, iArgc) {
 public bool:Native_IsPlayerPartialZombie(iPluginId, iArgc) {
     new pPlayer = get_param(1);
 
-    return IsPlayerInfected(pPlayer) && g_iPlayerInfectionState[pPlayer] >= InfectionState_PartialZombie;
+    return IsPlayerInfected(pPlayer) && g_rgiPlayerInfectionState[pPlayer] >= InfectionState_PartialZombie;
 }
 
 public bool:Native_IsPlayerTransforming(iPluginId, iArgc) {
     new pPlayer = get_param(1);
 
-    return IsPlayerInfected(pPlayer) && g_iPlayerInfectionState[pPlayer] >= InfectionState_Transformation;
+    return IsPlayerInfected(pPlayer) && g_rgiPlayerInfectionState[pPlayer] >= InfectionState_Transformation;
 }
 
 public Native_GetInfector(iPluginId, iArgc) {
@@ -115,7 +115,7 @@ public Native_GetInfector(iPluginId, iArgc) {
         return -1;
     }
 
-    return g_pPlayerInfector[pPlayer];
+    return g_rgpPlayerInfector[pPlayer];
 }
 
 public HamHook_Player_Spawn_Post(pPlayer) {
@@ -132,15 +132,15 @@ public HamHook_Player_PreThink_Post(pPlayer) {
         return HAM_IGNORED;
     }
 
-    new Float:flTimeLeft = g_flPlayerTransformationTime[pPlayer] - get_gametime();
+    new Float:flTimeLeft = g_rgflPlayerTransformationTime[pPlayer] - get_gametime();
     if (flTimeLeft <= 0.0) {
-        if (g_iPlayerInfectionState[pPlayer] != InfectionState_TransformationDeath) {
+        if (g_rgiPlayerInfectionState[pPlayer] != InfectionState_TransformationDeath) {
             if (!is_user_alive(pPlayer)) {
                 return HAM_IGNORED;
             }
 
             TransformPlayer(pPlayer);
-            g_iPlayerInfectionState[pPlayer] = InfectionState_TransformationDeath;
+            g_rgiPlayerInfectionState[pPlayer] = InfectionState_TransformationDeath;
         } else {
             if (is_user_alive(pPlayer)) {
                 return HAM_IGNORED;
@@ -154,23 +154,23 @@ public HamHook_Player_PreThink_Post(pPlayer) {
             return HAM_IGNORED;
         }
 
-        if (g_iPlayerInfectionState[pPlayer] != InfectionState_Transformation) {
+        if (g_rgiPlayerInfectionState[pPlayer] != InfectionState_Transformation) {
             SendScreenShake(pPlayer);
             client_cmd(pPlayer, "spk %s", ZP_TRANSFORMATION_SOUND);
-            g_iPlayerInfectionState[pPlayer] = InfectionState_Transformation;
+            g_rgiPlayerInfectionState[pPlayer] = InfectionState_Transformation;
         }
     } else if (flTimeLeft <= (TRANSFORMATION_DELAY / 2)) {
         if (!is_user_alive(pPlayer)) {
             return HAM_IGNORED;
         }
 
-        if (g_iPlayerInfectionState[pPlayer] != InfectionState_PartialZombie) {
-            g_iPlayerRoomType[pPlayer] = floatround(get_member(pPlayer, m_flSndRoomtype));
+        if (g_rgiPlayerInfectionState[pPlayer] != InfectionState_PartialZombie) {
+            g_rgiPlayerRoomType[pPlayer] = floatround(get_member(pPlayer, m_flSndRoomtype));
             SendBlinkEffect(pPlayer);
             SendRoomType(pPlayer);
             client_cmd(pPlayer, "spk %s", ZP_JOLT_SOUNDS[random(sizeof(ZP_JOLT_SOUNDS))]);
             ShowInfectionIcon(pPlayer);
-            g_iPlayerInfectionState[pPlayer] = InfectionState_PartialZombie;
+            g_rgiPlayerInfectionState[pPlayer] = InfectionState_PartialZombie;
         }
     }
 
@@ -186,7 +186,7 @@ public HamHook_Player_TraceAttack(pPlayer, pAttacker, Float:flDamage, Float:vecD
         return HAM_IGNORED;
     }
 
-    if (g_iPlayerInfectionState[pPlayer] < InfectionState_PartialZombie) {
+    if (g_rgiPlayerInfectionState[pPlayer] < InfectionState_PartialZombie) {
         return HAM_IGNORED;
     }
 
@@ -216,7 +216,7 @@ public HamHook_Player_TakeDamage(pPlayer, pInflictor, pAttacker, Float:flDamage,
         return HAM_IGNORED;
     }
 
-    if (g_iPlayerInfectionState[pPlayer] < InfectionState_PartialZombie) {
+    if (g_rgiPlayerInfectionState[pPlayer] < InfectionState_PartialZombie) {
         return HAM_IGNORED;
     }
 
@@ -260,7 +260,7 @@ public HamHook_Player_TakeDamage_Post(pPlayer, pInflictor, pAttacker) {
 }
 
 public HamHook_Player_BloodColor(pPlayer) {
-    if (g_iPlayerInfectionState[pPlayer] < InfectionState_PartialZombie) {
+    if (g_rgiPlayerInfectionState[pPlayer] < InfectionState_PartialZombie) {
         return HAM_IGNORED;
     }
 
@@ -286,13 +286,13 @@ bool:SetInfected(pPlayer, bool:bValue, pInfector = 0) {
             return false;
         }
 
-        g_iPlayerInfectionState[pPlayer] = InfectionState_Infected;
-        g_flPlayerTransformationTime[pPlayer] = get_gametime() + TRANSFORMATION_DELAY;
-        g_pPlayerInfector[pPlayer] = pInfector;
+        g_rgiPlayerInfectionState[pPlayer] = InfectionState_Infected;
+        g_rgflPlayerTransformationTime[pPlayer] = get_gametime() + TRANSFORMATION_DELAY;
+        g_rgpPlayerInfector[pPlayer] = pInfector;
 
         ExecuteForward(g_pFwInfected, g_iFwResult, pPlayer, pInfector);
     } else {
-        g_iPlayerInfectionState[pPlayer] = InfectionState_None;
+        g_rgiPlayerInfectionState[pPlayer] = InfectionState_None;
 
         ResetRoomType(pPlayer);
         HideInfectionIcon(pPlayer);
@@ -307,17 +307,17 @@ bool:IsPlayerInfected(pPlayer) {
     //     return false;
     // }
 
-    return g_iPlayerInfectionState[pPlayer] > InfectionState_None;
+    return g_rgiPlayerInfectionState[pPlayer] > InfectionState_None;
 }
 
 TransformPlayer(pPlayer) {
-    pev(pPlayer, pev_origin, g_flPlayerOrigin[pPlayer]);
-    pev(pPlayer, pev_angles, g_flPlayerAngles[pPlayer]);
-    pev(pPlayer, pev_v_angle, g_flPlayerViewAngles[pPlayer]);
-    g_iPlayerFlags[pPlayer] = pev(pPlayer, pev_flags);
+    pev(pPlayer, pev_origin, g_rgflPlayerOrigin[pPlayer]);
+    pev(pPlayer, pev_angles, g_rgflPlayerAngles[pPlayer]);
+    pev(pPlayer, pev_v_angle, g_rgflPlayerViewAngles[pPlayer]);
+    g_rgiPlayerFlags[pPlayer] = pev(pPlayer, pev_flags);
 
     ExecuteForward(g_pFwTransformationDeath, g_iFwResult, pPlayer);
-    ExecuteHamB(Ham_Killed, pPlayer, g_pPlayerInfector[pPlayer], 0);
+    ExecuteHamB(Ham_Killed, pPlayer, g_rgpPlayerInfector[pPlayer], 0);
     emit_sound(pPlayer, CHAN_VOICE, "common/null.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 }
 
@@ -325,10 +325,10 @@ EndPlayerTransformation(pPlayer) {
     set_member(pPlayer, m_iTeam, ZP_ZOMBIE_TEAM);
     ExecuteHamB(Ham_CS_RoundRespawn, pPlayer);
 
-    set_pev(pPlayer, pev_origin, g_flPlayerOrigin[pPlayer]);
-    set_pev(pPlayer, pev_angles, g_flPlayerAngles[pPlayer]);
-    set_pev(pPlayer, pev_v_angle, g_flPlayerViewAngles[pPlayer]);
-    set_pev(pPlayer, pev_flags, g_iPlayerFlags[pPlayer]);
+    set_pev(pPlayer, pev_origin, g_rgflPlayerOrigin[pPlayer]);
+    set_pev(pPlayer, pev_angles, g_rgflPlayerAngles[pPlayer]);
+    set_pev(pPlayer, pev_v_angle, g_rgflPlayerViewAngles[pPlayer]);
+    set_pev(pPlayer, pev_flags, g_rgiPlayerFlags[pPlayer]);
 
     ExecuteForward(g_pFwTransformed, g_iFwResult, pPlayer);
 }
@@ -340,15 +340,15 @@ SendRoomType(pPlayer) {
 }
 
 ResetRoomType(pPlayer) {
-    if (g_iPlayerRoomType[pPlayer] == -1) {
+    if (g_rgiPlayerRoomType[pPlayer] == -1) {
         return;
     }
 
     emessage_begin(MSG_ONE, SVC_ROOMTYPE, _, pPlayer);
-    ewrite_short(g_iPlayerRoomType[pPlayer]);
+    ewrite_short(g_rgiPlayerRoomType[pPlayer]);
     emessage_end();
 
-    g_iPlayerRoomType[pPlayer] = -1;
+    g_rgiPlayerRoomType[pPlayer] = -1;
 }
 
 ShowInfectionIcon(pPlayer) {

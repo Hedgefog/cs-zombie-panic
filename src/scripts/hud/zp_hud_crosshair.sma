@@ -14,7 +14,7 @@ new gmsgHideWeapon;
 new gmsgSetFOV;
 new gmsgCurWeapon;
 
-new g_iPlayerHideWeapon[MAX_PLAYERS + 1];
+new g_rgiPlayerHideWeapon[MAX_PLAYERS + 1];
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
@@ -34,7 +34,7 @@ public Message_HideWeapon(iMsgId, iMsgDest, pPlayer) {
         return PLUGIN_CONTINUE;
     }
 
-    g_iPlayerHideWeapon[pPlayer] = get_msg_arg_int(1);
+    g_rgiPlayerHideWeapon[pPlayer] = get_msg_arg_int(1);
 
     return PLUGIN_CONTINUE;
 }
@@ -61,7 +61,7 @@ public Event_CurWeapon(pPlayer) {
 
 UpdateCrosshair(pPlayer) {
     emessage_begin(MSG_ONE, gmsgHideWeapon, _, pPlayer);
-    ewrite_byte(g_iPlayerHideWeapon[pPlayer] | HIDEHUD_CROSSHAIR | HIDEHUD_OBSERVER_CROSSHAIR);
+    ewrite_byte(g_rgiPlayerHideWeapon[pPlayer] | HIDEHUD_CROSSHAIR | HIDEHUD_OBSERVER_CROSSHAIR);
     emessage_end();
 
     message_begin(MSG_ONE, gmsgSetFOV, _, pPlayer);
