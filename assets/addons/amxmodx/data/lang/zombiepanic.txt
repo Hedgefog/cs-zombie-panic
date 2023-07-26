@@ -20,6 +20,28 @@ ZP_ITEM_PICKUP = Pickup item
 ZP_WARN_INFECTION_TITLE = Infection
 ZP_WARN_INFECTOR = You've infected player
 
+[ua]
+ZP_HINT_TITLE = Порада
+ZP_HINT_PANIC = Паніка може допомогти вам втекти від зомбі^nНатисніть <O> для активації
+ZP_HINT_DROP_AMMO = Ви можете викинути патрони натиснувши <X>^nНатисніть <Z> для вибору типу патронів
+ZP_HINT_PICKUP = Натисніть <e> для того, щоб підібрати предмети на відстані
+ZP_WARN_TITLE = Увага
+ZP_WARN_SPEED = Не забувайте позбуватися непотрібних патронів, щоб підтримувати швидкість
+ZP_OBJECTIVE_TITLE = Виживання
+ZP_OBJECTIVE_HUMAN = Протримайтеся до кінця раунду або вбийте всіх зомбі
+ZP_OBJECTIVE_ZOMBIE = Вбийте усіх виживших
+ZPO_OBJECTIVE_TITLE = Мета
+ZPO_OBJECTIVE_HUMAN = Дотримуйтесь позначок для виконання цілей.
+ZPO_OBJECTIVE_ZOMBIE = Не дайте вижившим, виконати ціль
+ZP_RESPAWN_TITLE = Відродження
+ZP_RESPAWN_ZOMBIE = Незабаром, Ви відродитеся^nстежте за життями в правій нижній частині екрану
+ZP_RESPAWN_HUMAN = Незабаром Ви відродитеся за зомбі.
+ZP_RESPAWN_NOLIVES = Життя більше немає^nЧекайте, поки з'явиться більше життів
+ZP_ITEM_PICKUP_TITLE = <E>
+ZP_ITEM_PICKUP = Взяти предмет
+ZP_WARN_INFECTION_TITLE = Інфекція
+ZP_WARN_INFECTOR = Ви інфікували гравця
+
 [ru]
 ZP_HINT_TITLE = Совет
 ZP_HINT_PANIC = Паника может помочь вам убежать от зомби^nНажмите <O> для активации
