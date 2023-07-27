@@ -21,25 +21,17 @@ new g_iCeHandler;
 public plugin_precache() {
     g_iCeHandler = CE_Register(ENTITY_NAME, _, Float:{-8.0, -8.0, 0.0}, Float:{8.0, 8.0, 8.0}, _, ZP_AMMO_RESPAWN_TIME);
     CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME, "@Entity_Spawn");
+    CE_RegisterHook(CEFunction_Think, ENTITY_NAME, "@Entity_Think");
 }
 
 public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 
     RegisterHam(Ham_Touch, "weaponbox", "HamHook_WeaponBox_Touch_Post", .Post = 1);
-    RegisterHam(Ham_Think, CE_BASE_CLASSNAME, "HamHook_Base_Think_Post", .Post = 1);
 }
 
 public HamHook_WeaponBox_Touch_Post(pEntity) {
     UTIL_HandleSpawnerItemTouch(pEntity, g_iCeHandler);
-
-    return HAM_HANDLED;
-}
-
-public HamHook_Base_Think_Post(pEntity) {
-    if (CE_GetHandlerByEntity(pEntity) == g_iCeHandler) {
-        @Entity_Think(pEntity);
-    }
 
     return HAM_HANDLED;
 }
