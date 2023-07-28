@@ -165,6 +165,7 @@ bool:@Player_SetFlashlight(this, bool:bValue) {
     set_pev(pEntity, pev_movetype, MOVETYPE_FOLLOW);
     set_pev(pEntity, pev_aiment, this);
     set_pev(pEntity, pev_owner, this);
+    set_pev(pEntity, pev_renderfx, kRenderFxHologram);
 
     engfunc(EngFunc_SetModel, pEntity, ZP_FLASHLIGHT_LIGHTCONE_MODEL);
 

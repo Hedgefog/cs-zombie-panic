@@ -115,13 +115,11 @@ public FMHook_AddToFullPack_Post(es, e, pEntity, pHost, pHostFlags, pPlayer, pSe
         pTargetPlayer = pEntity;
     } else {
         new pAimEnt = pev(pEntity, pev_aiment);
-        if (IS_PLAYER(pAimEnt)) {
+        new iRenderMode = pev(pEntity, pev_rendermode);
+        new iRenderFx = pev(pEntity, pev_renderfx);
+        if (IS_PLAYER(pAimEnt) && iRenderMode== kRenderNormal && iRenderFx == kRenderFxNone) {
             pTargetPlayer = pAimEnt;
         }
-    }
-
-    if (pTargetPlayer == pHost) {
-        return FMRES_IGNORED;
     }
 
     if (!is_user_alive(pTargetPlayer)) {
