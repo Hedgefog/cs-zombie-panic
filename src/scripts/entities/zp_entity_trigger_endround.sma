@@ -20,8 +20,8 @@
 #define SF_FORALL (BIT(0))
 
 public plugin_precache() {
-    CE_Register(ENTITY_NAME, .preset = CEPreset_Trigger);
-    CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME, "@Entity_Spawn");
+    CE_Register(ENTITY_NAME, CEPreset_Trigger);
+    CE_RegisterHook(CEFunction_Spawned, ENTITY_NAME, "@Entity_Spawned");
     CE_RegisterHook(CEFunction_Activate, ENTITY_NAME, "@Entity_Activate");
     CE_RegisterHook(CEFunction_Activated, ENTITY_NAME, "@Entity_Activated");
 }
@@ -30,7 +30,7 @@ public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 }
 
-@Entity_Spawn(this) {
+@Entity_Spawned(this) {
     ZP_GameRules_SetObjectiveMode(true);
     CE_SetMember(this, MEMBER_PLAYER_FLAGS, 0);
 }
@@ -70,13 +70,8 @@ public plugin_init() {
     new iHumansNum = 0;
 
     for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
-        if (!is_user_alive(pPlayer)) {
-            continue;
-        }
-
-        if (ZP_Player_IsZombie(pPlayer)) {
-            continue;
-        }
+        if (!is_user_alive(pPlayer)) continue;
+        if (ZP_Player_IsZombie(pPlayer)) continue;
 
         iHumansNum++;
 

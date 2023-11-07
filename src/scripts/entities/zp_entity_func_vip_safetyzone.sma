@@ -5,8 +5,9 @@
 #include <fakemeta>
 #include <reapi>
 
-#include <zombiepanic>
 #include <api_custom_entities>
+
+#include <zombiepanic>
 
 #define PLUGIN "[Entity] func_vip_safetyzone"
 #define AUTHOR "Hedgehog Fog"
@@ -30,7 +31,7 @@ public HamHook_VipSafeZone_Spawn_Post(pEntity) {
 
     engfunc(EngFunc_RemoveEntity, pEntity);
 
-    new iEndroundTrigger = CE_Create("trigger_endround", vecOrigin, .temp = false);
+    new iEndroundTrigger = CE_Create("trigger_endround", vecOrigin, .bTemp = false);
     dllfunc(DLLFunc_Spawn, iEndroundTrigger);
     engfunc(EngFunc_SetModel, iEndroundTrigger, szModel);
     set_pev(iEndroundTrigger, pev_spawnflags, BIT(0));

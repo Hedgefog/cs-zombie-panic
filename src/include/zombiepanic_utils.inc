@@ -1,3 +1,7 @@
+#include <api_custom_entities>
+
+#include <zombiepanic>
+
 #define IS_PLAYER(%1) (%1 >= 1 && %1 <= MaxClients)
 
 // #define ITEM_FLAG_SELECTONEMPTY     1
@@ -55,6 +59,41 @@ stock UTIL_Message_Dlight(
     message_end();
 }
 
+stock UTIL_InitAmmoEntity(pAmmoBox) {
+    CE_SetMemberVec(pAmmoBox, CE_MEMBER_MINS, Float:{-8.0, -8.0, 0.0});
+    CE_SetMemberVec(pAmmoBox, CE_MEMBER_MINS, Float:{8.0, 8.0, 8.0});
+    CE_SetMember(pAmmoBox, CE_MEMBER_RESPAWNTIME, ZP_AMMO_RESPAWN_TIME);
+}
+
+stock UTIL_InitWeaponEntity(pAmmoBox) {
+    CE_SetMemberVec(pAmmoBox, CE_MEMBER_MINS, Float:{-8.0, -8.0, 0.0});
+    CE_SetMemberVec(pAmmoBox, CE_MEMBER_MINS, Float:{8.0, 8.0, 8.0});
+    CE_SetMember(pAmmoBox, CE_MEMBER_RESPAWNTIME, ZP_WEAPONS_RESPAWN_TIME);
+}
+
+stock UTIL_AmmoEntityThink(pAmmo, const ZP_AMMO_TYPE[]) {
+    if (pev(pAmmo, pev_deadflag) != DEAD_NO) return;
+
+    if (ZP_GameRules_CanItemRespawn(pAmmo)) {
+        new iAmmoHandler = ZP_Ammo_GetHandler(ZP_AMMO_TYPE);
+        new pWeaponBox = UTIL_CreateZpAmmoBox(iAmmoHandler);
+        UTIL_InitWithSpawner(pWeaponBox, pAmmo);
+    } else {
+        CE_Kill(pAmmo);
+    }
+}
+
+stock UTIL_WeaponEntityThink(pWeapon, CW:iCwHandler) {
+    if (pev(pWeapon, pev_deadflag) != DEAD_NO) return;
+
+    if (ZP_GameRules_CanItemRespawn(pWeapon)) {
+        new pWeaponBox = CW_SpawnWeaponBox(iCwHandler);
+        UTIL_InitWithSpawner(pWeaponBox, pWeapon);
+    } else {
+        CE_Kill(pWeapon);
+    }
+}
+
 stock UTIL_CreateAmmoBox(iAmmoId, iAmount) {
     new pWeaponBox = rg_create_entity("weaponbox", true);
     dllfunc(DLLFunc_Spawn, pWeaponBox);
@@ -110,7 +149,7 @@ stock bool:UTIL_IsMasterTriggered(const szMaster[], pActivator) {
         new pMaster = engfunc(EngFunc_FindEntityByString, 0, "targetname", szMaster);
 
         if (pMaster && (ExecuteHam(Ham_ObjectCaps, pMaster) & FCAP_MASTER)) {
-        return !!ExecuteHamB(Ham_IsTriggered, pMaster, pActivator);
+            return !!ExecuteHamB(Ham_IsTriggered, pMaster, pActivator);
         }
     }
 
@@ -188,7 +227,7 @@ stock UTIL_InitWithSpawner(pEntity, pSpawner) {
     engfunc(EngFunc_DropToFloor, pEntity);
 }
 
-stock UTIL_HandleSpawnerItemTouch(pEntity, iCeSpawnerHandler) {
+stock UTIL_HandleSpawnerItemTouch(pEntity, CE:iCeSpawnerHandler) {
     if (pev(pEntity, pev_flags) & FL_KILLME) {
         new pOwner = pev(pEntity, pev_owner);
         if (pev_valid(pOwner) && CE_GetHandlerByEntity(pOwner) == iCeSpawnerHandler) {

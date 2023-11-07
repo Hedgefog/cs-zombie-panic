@@ -21,10 +21,10 @@ new g_iszInfoPlayerDeathmatch;
 
 public plugin_precache() {
     CE_Register(ENTITY_NAME_1);
-    CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME_1, "@Entity_Spawn");
+    CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME_1, "@Entity_Spawned");
 
     CE_Register(ENTITY_NAME_2);
-    CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME_2, "@Entity_Spawn");
+    CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME_2, "@Entity_Spawned");
 
     g_iszInfoPlayerStart = engfunc(EngFunc_AllocString, "info_player_start");
     g_iszInfoPlayerDeathmatch = engfunc(EngFunc_AllocString, "info_player_deathmatch");
@@ -34,15 +34,10 @@ public plugin_init() {
     register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
 }
 
-@Entity_Spawn(this) {
-    new szClassname[32];
-    pev(this, pev_classname, szClassname, charsmax(szClassname));
-
-    new Float:vecOrigin[3];
-    pev(this, pev_origin, vecOrigin);
-
-    new Float:vecAngles[3];
-    pev(this, pev_angles, vecAngles);
+@Entity_Spawned(this) {
+    new szClassname[32]; pev(this, pev_classname, szClassname, charsmax(szClassname));
+    new Float:vecOrigin[3]; pev(this, pev_origin, vecOrigin);
+    new Float:vecAngles[3]; pev(this, pev_angles, vecAngles);
 
     CE_Remove(this);
 

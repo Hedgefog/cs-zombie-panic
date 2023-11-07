@@ -17,13 +17,14 @@
 #define ZP_AMMO_TYPE ZP_AMMO_RIFLE
 #define AMMO_BOX_MODEL "models/w_chainammo.mdl"
 
-new g_iCeHandler;
+new CE:g_iCeHandler;
 
 public plugin_precache() {
     precache_model(AMMO_BOX_MODEL);
 
-    g_iCeHandler = CE_Register(ENTITY_NAME, _, Float:{-8.0, -8.0, 0.0}, Float:{8.0, 8.0, 8.0}, _, ZP_AMMO_RESPAWN_TIME);
-    CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME, "@Entity_Spawn");
+    g_iCeHandler = CE_Register(ENTITY_NAME);
+    CE_RegisterHook(CEFunction_Init, ENTITY_NAME, "@Entity_Init");
+    CE_RegisterHook(CEFunction_Spawned, ENTITY_NAME, "@Entity_Spawned");
     CE_RegisterHook(CEFunction_Think, ENTITY_NAME, "@Entity_Think");
 }
 
@@ -39,11 +40,17 @@ public HamHook_WeaponBox_Touch_Post(pEntity) {
     return HAM_HANDLED;
 }
 
-@Entity_Spawn(this) {
+@Entity_Init(this) {
+    UTIL_InitAmmoEntity(this);
+}
+
+@Entity_Spawned(this) {
     set_pev(this, pev_nextthink, get_gametime() + 0.1);
 }
 
 @Entity_Think(this) {
+    if (pev(this, pev_deadflag) != DEAD_NO) return;
+
     if (ZP_GameRules_CanItemRespawn(this)) {
         new iAmmoHandler = ZP_Ammo_GetHandler(ZP_AMMO_TYPE);
         new pWeaponBox = UTIL_CreateZpAmmoBox(iAmmoHandler, ZP_Ammo_GetPackSize(iAmmoHandler) * 5);

@@ -17,16 +17,15 @@
 #define WEAPON_NAME ZP_WEAPON_CROWBAR
 
 new CW:g_iCwHandler;
-new g_iCeHandler;
+new CE:g_iCeHandler;
 
 public plugin_precache() {
     g_iCwHandler = CW_GetHandler(WEAPON_NAME);
-    if (g_iCwHandler == CW_INVALID_HANDLER) {
-        return;
-    }
+    if (g_iCwHandler == CW_INVALID_HANDLER) return;
 
-    g_iCeHandler = CE_Register(ENTITY_NAME, _, Float:{-8.0, -8.0, 0.0}, Float:{8.0, 8.0, 8.0}, _, ZP_WEAPONS_RESPAWN_TIME);
-    CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME, "@Entity_Spawn");
+    g_iCeHandler = CE_Register(ENTITY_NAME);
+    CE_RegisterHook(CEFunction_Init, ENTITY_NAME, "@Entity_Init");
+    CE_RegisterHook(CEFunction_Spawned, ENTITY_NAME, "@Entity_Spawned");
     CE_RegisterHook(CEFunction_Think, ENTITY_NAME, "@Entity_Think");
 }
 
@@ -42,16 +41,14 @@ public HamHook_WeaponBox_Touch_Post(pEntity) {
     return HAM_HANDLED;
 }
 
-@Entity_Spawn(this) {
+@Entity_Init(this) {
+    UTIL_InitWeaponEntity(this);
+}
+
+@Entity_Spawned(this) {
     set_pev(this, pev_nextthink, get_gametime() + 0.1);
 }
 
 @Entity_Think(this) {
-    if (ZP_GameRules_CanItemRespawn(this)) {
-        new pWeaponBox = CW_SpawnWeaponBox(g_iCwHandler);
-        UTIL_InitWithSpawner(pWeaponBox, this);
-    } else {
-        CE_Kill(this);
-    }
+    UTIL_WeaponEntityThink(this, g_iCwHandler);
 }
-

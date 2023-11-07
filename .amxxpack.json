@@ -3,10 +3,6 @@
     "version": "1.9",
     "addons": ["cstrike"]
   },
-  "include": [
-    "./.compiler/include",
-    "./.thirdparty/reapi/addons/amxmodx/scripting/include"
-  ],
   "thirdparty": {
     "dependencies": [
       {
@@ -18,21 +14,27 @@
         "url": "https://github.com/Hedgefog/cs-modding-kit/archive/refs/heads/next.zip",
         "strip": 1,
         "filter": [
-          "api_custom_entities.@(sma|inc)",
-          "api_custom_weapons.@(sma|inc)",
-          "api_player_model.@(sma|inc)",
-          "api_rounds.@(sma|inc)"
+          "util/**",
+          "api/rounds/**",
+          "api/custom-entities/**", 
+          "api/custom-weapons/**",
+          "api/player-model/**",
+          "api/waypoint-markers/**"
         ]
       }
     ]
   },
+  "include": [
+    "./.compiler/include",
+    "./.thirdparty/reapi/addons/amxmodx/scripting/include"
+  ],
   "input": {
     "scripts": [
       "./.thirdparty/cs-modding-kit",
       "./src/scripts"
     ],
     "include": [
-      "./.thirdparty/cs-modding-kit/include",
+      "./.thirdparty/cs-modding-kit",
       "./src/include"
     ],
     "assets": "./assets"

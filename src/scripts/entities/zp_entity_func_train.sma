@@ -40,7 +40,7 @@ public plugin_destroy() {
     ArrayDestroy(g_szTrainFirstTarget);
 }
 
-@Entity_Spawn(pEntity) {
+@Entity_Spawned(pEntity) {
     if (!pev_valid(pEntity)) {
         return HAM_IGNORED;
     }
