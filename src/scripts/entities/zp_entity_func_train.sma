@@ -27,7 +27,7 @@ public plugin_precache() {
     g_fTrainSpeed = ArrayCreate(1, 1);
     g_szTrainFirstTarget = ArrayCreate(32, 1);
 
-    RegisterHam(Ham_Spawn, "func_train", "@Entity_Spawn", .Post = 0);
+    RegisterHam(Ham_Spawn, "func_train", "@Entity_Spawned", .Post = 0);
 }
 
 public plugin_init() {
