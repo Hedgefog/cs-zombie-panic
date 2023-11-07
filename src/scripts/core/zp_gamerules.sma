@@ -287,7 +287,7 @@ public HamHook_Player_TakeDamage(pPlayer) {
     return Round_IsRoundEnd() ? HAM_SUPERCEDE : HAM_IGNORED;
 }
 
-public Round_Fw_CheckWinCondition() {
+public Round_Fw_CheckWinConditions() {
     return PLUGIN_HANDLED;
 }
 
