@@ -59,7 +59,6 @@ public WaypointMarker_Fw_Created(pMarker) {
 }
 
 public WaypointMarker_Fw_Destroy(pMarker) {
-    log_amx("WaypointMarker_Fw_Destroy %d", pMarker);
     new iGlobalId = ArrayFindValue(g_irgpMarkers, pMarker);
     if (iGlobalId != -1) {
         ArrayDeleteItem(g_irgpMarkers, iGlobalId);
