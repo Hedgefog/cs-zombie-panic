@@ -21,9 +21,9 @@
 
 public plugin_precache() {
     CE_Register(ENTITY_NAME, CEPreset_Trigger);
-    CE_RegisterHook(CEFunction_Spawned, ENTITY_NAME, "@Entity_Spawned");
-    CE_RegisterHook(CEFunction_Activate, ENTITY_NAME, "@Entity_Activate");
-    CE_RegisterHook(CEFunction_Activated, ENTITY_NAME, "@Entity_Activated");
+    CE_RegisterHook(ENTITY_NAME, CEFunction_Spawned, "@Entity_Spawned");
+    CE_RegisterHook(ENTITY_NAME, CEFunction_Activate, "@Entity_Activate");
+    CE_RegisterHook(ENTITY_NAME, CEFunction_Activated, "@Entity_Activated");
 }
 
 public plugin_init() {

@@ -21,10 +21,10 @@ new g_iszInfoPlayerDeathmatch;
 
 public plugin_precache() {
     CE_Register(ENTITY_NAME_1);
-    CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME_1, "@Entity_Spawned");
+    CE_RegisterHook(ENTITY_NAME_1, CEFunction_Spawn, "@Entity_Spawned");
 
     CE_Register(ENTITY_NAME_2);
-    CE_RegisterHook(CEFunction_Spawn, ENTITY_NAME_2, "@Entity_Spawned");
+    CE_RegisterHook(ENTITY_NAME_2, CEFunction_Spawn, "@Entity_Spawned");
 
     g_iszInfoPlayerStart = engfunc(EngFunc_AllocString, "info_player_start");
     g_iszInfoPlayerDeathmatch = engfunc(EngFunc_AllocString, "info_player_deathmatch");
