@@ -112,7 +112,7 @@ public Command_DropInactiveAmmo(pPlayer) {
 
   CW_Give(pPlayer, WEAPON(Crowbar));
   CW_Give(pPlayer, WEAPON(Pistol));
-  CW_GiveAmmo(pPlayer, AMMO(Pistol), 7);
+  CW_GiveAmmo(pPlayer, AMMO(Pistol), 14);
 
   PlayerRole_This_SetMember(MEMBER(iSelectedAmmo), -1);
 }
