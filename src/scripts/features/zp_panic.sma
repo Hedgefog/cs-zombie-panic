@@ -90,12 +90,16 @@ public HamHook_Player_Spawn_Post(pPlayer) {
   PlayerRole_Player_SetMember(pPlayer, PLAYER_ROLE(Base), BASE_ROLE_MEMBER(flNextItemPickup), get_gametime() + PANIC_DURATION);
 
   CustomEvent_Emit(PANIC_EVENT(Start), pPlayer);
+
+  PlayerRole_Player_SetMember(pPlayer, PLAYER_ROLE(Base), BASE_ROLE_MEMBER(flSpeedMultiplier), 1.25);
 }
 
 @State_Rest(const StateManager:this) {
   static pPlayer; pPlayer = State_Manager_GetUserToken(this);
 
   State_Manager_SetState(this, PANIC_STATE(None), PANIC_DELAY);
+
+  PlayerRole_Player_SetMember(pPlayer, PLAYER_ROLE(Base), BASE_ROLE_MEMBER(flSpeedMultiplier), 1.0);
 
   CustomEvent_Emit(PANIC_EVENT(End), pPlayer);
 }
