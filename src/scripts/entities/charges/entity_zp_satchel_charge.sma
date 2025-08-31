@@ -64,8 +64,8 @@ public plugin_end() {
   CE_CallBaseMethod();
 
   CE_SetMemberString(this, CE_Member_szModel, g_szModel);
-  CE_SetMemberVec(this, CE_Member_vecMins, Float:{-16.0, -16.0, 0.0});
-  CE_SetMemberVec(this, CE_Member_vecMaxs, Float:{16.0, 16.0, 16.0});
+  CE_SetMemberVec(this, CE_Member_vecMins, Float:{-6.0, -6.0, 0.0});
+  CE_SetMemberVec(this, CE_Member_vecMaxs, Float:{6.0, 6.0, 6.0});
 
   CE_SetMember(this, SATCHELCHARGE_MEMBER(flDamage), 500.0);
   CE_SetMember(this, SATCHELCHARGE_MEMBER(pRemote), FM_NULLENT);
