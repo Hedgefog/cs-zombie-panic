@@ -114,7 +114,7 @@ public HamHook_Player_TakeDamage_Post(const pPlayer) {
 }
 
 Float:@Role_GetMaxSpeed(const pPlayer) {
-  return 198.0;
+  return 180.0;
 }
 
 Float:@Role_GetMaxHealth(const pPlayer) {

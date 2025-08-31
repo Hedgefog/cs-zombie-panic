@@ -118,7 +118,7 @@ public Command_DropInactiveAmmo(pPlayer) {
 }
 
 Float:@Role_GetMaxSpeed(const pPlayer) {
-  return 260.0;
+  return 240.0;
 }
 
 Float:@Role_GetMaxHealth(const pPlayer) {
