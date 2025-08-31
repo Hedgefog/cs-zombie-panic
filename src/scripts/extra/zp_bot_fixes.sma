@@ -130,6 +130,7 @@ public CWHook_Base_Holster(const pWeapon) {
 
   if (CW_HasMember(pWeapon, m_iOriginalId)) {
     CW_SetMember(pWeapon, CW_Member_iId, CW_GetMember(pWeapon, m_iOriginalId));
+    set_ent_data(pWeapon, "CBasePlayerItem", "m_iId", CW_GetMember(pWeapon, m_iOriginalId));
     CW_DeleteMember(pWeapon, m_iOriginalId);
   }
 }
@@ -209,6 +210,17 @@ public HamHook_Door_Use(const pDoor, const pCaller, const pActivator) {
     case CSW_HEGRENADE: {
       if (@Bot_LookupEnemyToThrowGrenade(this)) {
         g_rgflPlayerNextThink[this] = flGametime + 0.5;
+        return;
+      }
+    }
+    default: {
+      static iClip; iClip = get_ent_data(pActiveItem, "CBasePlayerWeapon", "m_iClip");
+      static iPrimaryAmmoType; iPrimaryAmmoType = get_ent_data(pActiveItem, "CBasePlayerWeapon", "m_iPrimaryAmmoType");
+      static iAmmo; iAmmo = get_ent_data(this, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoType);
+
+      if (!iClip && iAmmo) {
+        set_pev(this, pev_button, pev(this, pev_button) | IN_RELOAD);
+        g_rgflPlayerNextThink[this] = flGametime + 0.25;
         return;
       }
     }
