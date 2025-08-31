@@ -7,7 +7,10 @@
     "lightcone": {
       "model": "models/zombiepanic/v100/lightcone.mdl"
     },
-    "sound": "items/flashlight1.wav"
+  },
+  "zombie-vision": {
+    "on-sound": "zombiepanic/v150/items/vision_on.wav",
+    "off-sound": "zombiepanic/v150/items/vision_off.wav"
   },
   "player": {
     "survivor": {

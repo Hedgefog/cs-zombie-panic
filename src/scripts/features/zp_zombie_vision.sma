@@ -5,6 +5,7 @@
 #include <fakemeta>
 #include <hamsandwich>
 
+#include <api_assets>
 #include <api_player_roles>
 #include <api_custom_events>
 #include <screenfade_util>
@@ -25,6 +26,11 @@
 #define VISION_ALPHA 20
 #define MAX_BRIGHTNESS 150
 
+/*--------------------------------[ Assets ]--------------------------------*/
+
+new g_szZombieVisionOnSound[MAX_RESOURCE_PATH_LENGTH];
+new g_szZombieVisionOffSound[MAX_RESOURCE_PATH_LENGTH];
+
 /*--------------------------------[ Plugin State ]--------------------------------*/
 
 new bool:g_bIgnoreFadeMessage;
@@ -38,6 +44,11 @@ new bool:g_rgbPlayerInfected[MAX_PLAYERS + 1];
 new Float:g_rgflPlayerNextToggle[MAX_PLAYERS + 1];
 
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
+
+public plugin_precache() {
+  Asset_Precache(ASSET_LIBRARY, ASSET(Sound_ZombieVisionOn), g_szZombieVisionOnSound, charsmax(g_szZombieVisionOnSound));
+  Asset_Precache(ASSET_LIBRARY, ASSET(Sound_ZombieVisionOff), g_szZombieVisionOffSound, charsmax(g_szZombieVisionOffSound));
+}
 
 public plugin_init() {
   register_plugin(PLUGIN_NAME("Zombie Vision"), ZP_VERSION, "Hedgehog Fog");
@@ -219,6 +230,10 @@ bool:@Player_SetVision(const &this, bool:bValue) {
 
   if (bValue) {
     PlayerRole_Player_CallMethod(this, PLAYER_ROLE(Base), BASE_ROLE_METHOD(PlaySound), BASE_ROLE_SOUND(Idle));
+  }
+
+  if (is_user_alive(this)) {
+    client_cmd(this, "spk ^"%s^"", bValue ? g_szZombieVisionOnSound : g_szZombieVisionOffSound);
   }
 
   return true;
