@@ -1,0 +1,170 @@
+#pragma semicolon 1
+
+#include <amxmodx>
+#include <engine>
+#include <fakemeta>
+#include <hamsandwich>
+#include <xs>
+
+#include <api_assets>
+#include <api_custom_weapons>
+#include <api_custom_entities>
+#include <shared_random>
+
+#include <zombiepanic_internal>
+
+#include <weapon_base_throwable_const>
+
+/*--------------------------------[ Constants ]--------------------------------*/
+
+#define WEAPON_NAME WEAPON(Grenade)
+
+/*--------------------------------[ Assets ]--------------------------------*/
+
+new g_szViewModel[MAX_RESOURCE_PATH_LENGTH];
+new g_szPlayerModel[MAX_RESOURCE_PATH_LENGTH];
+new g_szWorldModel[MAX_RESOURCE_PATH_LENGTH];
+new g_szFuseSound[MAX_RESOURCE_PATH_LENGTH];
+
+/*--------------------------------[ Plugin Initialization ]--------------------------------*/
+
+public plugin_precache() {
+  Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(Grenade), g_szWorldModel, charsmax(g_szWorldModel));
+  Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(GrenadeView), g_szViewModel, charsmax(g_szViewModel));
+  Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(GrenadePlayer), g_szPlayerModel, charsmax(g_szPlayerModel));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(GrenadeFuse), g_szFuseSound, charsmax(g_szFuseSound));
+
+  CW_RegisterClass(WEAPON_NAME, WEAPON_BASE_THROWABLE);
+
+  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Allocate, "@Weapon_Allocate");
+  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Idle, "@Weapon_Idle");
+  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_PrimaryAttack, "@Weapon_PrimaryAttack");
+  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Deploy, "@Weapon_Deploy");
+  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Holster, "@Weapon_Holster");
+  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_CanDrop, "@Weapon_CanDrop");
+
+  CW_RegisterClassMethod(WEAPON_NAME, BASETHROWABLE_METHOD(Throw), "@Weapon_Throw");
+  CW_RegisterClassMethod(WEAPON_NAME, BASETHROWABLE_METHOD(ReleaseThrow), "@Weapon_ReleaseThrow");
+  CW_RegisterClassMethod(WEAPON_NAME, BASETHROWABLE_METHOD(SpawnProjectile), "@Weapon_SpawnProjectile");
+}
+
+public plugin_init() {
+  register_plugin(WEAPON_PLUGIN(Grenade), ZP_VERSION, "Hedgehog Fog");
+}
+
+/*--------------------------------[ Methods ]--------------------------------*/
+
+@Weapon_Allocate(const this) {
+  CW_CallBaseMethod();
+
+  CW_SetMemberString(this, CW_Member_szModel, g_szWorldModel);
+  CW_SetMember(this, CW_Member_iId, WEAPON_ID(Grenade));
+  CW_SetMemberString(this, CW_Member_szPrimaryAmmo, AMMO(Grenade));
+  CW_SetMember(this, CW_Member_iSlot, 3);
+  CW_SetMember(this, CW_Member_iPosition, 0);
+  CW_SetMemberString(this, CW_Member_szIcon, "handgrenade");
+}
+
+@Weapon_Deploy(const this) {
+  CW_CallBaseMethod();
+
+  CW_CallNativeMethod(this, CW_Method_DefaultDeploy, g_szViewModel, g_szPlayerModel, 7, "grenade");
+}
+
+@Weapon_Holster(const this) {
+  static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
+  static Float:flStartThrow; flStartThrow = CW_GetMember(this, BASETHROWABLE_MEMBER(flStartThrow));
+
+  if (!is_user_connected(pPlayer)) return;
+
+  if (flStartThrow) {
+    CW_CallMethod(this, BASETHROWABLE_METHOD(Throw));
+  }
+
+  emit_sound(pPlayer, CHAN_WEAPON, "common/null.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+  CW_CallBaseMethod();
+}
+
+@Weapon_Idle(const this) {
+  CW_CallBaseMethod();
+
+  static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
+  static iPrimaryAmmoType; iPrimaryAmmoType = CW_GetMember(this, CW_Member_iPrimaryAmmoType);
+  static iPrimaryAmmo; iPrimaryAmmo = get_ent_data(pPlayer, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoType);
+  static iRandomSeed; iRandomSeed = get_ent_data(pPlayer, "CBasePlayer", "random_seed");
+
+  if (iPrimaryAmmo > 0) {
+    if (SharedRandomFloat(iRandomSeed, 0.0, 1.0) <= 0.75) {
+      CW_CallNativeMethod(this, CW_Method_PlayAnimation, 0, 91.0 / 30.0);
+    } else {
+      CW_CallNativeMethod(this, CW_Method_PlayAnimation, 1, 76.0 / 30.0);
+    }
+  }
+}
+
+@Weapon_PrimaryAttack(const this) {
+  if (CW_CallBaseMethod()) {
+    static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
+
+    CW_CallNativeMethod(this, CW_Method_PlayAnimation, 2, 0.5);
+    emit_sound(pPlayer, CHAN_WEAPON, g_szFuseSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+  }
+}
+
+@Weapon_ReleaseThrow(const this) {
+  CW_CallBaseMethod();
+
+  static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
+  static iPrimaryAmmoType; iPrimaryAmmoType = CW_GetMember(this, CW_Member_iPrimaryAmmoType);
+  static iPrimaryAmmo; iPrimaryAmmo = get_ent_data(pPlayer, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoType);
+
+  if (iPrimaryAmmo > 0) {
+    CW_CallNativeMethod(this, CW_Method_PlayAnimation, 0, 11.0 / 30.0);
+  }
+}
+
+@Weapon_CanDrop(const this) {
+  static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
+  static iPrimaryAmmoType; iPrimaryAmmoType = CW_GetMember(this, CW_Member_iPrimaryAmmoType);
+
+  if (pPlayer == -1) return true;
+  
+  static Float:flStartThrow; flStartThrow = CW_GetMember(this, BASETHROWABLE_MEMBER(flStartThrow));
+  if (flStartThrow) return false;
+
+  if (!get_ent_data(pPlayer, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoType)) return false;
+
+  return true;
+}
+
+@Weapon_Throw(const this) {
+  static pProjectile; pProjectile = CW_CallBaseMethod();
+  static Float:vecVelocity[3]; pev(pProjectile, pev_velocity, vecVelocity);
+  static Float:flForce; flForce = xs_vec_len(vecVelocity);
+
+  if (flForce < 500) {
+    CW_CallNativeMethod(this, CW_Method_PlayAnimation, 3);
+  } else if (flForce < 1000) {
+    CW_CallNativeMethod(this, CW_Method_PlayAnimation, 4);
+  } else {
+    CW_CallNativeMethod(this, CW_Method_PlayAnimation, 5);
+  }
+}
+
+@Weapon_SpawnProjectile(const this) {
+  static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
+  static Float:vecForward[3]; get_global_vector(GL_v_forward, vecForward);
+  static Float:vecSrc[3]; ExecuteHam(Ham_Player_GetGunPosition, pPlayer, vecSrc);
+
+  xs_vec_add_scaled(vecSrc, vecForward, 16.0, vecSrc);
+
+  new pGrenade = CE_Create(ENTITY(Grenade), vecSrc);
+  if (pGrenade == FM_NULLENT) return FM_NULLENT;
+
+  dllfunc(DLLFunc_Spawn, pGrenade);
+
+  set_pev(pGrenade, pev_owner, pPlayer);
+
+  return pGrenade;
+}

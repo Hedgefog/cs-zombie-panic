@@ -1,168 +1,65 @@
 #pragma semicolon 1
 
 #include <amxmodx>
-#include <fakemeta>
 
-#include <zombiepanic>
+#include <api_assets>
+#include <api_custom_weapons>
 
-#define PLUGIN "[Zombie Panic] Ammo"
-#define AUTHOR "Hedgehog Fog"
+#include <zombiepanic_internal>
 
-enum AmmoData {
-    Ammo_Name,
-    Ammo_Id,
-    Ammo_PackSize,
-    Ammo_PackModel,
-    Ammo_MaxAmount,
-    Ammo_Weight
-}
-
-new Array:g_rgAmmo[AmmoData];
-new Trie:g_iAmmoMap;
-new g_rgAmmoMap[15] = { -1, ... };
-new g_iAmmoCount = 0;
+new g_szPistolAmmoModel[MAX_RESOURCE_PATH_LENGTH];
+new g_szRifleAmmoModel[MAX_RESOURCE_PATH_LENGTH];
+new g_szShotgunAmmoModel[MAX_RESOURCE_PATH_LENGTH];
+new g_szMagnumAmmoModel[MAX_RESOURCE_PATH_LENGTH];
+new g_szSatchelAmmoModel[MAX_RESOURCE_PATH_LENGTH];
+new g_szGrenadeAmmoModel[MAX_RESOURCE_PATH_LENGTH];
 
 public plugin_precache() {
-    InitStorages();
+  Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(AmmoPistol), g_szPistolAmmoModel, charsmax(g_szPistolAmmoModel));
+  Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(AmmoRifle), g_szRifleAmmoModel, charsmax(g_szRifleAmmoModel));
+  Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(AmmoShotgun), g_szShotgunAmmoModel, charsmax(g_szShotgunAmmoModel));
+  Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(AmmoMagnum), g_szMagnumAmmoModel, charsmax(g_szMagnumAmmoModel));
+  Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(Satchel), g_szSatchelAmmoModel, charsmax(g_szSatchelAmmoModel));
+  Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(Grenade), g_szGrenadeAmmoModel, charsmax(g_szGrenadeAmmoModel));
 
-    RegisterAmmo(ZP_AMMO_PISTOL, 10, 7, ZP_AMMO_PISTOL_MODEL, 70, ZP_WEIGHT_PISTOL_AMMO);
-    RegisterAmmo(ZP_AMMO_RIFLE, 4, 30, ZP_AMMO_RIFLE_MODEL, 240, ZP_WEIGHT_RIFLE_AMMO);
-    RegisterAmmo(ZP_AMMO_SHOTGUN, 5, 6, ZP_AMMO_SHOTGUN_MODEL, 60, ZP_WEIGHT_SHOTGUN_AMMO);
-    RegisterAmmo(ZP_AMMO_MAGNUM, 1, 6, ZP_AMMO_MAGNUM_MODEL, 36, ZP_WEIGHT_MAGNUM_AMMO);
-    RegisterAmmo(ZP_AMMO_SATCHEL, 14, -1, NULL_STRING, 1, ZP_WEIGHT_SATCHEL);
-    RegisterAmmo(ZP_AMMO_GRENADE, 12, -1, NULL_STRING, 1, ZP_WEIGHT_GRENADE);
+  RegisterAmmo(AMMO(Pistol), 10, 7, "pistol", g_szPistolAmmoModel, 70, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flPistolAmmoWeight)));
+  RegisterAmmo(AMMO(Rifle), 4, 30, "rifle", g_szRifleAmmoModel, 240, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flRifleAmmoWeight)));
+  RegisterAmmo(AMMO(Shotgun), 5, 6, "shotgun", g_szShotgunAmmoModel, 60, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flShotgunAmmoWeight)));
+  RegisterAmmo(AMMO(Magnum), 1, 6, "magnum", g_szMagnumAmmoModel, 36, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flMagnumAmmoWeight)));
+
+  #if defined ZP_DROPPABLE_SATCHELS
+    RegisterAmmo(AMMO(Satchel), 14, 0, "satchel", g_szSatchelAmmoModel, 5, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flSatchelWeight)));
+    CW_Ammo_SetMetadata(AMMO(Satchel), AMMO_METADATA(iSequence), 1);
+  #else
+    RegisterAmmo(AMMO(Satchel), 14, _, _, g_szSatchelAmmoModel, 1, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flSatchelWeight)));
+  #endif
+
+  RegisterAmmo(AMMO(Grenade), 12, _, _, g_szGrenadeAmmoModel, 1, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flGrenadeWeight)));
+  RegisterAmmo(AMMO(ZombiesValue), 13);
 }
 
 public plugin_init() {
-    register_plugin(PLUGIN, ZP_VERSION, AUTHOR);
+  register_plugin(PLUGIN_NAME("Ammo"), ZP_VERSION, "Hedgehog Fog");
 }
 
 public plugin_natives() {
-    register_native("ZP_Ammo_GetHandler", "Native_GetHandler");
-    register_native("ZP_Ammo_GetHandlerById", "Native_GetHandlerById");
-    register_native("ZP_Ammo_GetName", "Native_GetName");
-    register_native("ZP_Ammo_GetId", "Native_GetId");
-    register_native("ZP_Ammo_GetPackSize", "Native_GetPackSize");
-    register_native("ZP_Ammo_GetPackModel", "Native_GetPackModel");
-    register_native("ZP_Ammo_GetCount", "Native_GetCount");
-    register_native("ZP_Ammo_GetMaxAmount", "Native_GetMaxAmount");
-    register_native("ZP_Ammo_GetWeight", "Native_GetWeight");
+  register_library(LIBRARY(Ammo));
 }
 
-public plugin_end() {
-    DestroyStorages();
-}
+/*
+  iPackSize = -1 - can't drop ammo for this weapon
+  iPackSize = 0 - drop weapon without ammo, drop 1 ammo
+  iPackSize > 0 - drop iPackSize amount of ammo
+*/
+RegisterAmmo(const szId[], iAmmoType = -1, iPackSize = -1, const szName[] = "", const szModel[] = "", iMaxAmount = -1, Float:flWeight = 0.0) {
+  if (!equal(szModel, NULL_STRING)) {
+    precache_model(szModel);
+  }
 
-public Native_GetHandler(iPluginId, iArgc) {
-    static szName[32];
-    get_string(1, szName, charsmax(szName));
-
-    new iAmmoIndex;
-    if (TrieGetCell(g_iAmmoMap, szName, iAmmoIndex)) {
-        return iAmmoIndex;
-    }
-
-    return -1;
-}
-
-public Native_GetHandlerById(iPluginId, iArgc) {
-    new iAmmoId = get_param(1);
-
-    return GetHandlerById(iAmmoId);
-}
-
-public Native_GetName(iPluginId, iArgc) {
-    new iHandler = get_param(1);
-    new iLen = get_param(3);
-
-    static szName[64];
-    ArrayGetString(Array:g_rgAmmo[Ammo_Name], iHandler, szName, charsmax(szName));
-
-    set_string(2, szName, iLen);
-}
-
-public Native_GetId(iPluginId, iArgc) {
-    new iHandler = get_param(1);
-
-    return ArrayGetCell(Array:g_rgAmmo[Ammo_Id], iHandler);
-}
-
-public Native_GetPackSize(iPluginId, iArgc) {
-    new iHandler = get_param(1);
-
-    return ArrayGetCell(Array:g_rgAmmo[Ammo_PackSize], iHandler);
-}
-
-public Native_GetPackModel(iPluginId, iArgc) {
-    new iHandler = get_param(1);
-    new iLen = get_param(3);
-
-    static szPackModel[64];
-    ArrayGetString(Array:g_rgAmmo[Ammo_PackModel], iHandler, szPackModel, charsmax(szPackModel));
-
-    set_string(2, szPackModel, iLen);
-}
-
-public Native_GetCount(iPluginId, iArgc) {
-    return g_iAmmoCount;
-}
-
-public Native_GetMaxAmount(iPluginId, iArgc) {
-    new iHandler = get_param(1);
-
-    return ArrayGetCell(Array:g_rgAmmo[Ammo_MaxAmount], iHandler);
-}
-
-public Float:Native_GetWeight(iPluginId, iArgc) {
-    new iHandler = get_param(1);
-
-    return ArrayGetCell(Array:g_rgAmmo[Ammo_Weight], iHandler);
-}
-
-RegisterAmmo(const szName[], iAmmoId, iPackSize, const szModel[], iMaxAmount, Float:flWeight) {
-    if (szModel[0] != '^0') {
-        precache_model(szModel);
-    }
-
-    if (TrieKeyExists(g_iAmmoMap, szName)) {
-        log_amx("Cannot register ^"%s^" ammo. Ammo ^"%s^" is already registered!", szName, szName);
-        return;
-    }
-
-    ArrayPushCell(Array:g_rgAmmo[Ammo_Id], iAmmoId);
-    ArrayPushString(Array:g_rgAmmo[Ammo_Name], szName);
-    ArrayPushCell(Array:g_rgAmmo[Ammo_PackSize], iPackSize);
-    ArrayPushString(Array:g_rgAmmo[Ammo_PackModel], szModel);
-    ArrayPushCell(Array:g_rgAmmo[Ammo_MaxAmount], iMaxAmount);
-    ArrayPushCell(Array:g_rgAmmo[Ammo_Weight], flWeight);
-    TrieSetCell(g_iAmmoMap, szName, g_iAmmoCount);
-
-    g_rgAmmoMap[iAmmoId] = g_iAmmoCount;
-    g_iAmmoCount++;
-}
-
-GetHandlerById(iAmmoId) {
-    return g_rgAmmoMap[iAmmoId];
-}
-
-InitStorages() {
-    g_rgAmmo[Ammo_Name] = ArrayCreate(32, 1);
-    g_rgAmmo[Ammo_Id] = ArrayCreate(1, 1);
-    g_rgAmmo[Ammo_PackSize] = ArrayCreate(1, 1);
-    g_rgAmmo[Ammo_PackModel] = ArrayCreate(64, 1);
-    g_rgAmmo[Ammo_MaxAmount] = ArrayCreate(1, 1);
-    g_rgAmmo[Ammo_Weight] = ArrayCreate(1, 1);
-    g_iAmmoMap = TrieCreate();
-}
-
-DestroyStorages() {
-    for (new i = 0; i < _:AmmoData; ++i) {
-        new Array:irgData = Array:g_rgAmmo[AmmoData:i];
-
-        if (irgData != Invalid_Array) {
-            ArrayDestroy(irgData);
-        }
-    }
-
-    TrieDestroy(g_iAmmoMap);
+  CW_Ammo_Register(szId, iAmmoType, iMaxAmount, AMMO_GROUP);
+  CW_Ammo_SetMetadataString(szId, AMMO_METADATA(szName), szName);
+  CW_Ammo_SetMetadata(szId, AMMO_METADATA(iPackSize), iPackSize);
+  CW_Ammo_SetMetadata(szId, AMMO_METADATA(flWeight), flWeight);
+  CW_Ammo_SetMetadataString(szId, AMMO_METADATA(szPackModel), szModel);
+  CW_Ammo_SetMetadata(szId, AMMO_METADATA(iSequence), 0);
 }
