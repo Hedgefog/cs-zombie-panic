@@ -82,7 +82,7 @@ public plugin_init() {
 
   static Float:vecSpread[3]; UTIL_CalculateWeaponSpread(this, UTIL_GetConeVector(3.0), iShotsFired, 3.0, 0.1, 0.95, 3.5, vecSpread);
 
-  if (CW_CallNativeMethod(this, CW_Method_DefaultShot, 30.0, 0.75, 0.125, vecSpread, 1)) {
+  if (CW_CallNativeMethod(this, CW_Method_DefaultShot, 30.0, 0.75, 0.15, vecSpread, 1)) {
     CW_CallNativeMethod(this, CW_Method_PlayAnimation, 3, 0.71);
     static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
     emit_sound(pPlayer, CHAN_WEAPON, g_szShotSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
