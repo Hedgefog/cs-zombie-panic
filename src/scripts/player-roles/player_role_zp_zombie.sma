@@ -1,3 +1,5 @@
+#pragma semicolon 1
+
 #include <amxmodx>
 #include <fakemeta>
 #include <hamsandwich>
@@ -112,11 +114,11 @@ public HamHook_Player_TakeDamage_Post(const pPlayer) {
 }
 
 Float:@Role_GetMaxSpeed(const pPlayer) {
-  return ZP_ZOMBIE_SPEED;
+  return 198.0;
 }
 
 Float:@Role_GetMaxHealth(const pPlayer) {
-  return ZP_ZOMBIE_HEALTH;
+  return 200.0;
 }
 
 @Role_Think(const pPlayer) {
@@ -136,7 +138,7 @@ Float:@Role_GetMaxHealth(const pPlayer) {
   static Float:flTimeDelta; flTimeDelta = flLastRegeneration ? flGameTime - flLastRegeneration : flRate;
   static Float:flValue; flValue = PlayerRole_This_GetMember(MEMBER(flRegenerationPerSecond));
 
-  ExecuteHamB(Ham_TakeHealth, pPlayer, flValue * flTimeDelta, 0)
+  ExecuteHamB(Ham_TakeHealth, pPlayer, flValue * flTimeDelta, 0);
 
   PlayerRole_This_SetMember(MEMBER(flLastRegeneration), flGameTime);
   PlayerRole_This_SetMember(MEMBER(flNextRegeneration), flGameTime + flRate);

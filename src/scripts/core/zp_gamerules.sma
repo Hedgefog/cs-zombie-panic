@@ -39,7 +39,6 @@ enum _:TeamMenuItem {
 
 new g_pCvarCompetitive;
 new g_pCvarRespawnTime;
-new g_pCvarBasePlayerSpeed;
 new g_pCvarPlayerWeightMultiplier;
 
 /*--------------------------------[ Menu Pointers ]--------------------------------*/
@@ -57,7 +56,6 @@ new bool:g_bCompetitiveMode = false;
 new g_iPlayersPerZombie = 0;
 new bool:g_bLimitedRoundTime = false;
 new bool:g_bRoundExpired = false;
-new Float:g_flBasePlayerSpeed = 0.0;
 new Float:g_flPlayerWeightMultiplier = 0.0;
 new g_iZombiesValue = -1;
 
@@ -89,8 +87,7 @@ public plugin_init() {
 
   g_pCvarCompetitive = register_cvar(CVAR("competitive"), "0");
   g_pCvarRespawnTime = register_cvar(CVAR("respawn_time"), "6.0");
-  g_pCvarBasePlayerSpeed = register_cvar(CVAR("player_base_speed"), "260.0");
-  g_pCvarPlayerWeightMultiplier = register_cvar(CVAR("player_weight_multiplier"), "0.01");
+  g_pCvarPlayerWeightMultiplier = register_cvar(CVAR("player_weight_multiplier"), "1.0");
 
   g_pTeamPreferenceMenu = CreateTeamPreferenceMenu();
 
@@ -536,7 +533,6 @@ bool:@Player_UpdateSpeed(const &this) {
 /*--------------------------------[ Functions ]--------------------------------*/
 
 ResetVariables() {
-  SetVariable(GAMERULES_VARIABLE(flBasePlayerSpeed), get_pcvar_float(g_pCvarBasePlayerSpeed));
   SetVariable(GAMERULES_VARIABLE(flPlayerWeightMultiplier), get_pcvar_float(g_pCvarPlayerWeightMultiplier));
   SetVariable(GAMERULES_VARIABLE(flRespawnTime), get_pcvar_float(g_pCvarRespawnTime));
   SetVariable(GAMERULES_VARIABLE(bCompetitiveMode), bool:get_pcvar_num(g_pCvarCompetitive));
@@ -548,7 +544,6 @@ ResetVariables() {
 
 any:GetVariable(const ZP_GameRules_Variable:iVariable) {
   switch (iVariable) {
-    case GAMERULES_VARIABLE(flBasePlayerSpeed): return g_flBasePlayerSpeed;
     case GAMERULES_VARIABLE(flPlayerWeightMultiplier): return g_flPlayerWeightMultiplier;
     case GAMERULES_VARIABLE(bAllowRespawn): return g_bAllowRespawn;
     case GAMERULES_VARIABLE(bCompetitiveMode): return g_bCompetitiveMode;
@@ -563,7 +558,6 @@ any:GetVariable(const ZP_GameRules_Variable:iVariable) {
 
 SetVariable(const ZP_GameRules_Variable:iVariable, any:value) {
   switch (iVariable) {
-    case GAMERULES_VARIABLE(flBasePlayerSpeed): g_flBasePlayerSpeed = value;
     case GAMERULES_VARIABLE(flPlayerWeightMultiplier): g_flPlayerWeightMultiplier = value;
     case GAMERULES_VARIABLE(bAllowRespawn): g_bAllowRespawn = value;
     case GAMERULES_VARIABLE(bCompetitiveMode): g_bCompetitiveMode = value;
@@ -764,9 +758,12 @@ RespawnPlayers() {
 Float:CalculatePlayerMaxSpeed(const &pPlayer) {
   static Float:flMaxSpeed; flMaxSpeed = PlayerRole_Player_CallMethod(pPlayer, PLAYER_ROLE(Base), BASE_ROLE_METHOD(GetMaxSpeed));
   static Float:flInventoryWeight; flInventoryWeight = PlayerRole_Player_GetMember(pPlayer, PLAYER_ROLE(Base), BASE_ROLE_MEMBER(flInventoryWeight));
+  static Float:flSpeedMultiplier; flSpeedMultiplier = PlayerRole_Player_GetMember(pPlayer, PLAYER_ROLE(Base), BASE_ROLE_MEMBER(flSpeedMultiplier));
+
+  flMaxSpeed *= flSpeedMultiplier;
 
   if (flInventoryWeight > 0.0) {
-    flMaxSpeed -= g_flBasePlayerSpeed * (flInventoryWeight * g_flPlayerWeightMultiplier);
+    flMaxSpeed -= (flInventoryWeight * g_flPlayerWeightMultiplier);
   }
 
   flMaxSpeed = floatmax(flMaxSpeed, 1.0);

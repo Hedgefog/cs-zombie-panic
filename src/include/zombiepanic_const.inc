@@ -57,7 +57,6 @@ enum ZP_GameRules_Variable {
   ZP_GameRules_Variable_iPlayersPerZombie,
   ZP_GameRules_Variable_bLimitedRoundTime,
   ZP_GameRules_Variable_iZombiesValue,
-  ZP_GameRules_Variable_flBasePlayerSpeed,
   ZP_GameRules_Variable_flPlayerWeightMultiplier
 };
 
@@ -84,54 +83,13 @@ stock const ZP_Library_Infection[] = "zombiepanic_infection";
 
 #define ZP_DROPPABLE_SATCHELS
 
-#define ZP_HUMAN_HEALTH 100.0
-#define ZP_ZOMBIE_HEALTH 200.0
 #define ZP_AMMO_RESPAWN_TIME 40.0
 #define ZP_WEAPONS_RESPAWN_TIME 60.0
 #define ZP_ITEMS_RESPAWN_TIME 60.0
 
-// #define ZP_MODE 1 // 1 - classic, 2 - zps
-
-// #if ZP_MODE == 1
-  #define ZP_HUMAN_SPEED 260.0
-  #define ZP_ZOMBIE_SPEED (ZP_HUMAN_SPEED * 0.76923)
-  #define ZP_PANIC_SPEED_MODIFIER 1.0
-  #define ZP_STRAFE_SPEED_MODIFIER 0.612961
-  #define ZP_BACKWARD_SPEED_MODIFIER 0.5
-  #define ZP_DUCK_SPEED_MODIFIER 1.066825
-
-//   #define ZP_WEIGHT_MELEE 52.0
-//   #define ZP_WEIGHT_PISTOL 21.66
-//   #define ZP_WEIGHT_MAGNUM 18.5714
-//   #define ZP_WEIGHT_RIFLE 13.0
-//   #define ZP_WEIGHT_SHOTGUN 11.8181
-// #elseif ZP_MODE == 2
-//   #define ZP_HUMAN_SPEED 195.0
-//   #define ZP_ZOMBIE_SPEED (ZP_HUMAN_SPEED * 0.77435)
-//   #define ZP_PANIC_SPEED_MODIFIER 1.10487
-//   #define ZP_STRAFE_SPEED_MODIFIER 1.0
-//   #define ZP_BACKWARD_SPEED_MODIFIER 0.87179
-//   #define ZP_DUCK_SPEED_MODIFIER 1.066825
-
-//   #define ZP_WEIGHT_MELEE 22.94
-//   #define ZP_WEIGHT_PISTOL 25.4902
-//   #define ZP_WEIGHT_MAGNUM 16.3865
-//   #define ZP_WEIGHT_RIFLE 12.0743
-//   #define ZP_WEIGHT_SHOTGUN 12.0743
-// #else // easy mode
-//   #define ZP_HUMAN_SPEED 200.0
-//   #define ZP_ZOMBIE_SPEED (ZP_HUMAN_SPEED * 0.78975)
-//   #define ZP_PANIC_SPEED_MODIFIER 1.0
-//   #define ZP_STRAFE_SPEED_MODIFIER 0.85
-//   #define ZP_BACKWARD_SPEED_MODIFIER 0.85
-//   #define ZP_DUCK_SPEED_MODIFIER 1.25
-
-//   #define ZP_WEIGHT_MELEE 80.0
-//   #define ZP_WEIGHT_PISTOL 47.0588
-//   #define ZP_WEIGHT_MAGNUM 38.0952
-//   #define ZP_WEIGHT_RIFLE 26.6666
-//   #define ZP_WEIGHT_SHOTGUN 26.6666
-// #endif
+#define ZP_STRAFE_SPEED_MODIFIER 0.612961
+#define ZP_BACKWARD_SPEED_MODIFIER 0.5
+#define ZP_DUCK_SPEED_MODIFIER 1.066825
 
 /*--------------------------------[ Player Roles ]--------------------------------*/
 
@@ -175,6 +133,7 @@ stock const ZP_PlayerRole_Base_Member_flMinIdleSoundDelay[] = "flMinIdleSoundDel
 stock const ZP_PlayerRole_Base_Member_flMaxIdleSoundDelay[] = "flMaxIdleSoundDelay";
 stock const ZP_PlayerRole_Base_Member_flNextPain[] = "flNextPain"; 
 stock const ZP_PlayerRole_Base_Member_flNextSound[] = "flNextSound";
+stock const ZP_PlayerRole_Base_Member_flSpeedMultiplier[] = "flSpeedMultiplier";
 
 stock const ZP_PlayerRole_Survivor_Member_iSelectedAmmo[] = "iSelectedAmmo";
 stock const ZP_PlayerRole_Survivor_Method_SelectNextAmmo[] = "SelectNextAmmo";

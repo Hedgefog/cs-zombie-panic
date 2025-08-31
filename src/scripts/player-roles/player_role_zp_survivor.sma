@@ -112,16 +112,17 @@ public Command_DropInactiveAmmo(pPlayer) {
 
   CW_Give(pPlayer, WEAPON(Crowbar));
   CW_Give(pPlayer, WEAPON(Pistol));
+  CW_GiveAmmo(pPlayer, AMMO(Pistol), 7);
 
   PlayerRole_This_SetMember(MEMBER(iSelectedAmmo), -1);
 }
 
 Float:@Role_GetMaxSpeed(const pPlayer) {
-  return ZP_HUMAN_SPEED;
+  return 260.0;
 }
 
 Float:@Role_GetMaxHealth(const pPlayer) {
-  return ZP_HUMAN_HEALTH;
+  return 100.0;
 }
 
 bool:@Role_PlaySound(const pPlayer, ZP_RoleSound:iSound) {

@@ -472,7 +472,7 @@ bool:@Bot_ShouldPanic(const &this) {
   if (!g_bPanic) return false;
 
   static Float:flMaxSpeed; pev(this, pev_maxspeed, flMaxSpeed);
-  if (flMaxSpeed > ZP_ZOMBIE_SPEED) return false;
+  if (flMaxSpeed > 190.0) return false;
 
   if (@Bot_FindPlayerNearby(this, PANIC_RANGE, TEAM(Zombies), false) == FM_NULLENT) return false;
 

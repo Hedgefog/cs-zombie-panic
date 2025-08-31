@@ -1,3 +1,5 @@
+#pragma semicolon 1
+
 #include <amxmodx>
 #include <fakemeta>
 #include <hamsandwich>
@@ -187,6 +189,7 @@ public CEHook_Button_Use_Post(const pButton, const pActivator) {
   PlayerRole_This_SetMember(MEMBER(flNextPain), 0.0);
   PlayerRole_This_SetMember(MEMBER(flTauntChance), 0.5);
   PlayerRole_This_SetMember(MEMBER(flNextSound), 0.0);
+  PlayerRole_This_SetMember(MEMBER(flSpeedMultiplier), 1.0);
 }
 
 @Role_Unassign(const pPlayer) {}
@@ -208,6 +211,7 @@ Float:@Role_GetMaxHealth(const pPlayer) {
     set_ent_data_string(pPlayer, "CBasePlayer", "m_szAnimExtention", "c4");
   }
 
+  PlayerRole_This_SetMember(MEMBER(flSpeedMultiplier), 1.0);
   PlayerRole_This_SetMember(MEMBER(bShouldUpdateInventoryWeight), true);
 }
 
@@ -382,7 +386,7 @@ Float:@Role_UpdateInventoryWeight(const pPlayer) {
     BASE_ROLE_DROP_FLAG(SkipActive) |
     BASE_ROLE_DROP_FLAG(ReverseDirection) |
     BASE_ROLE_DROP_FLAG(ReverseAngles)
-  )
+  );
 
   static const DropFlags:iDropFlags = (
     BASE_ROLE_DROP_FLAG(SkipActive) |
