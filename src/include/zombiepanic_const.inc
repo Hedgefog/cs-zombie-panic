@@ -363,6 +363,10 @@ stock const ZP_Asset_Sound_ZombieIdle[] = "player.zombie.sounds.idle";
 stock const ZP_Asset_Sound_PlayerJolt[] = "player.jolt-sound";
 stock const ZP_Asset_Sound_ItemMedkit[] = "items.medkit.sound";
 stock const ZP_Asset_Sound_ItemArmor[] = "items.armor.sound";
+stock const ZP_Asset_Sound_RoundStart[] = "round-start-sound";
+stock const ZP_Asset_Sound_SurvivorsWin[] = "survivors-win-sound";
+stock const ZP_Asset_Sound_ZombiesWin[] = "zombies-win-sound";
+stock const ZP_Asset_Sound_RoundDraw[] = "round-draw-sound";
 stock const ZP_Asset_Sound_ZombieVisionOn[] = "zombie-vision.on-sound";
 stock const ZP_Asset_Sound_ZombieVisionOff[] = "zombie-vision.off-sound";
 

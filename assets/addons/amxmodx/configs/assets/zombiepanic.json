@@ -3,6 +3,10 @@
   "shell-model": "models/shell.mdl",
   "shotgun-shell-model": "models/shotgunshell.mdl",
   "startup-sound": "sound/zombiepanic/v100/music/gamestartup.mp3",
+  "round-start-sound": "zombiepanic/v150/game/round_start.wav",
+  "survivors-win-sound": "zombiepanic/v150/game/survivors_win.wav",
+  "zombies-win-sound": "zombiepanic/v150/game/zombies_win.wav",
+  "round-draw-sound": "zombiepanic/v150/game/round_draw.wav",
   "flashlight": {
     "lightcone": {
       "model": "models/zombiepanic/v100/lightcone.mdl"

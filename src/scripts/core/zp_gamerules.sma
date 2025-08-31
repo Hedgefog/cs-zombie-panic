@@ -5,6 +5,7 @@
 #include <hamsandwich>
 #include <reapi>
 
+#include <api_assets>
 #include <api_rounds>
 #include <api_custom_events>
 #include <api_player_roles>
@@ -34,6 +35,13 @@ enum _:TeamMenuItem {
   TeamMenuItem_Zombie,
   TeamMenuItem_Spectator = 5,
 };
+
+/*--------------------------------[ Assets ]--------------------------------*/
+
+new g_szRoundStartSound[MAX_RESOURCE_PATH_LENGTH];
+new g_szSurvivorsWinSound[MAX_RESOURCE_PATH_LENGTH];
+new g_szZombiesWinSound[MAX_RESOURCE_PATH_LENGTH];
+new g_szRoundDrawSound[MAX_RESOURCE_PATH_LENGTH];
 
 /*--------------------------------[ Cvar Pointers ]--------------------------------*/
 
@@ -70,6 +78,11 @@ new PlayerMoveFlags:g_rgiPlayerMoveFlags[MAX_PLAYERS + 1];
 
 public plugin_precache() {
   g_pTrace = create_tr2();
+
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(RoundStart), g_szRoundStartSound, charsmax(g_szRoundStartSound));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(SurvivorsWin), g_szSurvivorsWinSound, charsmax(g_szSurvivorsWinSound));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(ZombiesWin), g_szZombiesWinSound, charsmax(g_szZombiesWinSound));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(RoundDraw), g_szRoundDrawSound, charsmax(g_szRoundDrawSound));
 
   CustomEvent_Register(GAMERULES_EVENT(PlayerRespawn), CEP_Cell);
   CustomEvent_Register(GAMERULES_EVENT(PlayerRespawned), CEP_Cell);
@@ -252,8 +265,8 @@ public Round_OnRoundStart() {
   g_bGameInProgress = true;
 
   RespawnPlayers();
-
   CustomEvent_Emit(GAMERULES_EVENT(GameStart));
+  PlayGameSound(g_szRoundStartSound);
   
   CheckWinConditions();
 }
@@ -272,6 +285,12 @@ public Round_OnRoundExpired() {
 
 public Round_OnRoundEnd(iWinnerTeam) {
   g_bGameInProgress = false;
+
+  switch (iWinnerTeam) {
+    case TEAM(Zombies): PlayGameSound(g_szZombiesWinSound);
+    case TEAM(Survivors): PlayGameSound(g_szSurvivorsWinSound);
+    case TEAM(Spectators): PlayGameSound(g_szRoundDrawSound);
+  }
 
   CustomEvent_Emit(GAMERULES_EVENT(GameEnd), iWinnerTeam);
 }
@@ -787,6 +806,13 @@ Float:CalculatePlayerMaxSpeed(const &pPlayer) {
   return floatmax(flMaxSpeed, 1.0);
 }
 
+PlayGameSound(const szSound[]) {
+  for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
+    if (!is_user_connected(pPlayer)) continue;
+    if (is_user_bot(pPlayer)) continue;
+    client_cmd(pPlayer, "spk ^"%s^"", szSound);
+  }
+}
 
 /*--------------------------------[ Tasks ]--------------------------------*/
 
