@@ -1,3 +1,5 @@
+#pragma semicolon 1
+
 #include <amxmodx>
 #include <fakemeta>
 #include <hamsandwich>
@@ -15,6 +17,7 @@
 /*--------------------------------[ Plugin State ]--------------------------------*/
 
 new g_iDefaultZombieLives;
+new g_iZombieLivesStartMax;
 new g_iZombieLivesPerPlayer;
 
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
@@ -39,8 +42,9 @@ public plugin_init() {
 
   RegisterHamPlayer(Ham_Killed, "HamHook_Player_Killed_Post", .Post = 1);
 
-  bind_pcvar_num(register_cvar(CVAR("zombie_lives"), "0"), g_iDefaultZombieLives);
-  bind_pcvar_num(register_cvar(CVAR("zombie_lives_per_player"), "2"), g_iZombieLivesPerPlayer);
+  bind_pcvar_num(register_cvar(CVAR("zombie_lives"), "8"), g_iDefaultZombieLives);
+  bind_pcvar_num(register_cvar(CVAR("zombie_lives_per_player"), "1"), g_iZombieLivesPerPlayer);
+  bind_pcvar_num(register_cvar(CVAR("zombie_lives_start_max"), "10"), g_iZombieLivesStartMax);
 }
 
 /*--------------------------------[ Client Forwards ]--------------------------------*/
@@ -67,7 +71,7 @@ public Callback_GameMode_Activate() {
 public Callback_GameMode_GameStart() {
   new iHumanCount = CalculatePlayerCount(TEAM(Survivors));
 
-  new iZombieLives = g_iDefaultZombieLives + (iHumanCount * g_iZombieLivesPerPlayer);
+  new iZombieLives = min(g_iDefaultZombieLives + (iHumanCount * g_iZombieLivesPerPlayer), g_iZombieLivesStartMax);
 
   SetZombieLives(iZombieLives);
 }
