@@ -164,7 +164,7 @@ public HamHook_Player_Spawn_Post(const pPlayer) {
   if (!PlayerRole_Player_HasRole(pPlayer, PLAYER_ROLE(Zombie))) return HAM_IGNORED;
 
   if (g_bAutoVision) {
-    set_task(0.1, "Task_ActivateVision", TASKID_ACTIVATE_VISION + pPlayer);
+    set_task(1.0, "Task_ActivateVision", TASKID_ACTIVATE_VISION + pPlayer);
   }
 
   return HAM_HANDLED;
