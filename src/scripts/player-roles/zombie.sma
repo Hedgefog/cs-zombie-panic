@@ -3,11 +3,13 @@
 #include <amxmodx>
 #include <fakemeta>
 #include <hamsandwich>
+#include <xs>
 
 #include <api_assets>
 #include <api_player_roles>
 #include <api_custom_weapons>
 #include <api_player_model>
+#include <api_entity_force>
 
 #include <zombiepanic_internal>
 
@@ -58,37 +60,16 @@ public plugin_precache() {
   PlayerRole_RegisterMethod(ROLE, BASE_METHOD(Spawn), "@Role_Spawn");
   PlayerRole_RegisterMethod(ROLE, BASE_METHOD(CanPickupItem), "@Role_CanPickupItem");
   PlayerRole_RegisterMethod(ROLE, BASE_METHOD(PlaySound), "@Role_PlaySound", PlayerRole_Type_Cell);
+  PlayerRole_RegisterMethod(ROLE, BASE_METHOD(CalculateDamage), "@Role_CalculateDamage", PlayerRole_Type_Cell, PlayerRole_Type_Cell, PlayerRole_Type_Cell, PlayerRole_Type_Cell);
+  PlayerRole_RegisterMethod(ROLE, BASE_METHOD(TakeDamage), "@Role_TakeDamage", PlayerRole_Type_Cell, PlayerRole_Type_Cell, PlayerRole_Type_Cell, PlayerRole_Type_Cell);
 
   PlayerRole_RegisterMethod(ROLE, METHOD(Regenerate), "@Role_Regenerate");
 }
 
 public plugin_init() {
   register_plugin(ROLE_PLUGIN(Zombie), ZP_VERSION, "Hedgehog Fog");
-  
-  RegisterHamPlayer(Ham_TakeDamage, "HamHook_Player_TakeDamage", .Post = 0);
-  RegisterHamPlayer(Ham_TakeDamage, "HamHook_Player_TakeDamage_Post", .Post = 1);
 
   g_pCvarRegenerationRate = register_cvar(CVAR("zombie_regeneration_rate"), "0.25");
-}
-
-public HamHook_Player_TakeDamage(const pPlayer, const pInflictor, const pAttacker, Float:flDamage, iDamageBits) {
-  if (PlayerRole_Player_HasRole(pPlayer, ZP_PlayerRole_Zombie)) {
-    if (iDamageBits & DMG_FALL && pInflictor == pPlayer && pAttacker == pPlayer) {
-      SetHamParamFloat(4, 0.0);
-      return HAM_OVERRIDE;
-    }
-  }
-
-  return HAM_HANDLED;
-}
-
-public HamHook_Player_TakeDamage_Post(const pPlayer) {
-  if (!PlayerRole_Player_HasRole(pPlayer, ROLE)) return HAM_IGNORED;
-
-  PlayerRole_Player_SetMember(pPlayer, ROLE, MEMBER(flNextRegeneration), get_gametime() + 10.0);
-  PlayerRole_Player_SetMember(pPlayer, ROLE, MEMBER(flLastRegeneration), 0.0);
-
-  return HAM_HANDLED;
 }
 
 @Role_Assign(const pPlayer) {
@@ -179,3 +160,19 @@ bool:@Role_CanPickupItem(const pPlayer, const pItem) {
   return false;
 }
 
+Float:@Role_CalculateDamage(const pPlayer, const pInflictor, const pAttacker, Float:flDamage, iDamageBits) {
+  if (iDamageBits & DMG_FALL && pInflictor == pPlayer && pAttacker == pPlayer) {
+    return 0.0;
+  }
+
+  return flDamage;
+}
+
+@Role_TakeDamage(const pPlayer, const pInflictor, const pAttacker, Float:flDamage, iDamageBits) {
+  if (pInflictor && iDamageBits & DMG_BULLET) {
+    EntityForce_AddFromEntity(pPlayer, pInflictor, floatmin(flDamage * 2.5, 800.0));
+  }
+
+  PlayerRole_Player_SetMember(pPlayer, ROLE, MEMBER(flNextRegeneration), get_gametime() + 10.0);
+  PlayerRole_Player_SetMember(pPlayer, ROLE, MEMBER(flLastRegeneration), 0.0);
+}

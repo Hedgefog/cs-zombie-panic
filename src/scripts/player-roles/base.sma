@@ -76,6 +76,8 @@ public plugin_precache() {
   PlayerRole_RegisterVirtualMethod(ROLE, METHOD(DropAllAmmo), "@Role_DropAllAmmo", PlayerRole_Type_Cell);
   PlayerRole_RegisterVirtualMethod(ROLE, METHOD(DropBackpack), "@Role_DropBackpack", PlayerRole_Type_Cell);
   PlayerRole_RegisterVirtualMethod(ROLE, METHOD(DropWeaponBox), "@Role_DropWeaponBox", PlayerRole_Type_Cell, PlayerRole_Type_Cell);
+  PlayerRole_RegisterVirtualMethod(ROLE, METHOD(CalculateDamage), "@Role_CalculateDamage", PlayerRole_Type_Cell, PlayerRole_Type_Cell, PlayerRole_Type_Cell, PlayerRole_Type_Cell);
+  PlayerRole_RegisterVirtualMethod(ROLE, METHOD(TakeDamage), "@Role_TakeDamage", PlayerRole_Type_Cell, PlayerRole_Type_Cell, PlayerRole_Type_Cell, PlayerRole_Type_Cell);
 
   CustomEvent_Register(BASE_ROLE_EVENT(UpdateInventoryWeight), CEP_Cell);
   CustomEvent_Register(BASE_ROLE_EVENT(UpdateModel), CEP_Cell);
@@ -121,6 +123,9 @@ public HamHook_Player_TakeDamage(const pPlayer, const pInflictor, const pAttacke
 
   pev(pPlayer, pev_velocity, g_rgflPlayerVelocity[pPlayer]);
 
+  flDamage = PlayerRole_Player_CallMethod(pPlayer, ROLE, METHOD(CalculateDamage), pInflictor, pAttacker, flDamage, iDamageBits);
+  SetHamParamFloat(4, flDamage);
+
   return HAM_HANDLED;
 }
 
@@ -132,6 +137,8 @@ public HamHook_Player_TakeDamage_Post(const pPlayer, const pInflictor, const pAt
 
   // Reset painshock
   set_ent_data_float(pPlayer, "CBasePlayer", "m_flVelocityModifier", 1.0);
+
+  PlayerRole_Player_CallMethod(pPlayer, ROLE, METHOD(TakeDamage), pInflictor, pAttacker, flDamage, iDamageBits);
 
   return HAM_HANDLED;
 }
@@ -296,6 +303,12 @@ bool:@Role_PlaySound(const pPlayer, ZP_RoleSound:iSound) {
   PlayerRole_This_SetMember(MEMBER(flNextPain), get_gametime() + 1.0);
 }
 
+Float:@Role_CalculateDamage(const pPlayer, const pInflictor, const pAttacker, Float:flDamage, iDamageBits) {
+  return flDamage;
+}
+
+@Role_TakeDamage(const pPlayer, const pInflictor, const pAttacker, Float:flDamage, iDamageBits) {}
+
 /*--------------------------------[ Role Inventory Methods ]--------------------------------*/
 
 Float:@Role_UpdateInventoryWeight(const pPlayer) {
@@ -372,10 +385,10 @@ Float:@Role_UpdateInventoryWeight(const pPlayer) {
 
   // Active item dropped, unlink it
   if (get_ent_data_entity(pActiveItem, "CBasePlayerItem", "m_pPlayer") != pPlayer) {
-  if (pPrevItem != FM_NULLENT) {
-    set_ent_data_entity(pPrevItem, "CBasePlayerItem", "m_pNext", pNextItem);
-  } else {
-    set_ent_data_entity(pPlayer, "CBasePlayer", "m_rgpPlayerItems", pNextItem, iActiveSlot);
+    if (pPrevItem != FM_NULLENT) {
+      set_ent_data_entity(pPrevItem, "CBasePlayerItem", "m_pNext", pNextItem);
+    } else {
+      set_ent_data_entity(pPlayer, "CBasePlayer", "m_rgpPlayerItems", pNextItem, iActiveSlot);
     }
   }
 
@@ -472,16 +485,16 @@ Float:@Role_UpdateInventoryWeight(const pPlayer) {
 
   // Weapon dropped, remove it from player HUD
   if (get_ent_data_entity(pItemToDrop, "CBasePlayerItem", "m_pPlayer") == pPlayer) {
-  set_pev(pPlayer, pev_weapons, pev(pPlayer, pev_weapons) &~ (1<<iId));
+    set_pev(pPlayer, pev_weapons, pev(pPlayer, pev_weapons) &~ (1<<iId));
   }
 
   CE_CallMethod(pWeaponBox, WEAPONBOX_METHOD(PackItem), pItemToDrop);
 
-      if (iAmmoToPack > 0) {
+  if (iAmmoToPack > 0) {
     if (bPackToWeapon) {
       set_ent_data(pItemToDrop, "CBasePlayerWeapon", "m_iDefaultAmmo", iAmmoToPack);
     } else {
-        CE_CallMethod(pWeaponBox, WEAPONBOX_METHOD(PackAmmo), szAmmo, iAmmoToPack);
+      CE_CallMethod(pWeaponBox, WEAPONBOX_METHOD(PackAmmo), szAmmo, iAmmoToPack);
     }
 
     set_ent_data(pPlayer, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoAmount - iAmmoToPack, iPrimaryAmmoType);

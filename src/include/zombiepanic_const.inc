@@ -122,6 +122,8 @@ stock const ZP_PlayerRole_Base_Method_PlaySound[] = "PlaySound";
 stock const ZP_PlayerRole_Base_Method_Taunt[] = "Taunt";
 stock const ZP_PlayerRole_Base_Method_Idle[] = "Idle";
 stock const ZP_PlayerRole_Base_Method_Pain[] = "Pain";
+stock const ZP_PlayerRole_Base_Method_TakeDamage[] = "TakeDamage";
+stock const ZP_PlayerRole_Base_Method_CalculateDamage[] = "CalculateDamage";
 
 stock const ZP_PlayerRole_Base_Member_flInventoryWeight[] = "flInventoryWeight";
 stock const ZP_PlayerRole_Base_Member_flNextItemPickup[] = "flNextItemPickup";
