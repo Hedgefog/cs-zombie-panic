@@ -298,7 +298,7 @@ bool:@Role_PlaySound(const pPlayer, ZP_RoleSound:iSound) {
 
   if (flNextPain > get_gametime()) return;
 
-  PlayerRole_Player_CallMethod(pPlayer, ROLE, METHOD(PlaySound), SOUND(Pain));
+  PlayerRole_This_CallMethod(METHOD(PlaySound), SOUND(Pain));
 
   PlayerRole_This_SetMember(MEMBER(flNextPain), get_gametime() + 1.0);
 }
@@ -413,15 +413,15 @@ Float:@Role_UpdateInventoryWeight(const pPlayer) {
 
   switch (g_iDropInactiveMode) {
     case DropMode_Backpack: {
-      PlayerRole_Player_CallMethod(pPlayer, ROLE, METHOD(DropBackpack), iDropBackpackFlags);
+      PlayerRole_This_CallMethod(METHOD(DropBackpack), iDropBackpackFlags);
     }
     case DropMode_ItemsAndBackpack: {
-      PlayerRole_Player_CallMethod(pPlayer, ROLE, METHOD(DropAllItems), iDropFlags);
-      PlayerRole_Player_CallMethod(pPlayer, ROLE, METHOD(DropBackpack), iDropBackpackFlags);
+      PlayerRole_This_CallMethod(METHOD(DropAllItems), iDropFlags);
+      PlayerRole_This_CallMethod(METHOD(DropBackpack), iDropBackpackFlags);
     }
     case DropMode_ItemsAndAmmo: {
-      PlayerRole_Player_CallMethod(pPlayer, ROLE, METHOD(DropAllItems), iDropFlags);
-      PlayerRole_Player_CallMethod(pPlayer, ROLE, METHOD(DropAllAmmo), iDropFlags);
+      PlayerRole_This_CallMethod(METHOD(DropAllItems), iDropFlags);
+      PlayerRole_This_CallMethod(METHOD(DropAllAmmo), iDropFlags);
     }
   }
 }
@@ -623,7 +623,9 @@ Float:@Role_UpdateInventoryWeight(const pPlayer) {
       while (pItem != FM_NULLENT) {
         static iAmmoType; iAmmoType = get_ent_data(pItem, "CBasePlayerWeapon", "m_iPrimaryAmmoType");
 
-        rgbAmmoShouldSkip[iAmmoType] = true;
+        if (iAmmoType != -1) {
+          rgbAmmoShouldSkip[iAmmoType] = true;
+        }
 
         pItem = get_ent_data_entity(pItem, "CBasePlayerItem", "m_pNext");
       }
