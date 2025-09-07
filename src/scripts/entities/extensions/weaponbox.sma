@@ -63,6 +63,7 @@ public plugin_end() {
   CE_CallBaseMethod();
 
   CE_SetMemberString(this, CE_Member_szModel, g_szModel);
+  CE_SetMember(this, WEAPONBOX_MEMBER(bDirty), false);
 }
 
 @Entity_Spawn(const this) {
@@ -201,18 +202,29 @@ bool:@Player_PickupWeaponBoxItems(const &this, const &pWeaponBox, &iItemsNum) {
 
 bool:@Player_PickupWeaponBoxItem(const &pWeaponBox, const &pItem, const &pPlayer) {
   new iId = get_ent_data(pItem, "CBasePlayerItem", "m_iId");
+  new bool:bResult = false;
   
   new pOriginal = @Player_FindItemById(pPlayer, iId);
 
   if (pOriginal != FM_NULLENT) {
-    if (!ExecuteHamB(Ham_Item_AddDuplicate, pItem, pOriginal)) return false;
+    if (ExecuteHamB(Ham_Item_AddDuplicate, pItem, pOriginal)) {
+      bResult = true;
+    }
   } else {
-    if (!ExecuteHamB(Ham_AddPlayerItem, pPlayer, pItem)) return false;
-    
+    if (ExecuteHamB(Ham_AddPlayerItem, pPlayer, pItem)) {
     ExecuteHamB(Ham_Item_AttachToPlayer, pItem, pPlayer);
+      bResult = true;
+    }
   }
 
-  return true;
+  // Mark weaponbox as "dirty" if the weapon is "dirty"
+  if (CW_IsInstanceOf(pItem, CW_Class_Base)) {
+    if (CW_GetMember(pItem, CW_Member_bDirty)) {
+      CE_SetMember(pWeaponBox, WEAPONBOX_MEMBER(bDirty), true);
+    }
+  }
+
+  return bResult;
 }
 
 bool:@Player_PickupWeaponBoxAmmo(const &this, const &pWeaponBox, &iAmmoNum) {
@@ -233,13 +245,11 @@ bool:@Player_PickupWeaponBoxAmmo(const &this, const &pWeaponBox, &iAmmoNum) {
 
     static iAddedAmmo; iAddedAmmo = @Player_AddAmmo(this, szAmmo, iAmount);
 
-    iAmount -= iAddedAmmo;
-
     if (iAddedAmmo) {
+      set_ent_data(pWeaponBox, "CWeaponBox", "m_rgAmmo", (iAmount -= iAddedAmmo), iSlot);
+      CE_SetMember(pWeaponBox, WEAPONBOX_MEMBER(bDirty), true);
       iAmmoNum++;
     }
-
-    set_ent_data(pWeaponBox, "CWeaponBox", "m_rgAmmo", iAmount, iSlot);
 
     if (!iAmount) {
       set_ent_data(pWeaponBox, "CWeaponBox", "m_rgiszAmmo", 0, iSlot);

@@ -26,14 +26,30 @@ public plugin_init() {
   register_plugin(ENTITY_PLUGIN(BaseSpawner), ZP_VERSION, "Hedgehog Fog");
 
   CE_RegisterClassMethodHook(ENTITY(WeaponBox), CE_Method_Free, "CEHook_WeaponBox_Free");
+  CE_RegisterClassMethodHook(ENTITY(WeaponBox), CE_Method_Touch, "CEHook_WeaponBox_Touch_Post", true);
 }
+
+/*--------------------------------[ Hooks ]--------------------------------*/
 
 public CEHook_WeaponBox_Free(const pEntity) {
   new pOwner = pev(pEntity, pev_owner);
 
   if (pOwner && CE_IsInstanceOf(pOwner, ENTITY(BaseSpawner))) {
-    ExecuteHamB(Ham_Killed, pOwner, 0, 0);
+    if (pev(pOwner, pev_deadflag) == DEAD_NO) {
+      ExecuteHamB(Ham_Killed, pOwner, 0, 0);
+    }
+
     CE_SetMember(pOwner, BASESPAWNER_MEMBER(pWeaponBox), FM_NULLENT);
+  }
+}
+
+public CEHook_WeaponBox_Touch_Post(const pEntity, const pToucher) {
+  new pOwner = pev(pEntity, pev_owner);
+  if (pOwner && CE_IsInstanceOf(pOwner, ENTITY(BaseSpawner)) && pev(pOwner, pev_deadflag) == DEAD_NO) {
+    if (CE_GetMember(pEntity, WEAPONBOX_MEMBER(bDirty))) {
+      // WeaponBox is dirty, schedule the respawn
+      ExecuteHamB(Ham_Killed, pOwner, 0, 0);
+    }
   }
 }
 
@@ -49,11 +65,21 @@ public CEHook_WeaponBox_Free(const pEntity) {
   /*
     Becase weaponbox cleanup phase is called after respawn, we need to unattach weaponbox from entity.
     Without this fix spawner will be killed at the beginning of a round.
+
+    With this logic we also handle the case when weaponbox is "dirty":
+      - If weaponbox became "dirty" after touch, spawner will be killed to schedule the respawn
+      - Spawn method will be called on respawn
+      - The old weaponbox will be destroyed and a new one will be spawned
   */
   new pWeaponBox = CE_GetMember(this, BASESPAWNER_MEMBER(pWeaponBox));
   if (pWeaponBox != FM_NULLENT) {
-    set_pev(pWeaponBox, pev_owner, 0);
+    // Unattach weaponbox from the spawner
     CE_SetMember(this, BASESPAWNER_MEMBER(pWeaponBox), FM_NULLENT);
+    set_pev(pWeaponBox, pev_owner, 0);
+
+    // Kill the weaponbox
+    set_pev(pWeaponBox, pev_flags, pev(pWeaponBox, pev_flags) | FL_KILLME);
+    dllfunc(DLLFunc_Think, pWeaponBox);
   }
 
   set_pev(this, pev_nextthink, get_gametime() + 0.1);

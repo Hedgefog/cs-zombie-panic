@@ -65,6 +65,7 @@ public plugin_precache() {
 
   #if defined ZP_DROPPABLE_SATCHELS
     CW_ImplementClassMethod(WEAPON_NAME, CW_Method_ExtractAmmo, "@Weapon_ExtractAmmo");
+    CW_ImplementClassMethod(WEAPON_NAME, CW_Method_AddDuplicate, "@Weapon_AddDuplicate");
   #endif
 
   CW_RegisterClassMethod(WEAPON_NAME, METHOD(ActivateCharges), "@Weapon_ActivateCharges");
@@ -98,7 +99,6 @@ public plugin_end() {
   CW_SetMember(this, CW_Member_iId, WEAPON_ID(Satchel));
   CW_SetMember(this, CW_Member_iMaxClip, -1);
   CW_SetMemberString(this, CW_Member_szPrimaryAmmo, AMMO(Satchel));
-  CW_SetMember(this, CW_Member_iMaxPrimaryAmmo, -1);
   CW_SetMember(this, CW_Member_iSlot, 4);
   CW_SetMember(this, CW_Member_iPosition, 5);
   CW_SetMember(this, CW_Member_iDefaultAmmo, 1);
@@ -111,7 +111,7 @@ public plugin_end() {
 
   CW_SetMember(this, CW_Member_iWeight, 123);
 
-  CW_SetMember(this, ZP_Weapon_Base_Member_flWeight, 0.0);
+  CW_SetMember(this, WEAPON_BASE_MEMBER(flWeight), 0.0);
 
   CW_SetMember(this, MEMBER(bUseRemote), false);
 }
@@ -219,13 +219,20 @@ public plugin_end() {
 
 #if defined ZP_DROPPABLE_SATCHELS
   @Weapon_ExtractAmmo(const this, const pOther) {
-    CW_CallBaseMethod(pOther);
+    if (!CW_CallBaseMethod(pOther)) return false;
 
     new pOwner = pev(this, pev_owner);
     if (CE_IsInstanceOf(pOwner, ENTITY(WeaponBox))) {
       CW_CallNativeMethod(this, CW_Method_UpdateWeaponBoxModel, pOwner);
     }
 
+    return true;
+  }
+
+  @Weapon_AddDuplicate(const this, const pOther) {
+    if (!CW_CallBaseMethod(pOther)) return false;
+
+    // Allows to pickup ammo, but never return true, so weaponbox keep the remote
     return false;
   }
 #endif

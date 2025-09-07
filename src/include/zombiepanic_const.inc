@@ -187,6 +187,7 @@ stock const ZP_Entity_WeaponBox_Method_PackItem[] = "PackItem";
 stock const ZP_Entity_WeaponBox_Method_BounceTouch[] = "BounceTouch";
 
 stock const ZP_Entity_WeaponBox_Member_iOldFlags[] = "iOldFlags";
+stock const ZP_Entity_WeaponBox_Member_bDirty[] = "bDirty";
 
 stock const ZP_Entity_BaseSpawner_Method_SpawnWeaponBox[] = "SpawnWeaponBox";
 stock const ZP_Entity_BaseSpawner_Member_pWeaponBox[] = "pWeaponBox";
