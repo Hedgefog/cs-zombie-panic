@@ -28,6 +28,9 @@ new g_szRadioPlayerModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szRadioWorldModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szBlipSound[MAX_RESOURCE_PATH_LENGTH];
 new g_szPressSound[MAX_RESOURCE_PATH_LENGTH];
+new g_szBounceSounds[4][MAX_RESOURCE_PATH_LENGTH];
+
+new g_iBounceSoundsNum = 0;
 
 /*--------------------------------[ Players State ]--------------------------------*/
 
@@ -51,6 +54,8 @@ public plugin_precache() {
   Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(SatchelRadioBlip), g_szBlipSound, charsmax(g_szBlipSound));
   Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(SatchelRadioPress), g_szPressSound, charsmax(g_szPressSound));
 
+  g_iBounceSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(GrenadeBounce), g_szBounceSounds, sizeof(g_szBounceSounds), charsmax(g_szBounceSounds[]));
+
   CW_RegisterClass(WEAPON_NAME, WEAPON(Base));
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Allocate, "@Weapon_Allocate");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Idle, "@Weapon_Idle");
@@ -62,6 +67,7 @@ public plugin_precache() {
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_AddPrimaryAmmo, "@Weapon_AddPrimaryAmmo");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_IsExhausted, "@Weapon_IsExhausted");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_UpdateWeaponBoxModel, "@Weapon_UpdateWeaponBoxModel");
+  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_AddToPlayer, "@Weapon_AddToPlayer");
 
   #if defined ZP_DROPPABLE_SATCHELS
     CW_ImplementClassMethod(WEAPON_NAME, CW_Method_ExtractAmmo, "@Weapon_ExtractAmmo");
@@ -112,6 +118,7 @@ public plugin_end() {
   CW_SetMember(this, CW_Member_iWeight, 123);
 
   CW_SetMember(this, WEAPON_BASE_MEMBER(flWeight), 0.0);
+  CW_SetMemberString(this, WEAPON_BASE_MEMBER(szBounceSound), g_szBounceSounds[random(g_iBounceSoundsNum)]);
 
   CW_SetMember(this, MEMBER(bUseRemote), false);
 }
@@ -327,6 +334,18 @@ bool:@Weapon_ShouldUseRemote(const this) {
   return CW_GetMember(this, MEMBER(iChargesNum)) > 0 || CW_CallNativeMethod(this, CW_Method_IsOutOfAmmo);
 }
 
+@Weapon_AddToPlayer(const this, const pPlayer) {
+  if (!CW_CallBaseMethod(pPlayer)) return false;
+
+  // No custom bounce sound for remotes
+  #if defined ZP_DROPPABLE_SATCHELS
+    CW_SetMemberString(this, WEAPON_BASE_MEMBER(szBounceSound), NULL_STRING);
+  #else
+    CW_SetMemberString(this, WEAPON_BASE_MEMBER(szBounceSound), g_szBounceSounds[random(g_iBounceSoundsNum)]);
+  #endif
+
+  return true;
+}
 
 /*--------------------------------[ Ammo Hooks ]--------------------------------*/
 

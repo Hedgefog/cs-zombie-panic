@@ -185,8 +185,12 @@ stock const ZP_Entity_WallToggle[] = "func_wall_toggle";
 stock const ZP_Entity_WeaponBox_Method_PackAmmo[] = "PackAmmo";
 stock const ZP_Entity_WeaponBox_Method_PackItem[] = "PackItem";
 stock const ZP_Entity_WeaponBox_Method_BounceTouch[] = "BounceTouch";
+stock const ZP_Entity_WeaponBox_Method_BounceSound[] = "BounceSound";
+stock const ZP_Entity_WeaponBox_Method_ResetBounceSound[] = "ResetBounceSound";
 
 stock const ZP_Entity_WeaponBox_Member_iOldFlags[] = "iOldFlags";
+stock const ZP_Entity_WeaponBox_Member_szBounceSound[] = "szBounceSound";
+stock const ZP_Entity_WeaponBox_Member_iItemsNum[] = "iItemsNum";
 stock const ZP_Entity_WeaponBox_Member_bDirty[] = "bDirty";
 
 stock const ZP_Entity_BaseSpawner_Method_SpawnWeaponBox[] = "SpawnWeaponBox";
@@ -263,6 +267,7 @@ stock const ZP_Weapon_Crowbar[] = "zombiepanic/v100/weapon_crowbar";
 stock const ZP_Weapon_Base_Member_bInUnload[] = "bInUnload";
 stock const ZP_Weapon_Base_Member_iUnloadAmount[] = "iUnloadAmount";
 stock const ZP_Weapon_Base_Member_flWeight[] = "flWeight";
+stock const ZP_Weapon_Base_Member_szBounceSound[] = "szBounceSound";
 
 stock const ZP_Weapon_Base_Method_CanUnload[] = "CanUnload";
 stock const ZP_Weapon_Base_Method_Unload[] = "Unload";
@@ -370,6 +375,7 @@ stock const ZP_Asset_Sound_ZombiesWin[] = "zombies-win-sound";
 stock const ZP_Asset_Sound_RoundDraw[] = "round-draw-sound";
 stock const ZP_Asset_Sound_ZombieVisionOn[] = "zombie-vision.on-sound";
 stock const ZP_Asset_Sound_ZombieVisionOff[] = "zombie-vision.off-sound";
+stock const ZP_Asset_Sound_WeaponBoxBounce[] = "items.weaponbox.sounds.bounce";
 
 stock const ZP_Asset_Variable_flPistolWeight[] = "weapons.pistol.weight";
 stock const ZP_Asset_Variable_flMagnumWeight[] = "weapons.magnum.weight";
@@ -430,6 +436,7 @@ stock const ZP_Ammo_Metadata_flWeight[] = "flWeight";
 stock const ZP_Ammo_Metadata_iPackSize[] = "iPackSize";
 stock const ZP_Ammo_Metadata_szPackModel[] = "szPackModel";
 stock const ZP_Ammo_Metadata_iSequence[] = "iSequence";
+stock const ZP_Ammo_Metadata_szBounceSound[] = "szBounceSound";
 
 /*--------------------------------[ Misc ]--------------------------------*/
 

@@ -24,6 +24,7 @@
 /*--------------------------------[ Assets ]--------------------------------*/
 
 new g_szModel[MAX_RESOURCE_PATH_LENGTH];
+new g_szBounceSound[MAX_RESOURCE_PATH_LENGTH];
 
 /*--------------------------------[ Plugin State ]--------------------------------*/
 
@@ -38,6 +39,7 @@ public plugin_precache() {
   g_pItemInfo = CreateHamItemInfo();
 
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(Weaponbox), g_szModel, charsmax(g_szModel));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(WeaponBoxBounce), g_szBounceSound, charsmax(g_szBounceSound));
 
   CE_ExtendClass(ENTITY(WeaponBox));
   CE_ImplementClassMethod(ENTITY(WeaponBox), CE_Method_Allocate, "@Entity_Allocate");
@@ -46,6 +48,8 @@ public plugin_precache() {
   CE_RegisterClassMethod(ENTITY(WeaponBox), WEAPONBOX_METHOD(PackItem), "@Entity_PackItem", CE_Type_Cell);
   CE_RegisterClassMethod(ENTITY(WeaponBox), WEAPONBOX_METHOD(PackAmmo), "@Entity_PackAmmo", CE_Type_String, CE_Type_Cell);
   CE_RegisterClassMethod(ENTITY(WeaponBox), WEAPONBOX_METHOD(BounceTouch), "@Entity_BounceTouch", CE_Type_Cell);
+  CE_RegisterClassMethod(ENTITY(WeaponBox), WEAPONBOX_METHOD(BounceSound), "@Entity_BounceSound");
+  CE_RegisterClassMethod(ENTITY(WeaponBox), WEAPONBOX_METHOD(ResetBounceSound), "@Entity_ResetBounceSound");
 }
 
 public plugin_init() {
@@ -63,6 +67,8 @@ public plugin_end() {
   CE_CallBaseMethod();
 
   CE_SetMemberString(this, CE_Member_szModel, g_szModel);
+  CE_SetMemberString(this, WEAPONBOX_MEMBER(szBounceSound), g_szBounceSound);
+  CE_SetMember(this, WEAPONBOX_MEMBER(iItemsNum), 0);
   CE_SetMember(this, WEAPONBOX_MEMBER(bDirty), false);
 }
 
@@ -110,6 +116,7 @@ public plugin_end() {
 @Entity_PackItem(const this, const pItem) {
   static iSlot; iSlot = ExecuteHamB(Ham_Item_ItemSlot, pItem) - 1;
   static pSlotItem; pSlotItem = get_ent_data_entity(this, "CWeaponBox", "m_rgpPlayerItems", iSlot);
+  static iItemsNum; iItemsNum = CE_GetMember(this, WEAPONBOX_MEMBER(iItemsNum));
 
   set_ent_data_entity(pItem, "CBasePlayerItem", "m_pPlayer", FM_NULLENT);
   set_ent_data_entity(pItem, "CBasePlayerItem", "m_pNext", FM_NULLENT);
@@ -133,6 +140,23 @@ public plugin_end() {
   set_pev(pItem, pev_modelindex, 0);
   set_pev(pItem, pev_model, NULL_STRING);
   set_pev(pItem, pev_owner, this);
+
+  CE_SetMember(this, WEAPONBOX_MEMBER(iItemsNum), iItemsNum += 1);
+
+  if (iItemsNum) {
+    if (iItemsNum == 1) {
+      static szBounceSound[MAX_RESOURCE_PATH_LENGTH]; copy(szBounceSound, charsmax(szBounceSound), NULL_STRING);
+      if (CW_IsInstanceOf(pItem, CW_Class_Base)) {
+        CW_GetMemberString(pItem, WEAPON_BASE_MEMBER(szBounceSound), szBounceSound, charsmax(szBounceSound));
+      }
+
+      if (!equal(szBounceSound, NULL_STRING)) {
+        CE_SetMemberString(this, WEAPONBOX_MEMBER(szBounceSound), szBounceSound);
+      }
+    } else {
+      CE_CallMethod(this, WEAPONBOX_METHOD(ResetBounceSound));
+    }
+  }
 }
 
 @Entity_PackAmmo(const this, const szAmmo[], iAmount) {
@@ -143,6 +167,19 @@ public plugin_end() {
   set_ent_data(this, "CWeaponBox", "m_rgAmmo", iAmount, iAmmoTypesNum);
   set_ent_data(this, "CWeaponBox", "m_rgiszAmmo", GetAmmoNameAllocatedString(szAmmo), iAmmoTypesNum);
   set_ent_data(this, "CWeaponBox", "m_cAmmoTypes", (iAmmoTypesNum += 1));
+
+  if (iAmmoTypesNum) {
+    if (iAmmoTypesNum == 1) {
+      static szBounceSound[MAX_RESOURCE_PATH_LENGTH]; copy(szBounceSound, charsmax(szBounceSound), NULL_STRING);
+      CW_Ammo_GetMetadataString(szAmmo, AMMO_METADATA(szBounceSound), szBounceSound, charsmax(szBounceSound));
+
+      if (!equal(szBounceSound, NULL_STRING)) {
+        CE_SetMemberString(this, WEAPONBOX_MEMBER(szBounceSound), szBounceSound);
+      }
+    } else {
+      CE_CallMethod(this, WEAPONBOX_METHOD(ResetBounceSound));
+    }
+  }
 }
 
 @Entity_BounceTouch(const this, const pToucher) {
@@ -151,9 +188,18 @@ public plugin_end() {
     xs_vec_mul_scalar(vecVelocity, 0.5, vecVelocity);
     set_pev(this, pev_velocity, vecVelocity);
   } else {
-    static iPitch; iPitch = 95 + random(29);
-    emit_sound(this, CHAN_VOICE, "items/weapondrop1.wav", VOL_NORM, ATTN_NORM, 0, iPitch);
+    CE_CallMethod(this, WEAPONBOX_METHOD(BounceSound));
   }
+}
+
+@Entity_BounceSound(const this) {
+  static iPitch; iPitch = 95 + random(29);
+  static szBounceSound[MAX_RESOURCE_PATH_LENGTH]; CE_GetMemberString(this, WEAPONBOX_MEMBER(szBounceSound), szBounceSound, charsmax(szBounceSound));
+  emit_sound(this, CHAN_VOICE, szBounceSound, VOL_NORM, ATTN_NORM, 0, iPitch);
+}
+
+@Entity_ResetBounceSound(const this) {  
+  CE_SetMemberString(this, WEAPONBOX_MEMBER(szBounceSound), g_szBounceSound);
 }
 
 /*--------------------------------[ Player Methods ]--------------------------------*/
@@ -212,7 +258,7 @@ bool:@Player_PickupWeaponBoxItem(const &pWeaponBox, const &pItem, const &pPlayer
     }
   } else {
     if (ExecuteHamB(Ham_AddPlayerItem, pPlayer, pItem)) {
-    ExecuteHamB(Ham_Item_AttachToPlayer, pItem, pPlayer);
+      ExecuteHamB(Ham_Item_AttachToPlayer, pItem, pPlayer);
       bResult = true;
     }
   }

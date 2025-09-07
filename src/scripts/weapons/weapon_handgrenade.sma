@@ -25,6 +25,9 @@ new g_szViewModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szPlayerModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szWorldModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szFuseSound[MAX_RESOURCE_PATH_LENGTH];
+new g_szBounceSounds[4][MAX_RESOURCE_PATH_LENGTH];
+
+new g_iBounceSoundsNum = 0;
 
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
 
@@ -34,10 +37,13 @@ public plugin_precache() {
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(GrenadePlayer), g_szPlayerModel, charsmax(g_szPlayerModel));
   Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(GrenadeFuse), g_szFuseSound, charsmax(g_szFuseSound));
 
+  g_iBounceSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(GrenadeBounce), g_szBounceSounds, sizeof(g_szBounceSounds), charsmax(g_szBounceSounds[]));
+
   CW_RegisterClass(WEAPON_NAME, WEAPON_BASE_THROWABLE);
 
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Allocate, "@Weapon_Allocate");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Idle, "@Weapon_Idle");
+  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_AddToPlayer, "@Weapon_AddToPlayer");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_PrimaryAttack, "@Weapon_PrimaryAttack");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Deploy, "@Weapon_Deploy");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Holster, "@Weapon_Holster");
@@ -63,6 +69,7 @@ public plugin_init() {
   CW_SetMember(this, CW_Member_iSlot, 3);
   CW_SetMember(this, CW_Member_iPosition, 0);
   CW_SetMemberString(this, CW_Member_szIcon, "handgrenade");
+  CW_SetMemberString(this, WEAPON_BASE_MEMBER(szBounceSound), g_szBounceSounds[random(g_iBounceSoundsNum)]);
 }
 
 @Weapon_Deploy(const this) {
@@ -167,4 +174,12 @@ public plugin_init() {
   set_pev(pGrenade, pev_owner, pPlayer);
 
   return pGrenade;
+}
+
+@Weapon_AddToPlayer(const this, const pPlayer) {
+  if (!CW_CallBaseMethod(pPlayer)) return false;
+
+  CW_SetMemberString(this, WEAPON_BASE_MEMBER(szBounceSound), g_szBounceSounds[random(g_iBounceSoundsNum)]);
+
+  return true;
 }

@@ -14,6 +14,8 @@ new g_szMagnumAmmoModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szSatchelAmmoModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szGrenadeAmmoModel[MAX_RESOURCE_PATH_LENGTH];
 
+new g_szGrenadeBounceSound[MAX_RESOURCE_PATH_LENGTH];
+
 public plugin_precache() {
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(AmmoPistol), g_szPistolAmmoModel, charsmax(g_szPistolAmmoModel));
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(AmmoRifle), g_szRifleAmmoModel, charsmax(g_szRifleAmmoModel));
@@ -21,6 +23,8 @@ public plugin_precache() {
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(AmmoMagnum), g_szMagnumAmmoModel, charsmax(g_szMagnumAmmoModel));
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(Satchel), g_szSatchelAmmoModel, charsmax(g_szSatchelAmmoModel));
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(Grenade), g_szGrenadeAmmoModel, charsmax(g_szGrenadeAmmoModel));
+
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(GrenadeBounce), g_szGrenadeBounceSound, charsmax(g_szGrenadeBounceSound));
 
   RegisterAmmo(AMMO(Pistol), 10, 7, "pistol", g_szPistolAmmoModel, 70, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flPistolAmmoWeight)));
   RegisterAmmo(AMMO(Rifle), 4, 30, "rifle", g_szRifleAmmoModel, 240, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flRifleAmmoWeight)));
@@ -36,6 +40,9 @@ public plugin_precache() {
 
   RegisterAmmo(AMMO(Grenade), 12, _, _, g_szGrenadeAmmoModel, 1, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flGrenadeWeight)));
   RegisterAmmo(AMMO(ZombiesValue), 13);
+
+  CW_Ammo_SetMetadataString(AMMO(Satchel), AMMO_METADATA(szBounceSound), g_szGrenadeBounceSound);
+  CW_Ammo_SetMetadataString(AMMO(Grenade), AMMO_METADATA(szBounceSound), g_szGrenadeBounceSound);
 }
 
 public plugin_init() {
