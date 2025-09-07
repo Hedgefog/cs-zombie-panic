@@ -440,7 +440,7 @@ Float:@Role_UpdateInventoryWeight(const pPlayer) {
   static iId; iId = get_ent_data(pItem, "CBasePlayerItem", "m_iId");
   static iClip; iClip = get_ent_data(pItem, "CBasePlayerWeapon", "m_iClip");
   static iPrimaryAmmoType; iPrimaryAmmoType = get_ent_data(pItem, "CBasePlayerWeapon", "m_iPrimaryAmmoType");
-  static iPrimaryAmmoAmount; iPrimaryAmmoAmount = get_ent_data(pPlayer, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoType);
+  static iPrimaryAmmoAmount; iPrimaryAmmoAmount = iPrimaryAmmoType != -1 ? get_ent_data(pPlayer, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoType) : 0;
   static szAmmo[CW_MAX_AMMO_NAME_LENGTH]; CW_GetMemberString(pItem, CW_Member_szPrimaryAmmo, szAmmo, charsmax(szAmmo));
 
   new iAmmoToPack = 0;

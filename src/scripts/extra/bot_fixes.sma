@@ -216,12 +216,14 @@ public HamHook_Door_Use(const pDoor, const pCaller, const pActivator) {
     default: {
       static iClip; iClip = get_ent_data(pActiveItem, "CBasePlayerWeapon", "m_iClip");
       static iPrimaryAmmoType; iPrimaryAmmoType = get_ent_data(pActiveItem, "CBasePlayerWeapon", "m_iPrimaryAmmoType");
-      static iAmmo; iAmmo = get_ent_data(this, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoType);
+      if (iPrimaryAmmoType != -1) {
+        static iAmmo; iAmmo = get_ent_data(this, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoType);
 
-      if (!iClip && iAmmo) {
-        set_pev(this, pev_button, pev(this, pev_button) | IN_RELOAD);
-        g_rgflPlayerNextThink[this] = flGametime + 0.25;
-        return;
+        if (!iClip && iAmmo) {
+          set_pev(this, pev_button, pev(this, pev_button) | IN_RELOAD);
+          g_rgflPlayerNextThink[this] = flGametime + 0.25;
+          return;
+        }
       }
     }
   }
@@ -388,11 +390,12 @@ bool:@Bot_ShouldPickupWeaponBox(const &this, const &pWeaponBox, bool:bTouched) {
     if (iItemId == CSW_SMOKEGRENADE) return false;
 
     if (iItemId != CSW_HEGRENADE) {
-      static iClip; iClip = get_ent_data(pItem, "CBasePlayerWeapon", "m_iClip");
       static iPrimaryAmmoType; iPrimaryAmmoType = get_ent_data(pItem, "CBasePlayerWeapon", "m_iPrimaryAmmoType");
-      static iAmmo; iAmmo = get_ent_data(this, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoType);
-
-      if (!iClip && !iAmmo) return false;
+      if (iPrimaryAmmoType != -1) {
+        static iClip; iClip = get_ent_data(pItem, "CBasePlayerWeapon", "m_iClip");
+        static iAmmo; iAmmo = get_ent_data(this, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoType);
+        if (!iClip && !iAmmo) return false;
+      }
     }
 
     bContainsWeapon = true;
