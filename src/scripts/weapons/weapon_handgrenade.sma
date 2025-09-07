@@ -50,7 +50,6 @@ public plugin_precache() {
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_CanDrop, "@Weapon_CanDrop");
 
   CW_RegisterClassMethod(WEAPON_NAME, BASETHROWABLE_METHOD(Throw), "@Weapon_Throw");
-  CW_RegisterClassMethod(WEAPON_NAME, BASETHROWABLE_METHOD(ReleaseThrow), "@Weapon_ReleaseThrow");
   CW_RegisterClassMethod(WEAPON_NAME, BASETHROWABLE_METHOD(SpawnProjectile), "@Weapon_SpawnProjectile");
 }
 
@@ -94,18 +93,24 @@ public plugin_init() {
 }
 
 @Weapon_Idle(const this) {
+  static Float:flStartThrow; flStartThrow = CW_GetMember(this, BASETHROWABLE_MEMBER(flStartThrow));
+  static Float:flReleaseThrow; flReleaseThrow = CW_GetMember(this, BASETHROWABLE_MEMBER(flReleaseThrow));
+  static bool:bRedeploy; bRedeploy = CW_GetMember(this, BASETHROWABLE_MEMBER(bRedeploy));
+
   CW_CallBaseMethod();
 
-  static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
-  static iPrimaryAmmoType; iPrimaryAmmoType = CW_GetMember(this, CW_Member_iPrimaryAmmoType);
-  static iPrimaryAmmo; iPrimaryAmmo = get_ent_data(pPlayer, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoType);
-  static iRandomSeed; iRandomSeed = get_ent_data(pPlayer, "CBasePlayer", "random_seed");
+  if (!flStartThrow && flReleaseThrow == -1.0 && !bRedeploy) {
+    static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
+    static iPrimaryAmmoType; iPrimaryAmmoType = CW_GetMember(this, CW_Member_iPrimaryAmmoType);
+    static iPrimaryAmmo; iPrimaryAmmo = get_ent_data(pPlayer, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoType);
+    static iRandomSeed; iRandomSeed = get_ent_data(pPlayer, "CBasePlayer", "random_seed");
 
-  if (iPrimaryAmmo > 0) {
-    if (SharedRandomFloat(iRandomSeed, 0.0, 1.0) <= 0.75) {
-      CW_CallNativeMethod(this, CW_Method_PlayAnimation, 0, 91.0 / 30.0);
-    } else {
-      CW_CallNativeMethod(this, CW_Method_PlayAnimation, 1, 76.0 / 30.0);
+    if (iPrimaryAmmo > 0) {
+      if (SharedRandomFloat(iRandomSeed, 0.0, 1.0) <= 0.75) {
+        CW_CallNativeMethod(this, CW_Method_PlayAnimation, 0, 91.0 / 30.0);
+      } else {
+        CW_CallNativeMethod(this, CW_Method_PlayAnimation, 1, 76.0 / 30.0);
+      }
     }
   }
 }
@@ -116,18 +121,6 @@ public plugin_init() {
 
     CW_CallNativeMethod(this, CW_Method_PlayAnimation, 2, 0.5);
     emit_sound(pPlayer, CHAN_WEAPON, g_szFuseSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-  }
-}
-
-@Weapon_ReleaseThrow(const this) {
-  CW_CallBaseMethod();
-
-  static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
-  static iPrimaryAmmoType; iPrimaryAmmoType = CW_GetMember(this, CW_Member_iPrimaryAmmoType);
-  static iPrimaryAmmo; iPrimaryAmmo = get_ent_data(pPlayer, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoType);
-
-  if (iPrimaryAmmo > 0) {
-    CW_CallNativeMethod(this, CW_Method_PlayAnimation, 0, 11.0 / 30.0);
   }
 }
 
