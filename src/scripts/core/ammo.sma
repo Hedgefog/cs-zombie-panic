@@ -32,13 +32,13 @@ public plugin_precache() {
   RegisterAmmo(AMMO(Magnum), 1, 6, "magnum", g_szMagnumAmmoModel, 36, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flMagnumAmmoWeight)));
 
   #if defined ZP_DROPPABLE_SATCHELS
-    RegisterAmmo(AMMO(Satchel), 14, 0, "satchel", g_szSatchelAmmoModel, 5, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flSatchelWeight)));
+    RegisterAmmo(AMMO(Satchel), 14, 0, "satchel", g_szSatchelAmmoModel, 10, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flSatchelWeight)));
     CW_Ammo_SetMetadata(AMMO(Satchel), AMMO_METADATA(iSequence), 1);
   #else
     RegisterAmmo(AMMO(Satchel), 14, _, _, g_szSatchelAmmoModel, 1, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flSatchelWeight)));
   #endif
 
-  RegisterAmmo(AMMO(Grenade), 12, _, "grenade", g_szGrenadeAmmoModel, 5, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flGrenadeWeight)));
+  RegisterAmmo(AMMO(Grenade), 12, _, "grenade", g_szGrenadeAmmoModel, 10, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flGrenadeWeight)));
 
   RegisterAmmo(AMMO(ZombiesValue), 13);
 
