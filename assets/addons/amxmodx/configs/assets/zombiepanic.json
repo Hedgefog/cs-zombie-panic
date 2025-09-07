@@ -77,7 +77,10 @@
       "sound": "items/tr_kevlar.wav"
     },
     "weaponbox": {
-      "model": "models/zombiepanic/v150/items/w_backpack.mdl"
+      "model": "models/zombiepanic/v150/items/w_backpack.mdl",
+      "sounds": {
+        "bounce": "items/weapondrop1.wav"
+      }
     }
   },
   "weapons": {
