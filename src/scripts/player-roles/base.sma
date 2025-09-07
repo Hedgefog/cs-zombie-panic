@@ -370,10 +370,13 @@ Float:@Role_UpdateInventoryWeight(const pPlayer) {
   static pWeaponBox; pWeaponBox = PlayerRole_This_CallMethod(METHOD(DropItem), pActiveItem, BASE_ROLE_DROP_FLAG(UseViewAngles));
   if (pWeaponBox == FM_NULLENT) return false;
 
+  // Active item dropped, unlink it
+  if (get_ent_data_entity(pActiveItem, "CBasePlayerItem", "m_pPlayer") != pPlayer) {
   if (pPrevItem != FM_NULLENT) {
     set_ent_data_entity(pPrevItem, "CBasePlayerItem", "m_pNext", pNextItem);
   } else {
     set_ent_data_entity(pPlayer, "CBasePlayer", "m_rgpPlayerItems", pNextItem, iActiveSlot);
+    }
   }
 
   PlayerRole_This_SetMember(MEMBER(bShouldUpdateInventoryWeight), true);
@@ -422,44 +425,66 @@ Float:@Role_UpdateInventoryWeight(const pPlayer) {
   dllfunc(DLLFunc_Spawn, pWeaponBox);
 
   static iId; iId = get_ent_data(pItem, "CBasePlayerItem", "m_iId");
+  static iClip; iClip = get_ent_data(pItem, "CBasePlayerWeapon", "m_iClip");
+  static iPrimaryAmmoType; iPrimaryAmmoType = get_ent_data(pItem, "CBasePlayerWeapon", "m_iPrimaryAmmoType");
+  static iPrimaryAmmoAmount; iPrimaryAmmoAmount = get_ent_data(pPlayer, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoType);
+  static szAmmo[CW_MAX_AMMO_NAME_LENGTH]; CW_GetMemberString(pItem, CW_Member_szPrimaryAmmo, szAmmo, charsmax(szAmmo));
 
-  if (get_ent_data_entity(pPlayer, "CBasePlayer", "m_pActiveItem") == pItem) {
+  new iAmmoToPack = 0;
+  new pItemToDrop = pItem;
+  new bool:bPackToWeapon = false;
+
+  // If the weapon is using inventory ammo (grenades, satchels, etc.)
+  if (iClip == -1 && iPrimaryAmmoType != -1 && !equal(szAmmo, NULL_STRING)) {
+    new iPackSize = CW_Ammo_GetMetadata(szAmmo, AMMO_METADATA(iPackSize));
+
+    if (iPackSize == -1) {
+      if (iPrimaryAmmoAmount > 1) {
+        // Clone weapon
+        static szWeapon[CW_MAX_NAME_LENGTH]; pev(pItem, pev_classname, szWeapon, charsmax(szWeapon));      
+        pItemToDrop = CW_Create(szWeapon);
+        dllfunc(DLLFunc_Spawn, pItemToDrop);
+      }
+
+      iAmmoToPack = 1;
+      bPackToWeapon = true;
+    } else if (iPackSize > 0) {
+      iAmmoToPack = min(iPackSize, iPrimaryAmmoAmount);
+    }
+  }
+
+  // If drop active weapon 
+  if (get_ent_data_entity(pPlayer, "CBasePlayer", "m_pActiveItem") == pItemToDrop) {
     static pLastItem; pLastItem = get_ent_data_entity(pPlayer, "CBasePlayer", "m_pLastItem");
 
-    ExecuteHamB(Ham_Item_Holster, pItem, 0);
+    ExecuteHamB(Ham_Item_Holster, pItemToDrop, 0);
 
-    if (pLastItem != pItem && pLastItem != FM_NULLENT) {
+    if (pLastItem != pItemToDrop && pLastItem != FM_NULLENT) {
       set_ent_data_entity(pPlayer, "CBasePlayer", "m_pActiveItem", pLastItem);
       ExecuteHamB(Ham_Item_Deploy, pLastItem);
       set_ent_data_entity(pPlayer, "CBasePlayer", "m_pLastItem", FM_NULLENT);
     } else {
       set_ent_data_entity(pPlayer, "CBasePlayer", "m_pActiveItem", FM_NULLENT);
-      ExecuteHamB(Ham_Weapon_RetireWeapon, pItem);
+      ExecuteHamB(Ham_Weapon_RetireWeapon, pItemToDrop);
       set_ent_data_entity(pPlayer, "CBasePlayer", "m_pLastItem", pLastItem);
     }
   }
 
+  // Weapon dropped, remove it from player HUD
+  if (get_ent_data_entity(pItemToDrop, "CBasePlayerItem", "m_pPlayer") == pPlayer) {
   set_pev(pPlayer, pev_weapons, pev(pPlayer, pev_weapons) &~ (1<<iId));
+  }
 
-  CE_CallMethod(pWeaponBox, WEAPONBOX_METHOD(PackItem), pItem);
-
-  static iPrimaryAmmoType; iPrimaryAmmoType = get_ent_data(pItem, "CBasePlayerWeapon", "m_iPrimaryAmmoType");
-  static iClip; iClip = get_ent_data(pItem, "CBasePlayerWeapon", "m_iClip");
-
-  if (iClip == -1 && iPrimaryAmmoType > 0) {
-    static szAmmo[CW_MAX_AMMO_NAME_LENGTH]; 
-    CW_GetMemberString(pItem, CW_Member_szPrimaryAmmo, szAmmo, charsmax(szAmmo));
-
-    if (!equal(szAmmo, NULL_STRING)) {
-      static iPrimaryAmmoAmount; iPrimaryAmmoAmount = get_ent_data(pPlayer, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoType);
-      static iPackSize; iPackSize = CW_Ammo_GetMetadata(szAmmo, AMMO_METADATA(iPackSize));
-      static iAmmoToPack; iAmmoToPack = iPackSize != -1 ? min(iPrimaryAmmoAmount, iPackSize) : iPrimaryAmmoAmount;
+  CE_CallMethod(pWeaponBox, WEAPONBOX_METHOD(PackItem), pItemToDrop);
 
       if (iAmmoToPack > 0) {
+    if (bPackToWeapon) {
+      set_ent_data(pItemToDrop, "CBasePlayerWeapon", "m_iDefaultAmmo", iAmmoToPack);
+    } else {
         CE_CallMethod(pWeaponBox, WEAPONBOX_METHOD(PackAmmo), szAmmo, iAmmoToPack);
-        set_ent_data(pPlayer, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoAmount - iAmmoToPack, iPrimaryAmmoType);
-      }
     }
+
+    set_ent_data(pPlayer, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoAmount - iAmmoToPack, iPrimaryAmmoType);
   }
 
   dllfunc(DLLFunc_Spawn, pWeaponBox);

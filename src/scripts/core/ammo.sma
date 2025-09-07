@@ -38,7 +38,8 @@ public plugin_precache() {
     RegisterAmmo(AMMO(Satchel), 14, _, _, g_szSatchelAmmoModel, 1, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flSatchelWeight)));
   #endif
 
-  RegisterAmmo(AMMO(Grenade), 12, _, _, g_szGrenadeAmmoModel, 1, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flGrenadeWeight)));
+  RegisterAmmo(AMMO(Grenade), 12, _, "grenade", g_szGrenadeAmmoModel, 5, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flGrenadeWeight)));
+
   RegisterAmmo(AMMO(ZombiesValue), 13);
 
   CW_Ammo_SetMetadataString(AMMO(Satchel), AMMO_METADATA(szBounceSound), g_szGrenadeBounceSound);
@@ -54,7 +55,7 @@ public plugin_natives() {
 }
 
 /*
-  iPackSize = -1 - can't drop ammo for this weapon
+  iPackSize = -1 - can't drop ammo for this weapon, clone weapon on drop with 1 packed ammo
   iPackSize = 0 - drop weapon without ammo, drop 1 ammo
   iPackSize > 0 - drop iPackSize amount of ammo
 */
