@@ -399,7 +399,9 @@ bool:@Bot_ShouldPickupWeaponBox(const &this, const &pWeaponBox, bool:bTouched) {
   }
 
   if (!bContainsWeapon && !bTouched) {
-    for (new iSlot = 0; iSlot < 32; ++iSlot) {
+    new iAmmoTypesNum; iAmmoTypesNum = get_ent_data(pWeaponBox, "CWeaponBox", "m_cAmmoTypes");
+
+    for (new iSlot = 0; iSlot < iAmmoTypesNum; ++iSlot) {
       static iszAmmo; iszAmmo = get_ent_data(pWeaponBox, "CWeaponBox", "m_rgiszAmmo", iSlot);
       if (!iszAmmo) continue;
 

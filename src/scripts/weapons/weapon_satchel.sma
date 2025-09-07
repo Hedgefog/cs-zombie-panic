@@ -247,8 +247,10 @@ public plugin_end() {
 @Weapon_UpdateWeaponBoxModel(const this, const pWeaponBox) {
   new bool:bHasSatchelAmmo = false;
 
+  new iAmmoTypesNum = get_ent_data(pWeaponBox, "CWeaponBox", "m_cAmmoTypes");
+
   if (!bHasSatchelAmmo) {
-    for (new iSlot = 0; iSlot < 32; ++iSlot) {
+    for (new iSlot = 0; iSlot < iAmmoTypesNum; ++iSlot) {
       static iAmount; iAmount = get_ent_data(pWeaponBox, "CWeaponBox", "m_rgAmmo", iSlot);
       if (!iAmount) continue;
 

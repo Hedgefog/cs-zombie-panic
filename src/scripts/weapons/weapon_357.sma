@@ -103,14 +103,14 @@ public plugin_init() {
   static Float:vecSpread[3]; UTIL_CalculateWeaponSpread(this, UTIL_GetConeVector(1.0), iShotsFired, 2.5, 1.0, 0.95, 7.5, vecSpread);
 
   if (CW_CallNativeMethod(this, CW_Method_DefaultShot, 80.0, 0.9, 0.5, vecSpread, 1)) {
-    CW_CallNativeMethod(this, CW_Method_PlayAnimation, 2, 1.03);
     static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
+
+    CW_CallNativeMethod(this, CW_Method_PlayAnimation, 2, 1.03);
     emit_sound(pPlayer, CHAN_WEAPON, g_rgszShotSounds[random(g_iShotSoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
-    static Float:vecPunchAngle[3];
-    pev(pPlayer, pev_punchangle, vecPunchAngle);
-    xs_vec_add(vecPunchAngle, Float:{-8.0, 0.0, 0.0}, vecPunchAngle);
+    static Float:vecPunchAngle[3]; pev(pPlayer, pev_punchangle, vecPunchAngle);
 
+    xs_vec_add(vecPunchAngle, Float:{-8.0, 0.0, 0.0}, vecPunchAngle);
     if (xs_vec_len(vecPunchAngle) > 0.0) {
       set_pev(pPlayer, pev_punchangle, vecPunchAngle);
     }
