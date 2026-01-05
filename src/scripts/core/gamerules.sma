@@ -465,7 +465,9 @@ public HamHook_Player_PostThink_Post(const pPlayer) {
       g_rgflPlayerNextRoleThink[pPlayer] = get_gametime() + 0.125;
     }
   } else {
-    @Player_RespawnThink(pPlayer);
+    if (g_bAllowRespawn) {
+      @Player_RespawnThink(pPlayer);
+    }
   }
 
   return HAM_HANDLED;
@@ -507,13 +509,18 @@ public HC_Player_DeadPlayerWeapons(const pPlayer) {
 
 /*--------------------------------[ Player Methods ]--------------------------------*/
 
-bool:@Player_RespawnThink(const &this) {
-  if (!g_bAllowRespawn) return;
-  if (!g_bGameInProgress) return;
-  if (g_rgflPlayerRespawnTime[this] >= get_gametime()) return;
+@Player_RespawnThink(const &this) {
+  if (!g_bGameInProgress) return; 
+
+  static iTeam; iTeam = get_ent_data(this, "CBasePlayer", "m_iTeam");
+  if (iTeam != TEAM(Survivors) && iTeam != TEAM(Zombies)) return;
+
+  new Float:flGameTime = get_gametime();
+  
+  if (g_rgflPlayerRespawnTime[this] > flGameTime) return;
 
   if (!@Player_Respawn(this)) {
-    g_rgflPlayerRespawnTime[this] = get_gametime() + 1.0;
+    g_rgflPlayerRespawnTime[this] = flGameTime + 1.0;
   }
 }
 

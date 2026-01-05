@@ -12,7 +12,7 @@
 public plugin_precache() {
   CE_RegisterClass(ENTITY(BaseItem), CE_Class_BaseItem, true);
 
-  CE_ImplementClassMethod(ENTITY(BaseItem), CE_Method_Allocate, "@Entity_Allocate");
+  CE_ImplementClassMethod(ENTITY(BaseItem), CE_Method_Create, "@Entity_Create");
   CE_ImplementClassMethod(ENTITY(BaseItem), CE_Method_Respawn, "@Entity_Respawn");
   CE_ImplementClassMethod(ENTITY(BaseItem), CE_Method_CanPickup, "@Entity_CanPickup");
 }
@@ -23,7 +23,7 @@ public plugin_init() {
 
 /*--------------------------------[ Methods ]--------------------------------*/
 
-@Entity_Allocate(const this) {
+@Entity_Create(const this) {
   CE_CallBaseMethod();
 
   CE_SetMemberVec(this, CE_Member_vecMins, Float:{-8.0, -8.0, 0.0});

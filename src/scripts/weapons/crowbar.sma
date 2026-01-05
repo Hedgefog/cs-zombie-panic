@@ -41,7 +41,7 @@ public plugin_precache() {
   g_iHitSoftSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(CrowbarHitSoft), g_rgszSoftHitSound, sizeof(g_rgszSoftHitSound), charsmax(g_rgszSoftHitSound[]));
 
   CW_RegisterClass(WEAPON_NAME, WEAPON(Base));
-  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Allocate, "@Weapon_Allocate");
+  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Create, "@Weapon_Create");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Idle, "@Weapon_Idle");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_PrimaryAttack, "@Weapon_PrimaryAttack");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Deploy, "@Weapon_Deploy");
@@ -55,7 +55,7 @@ public plugin_init() {
 
 /*--------------------------------[ Methods ]--------------------------------*/
 
-@Weapon_Allocate(const this) {
+@Weapon_Create(const this) {
   CW_CallBaseMethod();
 
   CW_SetMemberString(this, CW_Member_szModel, g_szWorldModel);

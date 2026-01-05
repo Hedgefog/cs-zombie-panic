@@ -11,14 +11,14 @@
 
 public plugin_precache() {
   CE_RegisterClass(ENTITY(PlayerSpawner));
-  CE_ImplementClassMethod(ENTITY(PlayerSpawner), CE_Method_Allocate, "@PlayerSpawner_Allocate");
+  CE_ImplementClassMethod(ENTITY(PlayerSpawner), CE_Method_Create, "@PlayerSpawner_Allocate");
   CE_ImplementClassMethod(ENTITY(PlayerSpawner), CE_Method_Spawn, "@PlayerSpawner_Spawn");
 
   CE_RegisterClass(ENTITY(SurvivorSpawner), ENTITY(PlayerSpawner));
-  CE_ImplementClassMethod(ENTITY(SurvivorSpawner), CE_Method_Allocate, "@SurvivorSpawner_Allocate");
+  CE_ImplementClassMethod(ENTITY(SurvivorSpawner), CE_Method_Create, "@SurvivorSpawner_Allocate");
 
   CE_RegisterClass(ENTITY(ZombieSpawner), ENTITY(PlayerSpawner));
-  CE_ImplementClassMethod(ENTITY(ZombieSpawner), CE_Method_Allocate, "@ZombieSpawner_Allocate");
+  CE_ImplementClassMethod(ENTITY(ZombieSpawner), CE_Method_Create, "@ZombieSpawner_Allocate");
 }
 
 public plugin_init() {

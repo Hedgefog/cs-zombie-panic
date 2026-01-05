@@ -211,7 +211,7 @@ public Native_GetDefault(const iPluginId, const iArgc) {
   set_string(2, g_rgszGameModeId[g_iDefaultGameMode], get_param(3));
 }
 
-/*--------------------------------[ Events ]--------------------------------*/
+/*--------------------------------[ Events Subscribers ]--------------------------------*/
 
 public EventSubscriber_GameInit() {
   if (g_bGameInitialized) return;

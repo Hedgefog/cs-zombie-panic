@@ -34,7 +34,7 @@ public plugin_precache() {
   g_iHitSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(SwipeHit), g_rgszHitSounds, sizeof(g_rgszHitSounds), charsmax(g_rgszHitSounds[]));
 
   CW_RegisterClass(WEAPON_NAME, WEAPON(Base));
-  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Allocate, "@Weapon_Allocate");
+  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Create, "@Weapon_Create");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Idle, "@Weapon_Idle");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_PrimaryAttack, "@Weapon_PrimaryAttack");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_SecondaryAttack, "@Weapon_SecondaryAttack");
@@ -92,7 +92,7 @@ public plugin_init() {
   CW_CallNativeMethod(this, CW_Method_DefaultDeploy, g_szViewModel, NULL_STRING, 1, "dualpistols");
 }
 
-@Weapon_Allocate(const this) {
+@Weapon_Create(const this) {
   CW_CallBaseMethod();
 
   CW_SetMember(this, CW_Member_iId, WEAPON_ID(Swipe));

@@ -42,7 +42,7 @@ public plugin_precache() {
   Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(WeaponBoxBounce), g_szBounceSound, charsmax(g_szBounceSound));
 
   CE_ExtendClass(ENTITY(WeaponBox));
-  CE_ImplementClassMethod(ENTITY(WeaponBox), CE_Method_Allocate, "@Entity_Allocate");
+  CE_ImplementClassMethod(ENTITY(WeaponBox), CE_Method_Create, "@Entity_Create");
   CE_ImplementClassMethod(ENTITY(WeaponBox), CE_Method_Spawn, "@Entity_Spawn");
   CE_ImplementClassMethod(ENTITY(WeaponBox), CE_Method_Touch, "@Entity_Touch");
   CE_RegisterClassMethod(ENTITY(WeaponBox), WEAPONBOX_METHOD(PackItem), "@Entity_PackItem", CE_Type_Cell);
@@ -63,7 +63,7 @@ public plugin_end() {
 
 /*--------------------------------[ Methods ]--------------------------------*/
 
-@Entity_Allocate(const this) {
+@Entity_Create(const this) {
   CE_CallBaseMethod();
 
   CE_SetMemberString(this, CE_Member_szModel, g_szModel);

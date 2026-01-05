@@ -16,7 +16,7 @@
 
 #define MAX_CHARACTER_ID_LENGTH 32
 #define MAX_CHARACTERS 16
-#define MAX_SOUNDS_PER_TYPE 8
+#define MAX_SOUNDS_PER_TYPE 16
 #define MAX_RESOURCE_KEY_LENGTH 32
 #define MAX_SOUNDS (MAX_CHARACTERS * MAX_SOUNDS_PER_TYPE * _:ZP_PlayerRole_Base_Sound)
 
@@ -73,9 +73,6 @@ public plugin_precache() {
   format(g_szCharacterDir, charsmax(g_szCharacterDir), "%s/zombiepanic/characters", g_szCharacterDir);
 
   LoadCharacters();
-
-  CustomEvent_Subscribe(BASE_ROLE_EVENT(UpdateModel), "EventSubscriber_UpdateModel");
-  CustomEvent_Subscribe(BASE_ROLE_EVENT(PlaySound), "EventSubscriber_PlaySound");
 }
 
 public plugin_init() {
@@ -85,6 +82,9 @@ public plugin_init() {
 
   g_pFwPlayerCharacterUpdated = CreateMultiForward("ZP_Characters_OnPlayerCharacterUpdated", ET_IGNORE, FP_CELL);
   g_pFwPlayerModelUpdated = CreateMultiForward("ZP_Characters_OnPlayerModelUpdated", ET_IGNORE, FP_CELL);
+
+  CustomEvent_Subscribe(BASE_ROLE_EVENT(UpdateModel), "EventSubscriber_UpdateModel");
+  CustomEvent_Subscribe(BASE_ROLE_EVENT(PlaySound), "EventSubscriber_PlaySound");
 }
 
 public plugin_end() {
@@ -272,39 +272,39 @@ LoadCharacter(const szId[]) {
   TrieSetCell(g_itCharacterIds, szId, iId);
 
   new JSON:iModelsDoc = json_object_get_value(iDoc, "models");
-  if (iModelsDoc != Invalid_JSON) {
-    for (new CharacterModel:iModel = CharacterModel:0; iModel < CharacterModel; iModel++) {
-      if (!LoadCharacterModel(iId, iModelsDoc, iModel) && iBaseId != -1) {
-        copy(g_rgrgszCharacterModels[iId][iModel], charsmax(g_rgrgszCharacterModels[][]), g_rgrgszCharacterModels[iBaseId][iModel]);
-      }
+  for (new CharacterModel:iModel = CharacterModel:0; iModel < CharacterModel; iModel++) {
+    if (iModelsDoc == Invalid_JSON || !LoadCharacterModel(iId, iModelsDoc, iModel) && iBaseId != -1) {
+      copy(g_rgrgszCharacterModels[iId][iModel], charsmax(g_rgrgszCharacterModels[][]), g_rgrgszCharacterModels[iBaseId][iModel]);
     }
+  }
 
+  if (iModelsDoc != Invalid_JSON) {
     json_free(iModelsDoc);
   }
 
   new JSON:iSoundsDoc = json_object_get_value(iDoc, "sounds");
-  if (iSoundsDoc != Invalid_JSON) {
-    for (new ZP_PlayerRole_Base_Sound:iSound = ZP_PlayerRole_Base_Sound:0; iSound < ZP_PlayerRole_Base_Sound; iSound++) {
-      if (!LoadCharacterSounds(iId, iSoundsDoc, iSound, TEAM(Zombies), iVersion) && iBaseId != -1) {
-        new iSoundsNum = g_rgrgiCharacterZombieSoundsNum[iBaseId][iSound];  
+  for (new ZP_PlayerRole_Base_Sound:iSound = ZP_PlayerRole_Base_Sound:0; iSound < ZP_PlayerRole_Base_Sound; iSound++) {
+    if (iSoundsDoc == Invalid_JSON || !LoadCharacterSounds(iId, iSoundsDoc, iSound, TEAM(Zombies), iVersion) && iBaseId != -1) {
+      new iSoundsNum = g_rgrgiCharacterZombieSoundsNum[iBaseId][iSound];  
 
-        for (new i = 0; i < iSoundsNum; i++) {
-          g_rgrgrgiCharacterZombieSounds[iId][iSound][i] = g_rgrgrgiCharacterZombieSounds[iBaseId][iSound][i];
-        }
-
-        g_rgrgiCharacterZombieSoundsNum[iId][iSound] = iSoundsNum;
+      for (new i = 0; i < iSoundsNum; i++) {
+        g_rgrgrgiCharacterZombieSounds[iId][iSound][i] = g_rgrgrgiCharacterZombieSounds[iBaseId][iSound][i];
       }
-      if (!LoadCharacterSounds(iId, iSoundsDoc, iSound, TEAM(Survivors), iVersion) && iBaseId != -1) {
-        new iSoundsNum = g_rgrgiCharacterSurvivorSoundsNum[iBaseId][iSound];
 
-        for (new i = 0; i < iSoundsNum; i++) {
-          g_rgrgrgiCharacterSurvivorSounds[iId][iSound][i] = g_rgrgrgiCharacterSurvivorSounds[iBaseId][iSound][i];
-        }
-
-        g_rgrgiCharacterSurvivorSoundsNum[iId][iSound] = iSoundsNum;
-      }
+      g_rgrgiCharacterZombieSoundsNum[iId][iSound] = iSoundsNum;
     }
+    if (iSoundsDoc == Invalid_JSON || !LoadCharacterSounds(iId, iSoundsDoc, iSound, TEAM(Survivors), iVersion) && iBaseId != -1) {
+      new iSoundsNum = g_rgrgiCharacterSurvivorSoundsNum[iBaseId][iSound];
 
+      for (new i = 0; i < iSoundsNum; i++) {
+        g_rgrgrgiCharacterSurvivorSounds[iId][iSound][i] = g_rgrgrgiCharacterSurvivorSounds[iBaseId][iSound][i];
+      }
+
+      g_rgrgiCharacterSurvivorSoundsNum[iId][iSound] = iSoundsNum;
+    }
+  }
+
+  if (iSoundsDoc != Invalid_JSON) {
     json_free(iSoundsDoc);
   }
 
@@ -418,11 +418,15 @@ AddCharacterSound(const iId, ZP_PlayerRole_Base_Sound:iSound, iTeam, const szSou
   switch (iTeam) {
     case TEAM(Zombies): {
       new iIndex = g_rgrgiCharacterZombieSoundsNum[iId][iSound];
+      if (iIndex >= MAX_SOUNDS_PER_TYPE) return;
+
       g_rgrgrgiCharacterZombieSounds[iId][iSound][iIndex] = iSoundId;
       g_rgrgiCharacterZombieSoundsNum[iId][iSound]++;
     }
     case TEAM(Survivors): {
       new iIndex = g_rgrgiCharacterSurvivorSoundsNum[iId][iSound];
+      if (iIndex >= MAX_SOUNDS_PER_TYPE) return;
+
       g_rgrgrgiCharacterSurvivorSounds[iId][iSound][iIndex] = iSoundId;
       g_rgrgiCharacterSurvivorSoundsNum[iId][iSound]++;
     }

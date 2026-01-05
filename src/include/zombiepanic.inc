@@ -1,20 +1,28 @@
 /*
     1.5.0
         Common:
-            The whole mod was refactored using AMXX Modding Kit
+            Refactored the entire codebase using AMXX Modding Kit
 
-        Additions and improvements:
-            Added ability to unload weapon
-            Players now can carry up to 5 satchels
-            Satchel charges now emit light and sound
-            Satchel charges are now attached to the remote not to the player
-            Satchel remote can now be dropped separately
-            Satchel charges can now be dropped as ammo
-            Added more character sound types (for API)
-            Added hit effects depends on material for each weapon
-            Reworked API for gamemodes
-            Added mouth controller for player models
+        Additions and Improvements:
+            Added ability to unload weapons
+            Increased maximum satchel capacity to 10
+            Increased maximum grenade capacity to 10
+            Added light and sound emission to satchel charges
+            Satchel Charges now attach to the remote instead of the player
+            Satchel Remote can now be dropped independently
+            Satchel Charges can now be dropped as ammo
+            Expanded character sound types in API
+            Added material-specific hit effects for weapons
+            Weaponboxes now bounce upon dropping
+            Reworked Gamemode API
+            Added mouth controller support for player models
             Updated backpack model
+            Added round win sounds
+            Added round start sound
+            Added Zombie Vision sound
+            Updated Flashlight sound
+            Readjusted weapon spread and damage parameters
+            Added blood decals when zombies hit world objects
 
         Fixes:
             Fixed bug when players can't pickup satchel charges in the water

@@ -20,6 +20,7 @@ new g_pFwConfigLoaded;
 public plugin_precache() {
   Asset_Library_Load(ASSET_LIBRARY);
 
+  CE_RegisterNullClass("info_map_parameters");
   CE_RegisterNullClass("func_bomb_target");
   CE_RegisterNullClass("func_escapezone");
   CE_RegisterNullClass("func_hostage_rescue");

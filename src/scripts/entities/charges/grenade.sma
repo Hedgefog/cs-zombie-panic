@@ -35,8 +35,8 @@ public plugin_precache() {
 
   CE_RegisterClass(ENTITY(Grenade));
 
-  CE_ImplementClassMethod(ENTITY(Grenade), CE_Method_Allocate, "@Entity_Allocate");
-  CE_ImplementClassMethod(ENTITY(Grenade), CE_Method_UpdatePhysics, "@Entity_UpdatePhysics");
+  CE_ImplementClassMethod(ENTITY(Grenade), CE_Method_Create, "@Entity_Create");
+  CE_ImplementClassMethod(ENTITY(Grenade), CE_Method_InitPhysics, "@Entity_InitPhysics");
   CE_ImplementClassMethod(ENTITY(Grenade), CE_Method_Spawn, "@Entity_Spawn");
 
   CE_RegisterClassMethod(ENTITY(Grenade), GRENADE_METHOD(TumbleThink), "@Entity_TumbleThink");
@@ -55,7 +55,7 @@ public plugin_end() {
 
 /*--------------------------------[ Methods ]--------------------------------*/
 
-@Entity_Allocate(const this) {
+@Entity_Create(const this) {
   CE_CallBaseMethod();
 
   CE_SetMemberString(this, CE_Member_szModel, g_szModel);
@@ -88,7 +88,7 @@ public plugin_end() {
   set_pev(this, pev_framerate, 1.0);
 }
 
-@Entity_UpdatePhysics(const this) {
+@Entity_InitPhysics(const this) {
   set_pev(this, pev_movetype, MOVETYPE_BOUNCE);
   set_pev(this, pev_solid, SOLID_BBOX);
   set_pev(this, pev_gravity, 0.5);

@@ -13,7 +13,7 @@
 public plugin_precache() {
   CE_RegisterClass(ENTITY(WeaponSpawner), ENTITY(BaseSpawner));
 
-  CE_ImplementClassMethod(ENTITY(WeaponSpawner), CE_Method_Allocate, "@Entity_Allocate");
+  CE_ImplementClassMethod(ENTITY(WeaponSpawner), CE_Method_Create, "@Entity_Create");
   CE_ImplementClassMethod(ENTITY(WeaponSpawner), CE_Method_Spawn, "@Entity_Spawn");
   
   CE_RegisterClassMethod(ENTITY(WeaponSpawner), BASESPAWNER_METHOD(SpawnWeaponBox), "@Entity_SpawnWeaponBox");
@@ -28,7 +28,7 @@ public plugin_init() {
 
 /*--------------------------------[ Methods ]--------------------------------*/
 
-@Entity_Allocate(const this) {
+@Entity_Create(const this) {
   CE_CallBaseMethod();
 
   CE_SetMember(this, CE_Member_flRespawnTime, ZP_WEAPONS_RESPAWN_TIME);

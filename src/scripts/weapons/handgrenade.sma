@@ -13,8 +13,6 @@
 
 #include <zombiepanic_internal>
 
-#include <weapon_base_throwable_const>
-
 /*--------------------------------[ Constants ]--------------------------------*/
 
 #define WEAPON_NAME WEAPON(Grenade)
@@ -39,9 +37,9 @@ public plugin_precache() {
 
   g_iBounceSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(GrenadeBounce), g_szBounceSounds, sizeof(g_szBounceSounds), charsmax(g_szBounceSounds[]));
 
-  CW_RegisterClass(WEAPON_NAME, WEAPON_BASE_THROWABLE);
+  CW_RegisterClass(WEAPON_NAME, WEAPON(BaseGrenade));
 
-  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Allocate, "@Weapon_Allocate");
+  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Create, "@Weapon_Create");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Idle, "@Weapon_Idle");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_AddToPlayer, "@Weapon_AddToPlayer");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_PrimaryAttack, "@Weapon_PrimaryAttack");
@@ -49,8 +47,8 @@ public plugin_precache() {
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Holster, "@Weapon_Holster");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_CanDrop, "@Weapon_CanDrop");
 
-  CW_RegisterClassMethod(WEAPON_NAME, BASETHROWABLE_METHOD(Throw), "@Weapon_Throw");
-  CW_RegisterClassMethod(WEAPON_NAME, BASETHROWABLE_METHOD(SpawnProjectile), "@Weapon_SpawnProjectile");
+  CW_RegisterClassMethod(WEAPON_NAME, BASEGRENADE_METHOD(Throw), "@Weapon_Throw");
+  CW_RegisterClassMethod(WEAPON_NAME, BASEGRENADE_METHOD(SpawnProjectile), "@Weapon_SpawnProjectile");
 }
 
 public plugin_init() {
@@ -59,7 +57,7 @@ public plugin_init() {
 
 /*--------------------------------[ Methods ]--------------------------------*/
 
-@Weapon_Allocate(const this) {
+@Weapon_Create(const this) {
   CW_CallBaseMethod();
 
   CW_SetMemberString(this, CW_Member_szModel, g_szWorldModel);
@@ -79,12 +77,12 @@ public plugin_init() {
 
 @Weapon_Holster(const this) {
   static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
-  static Float:flStartThrow; flStartThrow = CW_GetMember(this, BASETHROWABLE_MEMBER(flStartThrow));
+  static Float:flStartThrow; flStartThrow = CW_GetMember(this, BASEGRENADE_MEMBER(flStartThrow));
 
   if (!is_user_connected(pPlayer)) return;
 
   if (flStartThrow) {
-    CW_CallMethod(this, BASETHROWABLE_METHOD(Throw));
+    CW_CallMethod(this, BASEGRENADE_METHOD(Throw));
   }
 
   emit_sound(pPlayer, CHAN_WEAPON, "common/null.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
@@ -93,9 +91,9 @@ public plugin_init() {
 }
 
 @Weapon_Idle(const this) {
-  static Float:flStartThrow; flStartThrow = CW_GetMember(this, BASETHROWABLE_MEMBER(flStartThrow));
-  static Float:flReleaseThrow; flReleaseThrow = CW_GetMember(this, BASETHROWABLE_MEMBER(flReleaseThrow));
-  static bool:bRedeploy; bRedeploy = CW_GetMember(this, BASETHROWABLE_MEMBER(bRedeploy));
+  static Float:flStartThrow; flStartThrow = CW_GetMember(this, BASEGRENADE_MEMBER(flStartThrow));
+  static Float:flReleaseThrow; flReleaseThrow = CW_GetMember(this, BASEGRENADE_MEMBER(flReleaseThrow));
+  static bool:bRedeploy; bRedeploy = CW_GetMember(this, BASEGRENADE_MEMBER(bRedeploy));
 
   CW_CallBaseMethod();
 
@@ -130,7 +128,7 @@ public plugin_init() {
 
   if (pPlayer == -1) return true;
   
-  static Float:flStartThrow; flStartThrow = CW_GetMember(this, BASETHROWABLE_MEMBER(flStartThrow));
+  static Float:flStartThrow; flStartThrow = CW_GetMember(this, BASEGRENADE_MEMBER(flStartThrow));
   if (flStartThrow) return false;
 
   if (!get_ent_data(pPlayer, "CBasePlayer", "m_rgAmmo", iPrimaryAmmoType)) return false;

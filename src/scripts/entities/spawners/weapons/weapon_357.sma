@@ -8,14 +8,14 @@
 
 public plugin_precache() {
   CE_RegisterClass(ENTITY(MagnumWeapon), ENTITY(WeaponSpawner));
-  CE_ImplementClassMethod(ENTITY(MagnumWeapon), CE_Method_Allocate, "@Entity_Allocate");
+  CE_ImplementClassMethod(ENTITY(MagnumWeapon), CE_Method_Create, "@Entity_Create");
 }
 
 public plugin_init() {
   register_plugin(ENTITY_PLUGIN(MagnumWeapon), ZP_VERSION, "Hedgehog Fog");
 }
 
-@Entity_Allocate(const this) {
+@Entity_Create(const this) {
   CE_CallBaseMethod();
   CE_SetMemberString(this, WEAPONSPAWNER_MEMBER(szWeapon), WEAPON(Magnum));
 }

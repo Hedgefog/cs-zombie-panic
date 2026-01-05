@@ -21,7 +21,7 @@ public plugin_precache() {
   precache_model(SMOKEPUFF_SPRITE);
 
   CW_RegisterClass(WEAPON(Base), _, true);
-  CW_ImplementClassMethod(WEAPON(Base), CW_Method_Allocate, "@Weapon_Allocate");
+  CW_ImplementClassMethod(WEAPON(Base), CW_Method_Create, "@Weapon_Create");
   CW_ImplementClassMethod(WEAPON(Base), CW_Method_Idle, "@Weapon_Idle");
   CW_ImplementClassMethod(WEAPON(Base), CW_Method_Holster, "@Weapon_Holster");
   CW_ImplementClassMethod(WEAPON(Base), CW_Method_ExtractClipAmmo, "@Weapon_ExtractClipAmmo");
@@ -61,7 +61,7 @@ public Command_Unload(const pPlayer) {
 
 /*--------------------------------[ Methods ]--------------------------------*/
 
-@Weapon_Allocate(const this) {
+@Weapon_Create(const this) {
   CW_CallBaseMethod();
 
   CW_SetMember(this, CW_Member_iFlags, ITEM_FLAG_NOAUTORELOAD);

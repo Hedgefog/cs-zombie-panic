@@ -57,7 +57,7 @@ public plugin_precache() {
   g_iBounceSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(GrenadeBounce), g_szBounceSounds, sizeof(g_szBounceSounds), charsmax(g_szBounceSounds[]));
 
   CW_RegisterClass(WEAPON_NAME, WEAPON(Base));
-  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Allocate, "@Weapon_Allocate");
+  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Create, "@Weapon_Create");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Idle, "@Weapon_Idle");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_PrimaryAttack, "@Weapon_PrimaryAttack");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_SecondaryAttack, "@Weapon_SecondaryAttack");
@@ -86,8 +86,8 @@ public plugin_init() {
   RegisterHamPlayer(Ham_Player_PreThink, "HamHook_Player_PreThink_Post", .Post = 1);
   RegisterHamPlayer(Ham_Player_PostThink, "HamHook_Player_PostThink_Post", .Post = 1);
 
-  CE_RegisterClassMethodHook(ENTITY(SatchelCharge), CE_Method_Spawn, "CEHook_SatchelCharge_Spawn_Post", true);
-  CE_RegisterClassMethodHook(ENTITY(SatchelCharge), CE_Method_Killed, "CEHook_SatchelCharge_Killed_Post", true);
+  CE_RegisterClassNativeMethodHook(ENTITY(SatchelCharge), CE_Method_Spawn, "CEHook_SatchelCharge_Spawn_Post", true);
+  CE_RegisterClassNativeMethodHook(ENTITY(SatchelCharge), CE_Method_Killed, "CEHook_SatchelCharge_Killed_Post", true);
 
   CW_Ammo_RegisterHook(AMMO(Satchel), CW_AmmoHook_GiveToPlayer, "CWHook_SatchelAmmo_GiveToPlayer_Post", true);
 }
@@ -98,7 +98,7 @@ public plugin_end() {
 
 /*--------------------------------[ Methods ]--------------------------------*/
 
-@Weapon_Allocate(const this) {
+@Weapon_Create(const this) {
   CW_CallBaseMethod();
 
   CW_SetMemberString(this, CW_Member_szModel, g_szWorldModel);

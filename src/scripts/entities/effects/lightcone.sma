@@ -36,7 +36,7 @@ public plugin_precache() {
   g_pTrace = create_tr2();
 
   CE_RegisterClass(ENTITY(LightCone));
-  CE_ImplementClassMethod(ENTITY(LightCone), CE_Method_Allocate, "@Entity_Allocate");
+  CE_ImplementClassMethod(ENTITY(LightCone), CE_Method_Create, "@Entity_Create");
   CE_ImplementClassMethod(ENTITY(LightCone), CE_Method_Spawn, "@Entity_Spawn");
   CE_ImplementClassMethod(ENTITY(LightCone), CE_Method_Think, "@Entity_Think");
 
@@ -53,7 +53,7 @@ public plugin_end() {
 
 /*--------------------------------[ Methods ]--------------------------------*/
 
-@Entity_Allocate(const this) {
+@Entity_Create(const this) {
   CE_CallBaseMethod();
 
   CE_SetMemberString(this, CE_Member_szModel, g_szModel);

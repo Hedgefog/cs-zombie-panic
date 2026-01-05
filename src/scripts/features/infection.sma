@@ -95,15 +95,15 @@ public plugin_init() {
 
   register_message(gmsgScoreAttrib, "Message_ScoreAttrib");
 
-  CE_RegisterClassMethodHook(ENTITY(HealthKit), CE_Method_Pickup, "CEHook_HealthKit_Pickup_Post", true);
+  CE_RegisterClassNativeMethodHook(ENTITY(HealthKit), CE_Method_Pickup, "CEHook_HealthKit_Pickup_Post", true);
 }
 
 public plugin_natives() {
   register_library("zombiepanic_infection");
-  register_native("ZP_Infection_IsPlayerInfected", "Native_SetInfected");
-  register_native("ZP_Infection_IsPlayerTransforming", "Native_IsPlayerInfected");
+  register_native("ZP_Infection_IsPlayerInfected", "Native_IsPlayerInfected");
+  register_native("ZP_Infection_IsPlayerTransforming", "Native_IsPlayerTransforming");
   register_native("ZP_Infection_IsPlayerPartialZombie", "Native_IsPlayerPartialZombie");
-  register_native("ZP_Infection_SetPlayerInfected", "Native_IsPlayerTransforming");
+  register_native("ZP_Infection_SetPlayerInfected", "Native_SetInfected");
   register_native("ZP_Infection_GetPlayerInfector", "Native_GetInfector");
 }
 

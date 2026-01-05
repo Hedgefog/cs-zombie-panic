@@ -11,6 +11,7 @@
     "lightcone": {
       "model": "models/zombiepanic/v100/lightcone.mdl"
     },
+    "sound": "zombiepanic/v150/items/flashlight1.wav"
   },
   "zombie-vision": {
     "on-sound": "zombiepanic/v150/items/vision_on.wav",
@@ -263,18 +264,5 @@
     "sound/zombiepanic/v100/music/KM_Nightmare.mp3",
     "sound/zombiepanic/v100/music/KM_Orphanage.mp3",
     "sound/zombiepanic/v100/music/KM_Plague.mp3"
-  ],
-
-  "test-float-var1": 32.0,
-  "test-float-var2": { "@type": "float", "@value": 12.34 },
-  "test-bool-var1": true,
-  "test-bool-var2": { "@type": "bool", "@value": true },
-  "test-int-var1": 123,
-  "test-int-var2": { "@type": "int", "@value": 123 },
-  "test-vector-var1": [32.4, 56.7, 78.9],
-  "test-vector-var2": {"x": 132.4, "y": 156.7, "z": 178.9},
-  "test-vector-var3": { "@type": "vector", "@value": [32.4, 56.7, 78.9] },
-  "test-vector-var4": { "@type": "vector", "@value": {"x": 132.4, "y": 156.7, "z": 178.9} },
-  "test-string-var1": "Hello var1",
-  "test-string-var2": { "@type": "string", "@value": "Hello var2" }
+  ]
 }

@@ -37,7 +37,7 @@ public plugin_precache() {
   g_iShotSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(MagnumShot), g_rgszShotSounds, sizeof(g_rgszShotSounds), charsmax(g_rgszShotSounds[]));
 
   CW_RegisterClass(WEAPON_NAME, WEAPON(Base));
-  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Allocate, "@Weapon_Allocate");
+  CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Create, "@Weapon_Create");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Idle, "@Weapon_Idle");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_PrimaryAttack, "@Weapon_PrimaryAttack");
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Reload, "@Weapon_Reload");
@@ -54,7 +54,7 @@ public plugin_init() {
 
 /*--------------------------------[ Methods ]--------------------------------*/
 
-@Weapon_Allocate(const this) {
+@Weapon_Create(const this) {
   CW_CallBaseMethod();
 
   CW_SetMemberString(this, CW_Member_szModel, g_szWorldModel);

@@ -49,8 +49,8 @@ public plugin_init() {
   RegisterHamPlayer(Ham_Player_PreThink, "HamHook_Player_PreThink_Post", .Post = 1);
   RegisterHamPlayer(Ham_Player_PostThink, "HamHook_Player_PostThink_Post", .Post = 1);
 
-  CE_RegisterClassMethodHook(ENTITY(WeaponBox), CE_Method_Touch, "CEHook_Item_Touch");
-  CE_RegisterClassMethodHook(CE_Class_BaseItem, CE_Method_Touch, "CEHook_Item_Touch");
+  CE_RegisterClassNativeMethodHook(ENTITY(WeaponBox), CE_Method_Touch, "CEHook_Item_Touch");
+  CE_RegisterClassNativeMethodHook(CE_Class_BaseItem, CE_Method_Touch, "CEHook_Item_Touch");
 
   register_forward(FM_AddToFullPack, "FMHook_AddToFullPack_Post", 1);
 }

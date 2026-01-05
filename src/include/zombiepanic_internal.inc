@@ -162,8 +162,8 @@
 
 /*--------------------------------[ Weapons Shortcuts ]--------------------------------*/
 
-#define BASETHROWABLE_MEMBER(%1) Weapon_BaseThrowable_Member_%1
-#define BASETHROWABLE_METHOD(%1) Weapon_BaseThrowable_Method_%1
+#define BASEGRENADE_MEMBER(%1) Weapon_BaseThrowable_Member_%1
+#define BASEGRENADE_METHOD(%1) Weapon_BaseThrowable_Method_%1
 
 /*--------------------------------[ Use Pickup Shortcuts ]--------------------------------*/
 

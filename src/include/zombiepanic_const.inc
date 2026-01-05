@@ -3,6 +3,8 @@
 #endif
 #define _zombiepanic_const_included
 
+#include <weapon_base_throwable_const>
+
 #define ZP_TITLE "Zombie Panic"
 #define ZP_VERSION "1.6.0"
 
@@ -68,7 +70,8 @@ enum ZP_PlayerRole_Base_DropFlags (<<=1) {
   ZP_PlayerRole_Base_DropFlag_SkipActive,
   ZP_PlayerRole_Base_DropFlag_RandomForce,
   ZP_PlayerRole_Base_DropFlag_UseViewAngles,
-  ZP_PlayerRole_Base_DropFlag_ReverseAngles
+  ZP_PlayerRole_Base_DropFlag_ReverseAngles,
+  ZP_PlayerRole_Base_DropFlag_MultipleItems
 };
 
 /*--------------------------------[ Libraries ]--------------------------------*/
@@ -255,6 +258,7 @@ stock const ZP_Entity_Button_Member_pfnThink[] = "pfnThink";
 /*--------------------------------[ Weapons ]--------------------------------*/
 
 stock const ZP_Weapon_Base[] = "zombiepanic/v100/weapon_base";
+stock const ZP_Weapon_BaseGrenade[] = "zombiepanic/v100/weapon_basegrenade";
 stock const ZP_Weapon_Pistol[] = "zombiepanic/v100/weapon_9mmhandgun";
 stock const ZP_Weapon_Rifle[] = "zombiepanic/v100/weapon_556AR";
 stock const ZP_Weapon_Shotgun[] = "zombiepanic/v100/weapon_shotgun";

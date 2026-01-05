@@ -14,7 +14,7 @@
 public plugin_precache() {
   CE_RegisterClass(ENTITY(BaseSpawner), ENTITY(BaseItem), true);
 
-  CE_ImplementClassMethod(ENTITY(BaseSpawner), CE_Method_Allocate, "@Entity_Allocate");
+  CE_ImplementClassMethod(ENTITY(BaseSpawner), CE_Method_Create, "@Entity_Create");
   CE_ImplementClassMethod(ENTITY(BaseSpawner), CE_Method_Spawn, "@Entity_Spawn");
   CE_ImplementClassMethod(ENTITY(BaseSpawner), CE_Method_Think, "@Entity_Think");
   CE_ImplementClassMethod(ENTITY(BaseSpawner), CE_Method_CanPickup, "@Entity_CanPickup");
@@ -25,13 +25,13 @@ public plugin_precache() {
 public plugin_init() {
   register_plugin(ENTITY_PLUGIN(BaseSpawner), ZP_VERSION, "Hedgehog Fog");
 
-  CE_RegisterClassMethodHook(ENTITY(WeaponBox), CE_Method_Free, "CEHook_WeaponBox_Free");
-  CE_RegisterClassMethodHook(ENTITY(WeaponBox), CE_Method_Touch, "CEHook_WeaponBox_Touch_Post", true);
+  CE_RegisterClassNativeMethodHook(ENTITY(WeaponBox), CE_Method_Destroy, "CEHook_WeaponBox_Destroy");
+  CE_RegisterClassNativeMethodHook(ENTITY(WeaponBox), CE_Method_Touch, "CEHook_WeaponBox_Touch_Post", true);
 }
 
 /*--------------------------------[ Hooks ]--------------------------------*/
 
-public CEHook_WeaponBox_Free(const pEntity) {
+public CEHook_WeaponBox_Destroy(const pEntity) {
   new pOwner = pev(pEntity, pev_owner);
 
   if (pOwner && CE_IsInstanceOf(pOwner, ENTITY(BaseSpawner))) {
@@ -55,7 +55,7 @@ public CEHook_WeaponBox_Touch_Post(const pEntity, const pToucher) {
 
 /*--------------------------------[ Methods ]--------------------------------*/
 
-@Entity_Allocate(const this) {
+@Entity_Create(const this) {
   CE_SetMember(this, BASESPAWNER_MEMBER(pWeaponBox), FM_NULLENT);
 }
 
@@ -106,8 +106,9 @@ public CEHook_WeaponBox_Touch_Post(const pEntity, const pToucher) {
 
   dllfunc(DLLFunc_Spawn, pWeaponBox);
 
-  set_pev(pWeaponBox, pev_angles, vecAngles);
   set_pev(pWeaponBox, pev_owner, this);
+  set_pev(pWeaponBox, pev_angles, vecAngles);
+  // set_pev(pWeaponBox, pev_owner, this);
   engfunc(EngFunc_DropToFloor, pWeaponBox);
 
   CE_SetMember(this, BASESPAWNER_MEMBER(pWeaponBox), pWeaponBox);

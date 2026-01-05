@@ -7,7 +7,10 @@
   },
   "sounds": {
     "human": {
-      "panic": [
+      "idle": [],
+      "pain": [],
+      "taunt": [],
+      "scream": [
         "zombiepanic/v100/player/panicscream1.wav",
         "zombiepanic/v100/player/panicscream2.wav"
       ],
@@ -18,7 +21,7 @@
       ]
     },
     "zombie": {
-      "ambient": [
+      "idle": [
         "zombiepanic/v100/player/zomambient1.wav",
         "zombiepanic/v100/player/zomambient2.wav",
         "zombiepanic/v100/player/zomambient3.wav",
@@ -35,6 +38,7 @@
         "zombiepanic/v100/player/zomambient14.wav",
         "zombiepanic/v100/player/zomambient15.wav"
       ],
+      "pain": [],
       "death": [
         "zombiepanic/v100/player/zombiedeath1.wav",
         "zombiepanic/v100/player/zombiedeath2.wav",
@@ -42,5 +46,5 @@
       ]
     }
   },
-  "_version": 1
+  "_version": 2
 }

@@ -20,7 +20,7 @@ public plugin_precache() {
   Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(ItemMedkit), g_szSound, charsmax(g_szSound));
 
   CE_RegisterClass(ENTITY(HealthKit), ENTITY(BaseItem));
-  CE_ImplementClassMethod(ENTITY(HealthKit), CE_Method_Allocate, "@Entity_Allocate");
+  CE_ImplementClassMethod(ENTITY(HealthKit), CE_Method_Create, "@Entity_Create");
   CE_ImplementClassMethod(ENTITY(HealthKit), CE_Method_CanPickup, "@Entity_CanPickup");
   CE_ImplementClassMethod(ENTITY(HealthKit), CE_Method_Pickup, "@Entity_Pickup");
 }
@@ -31,7 +31,7 @@ public plugin_init() {
 
 /*--------------------------------[ Methods ]--------------------------------*/
 
-@Entity_Allocate(const this) {
+@Entity_Create(const this) {
   CE_CallBaseMethod();
 
   CE_SetMember(this, CE_Member_flRespawnTime, ZP_ITEMS_RESPAWN_TIME);

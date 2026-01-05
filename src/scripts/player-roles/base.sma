@@ -99,7 +99,7 @@ public plugin_init() {
   CW_RegisterClassMethodHook(WEAPON(Grenade), CW_Method_PrimaryAttack, "CWHook_Weapon_Attack_Post", true);
   CW_RegisterClassMethodHook(WEAPON(Grenade), CW_Method_SecondaryAttack, "CWHook_Weapon_Attack_Post", true);
 
-  CE_RegisterClassMethodHook(ENTITY(Button), CE_Method_Use, "CEHook_Button_Use_Post", true);
+  CE_RegisterClassNativeMethodHook(ENTITY(Button), CE_Method_Use, "CEHook_Button_Use_Post", true);
 
   bind_pcvar_num(
     register_cvar(CVAR("player_drop_inactive_mode"), "1"),
@@ -257,6 +257,7 @@ Float:@Role_GetMaxHealth(const pPlayer) {
 
 bool:@Role_UpdateModel(const pPlayer) {
   CustomEvent_SetToken(pPlayer);
+
   if (CustomEvent_Emit(BASE_ROLE_EVENT(UpdateModel), pPlayer) != CER_Continue) {
     return false;
   }
@@ -566,27 +567,39 @@ Float:@Role_UpdateInventoryWeight(const pPlayer) {
   set_ent_data_entity(pPlayer, "CBasePlayer", "m_pLastItem", FM_NULLENT);
 
   for (new iSlot = 0; iSlot < 6; ++iSlot) {
-    static pItem; pItem = get_ent_data_entity(pPlayer, "CBasePlayer", "m_rgpPlayerItems", iSlot);
-    static pPrevItem; pPrevItem = FM_NULLENT;
+    new pItem = get_ent_data_entity(pPlayer, "CBasePlayer", "m_rgpPlayerItems", iSlot);
+    new pPrevItem = FM_NULLENT;
 
     set_ent_data_entity(pPlayer, "CBasePlayer", "m_rgpPlayerItems", FM_NULLENT, iSlot);
 
     while (pItem != FM_NULLENT) {
-      static pNextItem; pNextItem = get_ent_data_entity(pItem, "CBasePlayerItem", "m_pNext");
+      new pNextItem = get_ent_data_entity(pItem, "CBasePlayerItem", "m_pNext");
 
       set_ent_data_entity(pItem, "CBasePlayerItem", "m_pNext", FM_NULLENT);
 
       if (
         pItem != pItemToSkip &&
-        ExecuteHamB(Ham_CS_Item_CanDrop, pItem) &&
-        PlayerRole_This_CallMethod(METHOD(DropItem), pItem, iDropFlags) != FM_NULLENT
+        ExecuteHamB(Ham_CS_Item_CanDrop, pItem)
       ) {
-        static iId; iId = get_ent_data(pItem, "CBasePlayerItem", "m_iId");
-        set_pev(pPlayer, pev_weapons, pev(pPlayer, pev_weapons) & ~(1 << iId));
-        pItem = FM_NULLENT;
+        new iDropedItemsNum = 0;
+
+        /*
+          Some weapons like grenades uses inventory ammo and create new weapon on drop
+          Call drop method until the original one is not dropped
+        */
+        while (get_ent_data_entity(pItem, "CBasePlayerItem", "m_pPlayer") == pPlayer) {
+          if (PlayerRole_This_CallMethod(METHOD(DropItem), pItem, iDropFlags) == FM_NULLENT) break;
+          iDropedItemsNum++;
+        }
+
+        if (iDropedItemsNum) {
+          static iId; iId = get_ent_data(pItem, "CBasePlayerItem", "m_iId");
+          set_pev(pPlayer, pev_weapons, pev(pPlayer, pev_weapons) & ~(1 << iId));
+          pItem = FM_NULLENT;
+        }
       }
 
-      static pItemToLink; pItemToLink = pItem == FM_NULLENT ? pNextItem : pItem;
+      new pItemToLink = pItem == FM_NULLENT ? pNextItem : pItem;
       
       if (pPrevItem != FM_NULLENT) {
         set_ent_data_entity(pPrevItem, "CBasePlayerItem", "m_pNext", pItemToLink);
