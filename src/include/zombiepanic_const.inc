@@ -96,8 +96,6 @@ stock const ZP_Library_Infection[] = "zombiepanic_infection";
 
 /*--------------------------------[ Player Roles ]--------------------------------*/
 
-stock const ZP_PlayerRoleGroup[] = "zombiepanic";
-
 stock const ZP_PlayerRole_Base[] = "zombiepanic-base";
 stock const ZP_PlayerRole_Survivor[] = "zombiepanic-survivor";
 stock const ZP_PlayerRole_Zombie[] = "zombiepanic-zombie";

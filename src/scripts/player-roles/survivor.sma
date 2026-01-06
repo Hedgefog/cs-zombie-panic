@@ -38,7 +38,7 @@ public plugin_precache() {
   g_iDeathSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(SurvivorDeath), g_szDeathSounds, sizeof(g_szDeathSounds), charsmax(g_szDeathSounds[]));
   g_iScreamSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(SurvivorScream), g_szScreamSounds, sizeof(g_szScreamSounds), charsmax(g_szScreamSounds[]));
 
-  PlayerRole_Register(ROLE, PLAYER_ROLE_GROUP, BASE_ROLE);
+  PlayerRole_Register(ROLE, BASE_ROLE);
 
   PlayerRole_ImplementMethod(ROLE, PlayerRole_Method_Assign, "@Role_Assign");
   PlayerRole_ImplementMethod(ROLE, PlayerRole_Method_Unassign, "@Role_Unassign");

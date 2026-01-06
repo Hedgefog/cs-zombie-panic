@@ -48,7 +48,7 @@ public plugin_precache() {
   g_iIdleSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(ZombieIdle), g_szIdleSounds, sizeof(g_szIdleSounds), charsmax(g_szIdleSounds[]));
   g_iDeathSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(ZombieDeath), g_szDeathSounds, sizeof(g_szDeathSounds), charsmax(g_szDeathSounds[]));
 
-  PlayerRole_Register(ROLE, PLAYER_ROLE_GROUP, BASE_ROLE);
+  PlayerRole_Register(ROLE, BASE_ROLE);
 
   PlayerRole_ImplementMethod(ROLE, PlayerRole_Method_Assign, "@Role_Assign");
   PlayerRole_ImplementMethod(ROLE, PlayerRole_Method_Unassign, "@Role_Unassign");

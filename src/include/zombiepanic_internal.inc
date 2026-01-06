@@ -29,7 +29,6 @@
 #define ENTITY_MEMBER<%1>(%2) ENTITY_DATA<Member>(%1,%2)
 
 #define PLAYER_ROLE(%1) NAMESPACE_FIELD<PlayerRole>(%1)
-#define PLAYER_ROLE_GROUP NAMESPACE(PlayerRoleGroup)
 #define PLAYER_ROLE_DATA<%1>(%2,%3) PLAYER_ROLE(%2)_%1_%3
 #define PLAYER_ROLE_METHOD<%1>(%2) PLAYER_ROLE_DATA<Method>(%1,%2)
 #define PLAYER_ROLE_MEMBER<%1>(%2) PLAYER_ROLE_DATA<Member>(%1,%2)
