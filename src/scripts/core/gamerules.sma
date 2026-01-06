@@ -63,9 +63,11 @@ new bool:g_bAllowRespawn = false;
 new bool:g_bCompetitiveMode = false;
 new g_iPlayersPerZombie = 0;
 new bool:g_bLimitedRoundTime = false;
-new bool:g_bRoundExpired = false;
 new Float:g_flPlayerWeightMultiplier = 0.0;
 new g_iZombiesValue = -1;
+new bool:g_bRoundExpired = false;
+
+new bool:g_rgbVariableModified[ZP_GameRules_Variable];
 
 /*--------------------------------[ Player State ]--------------------------------*/
 
@@ -272,7 +274,7 @@ public Round_OnRoundStart() {
 }
 
 public Round_OnRoundExpired() {
-  if (!g_bLimitedRoundTime) return;
+  if (!GetVariable(GAMERULES_VARIABLE(bLimitedRoundTime))) return;
 
   g_bRoundExpired = true;
 
@@ -444,9 +446,10 @@ public HamHook_Player_Killed(const pPlayer) {
 
 public HamHook_Player_Killed_Post(const pPlayer) {
   PlayerRole_Player_CallMethod(pPlayer, PLAYER_ROLE(Base), BASE_ROLE_METHOD(Killed));
+  log_amx("Player %d killed. Respawn time: %f", pPlayer, GetVariable(GAMERULES_VARIABLE(flRespawnTime)));
 
-  if (g_bAllowRespawn) {
-    g_rgflPlayerRespawnTime[pPlayer] = get_gametime() + g_flRespawnTime;
+  if (GetVariable(GAMERULES_VARIABLE(bAllowRespawn))) {
+    g_rgflPlayerRespawnTime[pPlayer] = get_gametime() + Float:GetVariable(GAMERULES_VARIABLE(flRespawnTime));
   }
 
   CheckWinConditions();
@@ -465,7 +468,7 @@ public HamHook_Player_PostThink_Post(const pPlayer) {
       g_rgflPlayerNextRoleThink[pPlayer] = get_gametime() + 0.125;
     }
   } else {
-    if (g_bAllowRespawn) {
+    if (GetVariable(GAMERULES_VARIABLE(bAllowRespawn))) {
       @Player_RespawnThink(pPlayer);
     }
   }
@@ -559,24 +562,30 @@ bool:@Player_UpdateSpeed(const &this) {
 /*--------------------------------[ Functions ]--------------------------------*/
 
 ResetVariables() {
-  SetVariable(GAMERULES_VARIABLE(flPlayerWeightMultiplier), get_pcvar_float(g_pCvarPlayerWeightMultiplier));
-  SetVariable(GAMERULES_VARIABLE(flRespawnTime), get_pcvar_float(g_pCvarRespawnTime));
-  SetVariable(GAMERULES_VARIABLE(bCompetitiveMode), bool:get_pcvar_num(g_pCvarCompetitive));
-  SetVariable(GAMERULES_VARIABLE(iPlayersPerZombie), g_bCompetitiveMode ? 2 : 6);
+  SetVariable(GAMERULES_VARIABLE(flPlayerWeightMultiplier), 0.0);
+  SetVariable(GAMERULES_VARIABLE(flRespawnTime), 0.0);
+  SetVariable(GAMERULES_VARIABLE(bCompetitiveMode), false);
+  SetVariable(GAMERULES_VARIABLE(iPlayersPerZombie), 0);
   SetVariable(GAMERULES_VARIABLE(bAllowRespawn), false);
   SetVariable(GAMERULES_VARIABLE(bLimitedRoundTime), false);
   SetVariable(GAMERULES_VARIABLE(iZombiesValue), -1);
+
+  for (new ZP_GameRules_Variable:iVariable = ZP_GameRules_Variable:0; iVariable < ZP_GameRules_Variable; iVariable++) {
+    g_rgbVariableModified[iVariable] = false;
+  }
 }
 
 any:GetVariable(const ZP_GameRules_Variable:iVariable) {
+  static bool:bModified; bModified = g_rgbVariableModified[iVariable];
+
   switch (iVariable) {
-    case GAMERULES_VARIABLE(flPlayerWeightMultiplier): return g_flPlayerWeightMultiplier;
-    case GAMERULES_VARIABLE(bAllowRespawn): return g_bAllowRespawn;
-    case GAMERULES_VARIABLE(bCompetitiveMode): return g_bCompetitiveMode;
-    case GAMERULES_VARIABLE(flRespawnTime): return g_flRespawnTime;
-    case GAMERULES_VARIABLE(iPlayersPerZombie): return g_iPlayersPerZombie;
-    case GAMERULES_VARIABLE(bLimitedRoundTime): return g_bLimitedRoundTime;
-    case GAMERULES_VARIABLE(iZombiesValue): return g_iZombiesValue;
+    case GAMERULES_VARIABLE(flPlayerWeightMultiplier): return bModified ? g_flPlayerWeightMultiplier : get_pcvar_float(g_pCvarPlayerWeightMultiplier);
+    case GAMERULES_VARIABLE(bAllowRespawn): return bModified ? g_bAllowRespawn : false;
+    case GAMERULES_VARIABLE(bCompetitiveMode): return bModified ? g_bCompetitiveMode : bool:get_pcvar_num(g_pCvarCompetitive);
+    case GAMERULES_VARIABLE(flRespawnTime): return bModified ? g_flRespawnTime : get_pcvar_float(g_pCvarRespawnTime);
+    case GAMERULES_VARIABLE(iPlayersPerZombie): return bModified ? g_iPlayersPerZombie : GetVariable(GAMERULES_VARIABLE(bCompetitiveMode)) ? 2 : 6;
+    case GAMERULES_VARIABLE(bLimitedRoundTime): return bModified ? g_bLimitedRoundTime : false;
+    case GAMERULES_VARIABLE(iZombiesValue): return bModified ? g_iZombiesValue : -1;
   }
 
   return 0;
@@ -592,6 +601,8 @@ SetVariable(const ZP_GameRules_Variable:iVariable, any:value) {
     case GAMERULES_VARIABLE(bLimitedRoundTime): g_bLimitedRoundTime = value;
     case GAMERULES_VARIABLE(iZombiesValue): g_iZombiesValue = value;
   }
+
+  g_rgbVariableModified[iVariable] = true;
 
   CustomEvent_Emit(GAMERULES_EVENT(VariableChanged), iVariable, value);
 }
@@ -683,7 +694,8 @@ DistributeTeams() {
     iPlayersNum++;
   }
 
-  new iRequiredZombieCount = g_iPlayersPerZombie && iPlayersNum > 1 ? floatround(float(iPlayersNum) / g_iPlayersPerZombie, floatround_ceil) : 0;
+  new iPlayersPerZombie = GetVariable(GAMERULES_VARIABLE(iPlayersPerZombie));
+  new iRequiredZombieCount = iPlayersPerZombie && iPlayersNum > 1 ? floatround(float(iPlayersNum) / iPlayersPerZombie, floatround_ceil) : 0;
   new iZombiesNum = ProcessZombiePlayers(iRequiredZombieCount);
 
   if (iZombiesNum) {
@@ -789,7 +801,7 @@ Float:CalculatePlayerMaxSpeed(const &pPlayer) {
   flMaxSpeed *= flSpeedMultiplier;
 
   if (flInventoryWeight > 0.0) {
-    flMaxSpeed -= (flInventoryWeight * g_flPlayerWeightMultiplier);
+    flMaxSpeed -= (flInventoryWeight * Float:GetVariable(GAMERULES_VARIABLE(flPlayerWeightMultiplier)));
   }
 
   flMaxSpeed = floatmax(flMaxSpeed, 1.0);
