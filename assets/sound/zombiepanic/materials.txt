@@ -386,3 +386,7 @@ W {in_rail01
 W {gyuo
 X {grassplz
 X {fortop2
+M out_dmplid
+M out_dmp3a
+M out_dmp2b
+M out_dmp2c
