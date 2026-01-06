@@ -5,6 +5,7 @@
 
         Additions and Improvements:
             Added ability to unload weapons
+            Added speed boost during panic
             Increased maximum satchel capacity to 10
             Increased maximum grenade capacity to 10
             Added light and sound emission to satchel charges
