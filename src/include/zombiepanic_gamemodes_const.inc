@@ -9,6 +9,7 @@
 enum ZP_GameModes_Callback {
   ZP_GameModes_Callback_Activate,
   ZP_GameModes_Callback_Deactivate,
+  ZP_GameModes_Callback_GameInit,
   ZP_GameModes_Callback_GameStart,
   ZP_GameModes_Callback_GameEnd,
   ZP_GameModes_Callback_CheckWinConditions,

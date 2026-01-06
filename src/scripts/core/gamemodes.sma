@@ -223,6 +223,8 @@ public EventSubscriber_GameInit() {
   }
 
   g_bGameInitialized = true;
+
+  GameMode_CallCallback(g_iCurrentGameMode, GAMEMODE_CALLBACK(GameInit));
 }
 
 public EventSubscriber_GameStart() {
