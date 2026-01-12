@@ -35,6 +35,7 @@ public plugin_init() {
     if (!pTarget) continue;
 
     if (pev(pTarget, pev_flags) & FL_KILLME) continue;
+    if (CE_IsInstanceOf(pTarget, ENTITY(MultiManager))) continue;
 
     ExecuteHamB(Ham_CS_Restart, pTarget);
   }
