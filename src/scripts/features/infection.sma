@@ -52,7 +52,6 @@ new Float:g_rgflPlayerOrigin[MAX_PLAYERS + 1][3];
 new Float:g_rgflPlayerAngles[MAX_PLAYERS + 1][3];
 new Float:g_rgflPlayerViewAngles[MAX_PLAYERS + 1][3];
 new g_rgiPlayerFlags[MAX_PLAYERS + 1];
-new g_rgiPlayerTeamBeforeDamage[MAX_PLAYERS + 1];
 new StateManager:g_rgPlayerStateManagers[MAX_PLAYERS + 1]  = { StateManager_Invalid, ... };
 
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
@@ -112,7 +111,6 @@ public plugin_natives() {
 
 public client_connect(pPlayer) {
   g_rgPlayerStateManagers[pPlayer] = State_Manager_Create(INFECTION_STATE_CONTEXT, pPlayer);
-  g_rgiPlayerTeamBeforeDamage[pPlayer] = TEAM(Unassigned);
 }
 
 public client_disconnected(pPlayer) {
@@ -195,23 +193,18 @@ public HamHook_Player_TakeDamage(const pPlayer, const pInflictor, const pAttacke
   if (!@Player_IsInfected(pPlayer)) return HAM_IGNORED;
   if (State_Manager_GetState(g_rgPlayerStateManagers[pPlayer]) < INFECTION_STATE(PartialZombie)) return HAM_IGNORED;
 
-  g_rgiPlayerTeamBeforeDamage[pPlayer] = get_ent_data(pPlayer, "CBasePlayer", "m_iTeam");
-
   static iTeam; iTeam = get_ent_data(pPlayer, "CBasePlayer", "m_iTeam");
   static iAttackerTeam; iAttackerTeam = get_ent_data(pAttacker, "CBasePlayer", "m_iTeam");
   if (iTeam != iAttackerTeam) return HAM_IGNORED;
 
   set_ent_data(pPlayer, "CBasePlayer", "m_iTeam", TEAM(Zombies));
+  ExecuteHam(Ham_TakeDamage, pPlayer, pInflictor, pAttacker, flDamage, iDamageBits);
+  set_ent_data(pPlayer, "CBasePlayer", "m_iTeam", TEAM(Survivors));
 
-  return HAM_HANDLED;
+  return HAM_SUPERCEDE;
 }
 
 public HamHook_Player_TakeDamage_Post(const pPlayer, const pInflictor, const pAttacker) {
-  if (g_rgiPlayerTeamBeforeDamage[pPlayer] != TEAM(Unassigned)) {
-    set_ent_data(pPlayer, "CBasePlayer", "m_iTeam", g_rgiPlayerTeamBeforeDamage[pPlayer]);
-    g_rgiPlayerTeamBeforeDamage[pPlayer] = TEAM(Unassigned);
-  }
-
   if (!IS_PLAYER(pAttacker)) return HAM_IGNORED;
   if (!PlayerRole_Player_HasRole(pAttacker, PLAYER_ROLE(Zombie))) return HAM_IGNORED;
   if (PlayerRole_Player_HasRole(pPlayer, PLAYER_ROLE(Zombie))) return HAM_IGNORED;
