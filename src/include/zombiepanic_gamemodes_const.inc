@@ -4,8 +4,6 @@
 
 #define _zombiepanic_gamemodes_const_included
 
-#define GAMEMODE_SURVIVAL "survival"
-
 enum ZP_GameModes_Callback {
   ZP_GameModes_Callback_Activate,
   ZP_GameModes_Callback_Deactivate,
@@ -17,3 +15,6 @@ enum ZP_GameModes_Callback {
   ZP_GameModes_Callback_PlayerRespawn,
   ZP_GameModes_Callback_PlayerRespawned
 };
+
+stock const ZP_Event_GameMode_Activated[] = "zombiepanic-gamemode-activated";
+stock const ZP_Event_GameMode_Deactivated[] = "zombiepanic-gamemode-deactivated";

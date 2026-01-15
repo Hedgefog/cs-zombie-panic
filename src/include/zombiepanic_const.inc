@@ -412,9 +412,6 @@ stock const ZP_Event_GameRules_GameInit[] = "zombiepanic-gamerules-game-init";
 stock const ZP_Event_GameRules_TeamPreferenceChanged[] = "zombiepanic-gamerules-team-preference-changed";
 stock const ZP_Event_GameRules_VariableChanged[] = "zombiepanic-gamerules-variable-changed";
 
-stock const ZP_Event_GameMode_Activated[] = "zombiepanic-gamemode-activated";
-stock const ZP_Event_GameMode_Deactivated[] = "zombiepanic-gamemode-deactivated";
-
 stock const ZP_Event_UsePickup_Hover[] = "zombiepanic-use-pickup-hover";
 
 stock const ZP_Event_Panic_Start[] = "zombiepanic-panic-start";

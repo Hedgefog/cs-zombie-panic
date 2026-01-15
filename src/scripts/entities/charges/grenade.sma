@@ -130,8 +130,8 @@ public plugin_end() {
   // only do damage if we're moving fairly fast
   if (CE_GetMember(this, GRENADE_MEMBER(flNextBounceDamage)) < get_gametime() && xs_vec_len(vecVelocity) > 100.0) {
     if (IS_PLAYER(pOwner) && IS_PLAYER(pOther) && rg_is_player_can_takedamage(pOther, pOwner)) {
-      rg_multidmg_clear();
       static Float:vecForward[3]; get_global_vector(GL_v_forward, vecForward);
+      rg_multidmg_clear();
       ExecuteHamB(Ham_TraceAttack, pOther, pOwner, 1.0, vecForward, g_pTrace, DMG_CLUB); 
       rg_multidmg_apply(this, pOwner);
     }
