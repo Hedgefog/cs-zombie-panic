@@ -161,8 +161,9 @@ bool:@Role_CanPickupItem(const pPlayer, const pItem) {
 }
 
 Float:@Role_CalculateDamage(const pPlayer, const pInflictor, const pAttacker, Float:flDamage, iDamageBits) {
-  if (iDamageBits & DMG_FALL && pInflictor == pPlayer && pAttacker == pPlayer) {
-    return 0.0;
+  if (iDamageBits & DMG_FALL) {
+    if (!pAttacker && !pInflictor) return 0.0;
+    if (pInflictor == pPlayer && pAttacker == pPlayer) return 0.0;
   }
 
   return flDamage;
