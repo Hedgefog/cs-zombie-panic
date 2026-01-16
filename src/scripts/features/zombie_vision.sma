@@ -53,7 +53,7 @@ public plugin_precache() {
 public plugin_init() {
   register_plugin(PLUGIN_NAME("Zombie Vision"), ZP_VERSION, "Hedgehog Fog");
 
-  bind_pcvar_num(register_cvar(CVAR("zombievision_auto"), "1"), g_bAutoVision);
+  bind_pcvar_num(create_cvar(CVAR("zombievision_auto"), "1"), g_bAutoVision);
 
   register_forward(FM_AddToFullPack, "FMHook_AddToFullPack_Post", 1);
 

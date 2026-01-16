@@ -40,7 +40,7 @@ public plugin_precache() {
 
   CW_LoadCustomMaterials("sound/zombiepanic/materials.txt");
 
-  hook_cvar_change(register_cvar("zombiepanic_version", ZP_VERSION, FCVAR_SERVER), "CvarHook_Version");
+  hook_cvar_change(create_cvar("zombiepanic_version", ZP_VERSION, FCVAR_SERVER), "CvarHook_Version");
 }
 
 public plugin_init() {

@@ -32,7 +32,7 @@ public plugin_precache() {
 public plugin_init() {
   register_plugin(PLUGIN_NAME("(Game Mode) Objective"), ZP_VERSION, "Hedgehog Fog");
 
-  bind_pcvar_float(register_cvar(CVAR("zombie_respawn_time"), "6.0"), g_flZombieRespawnTime);
+  bind_pcvar_float(create_cvar(CVAR("zombie_respawn_time"), "6.0"), g_flZombieRespawnTime);
 
   CustomEvent_Subscribe(GAMERULES_EVENT(TeamPreferenceChanged), "EventSubscriber_GameRules_TeamPreferenceChanged");
 }

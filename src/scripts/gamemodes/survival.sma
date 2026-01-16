@@ -42,9 +42,9 @@ public plugin_init() {
 
   RegisterHamPlayer(Ham_Killed, "HamHook_Player_Killed_Post", .Post = 1);
 
-  bind_pcvar_num(register_cvar(CVAR("zombie_lives"), "8"), g_iDefaultZombieLives);
-  bind_pcvar_num(register_cvar(CVAR("zombie_lives_per_player"), "1"), g_iZombieLivesPerPlayer);
-  bind_pcvar_num(register_cvar(CVAR("zombie_lives_start_max"), "10"), g_iZombieLivesStartMax);
+  bind_pcvar_num(create_cvar(CVAR("zombie_lives"), "8"), g_iDefaultZombieLives);
+  bind_pcvar_num(create_cvar(CVAR("zombie_lives_per_player"), "1"), g_iZombieLivesPerPlayer);
+  bind_pcvar_num(create_cvar(CVAR("zombie_lives_start_max"), "10"), g_iZombieLivesStartMax);
 }
 
 /*--------------------------------[ Client Forwards ]--------------------------------*/

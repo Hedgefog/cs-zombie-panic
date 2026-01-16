@@ -57,15 +57,15 @@ public plugin_precache() {
 public plugin_init() {
   register_plugin(PLUGIN_NAME("Bot Fixes"), ZP_VERSION, "Hedgehog Fog");
 
-  bind_pcvar_num(register_cvar(CVAR("bot_fix_melee_attack"), "1"), g_bFixMeleeAttack);
-  bind_pcvar_num(register_cvar(CVAR("bot_fix_pickup"), "1"), g_bFixPickup);
-  bind_pcvar_num(register_cvar(CVAR("bot_pickup_healthkit"), "1"), g_bPickupHealthkit);
-  bind_pcvar_num(register_cvar(CVAR("bot_drop_unloaded_gun"), "1"), g_bDropUnloadedGun);
-  bind_pcvar_num(register_cvar(CVAR("bot_drop_ammo"), "1"), g_bDropAmmo);
-  bind_pcvar_num(register_cvar(CVAR("bot_fix_destroy_breakables"), "1"), g_bDestroyBreakables);
-  bind_pcvar_num(register_cvar(CVAR("bot_fix_grenade_throw"), "1"), g_bFixGrenadeThrow);
-  bind_pcvar_num(register_cvar(CVAR("bot_panic"), "1"), g_bPanic);
-  bind_pcvar_num(register_cvar(CVAR("bot_activate_objectives"), "1"), g_bActivateObjectives);
+  bind_pcvar_num(create_cvar(CVAR("bot_fix_melee_attack"), "1"), g_bFixMeleeAttack);
+  bind_pcvar_num(create_cvar(CVAR("bot_fix_pickup"), "1"), g_bFixPickup);
+  bind_pcvar_num(create_cvar(CVAR("bot_pickup_healthkit"), "1"), g_bPickupHealthkit);
+  bind_pcvar_num(create_cvar(CVAR("bot_drop_unloaded_gun"), "1"), g_bDropUnloadedGun);
+  bind_pcvar_num(create_cvar(CVAR("bot_drop_ammo"), "1"), g_bDropAmmo);
+  bind_pcvar_num(create_cvar(CVAR("bot_fix_destroy_breakables"), "1"), g_bDestroyBreakables);
+  bind_pcvar_num(create_cvar(CVAR("bot_fix_grenade_throw"), "1"), g_bFixGrenadeThrow);
+  bind_pcvar_num(create_cvar(CVAR("bot_panic"), "1"), g_bPanic);
+  bind_pcvar_num(create_cvar(CVAR("bot_activate_objectives"), "1"), g_bActivateObjectives);
 
   RegisterHamPlayer(Ham_Player_PreThink, "HamHook_Player_PreThink_Post", .Post = 1);
   RegisterHam(Ham_Use, "func_door", "HamHook_Door_Use", .Post = 0);

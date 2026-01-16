@@ -100,9 +100,9 @@ public plugin_precache() {
 public plugin_init() {
   register_plugin(PLUGIN_NAME("Gamerules"), ZP_VERSION, "Hedgehog Fog");
 
-  g_pCvarCompetitive = register_cvar(CVAR("competitive"), "0");
-  g_pCvarRespawnTime = register_cvar(CVAR("respawn_time"), "6.0");
-  g_pCvarPlayerWeightMultiplier = register_cvar(CVAR("player_weight_multiplier"), "1.0");
+  g_pCvarCompetitive = create_cvar(CVAR("competitive"), "0");
+  g_pCvarRespawnTime = create_cvar(CVAR("respawn_time"), "6.0");
+  g_pCvarPlayerWeightMultiplier = create_cvar(CVAR("player_weight_multiplier"), "1.0");
 
   g_pTeamPreferenceMenu = CreateTeamPreferenceMenu();
 

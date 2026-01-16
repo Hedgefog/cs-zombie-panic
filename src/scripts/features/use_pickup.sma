@@ -39,12 +39,12 @@ public plugin_precache() {
 public plugin_init() {
   register_plugin(PLUGIN_NAME("Use Pickup"), ZP_VERSION, "Hedgehog Fog");
 
-  bind_pcvar_num(register_cvar(CVAR("use_pickup"), "1"), g_bEnabled);
-  bind_pcvar_num(register_cvar(CVAR("use_pickup_highlight"), "1"), g_bHighlight);
-  bind_pcvar_float(register_cvar(CVAR("use_pickup_range"), "64.0"), g_flPickupRange);
-  bind_pcvar_num(register_cvar(CVAR("use_pickup_highlight_color_r"), "96"), g_rgiHighlightColor[0]);
-  bind_pcvar_num(register_cvar(CVAR("use_pickup_highlight_color_g"), "64"), g_rgiHighlightColor[1]);
-  bind_pcvar_num(register_cvar(CVAR("use_pickup_highlight_color_b"), "16"), g_rgiHighlightColor[2]);
+  bind_pcvar_num(create_cvar(CVAR("use_pickup"), "1"), g_bEnabled);
+  bind_pcvar_num(create_cvar(CVAR("use_pickup_highlight"), "1"), g_bHighlight);
+  bind_pcvar_float(create_cvar(CVAR("use_pickup_range"), "64.0"), g_flPickupRange);
+  bind_pcvar_num(create_cvar(CVAR("use_pickup_highlight_color_r"), "96"), g_rgiHighlightColor[0]);
+  bind_pcvar_num(create_cvar(CVAR("use_pickup_highlight_color_g"), "64"), g_rgiHighlightColor[1]);
+  bind_pcvar_num(create_cvar(CVAR("use_pickup_highlight_color_b"), "16"), g_rgiHighlightColor[2]);
 
   RegisterHamPlayer(Ham_Player_PreThink, "HamHook_Player_PreThink_Post", .Post = 1);
   RegisterHamPlayer(Ham_Player_PostThink, "HamHook_Player_PostThink_Post", .Post = 1);

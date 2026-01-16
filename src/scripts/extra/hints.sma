@@ -91,7 +91,7 @@ public plugin_precache() {
 public plugin_init() {
   register_plugin(PLUGIN_NAME("Hints"), ZP_VERSION, "Hedgehog Fog");
 
-  bind_pcvar_num(register_cvar(CVAR("hints_enabled"), "1"), g_bEnabled);
+  bind_pcvar_num(create_cvar(CVAR("hints_enabled"), "1"), g_bEnabled);
 
   RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
   RegisterHamPlayer(Ham_Killed, "HamHook_Player_Killed_Post", .Post = 1);

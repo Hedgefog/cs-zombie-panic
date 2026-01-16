@@ -30,9 +30,9 @@ public plugin_precache() {
 public plugin_init() {
   register_plugin(PLUGIN_NAME("Music"), ZP_VERSION, "Hedgehog Fog");
 
-  bind_pcvar_num(register_cvar(CVAR("music"), "1"), g_bEnabled);
-  bind_pcvar_num(register_cvar(CVAR("music_loading"), "1"), g_bLoadingMusic);
-  bind_pcvar_float(register_cvar(CVAR("music_delay"), "5"), g_flMusicDelay);
+  bind_pcvar_num(create_cvar(CVAR("music"), "1"), g_bEnabled);
+  bind_pcvar_num(create_cvar(CVAR("music_loading"), "1"), g_bLoadingMusic);
+  bind_pcvar_float(create_cvar(CVAR("music_delay"), "5"), g_flMusicDelay);
 
   hook_cvar_change(get_cvar_pointer(CVAR("music")), "CvarHook_Enabled");
 }

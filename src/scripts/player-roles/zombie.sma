@@ -69,7 +69,7 @@ public plugin_precache() {
 public plugin_init() {
   register_plugin(ROLE_PLUGIN(Zombie), ZP_VERSION, "Hedgehog Fog");
 
-  g_pCvarRegenerationRate = register_cvar(CVAR("zombie_regeneration_rate"), "0.25");
+  g_pCvarRegenerationRate = create_cvar(CVAR("zombie_regeneration_rate"), "0.25");
 }
 
 @Role_Assign(const pPlayer) {

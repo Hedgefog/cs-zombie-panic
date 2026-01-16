@@ -33,7 +33,7 @@ new bool:g_bEnabled = false;
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
 
 public plugin_precache() {
-  bind_pcvar_num(register_cvar(CVAR("objective_marks"), "1"), g_bEnabled);
+  bind_pcvar_num(create_cvar(CVAR("objective_marks"), "1"), g_bEnabled);
 
   Asset_Precache(ASSET_LIBRARY, ASSET_SPRITE(ObjectiveMark), g_szSprite, charsmax(g_szSprite));
 }

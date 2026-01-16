@@ -82,9 +82,9 @@ public plugin_init() {
   gmsgScreenShake = get_user_msgid("ScreenShake");
   gmsgStatusIcon = get_user_msgid("StatusIcon");
 
-  bind_pcvar_num(register_cvar(CVAR("infection_chance"), "5"), g_iInfectionChance);
-  bind_pcvar_num(register_cvar(CVAR("infection_healthkit_cure_chance"), "25"), g_iCureChance);
-  bind_pcvar_num(register_cvar(CVAR("infection_healthkit_suspend"), "1"), g_bSuspendInfectionOnHeal);
+  bind_pcvar_num(create_cvar(CVAR("infection_chance"), "5"), g_iInfectionChance);
+  bind_pcvar_num(create_cvar(CVAR("infection_healthkit_cure_chance"), "25"), g_iCureChance);
+  bind_pcvar_num(create_cvar(CVAR("infection_healthkit_suspend"), "1"), g_bSuspendInfectionOnHeal);
 
   RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
   RegisterHamPlayer(Ham_Killed, "HamHook_Player_Killed_Post", .Post = 1);

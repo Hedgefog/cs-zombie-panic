@@ -102,7 +102,7 @@ public plugin_init() {
   CE_RegisterClassNativeMethodHook(ENTITY(Button), CE_Method_Use, "CEHook_Button_Use_Post", true);
 
   bind_pcvar_num(
-    register_cvar(CVAR("player_drop_inactive_mode"), "1"),
+    create_cvar(CVAR("player_drop_inactive_mode"), "1"),
     g_iDropInactiveMode
   );
 }

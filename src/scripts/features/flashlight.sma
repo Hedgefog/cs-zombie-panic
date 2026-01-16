@@ -53,8 +53,8 @@ public plugin_init() {
 
   gmsgFlashlight = get_user_msgid("Flashlight");
 
-  g_pCvarConsumptionRate = register_cvar(CVAR("flashlight_consumption_rate"), "1.0");
-  g_pCvarRecoveryRate = register_cvar(CVAR("flashlight_recovery_rate"), "0.5");
+  g_pCvarConsumptionRate = create_cvar(CVAR("flashlight_consumption_rate"), "1.0");
+  g_pCvarRecoveryRate = create_cvar(CVAR("flashlight_recovery_rate"), "0.5");
 
   RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
   RegisterHamPlayer(Ham_Killed, "HamHook_Player_Killed_Post", .Post = 1);
