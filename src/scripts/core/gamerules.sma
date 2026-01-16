@@ -446,7 +446,6 @@ public HamHook_Player_Killed(const pPlayer) {
 
 public HamHook_Player_Killed_Post(const pPlayer) {
   PlayerRole_Player_CallMethod(pPlayer, PLAYER_ROLE(Base), BASE_ROLE_METHOD(Killed));
-  log_amx("Player %d killed. Respawn time: %f", pPlayer, GetVariable(GAMERULES_VARIABLE(flRespawnTime)));
 
   if (GetVariable(GAMERULES_VARIABLE(bAllowRespawn))) {
     g_rgflPlayerRespawnTime[pPlayer] = get_gametime() + Float:GetVariable(GAMERULES_VARIABLE(flRespawnTime));

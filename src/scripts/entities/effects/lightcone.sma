@@ -31,9 +31,9 @@ new g_pTrace;
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
 
 public plugin_precache() {
-  Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(LightCone), g_szModel, charsmax(g_szModel));
-
   g_pTrace = create_tr2();
+
+  Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(LightCone), g_szModel, charsmax(g_szModel));
 
   CE_RegisterClass(ENTITY(LightCone));
   CE_ImplementClassMethod(ENTITY(LightCone), CE_Method_Create, "@Entity_Create");

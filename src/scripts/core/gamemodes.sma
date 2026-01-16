@@ -349,7 +349,7 @@ GameMode_Activate(const iId) {
 
   CustomEvent_Emit(GAMEMODE_EVENT(Activated), g_rgszGameModeId[iId]);
 
-  log_amx("[Zombie Panic Game Modes] Gamemode ^"%s^" is activated", g_rgszGameModeId[iId]);
+  log_amx("Gamemode ^"%s^" is activated", g_rgszGameModeId[iId]);
 }
 
 bool:GameMode_IsActive(const iId) {

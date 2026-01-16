@@ -34,10 +34,6 @@ new g_pCvarRecoveryRate;
 
 new g_szFlashlightSound[MAX_RESOURCE_PATH_LENGTH];
 
-/*--------------------------------[ Plugin State ]--------------------------------*/
-
-new g_pTrace;
-
 /*--------------------------------[ Players State ]--------------------------------*/
 
 new g_rgpPlayerLightCone[MAX_PLAYERS + 1];
@@ -49,8 +45,6 @@ new Float:g_rgflPlayerNextToggle[MAX_PLAYERS + 1];
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
 
 public plugin_precache() {
-  g_pTrace = create_tr2();
-
   Asset_Precache(ASSET_LIBRARY, ASSET(Sound_Flashlight), g_szFlashlightSound, charsmax(g_szFlashlightSound));
 }
 
@@ -68,10 +62,6 @@ public plugin_init() {
 
   register_clcmd("zp_flashlight", "Command_Flashlight");
   register_impulse(100, "Impulse_100");
-}
-
-public plugin_end() {
-  free_tr2(g_pTrace);
 }
 
 /*--------------------------------[ Commands ]--------------------------------*/
