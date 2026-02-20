@@ -64,7 +64,15 @@ public plugin_init() {
 
 @Entity_IsUsable(const this, const pActivator) {
   if (!CE_CallNativeMethod(this, CE_Method_IsMasterTriggered, pActivator)) return false;
-  if (get_ent_data(this, "CBaseToggle", "m_toggle_state") != TS_AT_BOTTOM) return false;
+
+  static iToggleState; iToggleState = get_ent_data(this, "CBaseToggle", "m_toggle_state");
+
+  if (pev(this, pev_spawnflags) & SF_BUTTON_TOGGLE) {
+    if (iToggleState != TS_AT_BOTTOM && iToggleState != TS_AT_TOP) return false;
+  } else {
+    if (iToggleState != TS_AT_BOTTOM) return false;
+  }
+
 
   if (CE_GetMember(this, BUTTON_MEMBER(bHumanOnly))) {
     if (PlayerRole_Player_HasRole(pActivator, PLAYER_ROLE(Zombie))) return false;
