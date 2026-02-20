@@ -86,7 +86,7 @@ public plugin_end() {
 
 public CWHook_Weapon_Deploy_Post(const pWeapon) {
   new pPlayer = get_ent_data_entity(pWeapon, "CBasePlayerItem", "m_pPlayer");
-  if (!is_user_bot(pPlayer)) return;
+  if (!is_user_bot(pPlayer)) return CW_IGNORED;
 
   static iId; iId = CW_GetMember(pWeapon, CW_Member_iId);
 
@@ -120,24 +120,30 @@ public CWHook_Weapon_Deploy_Post(const pWeapon) {
 
     set_pev(pPlayer, pev_weapons, pev(pPlayer, pev_weapons) | (1 << CW_GetMember(pWeapon, CW_Member_iId)) & ~(1 << iId));
   }
+
+  return CW_HANDLED;
 }
 
 public CWHook_Base_Holster(const pWeapon) {
   new pPlayer = get_ent_data_entity(pWeapon, "CBasePlayerItem", "m_pPlayer");
-  if (!is_user_bot(pPlayer)) return;
+  if (!is_user_bot(pPlayer)) return CW_IGNORED;
 
   if (CW_HasMember(pWeapon, m_iOriginalId)) {
     CW_SetMember(pWeapon, CW_Member_iId, CW_GetMember(pWeapon, m_iOriginalId));
     set_ent_data(pWeapon, "CBasePlayerItem", "m_iId", CW_GetMember(pWeapon, m_iOriginalId));
     CW_DeleteMember(pWeapon, m_iOriginalId);
   }
+
+  return CW_HANDLED;
 }
 
 public CWHook_Melee_SecondaryAttack_Post(const pWeapon) {
   new pPlayer = get_ent_data_entity(pWeapon, "CBasePlayerItem", "m_pPlayer");
-  if (!is_user_bot(pPlayer)) return;
+  if (!is_user_bot(pPlayer)) return CW_IGNORED;
 
   set_pev(pPlayer, pev_button, pev(pPlayer, pev_button) | IN_ATTACK & ~IN_ATTACK2);
+
+  return CW_HANDLED;
 }
 
 /*--------------------------------[ Weapon Box Hooks ]--------------------------------*/

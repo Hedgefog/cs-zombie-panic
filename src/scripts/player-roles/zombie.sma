@@ -26,27 +26,19 @@
 
 #define REGENERATION_START_DELAY 10.0
 
-new g_pCvarRegenerationRate;
+new Float:g_flRegenerationRate;
 
 /*--------------------------------[ Assets ]--------------------------------*/
 
 new g_szModel[MAX_RESOURCE_PATH_LENGTH];
-new g_szPressSound[MAX_RESOURCE_PATH_LENGTH];
-
-new g_szIdleSounds[15][MAX_RESOURCE_PATH_LENGTH];
-new g_szDeathSounds[3][MAX_RESOURCE_PATH_LENGTH];
-
-new g_iIdleSoundsNum = 0;
-new g_iDeathSoundsNum = 0;
 
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
 
 public plugin_precache() {
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(Zombie), g_szModel, charsmax(g_szModel));
-  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(ZombiePress), g_szPressSound, charsmax(g_szPressSound));
-
-  g_iIdleSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(ZombieIdle), g_szIdleSounds, sizeof(g_szIdleSounds), charsmax(g_szIdleSounds[]));
-  g_iDeathSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(ZombieDeath), g_szDeathSounds, sizeof(g_szDeathSounds), charsmax(g_szDeathSounds[]));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(ZombiePress));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(ZombieIdle));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(ZombieDeath));
 
   PlayerRole_Register(ROLE, BASE_ROLE);
 
@@ -69,7 +61,7 @@ public plugin_precache() {
 public plugin_init() {
   register_plugin(ROLE_PLUGIN(Zombie), ZP_VERSION, "Hedgehog Fog");
 
-  g_pCvarRegenerationRate = create_cvar(CVAR("zombie_regeneration_rate"), "0.25");
+  bind_pcvar_float(create_cvar(CVAR("zombie_regeneration_rate"), "0.25"), g_flRegenerationRate);
 }
 
 @Role_Assign(const pPlayer) {
@@ -79,7 +71,7 @@ public plugin_init() {
   PlayerRole_This_SetMember(BASE_MEMBER(flMinIdleSoundDelay), 10.0);
   PlayerRole_This_SetMember(BASE_MEMBER(flMaxIdleSoundDelay), 20.0);
 
-  PlayerRole_This_SetMember(MEMBER(flRegenerationRate), get_pcvar_float(g_pCvarRegenerationRate));
+  PlayerRole_This_SetMember(MEMBER(flRegenerationRate), g_flRegenerationRate);
   PlayerRole_This_SetMember(MEMBER(flNextRegeneration), 0.0);
   PlayerRole_This_SetMember(MEMBER(flLastRegeneration), 0.0);
   PlayerRole_This_SetMember(MEMBER(flRegenerationPerSecond), 5.0);
@@ -130,19 +122,19 @@ bool:@Role_PlaySound(const pPlayer, ZP_RoleSound:iSound) {
 
   switch (iSound) {
     case BASE_ROLE_SOUND(Idle): {
-      emit_sound(pPlayer, CHAN_VOICE, g_szIdleSounds[random(g_iIdleSoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+      Asset_EmitSound(pPlayer, CHAN_VOICE, ASSET_LIBRARY, ASSET_SOUND(ZombieIdle));
       return true;
     }
     case BASE_ROLE_SOUND(Death): {
-      emit_sound(pPlayer, CHAN_VOICE, g_szDeathSounds[random(g_iDeathSoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+      Asset_EmitSound(pPlayer, CHAN_VOICE, ASSET_LIBRARY, ASSET_SOUND(ZombieDeath));
       return true;
     }
     case BASE_ROLE_SOUND(Scream): {
-      emit_sound(pPlayer, CHAN_VOICE, g_szIdleSounds[random(g_iIdleSoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+      Asset_EmitSound(pPlayer, CHAN_VOICE, ASSET_LIBRARY, ASSET_SOUND(ZombieIdle));
       return true;
     }
     case BASE_ROLE_SOUND(Press): {
-      // emit_sound(pPlayer, CHAN_ITEM, g_szPressSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+      // Asset_EmitSound(pPlayer, CHAN_ITEM, ASSET_LIBRARY, ASSET_SOUND(ZombiePress));
       return true;
     }
   }

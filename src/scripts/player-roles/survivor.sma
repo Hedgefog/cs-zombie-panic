@@ -25,18 +25,13 @@
 /*--------------------------------[ Assets ]--------------------------------*/
 
 new g_szModel[MAX_RESOURCE_PATH_LENGTH];
-new g_szDeathSounds[4][MAX_RESOURCE_PATH_LENGTH];
-new g_szScreamSounds[2][MAX_RESOURCE_PATH_LENGTH];
-
-new g_iDeathSoundsNum = 0;
-new g_iScreamSoundsNum = 0;
 
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
 
 public plugin_precache() {
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(Survivor), g_szModel, charsmax(g_szModel));
-  g_iDeathSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(SurvivorDeath), g_szDeathSounds, sizeof(g_szDeathSounds), charsmax(g_szDeathSounds[]));
-  g_iScreamSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(SurvivorScream), g_szScreamSounds, sizeof(g_szScreamSounds), charsmax(g_szScreamSounds[]));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(SurvivorDeath));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(SurvivorScream));
 
   PlayerRole_Register(ROLE, BASE_ROLE);
 
@@ -130,11 +125,11 @@ bool:@Role_PlaySound(const pPlayer, ZP_RoleSound:iSound) {
 
   switch (iSound) {
     case BASE_ROLE_SOUND(Death): {
-      emit_sound(pPlayer, CHAN_VOICE, g_szDeathSounds[random(g_iDeathSoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+      Asset_EmitSound(pPlayer, CHAN_VOICE, ASSET_LIBRARY, ASSET_SOUND(SurvivorDeath));
       return true;
     }
     case BASE_ROLE_SOUND(Scream): {
-      emit_sound(pPlayer, CHAN_VOICE, g_szScreamSounds[random(g_iScreamSoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+      Asset_EmitSound(pPlayer, CHAN_VOICE, ASSET_LIBRARY, ASSET_SOUND(SurvivorScream));
       return true;
     }
   }

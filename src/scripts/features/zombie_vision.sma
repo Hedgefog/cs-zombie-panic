@@ -12,10 +12,6 @@
 
 #include <zombiepanic_internal>
 
-/*--------------------------------[ Helpers ]--------------------------------*/
-
-#define IS_PLAYER(%1) (%1 >= 1 && %1 <= MaxClients)
-
 /*--------------------------------[ Constants ]--------------------------------*/
 
 #define TASKID_FIX_FADE 100

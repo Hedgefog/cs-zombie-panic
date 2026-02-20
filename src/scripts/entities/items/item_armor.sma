@@ -14,14 +14,13 @@
 
 /*--------------------------------[ Assets ]--------------------------------*/
 
-new g_szSound[MAX_RESOURCE_PATH_LENGTH];
 new g_szModel[MAX_RESOURCE_PATH_LENGTH];
 
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
 
 public plugin_precache() {
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(ItemArmor), g_szModel, charsmax(g_szModel));
-  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(ItemArmor), g_szSound, charsmax(g_szSound));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(ItemArmor));
 
   CE_RegisterClass(ENTITY(Armor), ENTITY(BaseItem));
   CE_ImplementClassMethod(ENTITY(Armor), CE_Method_Create, "@Entity_Create");
@@ -60,7 +59,7 @@ public plugin_init() {
 
   set_ent_data(pToucher, "CBasePlayer", "m_iKevlar", 1);
   set_pev(pToucher, pev_armorvalue, (flArmorValue = floatmin(flArmorValue + 20.0, MAX_ARMOR_VALUE)));
-  emit_sound(pToucher, CHAN_ITEM, g_szSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+  Asset_EmitSound(pToucher, CHAN_ITEM, ASSET_LIBRARY, ASSET_SOUND(ItemArmor));
 
   return true;
 }

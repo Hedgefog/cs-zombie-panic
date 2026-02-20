@@ -27,12 +27,8 @@ new gmsgFlashlight;
 
 /*--------------------------------[ Cvar Pointers ]--------------------------------*/
 
-new g_pCvarConsumptionRate;
-new g_pCvarRecoveryRate;
-
-/*--------------------------------[ Assets ]--------------------------------*/
-
-new g_szFlashlightSound[MAX_RESOURCE_PATH_LENGTH];
+new Float:g_flConsumptionRate;
+new Float:g_flCvarRecoveryRate;
 
 /*--------------------------------[ Players State ]--------------------------------*/
 
@@ -45,7 +41,7 @@ new Float:g_rgflPlayerNextToggle[MAX_PLAYERS + 1];
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
 
 public plugin_precache() {
-  Asset_Precache(ASSET_LIBRARY, ASSET(Sound_Flashlight), g_szFlashlightSound, charsmax(g_szFlashlightSound));
+  Asset_Precache(ASSET_LIBRARY, ASSET(Sound_Flashlight));
 }
 
 public plugin_init() {
@@ -53,8 +49,8 @@ public plugin_init() {
 
   gmsgFlashlight = get_user_msgid("Flashlight");
 
-  g_pCvarConsumptionRate = create_cvar(CVAR("flashlight_consumption_rate"), "1.0");
-  g_pCvarRecoveryRate = create_cvar(CVAR("flashlight_recovery_rate"), "0.5");
+  bind_pcvar_float(create_cvar(CVAR("flashlight_consumption_rate"), "1.0"), g_flConsumptionRate);
+  bind_pcvar_float(create_cvar(CVAR("flashlight_recovery_rate"), "0.5"), g_flCvarRecoveryRate);
 
   RegisterHamPlayer(Ham_Spawn, "HamHook_Player_Spawn_Post", .Post = 1);
   RegisterHamPlayer(Ham_Killed, "HamHook_Player_Killed_Post", .Post = 1);
@@ -127,14 +123,14 @@ public HamHook_Player_PreThink_Post(const pPlayer) {
 
   if (g_rgbPlayerFlashlightEnabled[this]) {
     if (g_rgflPlayerFlashlightCharge[this] > FLASHLIGHT_MIN_CHARGE) {
-      g_rgflPlayerFlashlightCharge[this] -= (get_pcvar_float(g_pCvarConsumptionRate) * flDelta);
+      g_rgflPlayerFlashlightCharge[this] -= (g_flConsumptionRate * flDelta);
       g_rgflPlayerFlashlightCharge[this] = floatmax(g_rgflPlayerFlashlightCharge[this], FLASHLIGHT_MIN_CHARGE);
       set_pev(this, pev_framerate, 0.5);
     } else {
       @Player_SetFlashlight(this, false);
     }
   } else if (g_rgflPlayerFlashlightCharge[this] < FLASHLIGHT_MAX_CHARGE) {
-    g_rgflPlayerFlashlightCharge[this] += (get_pcvar_float(g_pCvarRecoveryRate) * flDelta);
+    g_rgflPlayerFlashlightCharge[this] += (g_flCvarRecoveryRate * flDelta);
     g_rgflPlayerFlashlightCharge[this] = floatmin(g_rgflPlayerFlashlightCharge[this], FLASHLIGHT_MAX_CHARGE);
   }
 
@@ -172,7 +168,7 @@ bool:@Player_SetFlashlight(const &this, bool:bValue) {
 
   if (is_user_alive(this)) {
     @Player_UpdateFlashlightHud(this);
-    emit_sound(this, CHAN_ITEM, g_szFlashlightSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    Asset_EmitSound(this, CHAN_ITEM, ASSET_LIBRARY, ASSET(Sound_Flashlight));
   }
 
   return true;

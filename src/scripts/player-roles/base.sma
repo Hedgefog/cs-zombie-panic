@@ -163,24 +163,32 @@ public HamHook_Player_PainSound_Post(const pPlayer) {
   emit_sound(pPlayer, CHAN_VOICE, "common/null.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
   PlayerRole_Player_CallMethod(pPlayer, ROLE, METHOD(Pain));
+
+  return HAM_HANDLED;
 }
 
 public HamHook_Player_Killed_Post(const pPlayer, const pKiller) {
   if (IS_PLAYER(pKiller) && is_user_alive(pKiller) && PlayerRole_Player_HasRole(pKiller, ROLE)) {
     PlayerRole_Player_CallMethod(pKiller, ROLE, METHOD(Taunt));
   }
+
+  return HAM_HANDLED;
 }
 
 public CWHook_Weapon_Attack_Post(const pWeapon) {
   new pPlayer = get_ent_data_entity(pWeapon, "CBasePlayerItem", "m_pPlayer");
 
   PlayerRole_Player_SetMember(pPlayer, ROLE, MEMBER(bShouldUpdateInventoryWeight), true);
+
+  return CW_HANDLED;
 }
 
 public CEHook_Button_Use_Post(const pButton, const pActivator) {
   if (IS_PLAYER(pActivator) && PlayerRole_Player_HasRole(pActivator, ROLE)) {
     PlayerRole_Player_CallMethod(pActivator, ROLE, METHOD(PlaySound), SOUND(Press));
   }
+
+  return CE_HANDLED;
 }
 
 /*--------------------------------[ Methods ]--------------------------------*/

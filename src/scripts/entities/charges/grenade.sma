@@ -9,16 +9,9 @@
 
 #include <zombiepanic_internal>
 
-/*--------------------------------[ Constants ]--------------------------------*/
-
-#define IS_PLAYER(%1) (%1 >= 1 && %1 <= MaxClients)
-
 /*--------------------------------[ Assets ]--------------------------------*/
 
 new g_szModel[MAX_RESOURCE_PATH_LENGTH];
-new g_rgszBounceSounds[4][MAX_RESOURCE_PATH_LENGTH];
-
-new g_iBounceSoundsNum = 0;
 
 /*--------------------------------[ Plugin State ]--------------------------------*/
 
@@ -30,8 +23,7 @@ public plugin_precache() {
   g_pTrace = create_tr2();
 
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(Grenade), g_szModel, charsmax(g_szModel));
-
-  g_iBounceSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(GrenadeBounce), g_rgszBounceSounds, sizeof(g_rgszBounceSounds), charsmax(g_rgszBounceSounds[]));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(GrenadeBounce));
 
   CE_RegisterClass(ENTITY(Grenade));
 
@@ -144,7 +136,7 @@ public plugin_end() {
     set_pev(this, pev_velocity, vecVelocity);
     set_pev(this, pev_sequence, 1);
   } else {
-    emit_sound(this, CHAN_VOICE, g_rgszBounceSounds[random(g_iBounceSoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    Asset_EmitSound(this, CHAN_VOICE, ASSET_LIBRARY, ASSET_SOUND(GrenadeBounce));
   }
   
   new Float:flFramerate = floatmin(xs_vec_len(vecVelocity) / 200.0, 1.0);

@@ -21,24 +21,15 @@
 new g_szViewModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szPlayerModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szWorldModel[MAX_RESOURCE_PATH_LENGTH];
-new g_szMissSound[MAX_RESOURCE_PATH_LENGTH];
-new g_rgszHitBodySounds[4][MAX_RESOURCE_PATH_LENGTH];
-new g_rgszHitSounds[4][MAX_RESOURCE_PATH_LENGTH];
-new g_rgszSoftHitSound[4][MAX_RESOURCE_PATH_LENGTH];
-
-new g_iHitBodySoundsNum = 0;
-new g_iHitSoundsNum = 0;
-new g_iHitSoftSoundsNum = 0;
 
 public plugin_precache() {
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(CrowbarView), g_szViewModel, charsmax(g_szViewModel));
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(CrowbarPlayer), g_szPlayerModel, charsmax(g_szPlayerModel));
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(Crowbar), g_szWorldModel, charsmax(g_szWorldModel));
-  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(CrowbarMiss), g_szMissSound, charsmax(g_szMissSound));
-
-  g_iHitBodySoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(CrowbarHitbody), g_rgszHitBodySounds, sizeof(g_rgszHitBodySounds), charsmax(g_rgszHitBodySounds[]));
-  g_iHitSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(CrowbarHit), g_rgszHitSounds, sizeof(g_rgszHitSounds), charsmax(g_rgszHitSounds[]));
-  g_iHitSoftSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(CrowbarHitSoft), g_rgszSoftHitSound, sizeof(g_rgszSoftHitSound), charsmax(g_rgszSoftHitSound[]));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(CrowbarMiss));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(CrowbarHitbody));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(CrowbarHit));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(CrowbarHitSoft));
 
   CW_RegisterClass(WEAPON_NAME, WEAPON(Base));
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Create, "@Weapon_Create");
@@ -148,19 +139,19 @@ public plugin_init() {
         EntityForce_AddFromOrigin(pHit, vecOrigin, 150.0);
       }
 
-      emit_sound(pPlayer, CHAN_ITEM, g_rgszHitBodySounds[random(g_iHitBodySoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+      Asset_EmitSound(pPlayer, CHAN_ITEM, ASSET_LIBRARY, ASSET_SOUND(CrowbarHitbody));
     } else {
       switch (chHitTextureType) {
-        case CHAR_TEX_DIRT: emit_sound(pPlayer, CHAN_ITEM, g_rgszSoftHitSound[random(g_iHitSoftSoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-        case CHAR_TEX_GRASS: emit_sound(pPlayer, CHAN_ITEM, g_rgszSoftHitSound[random(g_iHitSoftSoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-        case CHAR_TEX_SNOW: emit_sound(pPlayer, CHAN_ITEM, g_rgszSoftHitSound[random(g_iHitSoftSoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-        case CHAR_TEX_SLOSH: emit_sound(pPlayer, CHAN_ITEM, g_rgszSoftHitSound[random(g_iHitSoftSoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-        case CHAR_TEX_FLESH: emit_sound(pPlayer, CHAN_ITEM, g_rgszHitBodySounds[random(g_iHitBodySoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-        default: emit_sound(pPlayer, CHAN_ITEM, g_rgszHitSounds[random(g_iHitSoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+        case CHAR_TEX_DIRT: Asset_EmitSound(pPlayer, CHAN_ITEM, ASSET_LIBRARY, ASSET_SOUND(CrowbarHitSoft));
+        case CHAR_TEX_GRASS: Asset_EmitSound(pPlayer, CHAN_ITEM, ASSET_LIBRARY, ASSET_SOUND(CrowbarHitSoft));
+        case CHAR_TEX_SNOW: Asset_EmitSound(pPlayer, CHAN_ITEM, ASSET_LIBRARY, ASSET_SOUND(CrowbarHitSoft));
+        case CHAR_TEX_SLOSH: Asset_EmitSound(pPlayer, CHAN_ITEM, ASSET_LIBRARY, ASSET_SOUND(CrowbarHitSoft));
+        case CHAR_TEX_FLESH: Asset_EmitSound(pPlayer, CHAN_ITEM, ASSET_LIBRARY, ASSET_SOUND(CrowbarHitbody));
+        default: Asset_EmitSound(pPlayer, CHAN_ITEM, ASSET_LIBRARY, ASSET_SOUND(CrowbarHit));
       }
     }
   } else {
-    emit_sound(pPlayer, CHAN_ITEM, g_szMissSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    Asset_EmitSound(pPlayer, CHAN_ITEM, ASSET_LIBRARY, ASSET_SOUND(CrowbarMiss));
   }
 
   return pHit;

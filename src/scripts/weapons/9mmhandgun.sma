@@ -19,7 +19,6 @@
 new g_szViewModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szPlayerModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szWorldModel[MAX_RESOURCE_PATH_LENGTH];
-new g_szShotSound[MAX_RESOURCE_PATH_LENGTH];
 new g_szShellModel[MAX_RESOURCE_PATH_LENGTH];
 
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
@@ -30,7 +29,7 @@ public plugin_precache() {
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(PistolView), g_szViewModel, charsmax(g_szViewModel));
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(PistolPlayer), g_szPlayerModel, charsmax(g_szPlayerModel));
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(Pistol), g_szWorldModel, charsmax(g_szWorldModel));
-  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(PistolShot), g_szShotSound, charsmax(g_szShotSound));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(PistolShot));
 
   CW_RegisterClass(WEAPON_NAME, WEAPON(Base));
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Create, "@Weapon_Create");
@@ -85,7 +84,7 @@ public plugin_init() {
   if (CW_CallNativeMethod(this, CW_Method_DefaultShot, 20.0, 0.75, 0.15, vecSpread, 1)) {
     CW_CallNativeMethod(this, CW_Method_PlayAnimation, 3, 0.71);
     static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
-    emit_sound(pPlayer, CHAN_WEAPON, g_szShotSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    Asset_EmitSound(pPlayer, CHAN_WEAPON, ASSET_LIBRARY, ASSET_SOUND(PistolShot));
 
     static Float:vecPunchAngle[3];
     pev(pPlayer, pev_punchangle, vecPunchAngle);

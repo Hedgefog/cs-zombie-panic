@@ -22,7 +22,6 @@
 new g_szViewModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szPlayerModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szWorldModel[MAX_RESOURCE_PATH_LENGTH];
-new g_szFuseSound[MAX_RESOURCE_PATH_LENGTH];
 new g_szBounceSounds[4][MAX_RESOURCE_PATH_LENGTH];
 
 new g_iBounceSoundsNum = 0;
@@ -33,7 +32,7 @@ public plugin_precache() {
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(Grenade), g_szWorldModel, charsmax(g_szWorldModel));
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(GrenadeView), g_szViewModel, charsmax(g_szViewModel));
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(GrenadePlayer), g_szPlayerModel, charsmax(g_szPlayerModel));
-  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(GrenadeFuse), g_szFuseSound, charsmax(g_szFuseSound));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(GrenadeFuse));
 
   g_iBounceSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(GrenadeBounce), g_szBounceSounds, sizeof(g_szBounceSounds), charsmax(g_szBounceSounds[]));
 
@@ -118,7 +117,7 @@ public plugin_init() {
     static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
 
     CW_CallNativeMethod(this, CW_Method_PlayAnimation, 2, 0.5);
-    emit_sound(pPlayer, CHAN_WEAPON, g_szFuseSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    Asset_EmitSound(pPlayer, CHAN_WEAPON, ASSET_LIBRARY, ASSET_SOUND(GrenadeFuse));
   }
 }
 

@@ -26,8 +26,6 @@ new g_szWorldModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szRadioViewModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szRadioPlayerModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szRadioWorldModel[MAX_RESOURCE_PATH_LENGTH];
-new g_szBlipSound[MAX_RESOURCE_PATH_LENGTH];
-new g_szPressSound[MAX_RESOURCE_PATH_LENGTH];
 new g_szBounceSounds[4][MAX_RESOURCE_PATH_LENGTH];
 
 new g_iBounceSoundsNum = 0;
@@ -51,8 +49,8 @@ public plugin_precache() {
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(SatchelRadioView), g_szRadioViewModel, charsmax(g_szRadioViewModel));
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(SatchelRadioPlayer), g_szRadioPlayerModel, charsmax(g_szRadioPlayerModel));
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(SatchelRadio), g_szRadioWorldModel, charsmax(g_szRadioWorldModel));
-  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(SatchelRadioBlip), g_szBlipSound, charsmax(g_szBlipSound));
-  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(SatchelRadioPress), g_szPressSound, charsmax(g_szPressSound));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(SatchelRadioBlip));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(SatchelRadioPress));
 
   g_iBounceSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(GrenadeBounce), g_szBounceSounds, sizeof(g_szBounceSounds), charsmax(g_szBounceSounds[]));
 
@@ -312,10 +310,10 @@ bool:@Weapon_ThrowCharge(const this) {
 @Weapon_ActivateCharges(const this) {
   new pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
 
-  emit_sound(pPlayer, CHAN_WEAPON, g_szPressSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+  Asset_EmitSound(pPlayer, CHAN_WEAPON, ASSET_LIBRARY, ASSET_SOUND(SatchelRadioPress));
 
   if (CW_GetMember(this, MEMBER(iChargesNum))) {
-    emit_sound(pPlayer, CHAN_ITEM, g_szBlipSound, VOL_NORM * 0.125, ATTN_NORM, 0, PITCH_NORM);
+    Asset_EmitSound(pPlayer, CHAN_ITEM, ASSET_LIBRARY, ASSET_SOUND(SatchelRadioBlip), .flVolume = VOL_NORM * 0.125);
   }
 
   new pEntity;
@@ -353,11 +351,13 @@ bool:@Weapon_ShouldUseRemote(const this) {
 
 public CWHook_SatchelAmmo_GiveToPlayer_Post(const pPlayer, const iAmmoAmount) {
   new pActiveItem = get_ent_data_entity(pPlayer, "CBasePlayer", "m_pActiveItem");
-  if (pActiveItem == FM_NULLENT) return;
+  if (pActiveItem == FM_NULLENT) return CW_IGNORED;
 
   if (CW_IsInstanceOf(pActiveItem, WEAPON_NAME)) {
     CW_CallMethod(pActiveItem, METHOD(UpdateRemoteState));
   }
+
+  return CW_HANDLED;
 }
 
 /*--------------------------------[ Charges Hooks ]--------------------------------*/
@@ -368,6 +368,8 @@ public CEHook_SatchelCharge_Spawn_Post(const pSatchelCharge) {
   if (pRemote != FM_NULLENT) {
     CW_SetMember(pRemote, WEAPON_SATCHEL_MEMBER(iChargesNum), CW_GetMember(pRemote, WEAPON_SATCHEL_MEMBER(iChargesNum)) + 1);
   }
+
+  return CE_HANDLED;
 }
 
 public CEHook_SatchelCharge_Killed_Post(const pSatchelCharge) {
@@ -376,6 +378,8 @@ public CEHook_SatchelCharge_Killed_Post(const pSatchelCharge) {
   if (pRemote != FM_NULLENT) {
     CW_SetMember(pRemote, WEAPON_SATCHEL_MEMBER(iChargesNum), CW_GetMember(pRemote, WEAPON_SATCHEL_MEMBER(iChargesNum)) - 1);
   }
+
+  return CE_HANDLED;
 }
 
 /*--------------------------------[ Player Hoooks ]--------------------------------*/

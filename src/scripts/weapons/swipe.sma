@@ -19,19 +19,13 @@
 /*--------------------------------[ Assets ]--------------------------------*/
 
 new g_szViewModel[MAX_RESOURCE_PATH_LENGTH];
-new g_rgszMissSounds[4][MAX_RESOURCE_PATH_LENGTH];
-new g_rgszHitSounds[4][MAX_RESOURCE_PATH_LENGTH];
-
-new g_iMissSoundsNum = 0;
-new g_iHitSoundsNum = 0;
 
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
 
 public plugin_precache() {
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(SwipeView), g_szViewModel, charsmax(g_szViewModel));
-
-  g_iMissSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(SwipeMiss), g_rgszMissSounds, sizeof(g_rgszMissSounds), charsmax(g_rgszMissSounds[]));
-  g_iHitSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(SwipeHit), g_rgszHitSounds, sizeof(g_rgszHitSounds), charsmax(g_rgszHitSounds[]));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(SwipeMiss));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(SwipeHit));
 
   CW_RegisterClass(WEAPON_NAME, WEAPON(Base));
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Create, "@Weapon_Create");
@@ -160,9 +154,9 @@ public plugin_init() {
   static pHit; pHit = CW_CallBaseMethod();
 
   if (pHit != FM_NULLENT) {
-    emit_sound(pPlayer, CHAN_ITEM, g_rgszHitSounds[random(g_iHitSoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    Asset_EmitSound(pPlayer, CHAN_ITEM, ASSET_LIBRARY, ASSET_SOUND(SwipeHit));
   } else {
-    emit_sound(pPlayer, CHAN_ITEM, g_rgszMissSounds[random(g_iMissSoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    Asset_EmitSound(pPlayer, CHAN_ITEM, ASSET_LIBRARY, ASSET_SOUND(SwipeMiss));
   }
 }
 

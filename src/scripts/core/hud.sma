@@ -246,10 +246,14 @@ public EventSubscriber_GameRules_VariableChanged(const ZP_GameRules_Variable:iVa
 public HamHook_Player_Spawn_Post(const pPlayer) {
   @Player_UpdatePlayersInfo(pPlayer);
   @Player_UpdateZombiesValue(pPlayer);
+
+  return HAM_HANDLED;
 }
 
 public HamHook_Player_Killed(const pPlayer) {
   @Player_UpdatePlayersInfo(pPlayer);
+
+  return HAM_HANDLED;
 }
 
 /*--------------------------------[ Player Methods ]--------------------------------*/

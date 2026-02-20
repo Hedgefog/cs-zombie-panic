@@ -41,6 +41,8 @@ public CEHook_WeaponBox_Destroy(const pEntity) {
 
     CE_SetMember(pOwner, BASESPAWNER_MEMBER(pWeaponBox), FM_NULLENT);
   }
+
+  return CE_HANDLED;
 }
 
 public CEHook_WeaponBox_Touch_Post(const pEntity, const pToucher) {
@@ -51,6 +53,8 @@ public CEHook_WeaponBox_Touch_Post(const pEntity, const pToucher) {
       ExecuteHamB(Ham_Killed, pOwner, 0, 0);
     }
   }
+
+  return CE_HANDLED;
 }
 
 /*--------------------------------[ Methods ]--------------------------------*/

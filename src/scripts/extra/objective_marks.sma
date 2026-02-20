@@ -53,6 +53,8 @@ public plugin_init() {
 
 public HamHook_Player_Spawn_Post(const pPlayer) {
   @Player_UpdateMarkersVisibility(pPlayer);
+
+  return HAM_HANDLED;
 }
 
 /*--------------------------------[ Event Subscribers ]--------------------------------*/

@@ -10,8 +10,6 @@
 #include <zombiepanic_gamemodes>
 #include <zombiepanic_internal>
 
-#define IS_PLAYER(%1) (%1 >= 1 && %1 <= MaxClients)
-
 public plugin_precache() {
   CE_RegisterClass(ENTITY(EndRoundTrigger), CE_Class_BaseTrigger);
 

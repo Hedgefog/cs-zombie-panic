@@ -10,14 +10,13 @@
 
 /*--------------------------------[ Assets ]--------------------------------*/
 
-new g_szSound[MAX_RESOURCE_PATH_LENGTH];
 new g_szModel[MAX_RESOURCE_PATH_LENGTH];
 
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
 
 public plugin_precache() {
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(ItemMedkit), g_szModel, charsmax(g_szModel));
-  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(ItemMedkit), g_szSound, charsmax(g_szSound));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(ItemMedkit));
 
   CE_RegisterClass(ENTITY(HealthKit), ENTITY(BaseItem));
   CE_ImplementClassMethod(ENTITY(HealthKit), CE_Method_Create, "@Entity_Create");
@@ -58,7 +57,7 @@ public plugin_init() {
   static Float:flHealth; pev(pToucher, pev_health, flHealth);
 
   set_pev(pToucher, pev_health, (flHealth = floatmin(flHealth + 25.0, flMaxHealth)));
-  emit_sound(pToucher, CHAN_ITEM, g_szSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+  Asset_EmitSound(pToucher, CHAN_ITEM, ASSET_LIBRARY, ASSET_SOUND(ItemMedkit));
 
   return true;
 }

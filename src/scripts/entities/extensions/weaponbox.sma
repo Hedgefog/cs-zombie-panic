@@ -12,10 +12,6 @@
 #include <zombiepanic>
 #include <zombiepanic_internal>
 
-/*--------------------------------[ Helpers ]--------------------------------*/
-
-#define IS_PLAYER(%1) (%1 >= 1 && %1 <= MaxClients)
-
 /*--------------------------------[ Constants ]--------------------------------*/
 
 #define MAX_ITEM_TYPES 6

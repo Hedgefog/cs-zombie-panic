@@ -119,11 +119,13 @@ public CWHook_Swipe_Deploy_Post(const pWeapon) {
   static pPlayer; pPlayer = get_ent_data_entity(pWeapon, "CBasePlayerItem", "m_pPlayer");
   static iCharacterId; iCharacterId = g_rgiPlayerCharacter[pPlayer];
 
-  if (iCharacterId == -1) return;
+  if (iCharacterId == -1) return CW_IGNORED;
 
   if (!equal(g_rgrgszCharacterModels[iCharacterId][CharacterModel_Swipe], NULL_STRING)) {
     set_pev(pPlayer, pev_viewmodel2, g_rgrgszCharacterModels[iCharacterId][CharacterModel_Swipe]);
   }
+
+  return CW_HANDLED;
 }
 
 /*--------------------------------[ Event Subscribers ]--------------------------------*/

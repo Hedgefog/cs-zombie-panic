@@ -172,13 +172,15 @@ public EventSubscriber_GameRules_TeamPreferenceChanged(const pPlayer, const iPre
 /*--------------------------------[ Hooks ]--------------------------------*/
 
 public HamHook_Player_Killed_Post(const pPlayer) {
-  if (!ZP_GameMode_IsActive(GAMEMODE_ID)) return;
+  if (!ZP_GameMode_IsActive(GAMEMODE_ID)) return HAM_IGNORED;
 
   static iTeam; iTeam = get_ent_data(pPlayer, "CBasePlayer", "m_iTeam");
 
   if (iTeam != TEAM(Zombies)) {
     SetZombieLives(GetZombieLives() + 2);
   }
+
+  return HAM_HANDLED;
 }
 
 /*--------------------------------[ Functions ]--------------------------------*/

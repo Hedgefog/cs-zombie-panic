@@ -14,10 +14,6 @@
 #include <zombiepanic>
 #include <zombiepanic_internal>
 
-/*--------------------------------[ Helpers ]--------------------------------*/
-
-#define IS_PLAYER(%1) (%1 >= 1 && %1 <= MaxClients)
-
 /*--------------------------------[ Constants ]--------------------------------*/
 
 #define TRANSFORMATION_DELAY 60.0
@@ -156,7 +152,7 @@ public Native_GetInfector(const iPluginId, const iArgc) {
 /*--------------------------------[ Hooks ]--------------------------------*/
 
 public HamHook_Player_Spawn_Post(const pPlayer) {
-  if (!is_user_alive(pPlayer)) return;
+  if (!is_user_alive(pPlayer)) return HAM_IGNORED;
 
   State_Manager_SetState(g_rgPlayerStateManagers[pPlayer], INFECTION_STATE(None), _, true);
 
@@ -164,12 +160,16 @@ public HamHook_Player_Spawn_Post(const pPlayer) {
     if (!is_user_connected(pTarget)) continue;
     @Player_SendInfectionAttrib(pPlayer, pTarget);
   }
+
+  return HAM_HANDLED;
 }
 
 public HamHook_Player_Killed_Post(const pPlayer) {
   if (State_Manager_GetState(g_rgPlayerStateManagers[pPlayer]) != INFECTION_STATE(TransformationDeath)) {
     State_Manager_SetState(g_rgPlayerStateManagers[pPlayer], INFECTION_STATE(None), _, true);
   }
+
+  return HAM_HANDLED;
 }
 
 public HamHook_Player_TraceAttack(const pPlayer, const pAttacker, Float:flDamage, Float:vecDir[3], const pTr, iDamageBits) {

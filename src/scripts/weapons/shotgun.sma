@@ -20,12 +20,8 @@
 new g_szViewModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szPlayerModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szWorldModel[MAX_RESOURCE_PATH_LENGTH];
-new g_szShotSound[MAX_RESOURCE_PATH_LENGTH];
-new g_szPumpSound[MAX_RESOURCE_PATH_LENGTH];
-new g_rgszReloadSounds[2][MAX_RESOURCE_PATH_LENGTH];
 new g_szShellModel[MAX_RESOURCE_PATH_LENGTH];
-  
-new g_iReloadSoundsNum = 0;
+new g_szPumpSound[MAX_RESOURCE_PATH_LENGTH];
 
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
 
@@ -35,10 +31,9 @@ public plugin_precache() {
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(ShotgunView), g_szViewModel, charsmax(g_szViewModel));
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(ShotgunPlayer), g_szPlayerModel, charsmax(g_szPlayerModel));
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(Shotgun), g_szWorldModel, charsmax(g_szWorldModel));
-  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(ShotgunShot), g_szShotSound, charsmax(g_szShotSound));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(ShotgunShot));
   Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(ShotgunPump), g_szPumpSound, charsmax(g_szPumpSound));
-
-  g_iReloadSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(ShotgunReload), g_rgszReloadSounds, sizeof(g_rgszReloadSounds), charsmax(g_rgszReloadSounds[]));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(ShotgunReload));
 
   CW_RegisterClass(WEAPON_NAME, WEAPON(Base));
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Create, "@Weapon_Create");
@@ -78,7 +73,7 @@ public plugin_init() {
 
   static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
   CW_CallNativeMethod(this, CW_Method_DefaultDeploy, g_szViewModel, g_szPlayerModel, 4, "shotgun");
-  emit_sound(pPlayer, CHAN_ITEM, g_szPumpSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+  Asset_EmitSound(pPlayer, CHAN_ITEM, ASSET_LIBRARY, ASSET_SOUND(ShotgunPump));
 }
 
 @Weapon_Idle(const this) {
@@ -102,7 +97,7 @@ public plugin_init() {
   if (CW_CallNativeMethod(this, CW_Method_DefaultShotgunShot, 6.0, 0.9, 0.9, 0.5, vecSpread, 25)) {
     CW_CallNativeMethod(this, CW_Method_PlayAnimation, 1, 1.5);
     static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
-    emit_sound(pPlayer, CHAN_WEAPON, g_szShotSound, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    Asset_EmitSound(pPlayer, CHAN_WEAPON, ASSET_LIBRARY, ASSET_SOUND(ShotgunShot));
     
     set_pev(pPlayer, pev_punchangle, Float:{-5.0, 0.0, 0.0});
 
@@ -118,7 +113,7 @@ public plugin_init() {
 
     if (flInSpecialReload == 2) {
       static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
-      emit_sound(pPlayer, CHAN_WEAPON, g_rgszReloadSounds[random(g_iReloadSoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+      Asset_EmitSound(pPlayer, CHAN_WEAPON, ASSET_LIBRARY, ASSET_SOUND(ShotgunReload));
     }
   }
 }
@@ -133,5 +128,5 @@ public plugin_init() {
 
 @Weapon_PumpSound(const this) {
   static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
-  emit_sound(pPlayer, CHAN_ITEM, g_szPumpSound, VOL_NORM, ATTN_NORM, 0, 92 + random(0x10));
+  Asset_EmitSound(pPlayer, CHAN_ITEM, ASSET_LIBRARY, ASSET_SOUND(ShotgunPump), .iPitch = 92 + random(0x10));
 }

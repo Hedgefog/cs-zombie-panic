@@ -67,8 +67,10 @@ public Command_Panic(const pPlayer) {
 
 /*--------------------------------[ Hooks ]--------------------------------*/
 
-public HamHook_Player_Spawn_Post(pPlayer) {
+public HamHook_Player_Spawn_Post(const pPlayer) {
   State_Manager_SetState(g_rgPlayerStateManagers[pPlayer], PANIC_STATE(None), _, true);
+
+  return HAM_HANDLED;
 }
 
 /*--------------------------------[ State Hooks ]--------------------------------*/

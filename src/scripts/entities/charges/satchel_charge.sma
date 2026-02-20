@@ -14,11 +14,7 @@
 /*--------------------------------[ Assets ]--------------------------------*/
 
 new g_szModel[MAX_RESOURCE_PATH_LENGTH];
-new g_szBlipSound[MAX_RESOURCE_PATH_LENGTH];
 new g_szGlowSprite[MAX_RESOURCE_PATH_LENGTH];
-new g_rgszBounceSounds[4][MAX_RESOURCE_PATH_LENGTH];
-
-new g_iBounceSoundsNum = 0;
 
 /*--------------------------------[ Plugin State ]--------------------------------*/
 
@@ -30,10 +26,9 @@ public plugin_precache() {
   g_pTrace = create_tr2();
 
   Asset_Precache(ASSET_LIBRARY, ASSET_MODEL(Satchel), g_szModel, charsmax(g_szModel));
-  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(SatchelChargeBlip), g_szBlipSound, charsmax(g_szBlipSound));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(SatchelChargeBlip));
   Asset_Precache(ASSET_LIBRARY, ASSET_SPRITE(SatchelChargeGlow), g_szGlowSprite, charsmax(g_szGlowSprite));
-
-  g_iBounceSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(GrenadeBounce), g_rgszBounceSounds, sizeof(g_rgszBounceSounds), charsmax(g_rgszBounceSounds[]));
+  Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(GrenadeBounce));
 
   CE_RegisterClass(ENTITY(SatchelCharge));
 
@@ -117,7 +112,7 @@ public plugin_end() {
   }
 
   if ((~pev(this, pev_flags) & FL_ONGROUND) && xs_vec_len(vecVelocity) > 10.0) {
-    emit_sound(this, CHAN_VOICE, g_rgszBounceSounds[random(g_iBounceSoundsNum)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+    Asset_EmitSound(this, CHAN_VOICE, ASSET_LIBRARY, ASSET_SOUND(GrenadeBounce));
   }
 }
 
@@ -228,6 +223,6 @@ public plugin_end() {
       message_end();
     }
 
-    emit_sound(this, CHAN_BODY, g_szBlipSound, VOL_NORM * 0.05, ATTN_IDLE, 0, PITCH_NORM);
+    Asset_EmitSound(this, CHAN_BODY, ASSET_LIBRARY, ASSET_SOUND(SatchelChargeBlip), .flVolume = VOL_NORM * 0.05, .flAttenuation = ATTN_IDLE);
   }
 }
