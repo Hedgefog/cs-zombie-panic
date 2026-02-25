@@ -17,20 +17,26 @@
   ],
   "input": {
     "scripts": [
-      { "dir": "./src/scripts", "dest": "./zombiepanic" }
+      { "dir": "./src/scripts", "output": { "dir": "zombiepanic", "flat": false } },
+      { "dir": "./.thirdparty/amxx-modding-kit/api", "output": { "dir": "./amxx-modding-kit", "flat": true } },
+      { "dir": "./.thirdparty/amxx-modding-kit/entities", "output": { "dir": "./amxx-modding-kit", "flat": true } },
+      { "dir": "./.thirdparty/amxx-modding-kit/weapons", "output": { "dir": "./amxx-modding-kit", "flat": true } }
     ],
     "include": [
-      "./.thirdparty/cs-modding-kit",
-      "./src/include"
+      "./src/include",
+      "./.thirdparty/amxx-modding-kit/api",
+      "./.thirdparty/amxx-modding-kit/entities",
+      "./.thirdparty/amxx-modding-kit/weapons",
+      "./.thirdparty/amxx-modding-kit/util"
     ],
     "assets": "./assets"
   },
   "output": {
-    "base": "./dist/build",
+    "base": "./dist",
     "plugins": "./addons/amxmodx/plugins",
     "scripts": "./addons/amxmodx/scripting",
     "include": "./addons/amxmodx/scripting/include",
-    "assets": "./"
+    "assets": "."
   },
   "rules": {
     "flatCompilation": false

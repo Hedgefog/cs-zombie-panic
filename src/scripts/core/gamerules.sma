@@ -252,7 +252,7 @@ public client_disconnected(pPlayer) {
 
 /*--------------------------------[ Round Forwards ]--------------------------------*/
 
-public Round_OnNewRound() {
+public Round_OnInit() {
   g_bRoundExpired = false;
   
   ResetPlayerTeamPreferences();
@@ -261,7 +261,7 @@ public Round_OnNewRound() {
   CustomEvent_Emit(GAMERULES_EVENT(GameInit));
 }
 
-public Round_OnRoundStart() {
+public Round_OnStart() {
   DistributeTeams();
 
   g_bGameInProgress = true;
@@ -273,7 +273,7 @@ public Round_OnRoundStart() {
   CheckWinConditions();
 }
 
-public Round_OnRoundExpired() {
+public Round_OnExpired() {
   if (!GetVariable(GAMERULES_VARIABLE(bLimitedRoundTime))) return;
 
   g_bRoundExpired = true;
@@ -285,7 +285,7 @@ public Round_OnRoundExpired() {
   g_bGameInProgress = false;
 }
 
-public Round_OnRoundEnd(iWinnerTeam) {
+public Round_OnEnd(iWinnerTeam) {
   g_bGameInProgress = false;
 
   switch (iWinnerTeam) {
@@ -297,7 +297,7 @@ public Round_OnRoundEnd(iWinnerTeam) {
   CustomEvent_Emit(GAMERULES_EVENT(GameEnd), iWinnerTeam);
 }
 
-public Round_CheckResult:Round_OnCheckRoundStart() {
+public Round_CheckResult:Round_OnCanStartCheck() {
   new iPlayersNum = 0;
 
   for (new pPlayer = 1; pPlayer <= MaxClients; ++pPlayer) {
@@ -549,7 +549,7 @@ bool:@Player_UpdateSpeed(const &this) {
   if (!is_user_alive(this)) return false;
   if (!PlayerRole_Player_HasRole(this, ZP_PlayerRole_Base)) return false;
 
-  if (Round_IsRoundStarted()) {
+  if (Round_IsStarted()) {
     set_pev(this, pev_maxspeed, CalculatePlayerMaxSpeed(this));
   } else {
     set_pev(this, pev_maxspeed, 0.001);

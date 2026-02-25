@@ -129,7 +129,7 @@ public Command_Unload(const pPlayer) {
 
 /*--------------------------------[ Hooks ]--------------------------------*/
 
-public CvarHook_Version(pCvar) {
+public CvarHook_Version(const pCvar) {
   set_pcvar_string(pCvar, ZP_VERSION);
 }
 
@@ -144,9 +144,6 @@ public FMHook_GetGameDescription() {
 public Message_SendAudio()  {
   static szAudio[16]; get_msg_arg_string(2, szAudio, charsmax(szAudio));
 
-  if (equal(szAudio[7], "terwin")) return PLUGIN_HANDLED;
-  if (equal(szAudio[7], "ctwin")) return PLUGIN_HANDLED;
-  if (equal(szAudio[7], "rounddraw")) return PLUGIN_HANDLED;
   if (equal(szAudio, "%!MRAD_", 7)) return PLUGIN_HANDLED;
 
   return PLUGIN_CONTINUE;

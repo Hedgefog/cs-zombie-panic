@@ -38,7 +38,7 @@ public HamHook_Player_Spawn_Post(const pPlayer) {
   if (!is_user_alive(pPlayer)) return HAM_IGNORED;
 
   if (g_bEnabled) {
-    if (!Round_IsRoundStarted()) {
+    if (!Round_IsStarted()) {
       @Player_ShowMotd(pPlayer);
     }
   }

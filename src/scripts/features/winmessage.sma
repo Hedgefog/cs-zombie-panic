@@ -15,7 +15,7 @@ public plugin_init() {
 }
 
 public EventSubscriber_GameRules_GameEnd(const iWinnerTeam) {
-  static Float:flDelay; flDelay = floatmax(Round_GetRestartRoundTime() - get_gametime(), 1.0);
+  static Float:flDelay; flDelay = floatmax(Round_GetRestartTime() - get_gametime(), 1.0);
 
   set_dhudmessage(255, 255, 255, -1.0, -1.0);
 
