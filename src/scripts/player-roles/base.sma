@@ -264,7 +264,7 @@ Float:@Role_GetMaxHealth(const pPlayer) {
 }
 
 bool:@Role_UpdateModel(const pPlayer) {
-  CustomEvent_SetToken(pPlayer);
+  CustomEvent_SetActivator(pPlayer);
 
   if (CustomEvent_Emit(BASE_ROLE_EVENT(UpdateModel), pPlayer) != CER_Continue) {
     return false;
@@ -284,7 +284,7 @@ bool:@Role_PlaySound(const pPlayer, ZP_RoleSound:iSound) {
   static Float:flNextSound; flNextSound = PlayerRole_This_GetMember(MEMBER(flNextSound));
   if (flNextSound > get_gametime()) return false;
 
-  CustomEvent_SetToken(pPlayer);
+  CustomEvent_SetActivator(pPlayer);
   if (CustomEvent_Emit(BASE_ROLE_EVENT(PlaySound), pPlayer, iSound) != CER_Continue) {
     return false;
   }
@@ -355,7 +355,7 @@ Float:@Role_UpdateInventoryWeight(const pPlayer) {
 
   PlayerRole_This_SetMember(MEMBER(flInventoryWeight), flWeight);
 
-  CustomEvent_SetToken(pPlayer);
+  CustomEvent_SetActivator(pPlayer);
   CustomEvent_Emit(BASE_ROLE_EVENT(UpdateInventoryWeight), pPlayer);
 
   return flWeight;

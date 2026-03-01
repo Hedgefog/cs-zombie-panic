@@ -179,6 +179,7 @@ public plugin_end() {
 }
 
 @Entity_DetonateDestroy(const this) {
+  set_pev(this, pev_dmg, Float:CE_GetMember(this, SATCHELCHARGE_MEMBER(flDamage)));
   UTIL_GrenadeSmoke(this);
   ExecuteHamB(Ham_Killed, this, 0, 0);
 }

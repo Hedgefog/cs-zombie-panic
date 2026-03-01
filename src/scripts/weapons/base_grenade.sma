@@ -14,7 +14,7 @@
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
 
 public plugin_precache() {
-  CW_ForkClass(WEAPON_NAME, WEAPON_BASE_THROWABLE, WEAPON(Base));
+  CW_ForkClass(WEAPON_NAME, Weapon_BaseThrowable, WEAPON(Base));
 }
 
 public plugin_init() {

@@ -529,7 +529,7 @@ public HC_Player_DeadPlayerWeapons(const pPlayer) {
 bool:@Player_Respawn(const &this) {
   if (UTIL_IsPlayerSpectator(this)) return false;
 
-  CustomEvent_SetToken(this);
+  CustomEvent_SetActivator(this);
 
   if (CustomEvent_Emit(GAMERULES_EVENT(PlayerRespawn), this) != CER_Continue) {
     return false;
@@ -539,7 +539,7 @@ bool:@Player_Respawn(const &this) {
 
   if (!is_user_alive(this)) return false;
 
-  CustomEvent_SetToken(this);
+  CustomEvent_SetActivator(this);
   CustomEvent_Emit(GAMERULES_EVENT(PlayerRespawned), this);
 
   return true;
@@ -649,7 +649,7 @@ CheckWinConditions(pIgnorePlayer = 0) {
     }
   }
 
-  CustomEvent_SetToken(pIgnorePlayer);
+  CustomEvent_SetActivator(pIgnorePlayer);
   if (CustomEvent_Emit(GAMERULES_EVENT(CheckWinConditions)) != CER_Continue) return;
 
   if (iPlayersNum > 1) {
@@ -887,7 +887,7 @@ public Callback_MenuHandler_TeamPreference(pPlayer, iMenu, iItem) {
     }
   }
 
-  CustomEvent_SetToken(pPlayer);
+  CustomEvent_SetActivator(pPlayer);
   CustomEvent_Emit(GAMERULES_EVENT(TeamPreferenceChanged), pPlayer, g_rgiPlayerTeamPreference[pPlayer]);
 
   return PLUGIN_HANDLED;

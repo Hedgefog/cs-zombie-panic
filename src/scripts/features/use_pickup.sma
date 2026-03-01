@@ -149,7 +149,7 @@ public HamHook_Player_PostThink_Post(const pPlayer) {
     g_rgpPlayerHoveredItem[this] = pEntity;
 
     if (pEntity != pLastHoveredItem) {
-      CustomEvent_SetToken(this);
+      CustomEvent_SetActivator(this);
       CustomEvent_Emit(USEPICKUP_EVENT(Hover), this, pEntity);
     }
 
