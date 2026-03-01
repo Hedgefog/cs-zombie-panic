@@ -468,7 +468,7 @@ public HamHook_Player_TakeDamage(const pPlayer) {
 public HamHook_Player_PostThink_Post(const pPlayer) {
   if (is_user_alive(pPlayer)) {
     if (g_rgflPlayerNextRoleThink[pPlayer] < g_flGameTime) {
-      PlayerRole_Player_CallMethod(pPlayer, PLAYER_ROLE(Base), BASE_ROLE_METHOD(Think));
+      PlayerRole_Player_CallMethod(pPlayer, PLAYER_ROLE(Base), BASE_ROLE_METHOD(Update));
       g_rgflPlayerNextRoleThink[pPlayer] = g_flGameTime + 0.125;
     }
   } else {

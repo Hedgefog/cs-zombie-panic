@@ -49,7 +49,7 @@ public plugin_precache() {
   PlayerRole_RegisterMethod(ROLE, BASE_METHOD(Equip), "@Role_Equip");
   PlayerRole_RegisterMethod(ROLE, BASE_METHOD(GetMaxSpeed), "@Role_GetMaxSpeed");
   PlayerRole_RegisterMethod(ROLE, BASE_METHOD(GetMaxHealth), "@Role_GetMaxHealth");
-  PlayerRole_RegisterMethod(ROLE, BASE_METHOD(Think), "@Role_Think");
+  PlayerRole_RegisterMethod(ROLE, BASE_METHOD(Update), "@Role_Think");
   PlayerRole_RegisterMethod(ROLE, BASE_METHOD(Spawn), "@Role_Spawn");
   PlayerRole_RegisterMethod(ROLE, BASE_METHOD(CanPickupItem), "@Role_CanPickupItem");
   PlayerRole_RegisterMethod(ROLE, BASE_METHOD(PlaySound), "@Role_PlaySound", PlayerRole_Type_Cell);

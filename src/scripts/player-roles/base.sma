@@ -58,7 +58,7 @@ public plugin_precache() {
   PlayerRole_RegisterVirtualMethod(ROLE, METHOD(Equip), "@Role_Equip");
   PlayerRole_RegisterVirtualMethod(ROLE, METHOD(GetMaxSpeed), "@Role_GetMaxSpeed");
   PlayerRole_RegisterVirtualMethod(ROLE, METHOD(GetMaxHealth), "@Role_GetMaxHealth");
-  PlayerRole_RegisterVirtualMethod(ROLE, METHOD(Think), "@Role_Think");
+  PlayerRole_RegisterVirtualMethod(ROLE, METHOD(Update), "@Role_Think");
   PlayerRole_RegisterVirtualMethod(ROLE, METHOD(Spawn), "@Role_Spawn");
   PlayerRole_RegisterVirtualMethod(ROLE, METHOD(CanPickupItem), "@Role_CanPickupItem");
   PlayerRole_RegisterVirtualMethod(ROLE, METHOD(CanUseButton), "@Role_CanUseButton");
