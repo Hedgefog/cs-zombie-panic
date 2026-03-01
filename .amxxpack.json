@@ -8,12 +8,47 @@
       {
         "name": "reapi",
         "url": "https://github.com/s1lentq/reapi/releases/download/5.21.0.252/reapi-bin-5.21.0.252.zip"
+      },
+      {
+        "name": "amxx-modding-kit",
+        "url": "https://github.com/Hedgefog/amxx-modding-kit/archive/refs/tags/1.0.0.zip",
+        "strip": 1,
+        "filter": [
+          "util/**",
+          "weapons/**",
+          "entities/**",
+          "api/assets/**",
+          "api/custom-weapons/**",
+          "api/player-roles/**",
+          "api/custom-entities/**",
+          "api/custom-events/**",
+          "api/rounds/**",
+          "api/waypoint-markers/**",
+          "api/player-model/**",
+          "api/states/**",
+          "api/player-music/**",
+          "api/entity-force/**"
+        ]
       }
     ]
   },
   "include": [
     "./.compiler/include",
-    "./.thirdparty/reapi/addons/amxmodx/scripting/include"
+    "./.thirdparty/reapi/addons/amxmodx/scripting/include",
+    "./.thirdparty/amxx-modding-kit/api/assets/include",
+    "./.thirdparty/amxx-modding-kit/api/custom-weapons/include",
+    "./.thirdparty/amxx-modding-kit/api/player-roles/include",
+    "./.thirdparty/amxx-modding-kit/api/custom-entities/include",
+    "./.thirdparty/amxx-modding-kit/api/custom-events/include",
+    "./.thirdparty/amxx-modding-kit/api/rounds/include",
+    "./.thirdparty/amxx-modding-kit/api/waypoint-markers/include",
+    "./.thirdparty/amxx-modding-kit/api/player-model/include",
+    "./.thirdparty/amxx-modding-kit/api/states/include",
+    "./.thirdparty/amxx-modding-kit/api/player-music/include",
+    "./.thirdparty/amxx-modding-kit/api/entity-force/include",
+    "./.thirdparty/amxx-modding-kit/entities/include",
+    "./.thirdparty/amxx-modding-kit/weapons/include",
+    "./.thirdparty/amxx-modding-kit/util"
   ],
   "input": {
     "scripts": [
@@ -22,17 +57,11 @@
       { "dir": "./.thirdparty/amxx-modding-kit/entities", "output": { "dir": "./amxx-modding-kit", "flat": true } },
       { "dir": "./.thirdparty/amxx-modding-kit/weapons", "output": { "dir": "./amxx-modding-kit", "flat": true } }
     ],
-    "include": [
-      "./src/include",
-      "./.thirdparty/amxx-modding-kit/api",
-      "./.thirdparty/amxx-modding-kit/entities",
-      "./.thirdparty/amxx-modding-kit/weapons",
-      "./.thirdparty/amxx-modding-kit/util"
-    ],
+    "include": "./src/include",
     "assets": "./assets"
   },
   "output": {
-    "base": "./dist",
+    "base": "./dist/build",
     "plugins": "./addons/amxmodx/plugins",
     "scripts": "./addons/amxmodx/scripting",
     "include": "./addons/amxmodx/scripting/include",
