@@ -33,6 +33,8 @@ public plugin_precache() {
   CE_RegisterNullClass("func_buyzone");
   CE_RegisterNullClass("armoury_entity");
   CE_RegisterNullClass("weapon_shield");
+  CE_RegisterNullClass("game_player_equip");
+  CE_RegisterNullClass("player_weaponstrip");
 
   CE_RegisterClassAlias("item_healthkit", ENTITY(HealthKit));
   CE_RegisterClassAlias("item_battery", ENTITY(Armor));
