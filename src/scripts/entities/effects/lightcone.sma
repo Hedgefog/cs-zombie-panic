@@ -23,6 +23,7 @@ new g_szModel[MAX_RESOURCE_PATH_LENGTH];
 /*--------------------------------[ Plugin State ]--------------------------------*/
 
 new g_pTrace;
+new Float:g_flGameTime = 0.0;
 
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
 
@@ -47,6 +48,10 @@ public plugin_end() {
   free_tr2(g_pTrace);
 }
 
+public server_frame() {
+  g_flGameTime = get_gametime();
+}
+
 /*--------------------------------[ Methods ]--------------------------------*/
 
 @Entity_Create(const this) {
@@ -58,22 +63,20 @@ public plugin_end() {
 @Entity_Spawn(const this) {
   CE_CallBaseMethod();
 
-  set_pev(this, pev_nextthink, get_gametime());
+  set_pev(this, pev_nextthink, g_flGameTime);
 }
 
 @Entity_Think(const this) {
-  static Float:flGameTime; flGameTime = get_gametime();
-
   CE_CallBaseMethod();
 
   if (~pev(this, pev_effects) & EF_NODRAW) {
-    if (Float:CE_GetMember(this, LIGHTCONE_MEMBER(flNextLightUpdate)) <= flGameTime) {
+    if (Float:CE_GetMember(this, LIGHTCONE_MEMBER(flNextLightUpdate)) <= g_flGameTime) {
       CE_CallMethod(this, LIGHTCONE_METHOD(CreateLight));
-      CE_SetMember(this, LIGHTCONE_MEMBER(flNextLightUpdate), flGameTime + LIGHT_UPDATE_RATE);
+      CE_SetMember(this, LIGHTCONE_MEMBER(flNextLightUpdate), g_flGameTime + LIGHT_UPDATE_RATE);
     }
   }
 
-  set_pev(this, pev_nextthink, flGameTime + 0.01);
+  set_pev(this, pev_nextthink, g_flGameTime + 0.01);
 }
 
 @Entity_CreateLight(const this) {

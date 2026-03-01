@@ -166,8 +166,10 @@ public plugin_end() {
 
   if (CW_GetMember(this, MEMBER(bUseRemote))) {
     if (CW_CallMethod(this, METHOD(ThrowCharge))) {
-      CW_SetMember(this, CW_Member_flNextPrimaryAttack, get_gametime() + 0.53);
-      CW_SetMember(this, CW_Member_flNextSecondaryAttack, get_gametime() + 0.53);
+      static Float:flGameTime; flGameTime = get_gametime();
+
+      CW_SetMember(this, CW_Member_flNextPrimaryAttack, flGameTime + 0.53);
+      CW_SetMember(this, CW_Member_flNextSecondaryAttack, flGameTime + 0.53);
     }
   }
 
@@ -298,8 +300,10 @@ bool:@Weapon_ThrowCharge(const this) {
   set_ent_data(pPlayer, "CBasePlayer", "m_rgAmmo", (iAmmoAmount -= 1), iPrimaryAmmoType);
   rg_set_animation(pPlayer, PLAYER_ATTACK1);
 
-  CW_SetMember(this, CW_Member_flNextPrimaryAttack, get_gametime() + 1.0);
-  CW_SetMember(this, CW_Member_flNextSecondaryAttack, get_gametime() + 0.5);
+  static Float:flGameTime; flGameTime = get_gametime();
+
+  CW_SetMember(this, CW_Member_flNextPrimaryAttack, flGameTime + 1.0);
+  CW_SetMember(this, CW_Member_flNextSecondaryAttack, flGameTime + 0.5);
 
   CW_CallNativeMethod(this, CW_Method_PlayAnimation, 3, (61.0 / 30.0));
   CW_CallMethod(this, METHOD(UpdateRemoteState));
@@ -323,8 +327,10 @@ bool:@Weapon_ThrowCharge(const this) {
     }
   }
 
-  CW_SetMember(this, CW_Member_flNextPrimaryAttack, get_gametime() + 0.5);
-  CW_SetMember(this, CW_Member_flNextSecondaryAttack, get_gametime() + 0.5);
+  static Float:flGameTime; flGameTime = get_gametime();
+
+  CW_SetMember(this, CW_Member_flNextPrimaryAttack, flGameTime + 0.5);
+  CW_SetMember(this, CW_Member_flNextSecondaryAttack, flGameTime + 0.5);
 
   CW_CallNativeMethod(this, CW_Method_PlayAnimation, 3, (31.0 / 50.0));
   CW_CallMethod(this, METHOD(UpdateRemoteState));

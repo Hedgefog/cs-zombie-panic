@@ -209,9 +209,11 @@ public EventSubscriber_Infection_Reset(const pPlayer) {
 /*--------------------------------[ Player Methods ]--------------------------------*/
 
 bool:@Player_ToggleVission(const &this) {
-  if (g_rgflPlayerNextToggle[this] <= get_gametime()) {
+  static Float:flGameTime; flGameTime = get_gametime();
+
+  if (g_rgflPlayerNextToggle[this] <= flGameTime) {
     @Player_SetVision(this, !g_rgbPlayerVision[this]);
-    g_rgflPlayerNextToggle[this] = get_gametime() + 0.5;
+    g_rgflPlayerNextToggle[this] = flGameTime + 0.5;
   }
 
   return g_rgbPlayerVision[this];

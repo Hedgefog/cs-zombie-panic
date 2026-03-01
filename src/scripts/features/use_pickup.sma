@@ -22,6 +22,7 @@ new bool:g_rgbPlayerPickup[MAX_PLAYERS + 1];
 
 new bool:g_bBlockTouch = true;
 new g_pTrace;
+new Float:g_flGameTime = 0.0;
 
 new bool:g_bEnabled;
 new bool:g_bHighlight;
@@ -57,6 +58,10 @@ public plugin_init() {
 
 public plugin_end() {
   free_tr2(g_pTrace);
+}
+
+public server_frame() {
+  g_flGameTime = get_gametime();
 }
 
 /*--------------------------------[ Client Forwards ]--------------------------------*/
@@ -98,13 +103,11 @@ public HamHook_Item_Touch(const pEntity, const pToucher) {
 }
 
 public HamHook_Player_PreThink_Post(const pPlayer) {
-  static Float:flGameTime; flGameTime = get_gametime();
-
   g_rgbPlayerPickup[pPlayer] = pev(pPlayer, pev_button) & IN_USE && ~pev(pPlayer, pev_oldbuttons) & IN_USE;
 
-  if (g_rgflPlayerNextLookup[pPlayer] <= flGameTime) {
+  if (g_rgflPlayerNextLookup[pPlayer] <= g_flGameTime) {
     @Player_LookupItem(pPlayer);
-    g_rgflPlayerNextLookup[pPlayer] = flGameTime + 0.125;
+    g_rgflPlayerNextLookup[pPlayer] = g_flGameTime + 0.125;
   }
 
   return HAM_HANDLED;

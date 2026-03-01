@@ -27,6 +27,7 @@
 #define REGENERATION_START_DELAY 10.0
 
 new Float:g_flRegenerationRate;
+new Float:g_flGameTime = 0.0;
 
 /*--------------------------------[ Assets ]--------------------------------*/
 
@@ -62,6 +63,10 @@ public plugin_init() {
   register_plugin(ROLE_PLUGIN(Zombie), ZP_VERSION, "Hedgehog Fog");
 
   bind_pcvar_float(create_cvar(CVAR("zombie_regeneration_rate"), "0.25"), g_flRegenerationRate);
+}
+
+public server_frame() {
+  g_flGameTime = get_gametime();
 }
 
 @Role_Assign(const pPlayer) {
@@ -101,20 +106,19 @@ Float:@Role_GetMaxHealth(const pPlayer) {
 }
 
 @Role_Regenerate(const pPlayer) {
-  static Float:flGameTime; flGameTime = get_gametime();
   static Float:flNextRegeneration; flNextRegeneration = PlayerRole_This_GetMember(MEMBER(flNextRegeneration));
 
-  if (flNextRegeneration > flGameTime) return;
+  if (flNextRegeneration > g_flGameTime) return;
 
   static Float:flRate; flRate = PlayerRole_This_GetMember(MEMBER(flRegenerationRate));
   static Float:flLastRegeneration; flLastRegeneration = PlayerRole_This_GetMember(MEMBER(flLastRegeneration));
-  static Float:flTimeDelta; flTimeDelta = flLastRegeneration ? flGameTime - flLastRegeneration : flRate;
+  static Float:flTimeDelta; flTimeDelta = flLastRegeneration ? g_flGameTime - flLastRegeneration : flRate;
   static Float:flValue; flValue = PlayerRole_This_GetMember(MEMBER(flRegenerationPerSecond));
 
   ExecuteHamB(Ham_TakeHealth, pPlayer, flValue * flTimeDelta, 0);
 
-  PlayerRole_This_SetMember(MEMBER(flLastRegeneration), flGameTime);
-  PlayerRole_This_SetMember(MEMBER(flNextRegeneration), flGameTime + flRate);
+  PlayerRole_This_SetMember(MEMBER(flLastRegeneration), g_flGameTime);
+  PlayerRole_This_SetMember(MEMBER(flNextRegeneration), g_flGameTime + flRate);
 }
 
 bool:@Role_PlaySound(const pPlayer, ZP_RoleSound:iSound) {
@@ -166,6 +170,6 @@ Float:@Role_CalculateDamage(const pPlayer, const pInflictor, const pAttacker, Fl
     EntityForce_AddFromEntity(pPlayer, pInflictor, floatmin(flDamage * 2.5, 800.0));
   }
 
-  PlayerRole_Player_SetMember(pPlayer, ROLE, MEMBER(flNextRegeneration), get_gametime() + 10.0);
+  PlayerRole_Player_SetMember(pPlayer, ROLE, MEMBER(flNextRegeneration), g_flGameTime + 10.0);
   PlayerRole_Player_SetMember(pPlayer, ROLE, MEMBER(flLastRegeneration), 0.0);
 }

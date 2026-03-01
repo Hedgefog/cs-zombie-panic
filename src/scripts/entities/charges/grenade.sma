@@ -119,8 +119,10 @@ public plugin_end() {
 
   static Float:vecVelocity[3]; pev(this, pev_velocity, vecVelocity);
 
+  static Float:flGameTime; flGameTime = get_gametime();
+
   // only do damage if we're moving fairly fast
-  if (CE_GetMember(this, GRENADE_MEMBER(flNextBounceDamage)) < get_gametime() && xs_vec_len(vecVelocity) > 100.0) {
+  if (CE_GetMember(this, GRENADE_MEMBER(flNextBounceDamage)) < flGameTime && xs_vec_len(vecVelocity) > 100.0) {
     if (IS_PLAYER(pOwner) && IS_PLAYER(pOther) && rg_is_player_can_takedamage(pOther, pOwner)) {
       static Float:vecForward[3]; get_global_vector(GL_v_forward, vecForward);
       rg_multidmg_clear();
@@ -128,7 +130,7 @@ public plugin_end() {
       rg_multidmg_apply(this, pOwner);
     }
 
-    CE_SetMember(this, GRENADE_MEMBER(flNextBounceDamage), get_gametime() + 1.0);
+    CE_SetMember(this, GRENADE_MEMBER(flNextBounceDamage), flGameTime + 1.0);
   }
 
   if (pev(this, pev_flags) & FL_ONGROUND) {

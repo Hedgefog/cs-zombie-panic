@@ -66,6 +66,7 @@ new bool:g_bLimitedRoundTime = false;
 new Float:g_flPlayerWeightMultiplier = 0.0;
 new g_iZombiesValue = -1;
 new bool:g_bRoundExpired = false;
+new Float:g_flGameTime = 0.0;
 
 new bool:g_rgbVariableModified[ZP_GameRules_Variable];
 
@@ -168,7 +169,7 @@ public bool:Native_CanItemRespawn(const iPluginId, const iArgc) {
   static pItem; pItem = get_param(1);
 
   if (!g_bGameInProgress) return true;
-  if (get_gametime() - Round_GetStartTime() <= 1.0) return true;
+  if (g_flGameTime - Round_GetStartTime() <= 1.0) return true;
 
   static Float:vecOrigin[3]; pev(pItem, pev_origin, vecOrigin);
 
@@ -232,6 +233,10 @@ public bool:Native_IsRoundExpired(const iPluginId, const iArgc) {
 }
 
 /*--------------------------------[ Forwards ]--------------------------------*/
+
+public server_frame() {
+  g_flGameTime = get_gametime();
+}
 
 public ZP_OnConfigLoaded() {
   ResetVariables();
@@ -448,7 +453,7 @@ public HamHook_Player_Killed_Post(const pPlayer) {
   PlayerRole_Player_CallMethod(pPlayer, PLAYER_ROLE(Base), BASE_ROLE_METHOD(Killed));
 
   if (GetVariable(GAMERULES_VARIABLE(bAllowRespawn))) {
-    g_rgflPlayerRespawnTime[pPlayer] = get_gametime() + Float:GetVariable(GAMERULES_VARIABLE(flRespawnTime));
+    g_rgflPlayerRespawnTime[pPlayer] = g_flGameTime + Float:GetVariable(GAMERULES_VARIABLE(flRespawnTime));
   }
 
   CheckWinConditions();
@@ -462,9 +467,9 @@ public HamHook_Player_TakeDamage(const pPlayer) {
 
 public HamHook_Player_PostThink_Post(const pPlayer) {
   if (is_user_alive(pPlayer)) {
-    if (g_rgflPlayerNextRoleThink[pPlayer] < get_gametime()) {
+    if (g_rgflPlayerNextRoleThink[pPlayer] < g_flGameTime) {
       PlayerRole_Player_CallMethod(pPlayer, PLAYER_ROLE(Base), BASE_ROLE_METHOD(Think));
-      g_rgflPlayerNextRoleThink[pPlayer] = get_gametime() + 0.125;
+      g_rgflPlayerNextRoleThink[pPlayer] = g_flGameTime + 0.125;
     }
   } else {
     if (GetVariable(GAMERULES_VARIABLE(bAllowRespawn))) {
@@ -516,13 +521,11 @@ public HC_Player_DeadPlayerWeapons(const pPlayer) {
 
   static iTeam; iTeam = get_ent_data(this, "CBasePlayer", "m_iTeam");
   if (iTeam != TEAM(Survivors) && iTeam != TEAM(Zombies)) return;
-
-  new Float:flGameTime = get_gametime();
   
-  if (g_rgflPlayerRespawnTime[this] > flGameTime) return;
+  if (g_rgflPlayerRespawnTime[this] > g_flGameTime) return;
 
   if (!@Player_Respawn(this)) {
-    g_rgflPlayerRespawnTime[this] = flGameTime + 1.0;
+    g_rgflPlayerRespawnTime[this] = g_flGameTime + 1.0;
   }
 }
 

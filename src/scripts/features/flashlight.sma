@@ -25,6 +25,10 @@
 
 new gmsgFlashlight;
 
+/*--------------------------------[ Plugin State ]--------------------------------*/
+
+new Float:g_flGameTime = 0.0;
+
 /*--------------------------------[ Cvar Pointers ]--------------------------------*/
 
 new Float:g_flConsumptionRate;
@@ -58,6 +62,10 @@ public plugin_init() {
 
   register_clcmd("zp_flashlight", "Command_Flashlight");
   register_impulse(100, "Impulse_100");
+}
+
+public server_frame() {
+  g_flGameTime = get_gametime();
 }
 
 /*--------------------------------[ Commands ]--------------------------------*/
@@ -117,8 +125,7 @@ public HamHook_Player_PreThink_Post(const pPlayer) {
 /*--------------------------------[ Player Methods ]--------------------------------*/
 
 @Player_FlashlightThink(const &this) {
-  static Float:flGameTime; flGameTime = get_gametime();
-  static Float:flDelta; flDelta = flGameTime - g_rgflPlayerFlashlightLastThink[this];
+  static Float:flDelta; flDelta = g_flGameTime - g_rgflPlayerFlashlightLastThink[this];
   if (flDelta < FLASHLIGHT_UPDATE_RATE) return;
 
   if (g_rgbPlayerFlashlightEnabled[this]) {
@@ -134,13 +141,13 @@ public HamHook_Player_PreThink_Post(const pPlayer) {
     g_rgflPlayerFlashlightCharge[this] = floatmin(g_rgflPlayerFlashlightCharge[this], FLASHLIGHT_MAX_CHARGE);
   }
 
-  g_rgflPlayerFlashlightLastThink[this] = flGameTime;
+  g_rgflPlayerFlashlightLastThink[this] = g_flGameTime;
 }
 
 bool:@Player_ToggleFlashlight(const &this) {
-  if (g_rgflPlayerNextToggle[this] <= get_gametime()) {
+  if (g_rgflPlayerNextToggle[this] <= g_flGameTime) {
     @Player_SetFlashlight(this, !g_rgbPlayerFlashlightEnabled[this]);
-    g_rgflPlayerNextToggle[this] = get_gametime() + 0.15;
+    g_rgflPlayerNextToggle[this] = g_flGameTime + 0.15;
   }
 
   return g_rgbPlayerFlashlightEnabled[this];

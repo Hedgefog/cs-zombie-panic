@@ -41,6 +41,7 @@ enum DropMode {
 /*--------------------------------[ Plugin State ]--------------------------------*/
 
 new DropMode:g_iDropInactiveMode = DropMode_ItemsAndBackpack;
+new Float:g_flGameTime = 0.0;
 
 /*--------------------------------[ Player State ]--------------------------------*/
 
@@ -109,6 +110,9 @@ public plugin_init() {
 
 /*--------------------------------[ Forwards ]--------------------------------*/
 
+public server_frame() {
+  g_flGameTime = get_gametime();
+}
 
 public client_putinserver(pPlayer) {
   if (!is_user_bot(pPlayer)) {
@@ -238,7 +242,7 @@ Float:@Role_GetMaxHealth(const pPlayer) {
 
   static Float:flNextIdleSound; flNextIdleSound = PlayerRole_This_GetMember(MEMBER(flNextIdleSound));
 
-  if (flNextIdleSound <= get_gametime()) {
+  if (flNextIdleSound <= g_flGameTime) {
     if (flNextIdleSound) {
       PlayerRole_This_CallMethod(METHOD(PlaySound), SOUND(Idle));
     }
@@ -246,12 +250,12 @@ Float:@Role_GetMaxHealth(const pPlayer) {
     static Float:flMinIdleSoundDelay; flMinIdleSoundDelay = PlayerRole_This_GetMember(MEMBER(flMinIdleSoundDelay));
     static Float:flMaxIdleSoundDelay; flMaxIdleSoundDelay = PlayerRole_This_GetMember(MEMBER(flMaxIdleSoundDelay));
 
-    PlayerRole_This_SetMember(MEMBER(flNextIdleSound), get_gametime() + random_float(flMinIdleSoundDelay, flMaxIdleSoundDelay));
+    PlayerRole_This_SetMember(MEMBER(flNextIdleSound), g_flGameTime + random_float(flMinIdleSoundDelay, flMaxIdleSoundDelay));
   }
 }
 
 @Role_CanPickupItem(const pPlayer, const pItem) {
-  return Float:PlayerRole_This_GetMember(MEMBER(flNextItemPickup)) < get_gametime();
+  return Float:PlayerRole_This_GetMember(MEMBER(flNextItemPickup)) < g_flGameTime;
 }
 
 @Role_CanUseButton(const pPlayer, const pButton) {
@@ -259,7 +263,7 @@ Float:@Role_GetMaxHealth(const pPlayer) {
 }
 
 @Role_Killed(const pPlayer) {
-  PlayerRole_This_SetMember(MEMBER(flNextSound), get_gametime());
+  PlayerRole_This_SetMember(MEMBER(flNextSound), g_flGameTime);
   PlayerRole_This_CallMethod(METHOD(PlaySound), SOUND(Death));
 }
 
@@ -282,14 +286,14 @@ bool:@Role_UpdateModel(const pPlayer) {
 
 bool:@Role_PlaySound(const pPlayer, ZP_RoleSound:iSound) {
   static Float:flNextSound; flNextSound = PlayerRole_This_GetMember(MEMBER(flNextSound));
-  if (flNextSound > get_gametime()) return false;
+  if (flNextSound > g_flGameTime) return false;
 
   CustomEvent_SetActivator(pPlayer);
   if (CustomEvent_Emit(BASE_ROLE_EVENT(PlaySound), pPlayer, iSound) != CER_Continue) {
     return false;
   }
 
-  PlayerRole_This_SetMember(MEMBER(flNextSound), get_gametime() + 0.5);
+  PlayerRole_This_SetMember(MEMBER(flNextSound), g_flGameTime + 0.5);
 
   return true;
 }
@@ -305,11 +309,11 @@ bool:@Role_PlaySound(const pPlayer, ZP_RoleSound:iSound) {
 @Role_Pain(const pPlayer) {
   static Float:flNextPain; flNextPain = PlayerRole_This_GetMember(MEMBER(flNextPain));
 
-  if (flNextPain > get_gametime()) return;
+  if (flNextPain > g_flGameTime) return;
 
   PlayerRole_This_CallMethod(METHOD(PlaySound), SOUND(Pain));
 
-  PlayerRole_This_SetMember(MEMBER(flNextPain), get_gametime() + 1.0);
+  PlayerRole_This_SetMember(MEMBER(flNextPain), g_flGameTime + 1.0);
 }
 
 Float:@Role_CalculateDamage(const pPlayer, const pInflictor, const pAttacker, Float:flDamage, iDamageBits) {

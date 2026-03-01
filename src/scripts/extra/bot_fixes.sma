@@ -153,8 +153,10 @@ public CEHook_WeaponBox_Touch(const this, const pToucher) {
   if (!is_user_bot(pToucher)) return CE_IGNORED;
   if (!is_user_alive(pToucher)) return CE_IGNORED;
 
-  if (g_rgflPlayerNextPickup[pToucher] < get_gametime()) {
-    g_rgflPlayerNextPickup[pToucher] = get_gametime() + 0.25;
+  static Float:flGameTime; flGameTime = get_gametime();
+
+  if (g_rgflPlayerNextPickup[pToucher] < flGameTime) {
+    g_rgflPlayerNextPickup[pToucher] = flGameTime + 0.25;
     if (!@Bot_ShouldPickupWeaponBox(pToucher, this, true)) return CE_SUPERCEDE;
   } else {
     return CE_SUPERCEDE;
