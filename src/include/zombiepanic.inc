@@ -1,4 +1,33 @@
 /*
+    1.5.0
+        Common:
+            Refactored the entire codebase using AMXX Modding Kit
+
+        Additions and Improvements:
+            Added ability to unload weapons
+            Added speed boost during panic
+            Increased maximum satchel capacity to 10
+            Increased maximum grenade capacity to 10
+            Added light and sound emission to satchel charges
+            Satchel Charges now attach to the remote instead of the player
+            Satchel Remote can now be dropped independently
+            Satchel Charges can now be dropped as ammo
+            Expanded character sound types in API
+            Added material-specific hit effects for weapons
+            Weaponboxes now bounce upon dropping
+            Reworked Gamemode API
+            Added mouth controller support for player models
+            Updated backpack model
+            Added round win sounds
+            Added round start sound
+            Added Zombie Vision sound
+            Updated Flashlight sound
+            Readjusted weapon spread and damage parameters
+            Added blood decals when zombies hit world objects
+
+        Fixes:
+            Fixed bug when players can't pickup satchel charges in the water
+
     1.4.3
         Fixes:
             Fixed handgrenade respawn
@@ -132,79 +161,14 @@
 
 #include <zombiepanic_const>
 
-// Player
-
-native bool:ZP_Player_IsZombie(pPlayer);
-native bool:ZP_Player_Panic(pPlayer);
-native bool:ZP_Player_InPanic(pPlayer);
-native bool:ZP_Player_ToggleFlashlight(pPlayer);
-native bool:ZP_Player_ToggleZombieVision(pPlayer);
-native bool:ZP_Player_IsInfected(pPlayer);
-native bool:ZP_Player_IsTransforming(pPlayer);
-native bool:ZP_Player_IsPartialZombie(pPlayer);
-native ZP_Player_SetInfected(pPlayer, bool:bValue, pInfector = 0);
-native ZP_Player_GetInfector(pPlayer);
-native bool:ZP_Player_SetCharacter(pPlayer, const szCharacter[]);
-
-forward ZP_Fw_PlayerJoined(pPlayer);
-forward ZP_Fw_PlayerPanic(pPlayer);
-forward ZP_Fw_PlayerZombieVision(pPlayer, bool:bValue);
-forward ZP_Fw_PlayerAimItem(pPlayer, pItem);
-forward ZP_Fw_PlayerInfected(pPlayer, pInfector);
-forward ZP_Fw_PlayerCured(pPlayer);
-forward ZP_Fw_PlayerTransformationDeath(pPlayer);
-forward ZP_Fw_PlayerTransformed(pPlayer);
-forward ZP_Fw_PlayerEquiped(pPlayer);
-forward ZP_Fw_PlayerSpeedUpdated(pPlayer);
-forward ZP_Fw_PlayerCharacterUpdated(pPlayer);
-forward ZP_Fw_PlayerModelUpdated(pPlayer);
-
-// Player inventory
-
-native ZP_Player_UpdateSpeed(pPlayer);
-native ZP_Player_DropUnactiveWeapons(pPlayer);
-native ZP_Player_DropUnactiveAmmo(pPlayer);
-native ZP_Player_GetAmmo(pPlayer, const szAmmo[]);
-native ZP_Player_SetAmmo(pPlayer, const szAmmo[], iValue);
-native ZP_Player_AddAmmo(pPlayer, const szAmmo[], iValue);
-native ZP_Player_NextAmmo(pPlayer);
-native ZP_Player_DropAmmo(pPlayer);
-native ZP_Player_GetSelectedAmmo(pPlayer);
-native ZP_Player_SetSelectedAmmo(pPlayer, const szAmmo[]);
-
-// Weapons
-
-native ZP_Weapons_Register(CW:iCwHandler, Float:flWeight);
-native Float:ZP_Weapons_GetWeight(pEntity);
-
-// Ammo
-
-native ZP_Ammo_GetHandler(const szName[]);
-native ZP_Ammo_GetHandlerById(iAmmoId);
-native ZP_Ammo_GetId(iHandler);
-native ZP_Ammo_GetName(iHandler, szOut[], iLen);
-native ZP_Ammo_GetPackSize(iHandler);
-native ZP_Ammo_GetPackModel(iHandler, szOut[], iLen);
-native ZP_Ammo_GetMaxAmount(iHandler);
-native Float:ZP_Ammo_GetWeight(iHandler);
-native ZP_Ammo_GetCount();
-
-// Game Rules
-
-native bool:ZP_GameRules_GetObjectiveMode();
-native ZP_GameRules_SetObjectiveMode(bool:bValue);
-native ZP_GameRules_GetZombieLives();
-native ZP_GameRules_SetZombieLives(iLives);
-native ZP_GameRules_RespawnAsZombie(pPlayer);
 native ZP_GameRules_DispatchWin(iTeam);
-native ZP_GameRules_CanItemRespawn(pItem);
-native ZP_GameRules_IsCompetitive();
+native ZP_GameRules_CanItemRespawn(const pItem);
+native bool:ZP_GameRules_CanPickupItem(const pItem, const pPlayer);
+native ZP_GameRules_SetVariable(ZP_GameRules_Variable:variable, any:value);
+native any:ZP_GameRules_GetVariable(ZP_GameRules_Variable:variable);
+native ZP_GameRules_ResetVariables();
+native ZP_GameRules_CheckWinConditions();
+native bool:ZP_GameRules_IsGameInProgress();
+native bool:ZP_GameRules_IsRoundExpired();
 
-forward ZP_Fw_NewRound();
-forward ZP_Fw_RoundStarted();
-forward ZP_Fw_RoundEnd(iWinnerTeam);
-forward ZP_Fw_ZombieLivesChanged(iLives);
-
-// Map Info
-
-native ZP_ShowMapInfo(pPlayer);
+forward ZP_OnConfigLoaded();

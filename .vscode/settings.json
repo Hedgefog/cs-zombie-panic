@@ -1,9 +1,23 @@
 {
-    "editor.tabSize": 4,
+    "editor.tabSize": 2,
     "editor.insertSpaces": true,
     "amxxpawn.compiler.includePaths": [
-        "${workspaceRoot}/src/include",
-        "${workspaceRoot}/.compiler/include",
-        "${workspaceRoot}/.thirdparty/reapi/addons/amxmodx/scripting/include"
+      "${workspaceRoot}/.compiler/include",
+      "${workspaceRoot}/.thirdparty/reapi/addons/amxmodx/scripting/include",
+      "${workspaceRoot}/.thirdparty/amxx-modding-kit/util",
+      "${workspaceRoot}.thirdparty/amxx-modding-kit/api/assets/include",
+      "${workspaceRoot}.thirdparty/amxx-modding-kit/api/custom-weapons/include",
+      "${workspaceRoot}.thirdparty/amxx-modding-kit/api/player-roles/include",
+      "${workspaceRoot}.thirdparty/amxx-modding-kit/api/custom-entities/include",
+      "${workspaceRoot}.thirdparty/amxx-modding-kit/api/custom-events/include",
+      "${workspaceRoot}.thirdparty/amxx-modding-kit/api/rounds/include",
+      "${workspaceRoot}.thirdparty/amxx-modding-kit/api/waypoint-markers/include",
+      "${workspaceRoot}.thirdparty/amxx-modding-kit/api/player-model/include",
+      "${workspaceRoot}.thirdparty/amxx-modding-kit/api/states/include",
+      "${workspaceRoot}.thirdparty/amxx-modding-kit/api/player-music/include",
+      "${workspaceRoot}.thirdparty/amxx-modding-kit/api/entity-force/include",
+      "${workspaceRoot}.thirdparty/amxx-modding-kit/entities/include",
+      "${workspaceRoot}.thirdparty/amxx-modding-kit/weapons/include",
+      "${workspaceRoot}/src/include"
     ]
 }

@@ -1,0 +1,268 @@
+{
+  "objective-mark-sprite": "sprites/zombiepanic/v100/objective_mark.spr",
+  "shell-model": "models/shell.mdl",
+  "shotgun-shell-model": "models/shotgunshell.mdl",
+  "startup-sound": "sound/zombiepanic/v100/music/gamestartup.mp3",
+  "round-start-sound": "zombiepanic/v150/game/round_start.wav",
+  "survivors-win-sound": "zombiepanic/v150/game/survivors_win.wav",
+  "zombies-win-sound": "zombiepanic/v150/game/zombies_win.wav",
+  "round-draw-sound": "zombiepanic/v150/game/round_draw.wav",
+  "flashlight": {
+    "lightcone": {
+      "model": "models/zombiepanic/v100/lightcone.mdl"
+    },
+    "sound": "zombiepanic/v150/items/flashlight1.wav"
+  },
+  "zombie-vision": {
+    "on-sound": "zombiepanic/v150/items/vision_on.wav",
+    "off-sound": "zombiepanic/v150/items/vision_off.wav"
+  },
+  "player": {
+    "survivor": {
+      "model": "models/zombiepanic/v150/characters/male/survivor.mdl",
+      "sounds": {
+        "scream": [
+          "zombiepanic/v100/player/panicscream1.wav",
+          "zombiepanic/v100/player/panicscream2.wav"
+        ],
+        "death": [
+          "zombiepanic/v100/player/deathscream1.wav",
+          "zombiepanic/v100/player/deathscream2.wav",
+          "zombiepanic/v100/player/deathscream3.wav"
+        ]
+      }
+    },
+    "zombie": {
+      "model": "models/zombiepanic/v150/characters/male/zombie.mdl",
+      "sounds": {
+        "death": [
+          "zombiepanic/v100/player/zombiedeath1.wav",
+          "zombiepanic/v100/player/zombiedeath2.wav",
+          "zombiepanic/v100/player/zombiedeath3.wav"
+        ],
+        "idle": [
+          "zombiepanic/v100/player/zomambient1.wav",
+          "zombiepanic/v100/player/zomambient2.wav",
+          "zombiepanic/v100/player/zomambient3.wav",
+          "zombiepanic/v100/player/zomambient4.wav",
+          "zombiepanic/v100/player/zomambient5.wav",
+          "zombiepanic/v100/player/zomambient6.wav",
+          "zombiepanic/v100/player/zomambient7.wav",
+          "zombiepanic/v100/player/zomambient8.wav",
+          "zombiepanic/v100/player/zomambient9.wav",
+          "zombiepanic/v100/player/zomambient10.wav",
+          "zombiepanic/v100/player/zomambient11.wav",
+          "zombiepanic/v100/player/zomambient12.wav",
+          "zombiepanic/v100/player/zomambient13.wav",
+          "zombiepanic/v100/player/zomambient14.wav",
+          "zombiepanic/v100/player/zomambient15.wav"
+        ],
+        "press": "zombiepanic/v100/player/zombieclick.wav"
+      }
+    },
+    "transformation-sound": "zombiepanic/v110/player/transformation.wav",
+    "jolt-sound": [
+      "zombiepanic/v110/player/jolt01.wav",
+      "zombiepanic/v110/player/jolt02.wav",
+      "zombiepanic/v110/player/jolt03.wav",
+      "zombiepanic/v110/player/jolt04.wav"
+    ]
+  },
+  "items": {
+    "medkit": {
+      "model": "models/zombiepanic/v100/items/w_medkit.mdl",
+      "sound": "items/smallmedkit1.wav"
+    },
+    "armor": {
+      "model": "models/zombiepanic/v100/items/w_battery.mdl",
+      "sound": "items/tr_kevlar.wav"
+    },
+    "weaponbox": {
+      "model": "models/zombiepanic/v150/items/w_backpack.mdl",
+      "sounds": {
+        "bounce": "items/weapondrop1.wav"
+      }
+    }
+  },
+  "weapons": {
+    "crowbar": {
+      "weight": 1.923076,
+      "models": {
+        "view": "models/zombiepanic/v150/items/v_crowbar.mdl",
+        "player": "models/zombiepanic/v100/items/p_crowbar.mdl",
+        "world": "models/w_crowbar.mdl"
+      },
+      "sounds": {
+        "miss": "weapons/cbar_miss1.wav",
+        "hitbody": [
+          "weapons/cbar_hitbod1.wav",
+          "weapons/cbar_hitbod2.wav",
+          "weapons/cbar_hitbod3.wav"
+        ],
+        "hit": [
+          "weapons/cbar_hit1.wav",
+          "weapons/cbar_hit2.wav"
+        ],
+        "hit-soft": [
+          "weapons/bullet_hit1.wav",
+          "weapons/bullet_hit2.wav"
+        ]
+      }
+    },
+    "pistol": {
+      "weight": 10.0,
+      "models": {
+        "view": "models/zombiepanic/v150/items/v_9mmhandgun.mdl",
+        "player": "models/zombiepanic/v100/items/p_9mmhandgun.mdl",
+        "world": "models/zombiepanic/v150/items/w_9mmhandgun.mdl"
+      },
+      "sounds": {
+        "shot": "zombiepanic/v100/weapons/pl_gun3.wav"
+      }
+    },
+    "magnum": {
+      "weight": 15.0,
+      "models": {
+        "view": "models/zombiepanic/v150/items/v_357.mdl",
+        "player": "models/zombiepanic/v100/items/p_357.mdl",
+        "world": "models/zombiepanic/v100/items/w_357.mdl"
+      },
+      "sounds": {
+        "shot": [
+          "weapons/357_shot1.wav",
+          "weapons/357_shot2.wav"
+        ]
+      }
+    },
+    "rifle": {
+      "weight": 18.0,
+      "models": {
+        "view": "models/zombiepanic/v150/items/v_556ar.mdl",
+        "player": "models/zombiepanic/v100/items/p_556ar.mdl",
+        "world": "models/zombiepanic/v100/items/w_556ar.mdl"
+      },
+      "sounds": {
+        "shot": [
+          "zombiepanic/v100/weapons/hks1.wav",
+          "zombiepanic/v100/weapons/hks2.wav",
+          "zombiepanic/v100/weapons/hks3.wav"
+        ]
+      }
+    },
+    "shotgun": {
+      "weight": 15.0,
+      "models": {
+        "view": "models/zombiepanic/v150/items/v_shotgun.mdl",
+        "player": "models/zombiepanic/v100/items/p_shotgun.mdl",
+        "world": "models/zombiepanic/v100/items/w_shotgun.mdl"
+      },
+      "sounds": {
+        "shot": "zombiepanic/v100/weapons/sbarrel1.wav",
+        "pump": "zombiepanic/v100/weapons/scock1.wav",
+        "reload": [
+          "zombiepanic/v100/weapons/reload1.wav",
+          "zombiepanic/v100/weapons/reload3.wav"
+        ]
+      }
+    },
+    "satchel": {
+      "weight": 10.0,
+      "models": {
+        "view": "models/zombiepanic/v150/items/v_satchel.mdl",
+        "player": "models/zombiepanic/v100/items/p_satchel.mdl",
+        "world": "models/zombiepanic/v150/items/w_satchel.mdl"
+      }
+    },
+    "satchel-radio": {
+      "models": {
+        "view": "models/zombiepanic/v150/items/v_satchel_radio.mdl",
+        "player": "models/zombiepanic/v100/items/p_satchel_radio.mdl",
+        "world": "models/zombiepanic/v150/items/w_satchel_radio.mdl"
+      },
+      "sounds": {
+        "press": "buttons/lightswitch2.wav",
+        "blip": "buttons/blip2.wav"
+      }
+    },
+    "grenade": {
+      "weight": 5.0,
+      "models": {
+        "view": "models/zombiepanic/v150/items/v_grenade.mdl",
+        "player": "models/zombiepanic/v100/items/p_grenade.mdl",
+        "world": "models/zombiepanic/v100/items/w_grenade.mdl"
+      },
+      "sounds": {
+        "bounce": [
+          "weapons/g_bounce1.wav",
+          "weapons/g_bounce2.wav",
+          "weapons/g_bounce3.wav"
+        ],
+        "fuse": "zombiepanic/v100/weapons/fuse.wav"
+      }
+    },
+    "swipe": {
+      "models": {
+        "view": "models/zombiepanic/v150/items/v_swipe.mdl"
+      },
+      "sounds": {
+        "miss": [
+          "zombiepanic/v100/weapons/claw_miss1.wav",
+          "zombiepanic/v100/weapons/claw_miss1.wav"
+        ],
+        "hit": [
+          "zombiepanic/v100/weapons/claw_strike1.wav",
+          "zombiepanic/v100/weapons/claw_strike2.wav",
+          "zombiepanic/v100/weapons/claw_strike3.wav"
+        ]
+      }
+    }
+  },
+  "ammo": {
+    "pistol": {
+      "weight": 0.2125,
+      "models": {
+        "clip": "models/zombiepanic/v150/items/w_9mmclip.mdl"
+      }
+    },
+    "magnum": {
+      "weight": 0.65,
+      "models": {
+        "clip": "models/zombiepanic/v100/items/w_357ammobox.mdl"
+      }
+    },
+    "rifle": {
+      "weight": 0.35,
+      "models": {
+        "clip": "models/zombiepanic/v100/items/w_556arclip.mdl",
+        "box": "models/w_chainammo.mdl"
+      }
+    },
+    "shotgun": {
+      "weight": 1.35,
+      "models": {
+        "clip": "models/zombiepanic/v100/items/w_shotbox.mdl"
+      }
+    }
+  },
+  "entities": {
+    "satchel-charge": {
+      "sprites": {
+        "glow": "sprites/laserdot.spr"
+      },
+      "sounds": {
+        "blip": "buttons/blip1.wav"
+      }
+    }
+  },
+  "music": [
+    "sound/zombiepanic/v100/music/KM_CityOfSouls.mp3",
+    "sound/zombiepanic/v100/music/KM_CloudOfSorrow.mp3",
+    "sound/zombiepanic/v100/music/KM_Descent.mp3",
+    "sound/zombiepanic/v100/music/KM_ForgottenKingdom.mp3",
+    "sound/zombiepanic/v100/music/KM_FrozenWasteland.mp3",
+    "sound/zombiepanic/v100/music/KM_Horde.mp3",
+    "sound/zombiepanic/v100/music/KM_Nightmare.mp3",
+    "sound/zombiepanic/v100/music/KM_Orphanage.mp3",
+    "sound/zombiepanic/v100/music/KM_Plague.mp3"
+  ]
+}
