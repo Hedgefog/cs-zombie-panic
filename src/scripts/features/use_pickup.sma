@@ -17,6 +17,7 @@
 new Float:g_rgflPlayerNextLookup[MAX_PLAYERS + 1];
 new g_rgpPlayerHoveredItem[MAX_PLAYERS + 1];
 new bool:g_rgbPlayerPickup[MAX_PLAYERS + 1];
+new g_rgiPlayerHoverBits = 0;
 
 /*--------------------------------[ Plugin State ]--------------------------------*/
 
@@ -28,6 +29,9 @@ new bool:g_bEnabled;
 new bool:g_bHighlight;
 new Float:g_flPickupRange;
 new g_rgiHighlightColor[3];
+
+new g_pfwfmAddToFullPack = 0;
+new HamHook:g_pfwhamPostThinkPost = HamHook:0;
 
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
 
@@ -48,12 +52,12 @@ public plugin_init() {
   bind_pcvar_num(create_cvar(CVAR("use_pickup_highlight_color_b"), "16"), g_rgiHighlightColor[2]);
 
   RegisterHamPlayer(Ham_Player_PreThink, "HamHook_Player_PreThink_Post", .Post = 1);
-  RegisterHamPlayer(Ham_Player_PostThink, "HamHook_Player_PostThink_Post", .Post = 1);
+  g_pfwhamPostThinkPost = RegisterHamPlayer(Ham_Player_PostThink, "HamHook_Player_PostThink_Post", .Post = 1);
 
   CE_RegisterClassNativeMethodHook(ENTITY(WeaponBox), CE_Method_Touch, "CEHook_Item_Touch");
   CE_RegisterClassNativeMethodHook(CE_Class_BaseItem, CE_Method_Touch, "CEHook_Item_Touch");
 
-  register_forward(FM_AddToFullPack, "FMHook_AddToFullPack_Post", 1);
+  UpdateHooks();
 }
 
 public plugin_end() {
@@ -70,6 +74,10 @@ public client_connect(pPlayer) {
   g_rgpPlayerHoveredItem[pPlayer] = FM_NULLENT;
   g_rgbPlayerPickup[pPlayer] = false;
   g_rgflPlayerNextLookup[pPlayer] = 0.0;
+}
+
+public client_disconnected(pPlayer) {
+  @Player_ClearHoveredItem(pPlayer);
 }
 
 /*--------------------------------[ Hooks ]--------------------------------*/
@@ -103,11 +111,15 @@ public HamHook_Item_Touch(const pEntity, const pToucher) {
 }
 
 public HamHook_Player_PreThink_Post(const pPlayer) {
-  g_rgbPlayerPickup[pPlayer] = pev(pPlayer, pev_button) & IN_USE && ~pev(pPlayer, pev_oldbuttons) & IN_USE;
-
   if (g_rgflPlayerNextLookup[pPlayer] <= g_flGameTime) {
     @Player_LookupItem(pPlayer);
     g_rgflPlayerNextLookup[pPlayer] = g_flGameTime + 0.125;
+  }
+
+  if (g_rgpPlayerHoveredItem[pPlayer] != FM_NULLENT) {
+    g_rgbPlayerPickup[pPlayer] = pev(pPlayer, pev_button) & IN_USE && ~pev(pPlayer, pev_oldbuttons) & IN_USE;
+  } else {
+    g_rgbPlayerPickup[pPlayer] = false;
   }
 
   return HAM_HANDLED;
@@ -123,7 +135,7 @@ public HamHook_Player_PostThink_Post(const pPlayer) {
   g_bBlockTouch = true;
 
   g_rgbPlayerPickup[pPlayer] = false;
-  g_rgpPlayerHoveredItem[pPlayer] = FM_NULLENT;
+  @Player_ClearHoveredItem(pPlayer);
 
   return HAM_HANDLED;
 }
@@ -135,7 +147,7 @@ public HamHook_Player_PostThink_Post(const pPlayer) {
 
   static pLastHoveredItem; pLastHoveredItem = g_rgpPlayerHoveredItem[this];
 
-  g_rgpPlayerHoveredItem[this] = FM_NULLENT;
+  @Player_ClearHoveredItem(this);
 
   static Float:vecAngles[3]; pev(this, pev_v_angle, vecAngles);
   static Float:vecForward[3]; angle_vector(vecAngles, ANGLEVECTOR_FORWARD, vecForward);
@@ -149,7 +161,7 @@ public HamHook_Player_PostThink_Post(const pPlayer) {
   while ((pEntity = engfunc(EngFunc_FindEntityInSphere, pEntity, vecEnd, 1.0)) != 0) {
     if (!@Entity_IsUsableItem(pEntity, this)) continue;
 
-    g_rgpPlayerHoveredItem[this] = pEntity;
+    @Player_SetHoveredItem(this, pEntity);
 
     if (pEntity != pLastHoveredItem) {
       CustomEvent_SetActivator(this);
@@ -160,6 +172,24 @@ public HamHook_Player_PostThink_Post(const pPlayer) {
   }
 
   return FM_NULLENT;
+}
+
+@Player_SetHoveredItem(const &this, const &pEntity) {
+  if (g_rgpPlayerHoveredItem[this] == pEntity) return;
+
+  g_rgpPlayerHoveredItem[this] = pEntity;
+  g_rgiPlayerHoverBits |= BIT(this);
+
+  UpdateHooks();
+}
+
+@Player_ClearHoveredItem(const &this) {
+  if (g_rgpPlayerHoveredItem[this] == FM_NULLENT) return;
+
+  g_rgpPlayerHoveredItem[this] = FM_NULLENT;
+  g_rgiPlayerHoverBits &= ~BIT(this);
+
+  UpdateHooks();
 }
 
 /*--------------------------------[ Entity Methods ]--------------------------------*/
@@ -186,4 +216,23 @@ bool:@Entity_IsUsableItem(const &this, const &pPlayer) {
   if (equal(szClassname, "item_", 5)) return ZP_GameRules_CanPickupItem(this, pPlayer);
 
   return false;
+}
+
+/*--------------------------------[ Functions ]--------------------------------*/
+
+UpdateHooks() {
+  if (g_rgiPlayerHoverBits) {
+    if (!g_pfwfmAddToFullPack) {
+      g_pfwfmAddToFullPack = register_forward(FM_AddToFullPack, "FMHook_AddToFullPack_Post", 1);
+    }
+
+    EnableHamForward(g_pfwhamPostThinkPost);
+  } else {
+    if (g_pfwfmAddToFullPack) {
+      unregister_forward(FM_AddToFullPack, g_pfwfmAddToFullPack, 1);
+      g_pfwfmAddToFullPack = 0;
+    }
+
+    DisableHamForward(g_pfwhamPostThinkPost);
+  }
 }

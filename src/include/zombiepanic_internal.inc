@@ -10,6 +10,10 @@
 
 #define IS_PLAYER(%1) (%1 >= 1 && %1 <= MaxClients)
 
+#if !defined BIT
+  #define BIT(%1) (1 << (%1))
+#endif
+
 /*--------------------------------[ Entities ]--------------------------------*/
 
 // #define WEAPONBOX_ENTITY "weaponbox"
