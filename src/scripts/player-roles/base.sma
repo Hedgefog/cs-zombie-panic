@@ -97,8 +97,6 @@ public plugin_init() {
 
   CW_RegisterClassNativeMethodHook(WEAPON(Base), CW_Method_PrimaryAttack, "CWHook_Weapon_Attack_Post", true);
   CW_RegisterClassNativeMethodHook(WEAPON(Base), CW_Method_SecondaryAttack, "CWHook_Weapon_Attack_Post", true);
-  CW_RegisterClassNativeMethodHook(WEAPON(Grenade), CW_Method_PrimaryAttack, "CWHook_Weapon_Attack_Post", true);
-  CW_RegisterClassNativeMethodHook(WEAPON(Grenade), CW_Method_SecondaryAttack, "CWHook_Weapon_Attack_Post", true);
 
   CE_RegisterClassNativeMethodHook(ENTITY(Button), CE_Method_Use, "CEHook_Button_Use_Post", true);
 
