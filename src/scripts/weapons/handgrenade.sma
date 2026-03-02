@@ -65,6 +65,7 @@ public plugin_init() {
   CW_SetMember(this, CW_Member_iSlot, 3);
   CW_SetMember(this, CW_Member_iPosition, 0);
   CW_SetMemberString(this, CW_Member_szIcon, "handgrenade");
+  CW_SetMember(this, Weapon_BaseThrowable_Member_bThrowOnHolster, true);
   CW_SetMemberString(this, WEAPON_BASE_MEMBER(szBounceSound), g_rgszBounceSounds[random(g_iBounceSoundsNum)]);
 }
 
@@ -76,15 +77,10 @@ public plugin_init() {
 
 @Weapon_Holster(const this) {
   static pPlayer; pPlayer = get_ent_data_entity(this, "CBasePlayerItem", "m_pPlayer");
-  static Float:flStartThrow; flStartThrow = CW_GetMember(this, BASEGRENADE_MEMBER(flStartThrow));
 
-  if (!is_user_connected(pPlayer)) return;
-
-  if (flStartThrow) {
-    CW_CallMethod(this, BASEGRENADE_METHOD(Throw));
+  if (is_user_connected(pPlayer)) {
+    emit_sound(pPlayer, CHAN_WEAPON, "common/null.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
   }
-
-  emit_sound(pPlayer, CHAN_WEAPON, "common/null.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
   CW_CallBaseMethod();
 }
