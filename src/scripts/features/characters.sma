@@ -78,7 +78,7 @@ public plugin_precache() {
 public plugin_init() {
   register_plugin(PLUGIN_NAME("Characters"), ZP_VERSION, "Hedgehog Fog");
 
-  CW_RegisterClassMethodHook(WEAPON(Swipe), CW_Method_Deploy, "CWHook_Swipe_Deploy_Post", true);
+  CW_RegisterClassNativeMethodHook(WEAPON(Swipe), CW_Method_Deploy, "CWHook_Swipe_Deploy_Post", true);
 
   g_pfwPlayerCharacterUpdated = CreateMultiForward("ZP_Characters_OnPlayerCharacterUpdated", ET_IGNORE, FP_CELL);
   g_pfwPlayerModelUpdated = CreateMultiForward("ZP_Characters_OnPlayerModelUpdated", ET_IGNORE, FP_CELL);
