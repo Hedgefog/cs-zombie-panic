@@ -224,6 +224,6 @@ public plugin_end() {
       message_end();
     }
 
-    Asset_EmitSound(this, CHAN_BODY, ASSET_LIBRARY, ASSET_SOUND(SatchelChargeBlip), .flVolume = VOL_NORM * 0.05, .flAttenuation = ATTN_IDLE);
+    Asset_EmitSound(this, CHAN_BODY, ASSET_LIBRARY, ASSET_SOUND(SatchelChargeBlip), .flVolume = VOL_NORM * 0.1, .flAttenuation = ATTN_IDLE);
   }
 }
