@@ -6,7 +6,7 @@
 #include <weapon_base_throwable_const>
 
 #define ZP_TITLE "Zombie Panic"
-#define ZP_VERSION "1.6.0"
+#define ZP_VERSION "1.5.0"
 
 /*--------------------------------[ Constants ]--------------------------------*/
 
