@@ -20,7 +20,7 @@ ZP_ITEM_PICKUP = Pickup item
 ZP_WARN_INFECTION_TITLE = Infection
 ZP_WARN_INFECTOR = You've infected player "%n"
 
-[ua]
+[uk]
 ZP_HINT_TITLE = Порада
 ZP_HINT_PANIC = Паніка може допомогти вам втекти від зомбі^nНатисніть <O> для активації
 ZP_HINT_DROP_AMMO = Ви можете викинути патрони натиснувши <X>^nНатисніть <Z> для вибору типу патронів
