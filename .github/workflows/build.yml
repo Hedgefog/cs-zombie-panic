@@ -16,7 +16,7 @@
         - name: Install Node.js
           uses: actions/setup-node@v1
           with:
-            node-version: 14
+            node-version: 16
         - name: Install Dependencies
           run: npm install
         - name: Build project
