@@ -6,9 +6,7 @@
     "build": "amxxpack build",
     "watch": "amxxpack build --watch",
     "postinstall": "amxxpack install",
-    "pack": "gulp",
-    "update-version": "node ./scripts/update-version.js",
-    "update-config": "node ./scripts/update-config.js"
+    "pack": "gulp"
   },
   "author": "Hedgehog Fog",
   "license": "MIT",
