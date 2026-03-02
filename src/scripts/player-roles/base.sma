@@ -95,10 +95,10 @@ public plugin_init() {
   RegisterHamPlayer(Ham_PainSound, "HamHook_Player_PainSound_Post", .Post = 1);
   RegisterHamPlayer(Ham_Killed, "HamHook_Player_Killed_Post", .Post = 1);
 
-  CW_RegisterClassMethodHook(WEAPON(Base), CW_Method_PrimaryAttack, "CWHook_Weapon_Attack_Post", true);
-  CW_RegisterClassMethodHook(WEAPON(Base), CW_Method_SecondaryAttack, "CWHook_Weapon_Attack_Post", true);
-  CW_RegisterClassMethodHook(WEAPON(Grenade), CW_Method_PrimaryAttack, "CWHook_Weapon_Attack_Post", true);
-  CW_RegisterClassMethodHook(WEAPON(Grenade), CW_Method_SecondaryAttack, "CWHook_Weapon_Attack_Post", true);
+  CW_RegisterClassNativeMethodHook(WEAPON(Base), CW_Method_PrimaryAttack, "CWHook_Weapon_Attack_Post", true);
+  CW_RegisterClassNativeMethodHook(WEAPON(Base), CW_Method_SecondaryAttack, "CWHook_Weapon_Attack_Post", true);
+  CW_RegisterClassNativeMethodHook(WEAPON(Grenade), CW_Method_PrimaryAttack, "CWHook_Weapon_Attack_Post", true);
+  CW_RegisterClassNativeMethodHook(WEAPON(Grenade), CW_Method_SecondaryAttack, "CWHook_Weapon_Attack_Post", true);
 
   CE_RegisterClassNativeMethodHook(ENTITY(Button), CE_Method_Use, "CEHook_Button_Use_Post", true);
 

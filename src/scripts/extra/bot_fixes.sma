@@ -72,10 +72,10 @@ public plugin_init() {
 
   CE_RegisterClassNativeMethodHook(ENTITY(WeaponBox), CE_Method_Touch, "CEHook_WeaponBox_Touch");
 
-  CW_RegisterClassMethodHook(WEAPON(Base), CW_Method_Deploy, "CWHook_Weapon_Deploy_Post", true);
-  CW_RegisterClassMethodHook(WEAPON(Base), CW_Method_Holster, "CWHook_Base_Holster");
-  CW_RegisterClassMethodHook(WEAPON(Crowbar), CW_Method_SecondaryAttack, "CWHook_Melee_SecondaryAttack_Post", true);
-  CW_RegisterClassMethodHook(WEAPON(Swipe), CW_Method_SecondaryAttack, "CWHook_Melee_SecondaryAttack_Post", true);
+  CW_RegisterClassNativeMethodHook(WEAPON(Base), CW_Method_Deploy, "CWHook_Weapon_Deploy_Post", true);
+  CW_RegisterClassNativeMethodHook(WEAPON(Base), CW_Method_Holster, "CWHook_Base_Holster");
+  CW_RegisterClassNativeMethodHook(WEAPON(Crowbar), CW_Method_SecondaryAttack, "CWHook_Melee_SecondaryAttack_Post", true);
+  CW_RegisterClassNativeMethodHook(WEAPON(Swipe), CW_Method_SecondaryAttack, "CWHook_Melee_SecondaryAttack_Post", true);
 }
 
 public plugin_end() {
