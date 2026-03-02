@@ -65,7 +65,7 @@ public plugin_init() {
   CW_SetMemberString(this, CW_Member_szIcon, "m3");
   CW_SetMember(this, CW_Member_iWeight, 20);
 
-  CW_SetMember(this, ZP_Weapon_Base_Member_flWeight, Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flShotgunWeight)));
+  CW_SetMember(this, WEAPON_BASE_MEMBER(flWeight), Asset_GetFloat(ASSET_LIBRARY, ASSET_VARIABLE(flShotgunWeight)));
 }
 
 @Weapon_Deploy(const this) {

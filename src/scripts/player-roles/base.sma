@@ -332,7 +332,7 @@ Float:@Role_UpdateInventoryWeight(const pPlayer) {
 
     while (pWeapon != FM_NULLENT) {
       if (CW_IsInstanceOf(pWeapon, WEAPON(Base)) || CW_IsInstanceOf(pWeapon, WEAPON(Grenade))) {
-        flWeight += Float:CW_GetMember(pWeapon, ZP_Weapon_Base_Member_flWeight);
+        flWeight += Float:CW_GetMember(pWeapon, WEAPON_BASE_MEMBER(flWeight));
 
         static szAmmo[CW_MAX_AMMO_NAME_LENGTH]; CW_GetMemberString(pWeapon, CW_Member_szPrimaryAmmo, szAmmo, charsmax(szAmmo));
         if (!equal(szAmmo, NULL_STRING) && CW_Ammo_IsRegistered(szAmmo)) {

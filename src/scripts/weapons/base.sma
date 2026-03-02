@@ -66,7 +66,7 @@ public Command_Unload(const pPlayer) {
 
   CW_SetMember(this, CW_Member_iFlags, ITEM_FLAG_NOAUTORELOAD);
 
-  CW_SetMember(this, ZP_Weapon_Base_Member_flWeight, 0.0);
+  CW_SetMember(this, WEAPON_BASE_MEMBER(flWeight), 0.0);
 }
 
 @Weapon_Idle(const this) {
