@@ -489,7 +489,7 @@ public HC_Player_SpawnEquip(const pPlayer) {
   set_ent_data(pPlayer, "CBasePlayer", "m_iKevlar", 0);
 
   if (g_bGameInProgress) {
-    PlayerRole_Player_CallMethod(pPlayer, PLAYER_ROLE(Base), "Equip");
+    PlayerRole_Player_CallMethod(pPlayer, PLAYER_ROLE(Base), BASE_ROLE_METHOD(Equip));
   }
 
   /*

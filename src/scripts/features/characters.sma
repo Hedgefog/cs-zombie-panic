@@ -33,8 +33,8 @@ enum CharacterModel {
 
 /*--------------------------------[ Forward Pointers ]--------------------------------*/
 
-new g_pFwPlayerCharacterUpdated;
-new g_pFwPlayerModelUpdated;
+new g_pfwPlayerCharacterUpdated;
+new g_pfwPlayerModelUpdated;
 
 /*--------------------------------[ Sound Data ]--------------------------------*/
 
@@ -80,8 +80,8 @@ public plugin_init() {
 
   CW_RegisterClassMethodHook(WEAPON(Swipe), CW_Method_Deploy, "CWHook_Swipe_Deploy_Post", true);
 
-  g_pFwPlayerCharacterUpdated = CreateMultiForward("ZP_Characters_OnPlayerCharacterUpdated", ET_IGNORE, FP_CELL);
-  g_pFwPlayerModelUpdated = CreateMultiForward("ZP_Characters_OnPlayerModelUpdated", ET_IGNORE, FP_CELL);
+  g_pfwPlayerCharacterUpdated = CreateMultiForward("ZP_Characters_OnPlayerCharacterUpdated", ET_IGNORE, FP_CELL);
+  g_pfwPlayerModelUpdated = CreateMultiForward("ZP_Characters_OnPlayerModelUpdated", ET_IGNORE, FP_CELL);
 
   CustomEvent_Subscribe(BASE_ROLE_EVENT(UpdateModel), "EventSubscriber_UpdateModel");
   CustomEvent_Subscribe(BASE_ROLE_EVENT(PlaySound), "EventSubscriber_PlaySound");
@@ -195,7 +195,7 @@ bool:@Player_SetCharacter(const &this, const szCharacter[]) {
 
   set_pev(this, pev_body, g_rgrgiCharacterBodyIndex[iId]);
 
-  ExecuteForward(g_pFwPlayerModelUpdated, _, this);
+  ExecuteForward(g_pfwPlayerModelUpdated, _, this);
 }
 
 @Player_UpdateCharacter(const &this, bool:bOverride) {
@@ -221,7 +221,7 @@ bool:@Player_SetCharacter(const &this, const szCharacter[]) {
   }
 
   g_rgiPlayerCharacter[this] = iId;
-  ExecuteForward(g_pFwPlayerCharacterUpdated, _, this);
+  ExecuteForward(g_pfwPlayerCharacterUpdated, _, this);
 }
 
 /*--------------------------------[ Functions ]--------------------------------*/

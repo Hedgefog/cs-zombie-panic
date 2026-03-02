@@ -26,7 +26,7 @@ new g_szWorldModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szRadioViewModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szRadioPlayerModel[MAX_RESOURCE_PATH_LENGTH];
 new g_szRadioWorldModel[MAX_RESOURCE_PATH_LENGTH];
-new g_szBounceSounds[4][MAX_RESOURCE_PATH_LENGTH];
+new g_rgszBounceSounds[4][MAX_RESOURCE_PATH_LENGTH];
 
 new g_iBounceSoundsNum = 0;
 
@@ -52,7 +52,7 @@ public plugin_precache() {
   Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(SatchelRadioBlip));
   Asset_Precache(ASSET_LIBRARY, ASSET_SOUND(SatchelRadioPress));
 
-  g_iBounceSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(GrenadeBounce), g_szBounceSounds, sizeof(g_szBounceSounds), charsmax(g_szBounceSounds[]));
+  g_iBounceSoundsNum = Asset_PrecacheList(ASSET_LIBRARY, ASSET_SOUND(GrenadeBounce), g_rgszBounceSounds, sizeof(g_rgszBounceSounds), charsmax(g_rgszBounceSounds[]));
 
   CW_RegisterClass(WEAPON_NAME, WEAPON(Base));
   CW_ImplementClassMethod(WEAPON_NAME, CW_Method_Create, "@Weapon_Create");
@@ -116,7 +116,7 @@ public plugin_end() {
   CW_SetMember(this, CW_Member_iWeight, 123);
 
   CW_SetMember(this, WEAPON_BASE_MEMBER(flWeight), 0.0);
-  CW_SetMemberString(this, WEAPON_BASE_MEMBER(szBounceSound), g_szBounceSounds[random(g_iBounceSoundsNum)]);
+  CW_SetMemberString(this, WEAPON_BASE_MEMBER(szBounceSound), g_rgszBounceSounds[random(g_iBounceSoundsNum)]);
 
   CW_SetMember(this, MEMBER(bUseRemote), false);
 }
@@ -347,7 +347,7 @@ bool:@Weapon_ShouldUseRemote(const this) {
   #if defined ZP_DROPPABLE_SATCHELS
     CW_SetMemberString(this, WEAPON_BASE_MEMBER(szBounceSound), NULL_STRING);
   #else
-    CW_SetMemberString(this, WEAPON_BASE_MEMBER(szBounceSound), g_szBounceSounds[random(g_iBounceSoundsNum)]);
+    CW_SetMemberString(this, WEAPON_BASE_MEMBER(szBounceSound), g_rgszBounceSounds[random(g_iBounceSoundsNum)]);
   #endif
 
   return true;

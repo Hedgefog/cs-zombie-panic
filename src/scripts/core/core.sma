@@ -13,7 +13,7 @@
 
 /*--------------------------------[ Forward Pointers ]--------------------------------*/
 
-new g_pFwConfigLoaded;
+new g_pfwConfigLoaded;
 
 /*--------------------------------[ Plugin Initialization ]--------------------------------*/
 
@@ -79,7 +79,7 @@ public plugin_init() {
   register_clcmd("buyequip", "Command_Panic");
   register_clcmd("nightvision", "Command_Unload");
 
-  g_pFwConfigLoaded = CreateMultiForward("ZP_OnConfigLoaded", ET_IGNORE);
+  g_pfwConfigLoaded = CreateMultiForward("ZP_OnConfigLoaded", ET_IGNORE);
 }
 
 public plugin_cfg() {
@@ -90,7 +90,7 @@ public plugin_cfg() {
   server_cmd("exec %s/zombiepanic/%s.cfg", szConfigDir, szMapName);
   server_exec();
 
-  ExecuteForward(g_pFwConfigLoaded);
+  ExecuteForward(g_pfwConfigLoaded);
 }
 
 public plugin_natives() {

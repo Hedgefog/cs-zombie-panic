@@ -80,7 +80,6 @@ public CvarHook_Enabled(pCvar, const szOldValue[], const szNewValue[]) {
   PlayerMusic_Player_PlayTrack(pPlayer, g_rgiTracks[random(g_iTracksNum)], g_flMusicDelay);
 }
 
-
 /*--------------------------------[ Functions ]--------------------------------*/
 
 LoadTracks() {
