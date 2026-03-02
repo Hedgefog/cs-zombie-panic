@@ -1,6 +1,6 @@
 {
   "name": "zombiepanic",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "CS Zombie Panic",
   "scripts": {
     "build": "amxxpack build",

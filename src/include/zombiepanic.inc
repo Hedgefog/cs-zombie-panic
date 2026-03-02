@@ -1,4 +1,8 @@
 /*
+    1.5.1
+        Fixes:
+            Fixed grenade throw on holster
+
     1.5.0
         Common:
             Refactored the entire codebase using AMXX Modding Kit
