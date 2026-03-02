@@ -16,7 +16,6 @@
         "filter": [
           "util/**",
           "weapons/**",
-          "entities/**",
           "api/assets/**",
           "api/custom-weapons/**",
           "api/player-roles/**",
@@ -46,7 +45,6 @@
     "./.thirdparty/amxx-modding-kit/api/states/include",
     "./.thirdparty/amxx-modding-kit/api/player-music/include",
     "./.thirdparty/amxx-modding-kit/api/entity-force/include",
-    "./.thirdparty/amxx-modding-kit/entities/include",
     "./.thirdparty/amxx-modding-kit/weapons/include",
     "./.thirdparty/amxx-modding-kit/util"
   ],
