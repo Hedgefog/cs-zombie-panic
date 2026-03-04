@@ -250,9 +250,6 @@ stock const ZP_Entity_Train_Member_flSpeed[] = "flSpeed";
 
 stock const ZP_Entity_AmbientGeneric_Member_bStartSilent[] = "bStartSilent";
 
-stock const ZP_Entity_Button_Member_pfnUse[] = "pfnUse";
-stock const ZP_Entity_Button_Member_pfnThink[] = "pfnThink";
-
 /*--------------------------------[ Weapons ]--------------------------------*/
 
 stock const ZP_Weapon_Base[] = "zombiepanic/v100/weapon_base";
