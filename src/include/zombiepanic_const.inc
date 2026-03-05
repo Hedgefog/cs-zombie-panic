@@ -6,7 +6,7 @@
 #include <weapon_base_throwable_const>
 
 #define ZP_TITLE "Zombie Panic"
-#define ZP_VERSION "1.5.1"
+#define ZP_VERSION "1.5.2"
 
 /*--------------------------------[ Constants ]--------------------------------*/
 
@@ -249,9 +249,6 @@ stock const ZP_Entity_Train_Member_szFirstTarget[] = "szFirstTarget";
 stock const ZP_Entity_Train_Member_flSpeed[] = "flSpeed";
 
 stock const ZP_Entity_AmbientGeneric_Member_bStartSilent[] = "bStartSilent";
-
-stock const ZP_Entity_Button_Member_pfnUse[] = "pfnUse";
-stock const ZP_Entity_Button_Member_pfnThink[] = "pfnThink";
 
 /*--------------------------------[ Weapons ]--------------------------------*/
 

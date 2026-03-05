@@ -11,14 +11,14 @@
 
 public plugin_precache() {
   CE_RegisterClass(ENTITY(PlayerSpawner));
-  CE_ImplementClassMethod(ENTITY(PlayerSpawner), CE_Method_Create, "@PlayerSpawner_Allocate");
+  CE_ImplementClassMethod(ENTITY(PlayerSpawner), CE_Method_Create, "@PlayerSpawner_Create");
   CE_ImplementClassMethod(ENTITY(PlayerSpawner), CE_Method_Spawn, "@PlayerSpawner_Spawn");
 
   CE_RegisterClass(ENTITY(SurvivorSpawner), ENTITY(PlayerSpawner));
-  CE_ImplementClassMethod(ENTITY(SurvivorSpawner), CE_Method_Create, "@SurvivorSpawner_Allocate");
+  CE_ImplementClassMethod(ENTITY(SurvivorSpawner), CE_Method_Create, "@SurvivorSpawner_Create");
 
   CE_RegisterClass(ENTITY(ZombieSpawner), ENTITY(PlayerSpawner));
-  CE_ImplementClassMethod(ENTITY(ZombieSpawner), CE_Method_Create, "@ZombieSpawner_Allocate");
+  CE_ImplementClassMethod(ENTITY(ZombieSpawner), CE_Method_Create, "@ZombieSpawner_Create");
 }
 
 public plugin_init() {
@@ -27,7 +27,7 @@ public plugin_init() {
 
 /*--------------------------------[ Methods ]--------------------------------*/
 
-@PlayerSpawner_Allocate(const this) {
+@PlayerSpawner_Create(const this) {
   CE_CallBaseMethod();
 
   CE_SetMember(this, PLAYERSPAWNER_MEMBER(iTeam), 0);
@@ -60,12 +60,12 @@ public plugin_init() {
   dllfunc(DLLFunc_Think, this);
 }
 
-@SurvivorSpawner_Allocate(const this) {
+@SurvivorSpawner_Create(const this) {
   CE_CallBaseMethod();
   CE_SetMember(this, PLAYERSPAWNER_MEMBER(iTeam), TEAM(Survivors));
 }
 
-@ZombieSpawner_Allocate(const this) {
+@ZombieSpawner_Create(const this) {
   CE_CallBaseMethod();
   CE_SetMember(this, PLAYERSPAWNER_MEMBER(iTeam), TEAM(Zombies));
 }

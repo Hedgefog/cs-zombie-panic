@@ -1,4 +1,8 @@
 /*
+    1.5.2
+        Fixes:
+            Fixed grenade throw direction
+
     1.5.1
         Fixes:
             Fixed grenade throw on holster
