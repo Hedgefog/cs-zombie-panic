@@ -11,7 +11,7 @@
       },
       {
         "name": "amxx-modding-kit",
-        "url": "https://github.com/Hedgefog/amxx-modding-kit/archive/refs/tags/1.0.0.zip",
+        "url": "https://github.com/Hedgefog/amxx-modding-kit/archive/refs/tags/1.0.2.zip",
         "strip": 1,
         "filter": [
           "util/**",
